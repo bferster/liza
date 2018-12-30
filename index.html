@@ -13,6 +13,8 @@
 		 body { 			font-family:Verdana,Geneva,sans-serif;font-size:13px; box-sizing:border-box; 
 							padding:0;margin:0; 
 							}
+		.lz-splash { 		width:100%; color:#999; text-align:center; margin-top:10%;  display:none;
+							}
 		.lz-main { 			position:absolute; top:0; width:100%; height:100%; background-color: #ddd; display:none;
 							}
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
@@ -38,6 +40,10 @@
 	<div id="mainDiv" class="lz-main">
 	Hello from LIZA
 	</div>
+	<div id="splashDiv" class="lz-splash">
+		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br><br>
+		<br><p style="color:#000;font-size:14px"><em>A tool for engaging people in highly affective script-driven discourse<br>for learning and practicing goal-directed behaviors.</em></p>
+	</div>
 
 <script>
 
@@ -57,9 +63,9 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	var url=window.location.search.substring(1);						   	// Get query string
 	app=new App(url);                                                      	// Alloc app
 	isMobile=navigator.userAgent.match(/(ipad|iphone|ipod|android)/i) ? true : false; // Set mobile flag
-	if ((window.location.host != "localhost") && (url != "preview")) {		// Not in debug or preview
-		$("#splashDiv").fadeIn().delay(2000).fadeOut();						// Fade out splash
-		$("#mainDiv").delay(2000).fadeIn(2000);								// Wait, and fade in main
+	if ((window.location.host != "loocalhost") && (url != "preview")) {		// Not in debug or preview
+		$("#splashDiv").fadeIn().delay(4000).fadeOut();						// Fade out splash
+		$("#mainDiv").delay(4000).fadeIn(2000);								// Wait, and fade in main
 		}	
 	else																	// Debug
 		$("#mainDiv").fadeIn(0);											// Load fast
