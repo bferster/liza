@@ -1,7 +1,8 @@
 # L I Z A - Live Interactive Visualization Agent
 
-This tool is implelemented in Javascript 
+A tool for engaging people in highly affective script-driven discourse towards learning and/or practicing goal-directed behaviors.
 
+This tool is implelemented in Javascript 
 
 ### Dependencies 
 
