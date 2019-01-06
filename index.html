@@ -8,6 +8,11 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link   rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>	
+	<script src="lib/wgl/three.min.js"></script>
+	<script src="lib/wgl/OBJLoader.js"></script>
+	<script src="lib/wgl/OrbitControls.js"></script>
+
+	
 	<script src="lib/jquery.ui.touch-punch.min.js"></script>
 	<style>
 		 body { 			font-family:Verdana,Geneva,sans-serif;font-size:13px; box-sizing:border-box; 
@@ -40,7 +45,6 @@
 <body>
 	
 	<div id="mainDiv" class="lz-main">
-		<iframe class='lz-about' src="https://docs.google.com/document/d/e/2PACX-1vRTZ4ZlvTXRmgy-zHNOkt2FB0lnU8K36NDDidYkou7h3ZBrj99R6rLYVFk6B2qDO0RuVE7oiBSy9d3h/pub?embedded=true"></iframe>	
 		</div>
 	<div id="splashDiv" class="lz-splash">
 		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br><br>
@@ -48,6 +52,155 @@
 	</div>
 
 <script>
+
+			var camera, scene, renderer, controls;
+			var mouseX = 0, mouseY = 0;
+			var floor="wood.jpg"; 
+			var frontWall="", backWall="";
+			var leftWall="", rightWall="";
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+			var object;
+
+			var yOff=-100;
+
+
+			InitWGL();
+			animate();
+
+	function InitWGL() 
+	{
+		var container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+		camera.position.z = 250;
+		scene = new THREE.Scene();
+		var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+		scene.add( ambientLight );
+		var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+		camera.add( pointLight );
+		scene.add( camera );
+
+		clock=new THREE.Clock();													// Reset clock
+		controls=new THREE.OrbitControls(camera);
+		controls.damping = 0.2;
+
+		if (floor) {
+			var tex=THREE.ImageUtils.loadTexture(floor);
+			tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+			tex.repeat.set(4,4);
+			var mat=new THREE.MeshPhongMaterial({ map:tex });
+			var cbg=new THREE.PlaneGeometry(1024,1024,1,1);
+			var mesh=new THREE.Mesh(cbg,mat);
+			mesh.rotation.x=-Math.PI/2;
+			mesh.position.y=yOff;
+			scene.add(mesh);			
+			}
+
+
+
+		function loadModel() {
+			object.traverse( function ( child ) {
+				if ( child.isMesh ) child.material.map = texture;
+				});
+			object.position.y = - 95;
+			object.scale.x=object.scale.y=object.scale.z=20
+			scene.add( object );
+		}
+
+		var manager = new THREE.LoadingManager( loadModel );
+		manager.onProgress = function ( item, loaded, total ) {
+			console.log( item, loaded, total );
+			};
+
+		var textureLoader = new THREE.TextureLoader( manager );
+		var texture = textureLoader.load( 'lib/wgl/map.jpg' );
+
+		function onProgress( xhr ) {
+			if ( xhr.lengthComputable ) {
+				var percentComplete = xhr.loaded / xhr.total * 100;
+				console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
+				}
+			}
+		
+		var loader=null;
+		var modSrc="lib/wgl/male02.obj";
+		modSrc="desk.json"
+
+		if (modSrc.match(/json/i))	loader=new THREE.ObjectLoader(manager);			// If JSON model format
+		if (modSrc.match(/obj/i))	loader=new THREE.OBJLoader(manager);			// If OBJ
+		loader.load(modSrc, (obj)=> { object=obj; }, onProgress, onError );			// Load
+		renderer=new THREE.WebGLRenderer();											// Init renderer
+		renderer.setPixelRatio(window.devicePixelRatio);							// Set ratio
+		onWindowResize();															// Resize window
+		container.appendChild(renderer.domElement);									// Add to div
+		window.addEventListener("resize", onWindowResize, false);					// Add resize listener
+	}
+
+	function onError(err) 														// SHOW ERROR
+	{ 
+		console.log(err) 
+	}
+		
+	function onWindowResize() 													// ON WINDOW RESIZE
+	{
+		camera.aspect=window.innerWidth/window.innerHeight;							// Set apsect
+		camera.updateProjectionMatrix();											// Reset matrix
+		renderer.setSize(window.innerWidth,window.innerHeight-3);					// Reset render size
+	}
+
+	function animate() {														// ANIMATE LOOP
+		var delta=clock.getDelta()
+		controls.update(delta);														// Update control time
+		requestAnimationFrame(animate);												// Set timer
+		renderer.render(scene,camera);												// Render
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN 

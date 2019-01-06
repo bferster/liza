@@ -8,11 +8,8 @@
 <body>
  	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>	
 	<script src="lib/wgl/three.min.js"></script>
-	<script src="lib/wgl/loaders/OBJLoader.js"></script>
-	<script src="lib/wgl/loaders/ColladaLoader.js"></script>
-	<script src="lib/wgl/controls/OrbitControls.js"></script>
-	<script src="lib/wgl/controls/TrackballControls.js"></script>
-	<script src="lib/wgl/controls/FirstPersonControls.js"></script>
+	<script src="lib/wgl/OBJLoader.js"></script>
+	<script src="lib/wgl/OrbitControls.js"></script>
 	<script src="lib/wgl/Detector.js"></script>
 <style type="text/css">
 	body { font-family:Verdana,Geneva,sans-serif; font-size:xx-small;margin:0px;padding:0px }
@@ -20,8 +17,7 @@
 		
 <script>
 
-	var modelSrc="testboxes.json";
-	
+	var modelSrc="lib/wgl/male02.obj";
 //	modelSrc="/lib/wgl/avatar.dae"
 	var modelScale=1;															// Size of model
 	var keyScale=1;																// Scale of keyframe animation
@@ -105,23 +101,7 @@
 				qe.SendMessage("ready","");									// Send ready message
 				});
 			}
-		else if (modelSrc.match(/\.json/i)) {								// IMPORT 3JS JSON MODEL 
-			var loader = new THREE.JSONLoader();
-			ambientLight="#cccccc";
-			spotLight="#666666";
-			loader.load(modelSrc,function(geometry, materials) {
-				materials[0].skinner=true;
-				var set=new THREE.SkinnedMesh(geometry,new THREE.MeshFaceMaterial(materials));
-				set.positionset(0,0,0)
-				set.scale(1,1,1)
-				set.castShadow=true;
-				scene.add(set)
-				help=new Three.SkeletonHelper(set);
-				scene.add(help);
-				qe.SendMessage("ready","");										// Send ready message
-				});
-			}
-		else if (modelSrc.match(/\.dae/i)) {								// IMPORT COLLADA DAE MODEL 
+		else if (modelSrc.match(/\.dae/i)) {								// IMPORT COLLADA DAE MODELS 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis=true;
 			ambientLight="#cccccc";
