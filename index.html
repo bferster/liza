@@ -123,6 +123,27 @@ class Scene {
 			}
 		}
 
+	AddWalls()																				// ADD WALLS TO SCENE
+	{
+		var urls=['lib/wgl/px.jpg','lib/wgl/nx.jpg','lib/wgl/py.jpg','lib/wgl/ny.jpg','lib/wgl/pz.jpg','lib/wgl/nz.jpg'];
+		var reflectionCube = THREE.ImageUtils.loadTextureCube(urls);
+		reflectionCube.format = THREE.RGBFormat;
+		var refractionCube = new THREE.CubeTexture( reflectionCube.image, THREE.CubeRefractionMapping );
+		refractionCube.format = THREE.RGBFormat;
+		var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+		var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
+		var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } )
+		var shader = THREE.ShaderLib[ "cube" ];
+		shader.uniforms[ "tCube" ].value=reflectionCube;
+		var material = new THREE.ShaderMaterial( {
+			fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader,
+			uniforms: shader.uniforms, depthWrite: false, side: THREE.BackSide
+			}),
+		mesh=new THREE.Mesh( new THREE.BoxGeometry( 800, 800, 800 ), material );
+		mesh.position.y;
+		this.scene.add(mesh);
+	}
+
 	AddModel(src, x, z, y, scale, rot)															// ADD MODEL TO SCENE
 	{
 		var loader;
