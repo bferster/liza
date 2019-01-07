@@ -76,13 +76,21 @@ class Scene {
 		this.manager=new THREE.LoadingManager();													// Loading manager
 		this.manager.onProgress=function(item, loaded, total ) { console.log(item,loaded,total); };	// Show progress
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
-		this.scene.add(new THREE.AmbientLight(0xcccccc, 0.4));										// Add ambient light
 		this.AddCamera(0,200,500,.4);																// Add camera
 		this.renderer=new THREE.WebGLRenderer();													// Init renderer
 		this.renderer.setPixelRatio(window.devicePixelRatio);										// Set ratio
+		this.AddLights();																			// Add lights
 		this.Resize();																				// Resize 3D space
 		this.container.appendChild(this.renderer.domElement);										// Add to div
 		this.AddRoom();																				// Add room walls
+	}
+
+	AddLights()																					// ADD LIGHTS
+	{
+		var directionalLight=new THREE.DirectionalLight("#333333");									// Made directional light
+		directionalLight.position.set(0,0,1);														// Set angle
+		this.scene.add(directionalLight);															// Add directioal light
+		this.scene.add(new THREE.AmbientLight(0xcccccc, 0.8));										// Add ambient light
 	}
 
 	Resize()																					// RESIZE 3D SPACE
@@ -96,8 +104,6 @@ class Scene {
 	{
 		this.camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,2000);	// Add 45 degree POV
 		this.camera.position.x=x;	this.camera.position.y=y;	this.camera.position.z=z;			// Camera position
-		var pointLight=new THREE.PointLight(0xffffff,light);										// Camera light
-		this.camera.add(pointLight);																// Add light to camera
 		this.scene.add(this.camera);																// Add camera to scene
 		this.controls=new THREE.OrbitControls(this.camera);											// Add orbiter control
 		this.controls.damping=0.2;																	// Set dampening
@@ -117,12 +123,6 @@ class Scene {
 			}
 		}
 
-	AddModels(models)
-	{
-	}
-		
-	
-	
 	AddModel(src, x, z, y, scale, rot)															// ADD MODEL TO SCENE
 	{
 		var loader;
@@ -155,10 +155,10 @@ class Scene {
 	var sc=new Scene();	
 	sc.AddModel("desk.json",-100,0,0,20,0);				
 	sc.AddModel("desk.json",0,0,0,20,0)
-	sc.AddModel("desk.json",100,0,0,20,0);				
+	sc.AddModel("desk.json",100,0,0,20,30);				
 	sc.AddModel("desk.json",-100,200,0,20,-10);				
 	sc.AddModel("desk.json",0,200,0,20,5)
-	sc.AddModel("desk.json",100,200,0,20,30);				
+	sc.AddModel("desk.json",100,200,0,20,0);				
 
 
 	animate();																				// Alloc scene	
