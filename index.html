@@ -52,108 +52,122 @@
 	</div>
 
 <script>
+	
+class Scene {
 
-			var camera, scene, renderer, controls;
-			var mouseX = 0, mouseY = 0;
-			var floor="wood.jpg"; 
-			var frontWall="", backWall="";
-			var leftWall="", rightWall="";
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-			var object;
-
-			var yOff=-100;
-
-
-			InitWGL();
-			animate();
-
-	function InitWGL() 
+	constructor()																				// CONSTRUCTOR
 	{
-		var container = document.createElement( 'div' );
-		document.body.appendChild( container );
-		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-		camera.position.z = 250;
-		scene = new THREE.Scene();
-		var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-		scene.add( ambientLight );
-		var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-		camera.add( pointLight );
-		scene.add( camera );
+		this.container=$("#mainDiv")[0];															// Div container														
+		this.camera=null;																			// Camera object
+		this.renderer=null;																			// Renderer object
+		this.scene=null;																			// Holds scene
+		this.controls=null;																			// Controls object
+		this.floor="wood.jpg";																		// Floor texture
+		this.frontWall="";																			// Wall texture
+		this.backWall="";																			// Wall texture
+		this.leftWall="";																			// Wall texture
+		this.tightWall="";																			// Wall texture
+		this.Init();																				// Init 3D system
+	}
 
-		clock=new THREE.Clock();													// Reset clock
-		controls=new THREE.OrbitControls(camera);
-		controls.damping = 0.2;
+	Init()																						// INIT 3D SYSTEM
+	{
+		this.scene=new THREE.Scene();																// Alloc new scene
+		this.manager=new THREE.LoadingManager();													// Loading manager
+		this.manager.onProgress=function(item, loaded, total ) { console.log(item,loaded,total); };	// Show progress
+		this.textureLoader=new THREE.TextureLoader();												// Texture loader
+		this.scene.add(new THREE.AmbientLight(0xcccccc, 0.4));										// Add ambient light
+		this.AddCamera(0,200,500,.4);																// Add camera
+		this.renderer=new THREE.WebGLRenderer();													// Init renderer
+		this.renderer.setPixelRatio(window.devicePixelRatio);										// Set ratio
+		this.Resize();																				// Resize 3D space
+		this.container.appendChild(this.renderer.domElement);										// Add to div
+		this.AddRoom();																				// Add room walls
+	}
 
-		if (floor) {
-			var tex=THREE.ImageUtils.loadTexture(floor);
-			tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
-			tex.repeat.set(4,4);
-			var mat=new THREE.MeshPhongMaterial({ map:tex });
-			var cbg=new THREE.PlaneGeometry(1024,1024,1,1);
-			var mesh=new THREE.Mesh(cbg,mat);
-			mesh.rotation.x=-Math.PI/2;
-			mesh.position.y=yOff;
-			scene.add(mesh);			
+	Resize()																					// RESIZE 3D SPACE
+	{
+		this.camera.aspect=window.innerWidth/window.innerHeight;									// Set aspect
+		this.camera.updateProjectionMatrix();														// Reset matrix
+		this.renderer.setSize(window.innerWidth,window.innerHeight-3);								// Reset render size
+	}
+
+	AddCamera(x, y, z, light)																	// ADD CAMERA
+	{
+		this.camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,2000);	// Add 45 degree POV
+		this.camera.position.x=x;	this.camera.position.y=y;	this.camera.position.z=z;			// Camera position
+		var pointLight=new THREE.PointLight(0xffffff,light);										// Camera light
+		this.camera.add(pointLight);																// Add light to camera
+		this.scene.add(this.camera);																// Add camera to scene
+		this.controls=new THREE.OrbitControls(this.camera);											// Add orbiter control
+		this.controls.damping=0.2;																	// Set dampening
+	}
+
+	AddRoom()																					// ADD ROOM TO SCENE
+	{	
+		if (this.floor) {																			// If a floor spec'd
+			var tex=this.textureLoader.load(this.floor);											// Load texture
+			tex.wrapS=tex.wrapT=THREE.RepeatWrapping;												// Wrap and repeat
+			tex.repeat.set(4,4);																	// 4 by 4
+			var mat=new THREE.MeshPhongMaterial({ map:tex });										// Make material
+			var cbg=new THREE.PlaneGeometry(1024,1024,1,1);											// Make grid
+			var mesh=new THREE.Mesh(cbg,mat);														// Make mesh
+			mesh.rotation.x=-Math.PI/2;																// Rotate to bottom
+			this.scene.add(mesh);																	// Add to scene		
 			}
-
-
-
-		function loadModel() {
-			object.traverse( function ( child ) {
-				if ( child.isMesh ) child.material.map = texture;
-				});
-			object.position.y = - 95;
-			object.scale.x=object.scale.y=object.scale.z=20
-			scene.add( object );
 		}
 
-		var manager = new THREE.LoadingManager( loadModel );
-		manager.onProgress = function ( item, loaded, total ) {
-			console.log( item, loaded, total );
-			};
+	AddModels(models)
+	{
+	}
+		
+	
+	
+	AddModel(src, x, z, y, scale, rot)															// ADD MODEL TO SCENE
+	{
+		var loader;
+		var _this=this;																				// Save context
+		if (src.match(/json/i))	loader=new THREE.ObjectLoader(this.manager);						// If JSON model format
+		if (src.match(/obj/i))	loader=new THREE.OBJLoader(this.manager);							// If OBJ
+		loader.load(src, (obj)=> { loadModel(obj) }, onProgress, onError );							// Load
 
-		var textureLoader = new THREE.TextureLoader( manager );
-		var texture = textureLoader.load( 'lib/wgl/map.jpg' );
-
-		function onProgress( xhr ) {
-			if ( xhr.lengthComputable ) {
-				var percentComplete = xhr.loaded / xhr.total * 100;
-				console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
+		function onProgress(xhr) {																	// On load progress event
+			if (xhr.lengthComputable ) {															// If a length
+				var percentComplete=xhr.loaded/xhr.total*100;										// Percent
+				console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded');			// Message
 				}
 			}
-		
-		var loader=null;
-		var modSrc="lib/wgl/male02.obj";
-		modSrc="desk.json"
+		function onError(err) {	console.log(err) };													// On error
 
-		if (modSrc.match(/json/i))	loader=new THREE.ObjectLoader(manager);			// If JSON model format
-		if (modSrc.match(/obj/i))	loader=new THREE.OBJLoader(manager);			// If OBJ
-		loader.load(modSrc, (obj)=> { object=obj; }, onProgress, onError );			// Load
-		renderer=new THREE.WebGLRenderer();											// Init renderer
-		renderer.setPixelRatio(window.devicePixelRatio);							// Set ratio
-		onWindowResize();															// Resize window
-		container.appendChild(renderer.domElement);									// Add to div
-		window.addEventListener("resize", onWindowResize, false);					// Add resize listener
-	}
+		function loadModel(object) {																		// On Load
+			var texture=_this.textureLoader.load("lib/wgl/map.jpg");								// Get model texture
+			object.traverse(function(child) {														// Go thru model
+				if (child.isMesh) child.material.map=texture;										// If a texture, wrap it								
+				});
+			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
+			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
+			object.rotation.y=rot*Math.PI/180;														// Rotation
+			_this.scene.add(object);																// Add model to scene
+			}
+	}																								// SCENE CLOSURE
+}  // CLASS CLOSURE
 
-	function onError(err) 														// SHOW ERROR
-	{ 
-		console.log(err) 
-	}
-		
-	function onWindowResize() 													// ON WINDOW RESIZE
-	{
-		camera.aspect=window.innerWidth/window.innerHeight;							// Set apsect
-		camera.updateProjectionMatrix();											// Reset matrix
-		renderer.setSize(window.innerWidth,window.innerHeight-3);					// Reset render size
-	}
+	var sc=new Scene();	
+	sc.AddModel("desk.json",-100,0,0,20,0);				
+	sc.AddModel("desk.json",0,0,0,20,0)
+	sc.AddModel("desk.json",100,0,0,20,0);				
+	sc.AddModel("desk.json",-100,200,0,20,-10);				
+	sc.AddModel("desk.json",0,200,0,20,5)
+	sc.AddModel("desk.json",100,200,0,20,30);				
+
+
+	animate();																				// Alloc scene	
 
 	function animate() {														// ANIMATE LOOP
-		var delta=clock.getDelta()
-		controls.update(delta);														// Update control time
+		sc.controls.update();														// Update control time
 		requestAnimationFrame(animate);												// Set timer
-		renderer.render(scene,camera);												// Render
+		sc.renderer.render(sc.scene,sc.camera);												// Render
+//		trace(sc.camera.position)
 	}
 
 
@@ -210,6 +224,7 @@ var app=null;															// Holds app
 var isMobile=false;														// Flag for mobile devices
 
 $(window).resize(function() {                                         	// ON WINDOW RESIZE
+	sc.Resize();															// Resize 3D
 	if (app && app.allowResize)												// If app loaded and allowing resizing
 		app.Draw();															// Redraw to fit screen
 	});
