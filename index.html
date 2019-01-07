@@ -79,6 +79,7 @@ class Scene {
 		this.AddCamera(0,200,500,.4);																// Add camera
 		this.renderer=new THREE.WebGLRenderer();													// Init renderer
 		this.renderer.setPixelRatio(window.devicePixelRatio);										// Set ratio
+		this.renderer.shadowMap.enabled=true;														// Support shadows
 		this.AddLights();																			// Add lights
 		this.Resize();																				// Resize 3D space
 		this.container.appendChild(this.renderer.domElement);										// Add to div
@@ -87,9 +88,10 @@ class Scene {
 
 	AddLights()																					// ADD LIGHTS
 	{
-		var directionalLight=new THREE.DirectionalLight("#333333");									// Made directional light
-		directionalLight.position.set(0,0,1);														// Set angle
-		this.scene.add(directionalLight);															// Add directioal light
+		var light=new THREE.DirectionalLight("#333333");											// Made directional light
+		light.position.set(0,0,1);																	// Set angle
+		light.castShadow=true;            															// Cast a shadow
+		this.scene.add(light);																		// Add directioal light
 		this.scene.add(new THREE.AmbientLight(0xcccccc, 0.8));										// Add ambient light
 	}
 
@@ -118,33 +120,13 @@ class Scene {
 			var mat=new THREE.MeshPhongMaterial({ map:tex });										// Make material
 			var cbg=new THREE.PlaneGeometry(1024,1024,1,1);											// Make grid
 			var mesh=new THREE.Mesh(cbg,mat);														// Make mesh
+			mesh.receiveShadow=true;																// Catch shadow
 			mesh.rotation.x=-Math.PI/2;																// Rotate to bottom
 			this.scene.add(mesh);																	// Add to scene		
 			}
-		}
-
-	AddWalls()																				// ADD WALLS TO SCENE
-	{
-		var urls=['lib/wgl/px.jpg','lib/wgl/nx.jpg','lib/wgl/py.jpg','lib/wgl/ny.jpg','lib/wgl/pz.jpg','lib/wgl/nz.jpg'];
-		var reflectionCube = THREE.ImageUtils.loadTextureCube(urls);
-		reflectionCube.format = THREE.RGBFormat;
-		var refractionCube = new THREE.CubeTexture( reflectionCube.image, THREE.CubeRefractionMapping );
-		refractionCube.format = THREE.RGBFormat;
-		var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
-		var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
-		var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } )
-		var shader = THREE.ShaderLib[ "cube" ];
-		shader.uniforms[ "tCube" ].value=reflectionCube;
-		var material = new THREE.ShaderMaterial( {
-			fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader,
-			uniforms: shader.uniforms, depthWrite: false, side: THREE.BackSide
-			}),
-		mesh=new THREE.Mesh( new THREE.BoxGeometry( 800, 800, 800 ), material );
-		mesh.position.y;
-		this.scene.add(mesh);
 	}
 
-	AddModel(src, x, z, y, scale, rot)															// ADD MODEL TO SCENE
+	AddModel(src, x, z, y, scale, rot, tex)														// ADD MODEL TO SCENE
 	{
 		var loader;
 		var _this=this;																				// Save context
@@ -152,35 +134,45 @@ class Scene {
 		if (src.match(/obj/i))	loader=new THREE.OBJLoader(this.manager);							// If OBJ
 		loader.load(src, (obj)=> { loadModel(obj) }, onProgress, onError );							// Load
 
-		function onProgress(xhr) {																	// On load progress event
+		function onProgress(xhr) {																	// ON PROGRESS
 			if (xhr.lengthComputable ) {															// If a length
 				var percentComplete=xhr.loaded/xhr.total*100;										// Percent
 				console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded');			// Message
 				}
 			}
-		function onError(err) {	console.log(err) };													// On error
+		function onError(err) {	console.log(err) };													// ON ERROR
 
-		function loadModel(object) {																		// On Load
-			var texture=_this.textureLoader.load("lib/wgl/map.jpg");								// Get model texture
-			object.traverse(function(child) {														// Go thru model
-				if (child.isMesh) child.material.map=texture;										// If a texture, wrap it								
-				});
+		function loadModel(object) {																// ON LOAD
+			if (tex == "ghost") {
+				var mat=new THREE.MeshBasicMaterial( { color: 0xaaaaaa } )
+				object.traverse(function(child) {													// Go thru model
+					if (child.isMesh) child.material=mat;											// If a mesh, wrap it								
+					});
+				}
+			else if (tex) {																			// If textured
+				var texture=_this.textureLoader.load(tex);											// Get model texture
+				object.traverse(function(child) {													// Go thru model
+					if (child.isMesh) child.material.map=texture;									// If a mesh, wrap it								
+					});
+				}
 			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
 			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
 			object.rotation.y=rot*Math.PI/180;														// Rotation
+			object.castShadow=true; 																// Cast a shadow
 			_this.scene.add(object);																// Add model to scene
 			}
 	}																								// SCENE CLOSURE
 }  // CLASS CLOSURE
 
+	var tex="lib/wgl/map.jpg";
 	var sc=new Scene();	
-	sc.AddModel("desk.json",-100,0,0,20,0);				
-	sc.AddModel("desk.json",0,0,0,20,0)
-	sc.AddModel("desk.json",100,0,0,20,30);				
-	sc.AddModel("desk.json",-100,200,0,20,-10);				
-	sc.AddModel("desk.json",0,200,0,20,5)
-	sc.AddModel("desk.json",100,200,0,20,0);				
-
+	sc.AddModel("desk.json",-100,0,0,20,0,tex);				
+	sc.AddModel("desk.json",0,0,0,20,0,tex)
+	sc.AddModel("desk.json",100,0,0,20,30,tex);				
+	sc.AddModel("desk.json",-100,200,0,20,-10,tex);				
+	sc.AddModel("desk.json",0,200,0,20,5,tex)
+	sc.AddModel("desk.json",100,200,0,20,0,tex);				
+	sc.AddModel("body.json",100,200,0,45,0,"ghost");				
 
 	animate();																				// Alloc scene	
 
@@ -256,7 +248,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	isMobile=navigator.userAgent.match(/(ipad|iphone|ipod|android)/i) ? true : false; // Set mobile flag
 	if ((window.location.host != "localhost") && (url != "preview")) {		// Not in debug or preview
 		$("#splashDiv").fadeIn().delay(4000).fadeOut();						// Fade out splash
-		$("#mainDiv").delay(4000).fadeIn(2000);								// Wait, and fade in main
+		$("#mainDiv").delay(2000).fadeIn(2000);								// Wait, and fade in main
 		}	
 	else																	// Debug
 		$("#mainDiv").fadeIn(0);											// Load fast
