@@ -90,7 +90,7 @@ class Scene {
 
 	AddLights()																					// ADD LIGHTS
 	{
-		var light=new THREE.DirectionalLight("#333333");											// Made directional light
+		var light=new THREE.DirectionalLight("#222222");											// Made directional light
 		light.position.set(0,0,1);																	// Set angle
 		light.castShadow=true;            															// Cast a shadow
 		this.scene.add(light);																		// Add directioal light
@@ -146,14 +146,14 @@ class Scene {
 			}
 		function onError(err) {	console.log(err) };													// ON ERROR
 
-		function loadModel(object) {																// ON LOAD
-
-			if (!isNaN(tex)) {
-				var mat=new THREE.MeshToonMaterial( { color:tex-0 } )
+		function loadModel(object) {															// ON LOAD
+			trace(object)
+			if (tex && !isNaN(tex)) {																// If spec'd by color
+				var mat=new THREE.MeshToonMaterial( { color:tex-0 } );								// Toon material
 				mat.userData.outlineParameters= { visible: true	};									// Make outline visible
 				object.traverse(function(child) {													// Go thru model
-					if (child.isMesh) child.material=mat;											// If a mesh, set material								
-					});
+					if (child.isMesh) 	child.material=mat;											// If a mesh, set material								
+				});
 				}
 			else if (tex) {																			// If textured
 				var texture=_this.textureLoader.load(tex);											// Get model texture
@@ -164,6 +164,13 @@ class Scene {
 						}							
 					});
 				}
+			else{																					// If plain model
+				object.traverse(function(child) {													// Go thru model
+					if (child.isMesh) 	 															// If a mesh
+						child.material.userData.outlineParameters= { visible:false };				// No outline
+					});
+				}
+
 			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
 			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
 			object.rotation.y=rot*Math.PI/180;														// Rotation
@@ -205,7 +212,7 @@ class Scene {
 
 
 
-
+ 
 
 
 
