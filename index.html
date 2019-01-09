@@ -11,6 +11,7 @@
 	<script src="lib/wgl/three.min.js"></script>
 	<script src="lib/wgl/OBJLoader.js"></script>
 	<script src="lib/wgl/OrbitControls.js"></script>
+	<script src="lib/wgl/OutlineEffect.js"></script>
 
 	
 	<script src="lib/jquery.ui.touch-punch.min.js"></script>
@@ -62,6 +63,7 @@ class Scene {
 		this.renderer=null;																			// Renderer object
 		this.scene=null;																			// Holds scene
 		this.controls=null;																			// Controls object
+		this.outliner=null;																			// Outline renderer
 		this.floor="wood.jpg";																		// Floor texture
 		this.frontWall="";																			// Wall texture
 		this.backWall="";																			// Wall texture
@@ -93,6 +95,7 @@ class Scene {
 		light.castShadow=true;            															// Cast a shadow
 		this.scene.add(light);																		// Add directioal light
 		this.scene.add(new THREE.AmbientLight(0xcccccc, 0.8));										// Add ambient light
+		this.outliner=new THREE.OutlineEffect(this.renderer);										// Add outliner
 	}
 
 	Resize()																					// RESIZE 3D SPACE
@@ -118,6 +121,7 @@ class Scene {
 			tex.wrapS=tex.wrapT=THREE.RepeatWrapping;												// Wrap and repeat
 			tex.repeat.set(4,4);																	// 4 by 4
 			var mat=new THREE.MeshPhongMaterial({ map:tex });										// Make material
+			mat.userData.outlineParameters= { visible:false };										// No outline
 			var cbg=new THREE.PlaneGeometry(1024,1024,1,1);											// Make grid
 			var mesh=new THREE.Mesh(cbg,mat);														// Make mesh
 			mesh.receiveShadow=true;																// Catch shadow
@@ -143,16 +147,21 @@ class Scene {
 		function onError(err) {	console.log(err) };													// ON ERROR
 
 		function loadModel(object) {																// ON LOAD
-			if (tex == "ghost") {
-				var mat=new THREE.MeshBasicMaterial( { color: 0xaaaaaa } )
+
+			if (!isNaN(tex)) {
+				var mat=new THREE.MeshToonMaterial( { color:tex-0 } )
+				mat.userData.outlineParameters= { visible: true	};									// Make outline visible
 				object.traverse(function(child) {													// Go thru model
-					if (child.isMesh) child.material=mat;											// If a mesh, wrap it								
+					if (child.isMesh) child.material=mat;											// If a mesh, set material								
 					});
 				}
 			else if (tex) {																			// If textured
 				var texture=_this.textureLoader.load(tex);											// Get model texture
 				object.traverse(function(child) {													// Go thru model
-					if (child.isMesh) child.material.map=texture;									// If a mesh, wrap it								
+					if (child.isMesh) { 															// If a mesh
+						child.material.map=texture;													// Add texture
+						child.material.userData.outlineParameters= { visible:false };				// No outline
+						}							
 					});
 				}
 			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
@@ -172,15 +181,15 @@ class Scene {
 	sc.AddModel("desk.json",-100,200,0,20,-10,tex);				
 	sc.AddModel("desk.json",0,200,0,20,5,tex)
 	sc.AddModel("desk.json",100,200,0,20,0,tex);				
-	sc.AddModel("body.json",100,200,0,45,0,"ghost");				
+	sc.AddModel("body.json",100,200,0,45,0,0xffffff);				
 
 	animate();																				// Alloc scene	
 
 	function animate() {														// ANIMATE LOOP
 		sc.controls.update();														// Update control time
 		requestAnimationFrame(animate);												// Set timer
-		sc.renderer.render(sc.scene,sc.camera);												// Render
-//		trace(sc.camera.position)
+		sc.renderer.render(sc.scene,sc.camera);										// Render scene
+		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
 	}
 
 
