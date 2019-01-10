@@ -13,8 +13,6 @@
 	<script src="lib/wgl/GLTFLoader.js"></script>
 	<script src="lib/wgl/OrbitControls.js"></script>
 	<script src="lib/wgl/OutlineEffect.js"></script>
-		if (src.match(/obj/i))	loader=new THREE.OBJLoader(this.manager);							// If OBJ
-
 	
 	<script src="lib/jquery.ui.touch-punch.min.js"></script>
 	<style>
@@ -151,49 +149,37 @@ class Scene {
 		function onError(err) {	console.log(err) };													// ON ERROR
 
 		function loadModel(object) {															// ON LOAD
-			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF)			
+			var texture=null;
 			_this.models.push({ name:src, bones:[] });												// Add new model	
-			var cm=_this.models[_this.models.length-1];												// Point at \ model slot
-			if (tex && !isNaN(tex)) {																// If spec'd by color
-				var mat=new THREE.MeshToonMaterial( { color:tex-0 } );								// Toon material
-				mat.userData.outlineParameters= { visible: true	};									// Make outline visible
-				object.traverse(function(child) {													// Go thru model
-					if (child.isBone) 	cm.bones.push(child); 										// If a bone, add to list
-					if (child.isMesh) 	child.material=mat;											// If a mesh, set material								
+			var cm=_this.models[_this.models.length-1];												// Point at model slot
+			if (tex && isNaN(tex)) 																	// If a textur
+				texture=_this.textureLoader.load(tex);												// Load texture
+			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF)			
+			
+			object.traverse(function(child) {														// Go thru model
+				if (child.isBone) cm.bones.push(child); 											// If a bone, add to list
+				if (child.isMesh) { 																// If a mesh
+					if (texture)		child.material.map=texture;									// If has texture, add it
+					if (!isNaN(tex)) {																// If a cartoon shading
+						child.material.color=new THREE.Color(tex);									// Set color
+						}
+					if (child.material.userData)													// If user data
+						child.material.userData.outlineParameters= { visible:!isNaN(tex) };			// Outline if a number
+					}							
 				});
-				}
-			else if (tex) {																			// If textured
-				var texture=_this.textureLoader.load(tex);											// Get model texture
-				object.traverse(function(child) {													// Go thru model
-					if (child.isBone) cm.bones.push(child); 										// If a bone, add to list
-					if (child.isMesh) { 															// If a mesh
-						child.material.map=texture;													// Add texture
-						if (child.material.userData)												// If user data
-							child.material.userData.outlineParameters= { visible:false };			// No outline
-						}							
-					});
-				}
-			else{																					// If plain model
-				object.traverse(function(child) {													// Go thru model
-					if (child.isBone) cm.bones.push(child); 										// If a bone, add to list
-					if (child.isMesh) 	 															// If a mesh
-						if (child.material.userData)												// If user data
-								child.material.userData.outlineParameters= { visible:false };		// No outline
-					});
-				}
 
-			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
+				object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
 			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
 			object.rotation.y=rot*Math.PI/180;														// Rotation
 			object.castShadow=true; 																// Cast a shadow
 			_this.scene.add(object);																// Add model to scene
 		}
 	}																								// SCENE CLOSURE
-}  // CLASS CLOSURE
+}  // CLOSURE
 
 	var tex="lib/wgl/map.jpg";
 	var sc=new Scene();	
-	sc.AddModel("cube.gltf",-100,0,0,20,0,tex);				
+	sc.AddModel("char.gltf",-100,0,0,25,0,0xffffff);				
 	sc.AddModel("desk.json",0,0,0,20,0,tex)
 	sc.AddModel("desk.json",100,0,0,20,30,tex);				
 	sc.AddModel("desk.json",-100,200,0,20,-10,tex);				
@@ -208,9 +194,9 @@ class Scene {
 		sc.renderer.render(sc.scene,sc.camera);										// Render scene
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
 		if (sc.models[0] && sc.models[0].bones[0]) {
-			sc.models[0].bones[0].rotation.y+=.03
-			sc.models[0].bones[1].rotation.z+=.05
-			sc.models[0].bones[2].rotation.x+=.1
+//			sc.models[0].bones[0].rotation.x+=.03
+			sc.models[0].bones[2].rotation.z+=.05
+			sc.models[0].bones[3].rotation.x+=.1
 		}
 
 	}
@@ -267,6 +253,7 @@ class Scene {
 
 var app=null;															// Holds app
 var isMobile=false;														// Flag for mobile devices
+var xxx=0
 
 $(window).resize(function() {                                         	// ON WINDOW RESIZE
 	sc.Resize();															// Resize 3D
@@ -291,7 +278,9 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		window.attachEvent("message",html5MessageHandler);					// Add handler
 
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
-		});
+		trace(xxx++)	
+	
+	});
  
  });									
 
