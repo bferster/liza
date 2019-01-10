@@ -1,0 +1,787 @@
+{
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 10658,
+            "max": [
+                2.977858304977417,
+                0.5140893459320068,
+                2.9517362117767334
+            ],
+            "min": [
+                -2.977858304977417,
+                -0.6782699823379517,
+                -4.022609233856201
+            ],
+            "name": "accessor_buffer_Cube.001_POSITION_0",
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 10658,
+            "max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ],
+            "name": "accessor_buffer_Cube.001_NORMAL_0",
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 3,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 288,
+            "max": [
+                10504
+            ],
+            "min": [
+                123
+            ],
+            "name": "accessor_buffer_Cube.001_1",
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 63264,
+            "max": [
+                10657
+            ],
+            "min": [
+                0
+            ],
+            "name": "accessor_buffer_Cube.001_0",
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 4,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 384,
+            "max": [
+                10429
+            ],
+            "min": [
+                58
+            ],
+            "name": "accessor_buffer_Cube.001_2",
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 5,
+            "byteOffset": 0,
+            "componentType": 5121,
+            "count": 10658,
+            "max": [
+                13,
+                13,
+                13,
+                13
+            ],
+            "min": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "name": "accessor_buffer_Cube.001_skin_0",
+            "type": "VEC4"
+        },
+        {
+            "bufferView": 5,
+            "byteOffset": 16,
+            "componentType": 5126,
+            "count": 10658,
+            "max": [
+                1.011639952659607,
+                0.49965450167655945,
+                0.26944804191589355,
+                0.1548771858215332
+            ],
+            "min": [
+                0.3704727292060852,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "accessor_buffer_Cube.001_skin_1",
+            "type": "VEC4"
+        },
+        {
+            "bufferView": 6,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 14,
+            "max": [
+                1.0,
+                1.0,
+                0.4615384340286255,
+                0,
+                1.0,
+                1.6292068494294654e-07,
+                0.8320502638816833,
+                0,
+                0.46153849363327026,
+                1.0,
+                1.0,
+                0,
+                0.46153849363327026,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -0.4615384340286255,
+                0.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                0.0,
+                -0.46153849363327026,
+                -0.8320502042770386,
+                7.549790126404332e-08,
+                0.0,
+                -0.46153849363327026,
+                -2.6348259449005127,
+                -1.0,
+                1.0
+            ],
+            "name": "accessor_buffer_IBM_Cube_skin_0",
+            "type": "MAT4"
+        }
+    ],
+    "asset": {
+        "version": "2.0"
+    },
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteLength": 127896,
+            "byteOffset": 0,
+            "byteStride": 12,
+            "name": "bufferView_buffer_Cube.001_POSITION_0",
+            "target": 34962
+        },
+        {
+            "buffer": 1,
+            "byteLength": 127896,
+            "byteOffset": 0,
+            "byteStride": 12,
+            "name": "bufferView_buffer_Cube.001_NORMAL_0",
+            "target": 34962
+        },
+        {
+            "buffer": 2,
+            "byteLength": 126528,
+            "byteOffset": 0,
+            "name": "bufferView_buffer_Cube.001_0",
+            "target": 34963
+        },
+        {
+            "buffer": 2,
+            "byteLength": 576,
+            "byteOffset": 126528,
+            "name": "bufferView_buffer_Cube.001_1",
+            "target": 34963
+        },
+        {
+            "buffer": 2,
+            "byteLength": 768,
+            "byteOffset": 127104,
+            "name": "bufferView_buffer_Cube.001_2",
+            "target": 34963
+        },
+        {
+            "buffer": 3,
+            "byteLength": 341056,
+            "byteOffset": 0,
+            "byteStride": 32,
+            "name": "bufferView_buffer_Cube.001_skin_0",
+            "target": 34962
+        },
+        {
+            "buffer": 4,
+            "byteLength": 896,
+            "byteOffset": 0,
+            "byteStride": 64,
+            "name": "bufferView_buffer_IBM_Cube_skin_0"
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 127896,
+            "name": "buffer_Cube.001_POSITION",
+            "uri": "buffer_Cube_001_POSITION.bin"
+        },
+        {
+            "byteLength": 127896,
+            "name": "buffer_Cube.001_NORMAL",
+            "uri": "buffer_Cube_001_NORMAL.bin"
+        },
+        {
+            "byteLength": 127872,
+            "name": "buffer_Cube.001",
+            "uri": "buffer_Cube_001.bin"
+        },
+        {
+            "byteLength": 341056,
+            "name": "buffer_Cube.001_skin",
+            "uri": "buffer_Cube_001_skin.bin"
+        },
+        {
+            "byteLength": 896,
+            "name": "buffer_IBM_Cube_skin",
+            "uri": "buffer_IBM_Cube_skin.bin"
+        }
+    ],
+    "cameras": [
+        {
+            "name": "Camera",
+            "perspective": {
+                "aspectRatio": 1.703595982340029,
+                "yfov": 0.5033799409866333,
+                "zfar": 100.0,
+                "znear": 0.10000000149011612
+            },
+            "type": "perspective"
+        }
+    ],
+    "materials": [
+        {
+            "emissiveFactor": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "Material",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.0,
+                    0.64000004529953,
+                    0.12800000607967377,
+                    1.0
+                ],
+                "metallicFactor": 0.0,
+                "roughnessFactor": 1.0
+            }
+        },
+        {
+            "emissiveFactor": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "Material.001",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.800000011920929,
+                    0.800000011920929,
+                    0.800000011920929,
+                    1.0
+                ],
+                "metallicFactor": 0.0,
+                "roughnessFactor": 1.0
+            }
+        },
+        {
+            "emissiveFactor": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "Material.002",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "metallicFactor": 0.0,
+                "roughnessFactor": 1.0
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "name": "Cube.001",
+            "primitives": [
+                {
+                    "attributes": {
+                        "JOINTS_0": 5,
+                        "NORMAL": 1,
+                        "POSITION": 0,
+                        "WEIGHTS_0": 6
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                },
+                {
+                    "attributes": {
+                        "JOINTS_0": 5,
+                        "NORMAL": 1,
+                        "POSITION": 0,
+                        "WEIGHTS_0": 6
+                    },
+                    "indices": 2,
+                    "material": 2,
+                    "mode": 4
+                },
+                {
+                    "attributes": {
+                        "JOINTS_0": 5,
+                        "NORMAL": 1,
+                        "POSITION": 0,
+                        "WEIGHTS_0": 6
+                    },
+                    "indices": 4,
+                    "material": 1,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "children": [
+                2,
+                3
+            ],
+            "name": "Armature",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        {
+            "camera": 0,
+            "name": "Camera",
+            "rotation": [
+                0.48170700669288635,
+                0.21292175352573395,
+                0.3342514932155609,
+                0.7816000580787659
+            ],
+            "scale": [
+                1.0,
+                0.9999999403953552,
+                1.0
+            ],
+            "translation": [
+                7.481131553649902,
+                -6.5076398849487305,
+                5.34366512298584
+            ]
+        },
+        {
+            "mesh": 0,
+            "name": "Cube",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "skin": 0,
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        {
+            "children": [
+                4,
+                13,
+                15
+            ],
+            "name": "Armature_Bone",
+            "rotation": [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                1.0,
+                -1.0
+            ]
+        },
+        {
+            "children": [
+                5,
+                9,
+                11
+            ],
+            "name": "Armature_Bone.00",
+            "rotation": [
+                3.090862321641907e-08,
+                0.7071068286895752,
+                0.7071068286895752,
+                3.090862676913275e-08
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        {
+            "children": [
+                6
+            ],
+            "name": "Armature_Bone.04",
+            "rotation": [
+                0.0,
+                4.371138828673793e-08,
+                3.3001180777756647e-15,
+                1.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                2.0,
+                -1.164670302474663e-21
+            ]
+        },
+        {
+            "children": [
+                7
+            ],
+            "name": "Armature_Bone.08",
+            "rotation": [
+                0.0,
+                -2.979391818546846e-32,
+                1.4783016955941088e-33,
+                1.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.5,
+                7.105427357601002e-15
+            ]
+        },
+        {
+            "children": [
+                8
+            ],
+            "name": "Armature_Bone.05",
+            "rotation": [
+                0.0,
+                -2.979391818546846e-32,
+                1.4783016955941088e-33,
+                1.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.3500000238418579,
+                -1.4210854715202004e-14
+            ]
+        },
+        {
+            "name": "Armature_Bone.01",
+            "rotation": [
+                0.0,
+                -2.979391818546846e-32,
+                1.4783016955941088e-33,
+                1.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.5100001096725464,
+                0.0
+            ]
+        },
+        {
+            "children": [
+                10
+            ],
+            "name": "Armature_Bone.06",
+            "rotation": [
+                -0.5,
+                -0.4999999403953552,
+                -0.5,
+                0.5000000596046448
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                2.0,
+                -1.164670302474663e-21
+            ]
+        },
+        {
+            "name": "Armature_Bone.02",
+            "rotation": [
+                -5.510129769479473e-39,
+                -5.958783637093692e-32,
+                0.0,
+                1.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.552713678800501e-15,
+                1.5,
+                0.0
+            ]
+        },
+        {
+            "children": [
+                12
+            ],
+            "name": "Armature_Bone.11",
+            "rotation": [
+                -0.5,
+                0.4999999403953552,
+                0.5,
+                0.5000000596046448
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                2.0,
+                -1.164670302474663e-21
+            ]
+        },
+        {
+            "name": "Armature_Bone.09",
+            "rotation": [
+                -1.3939709961821486e-36,
+                -5.958783637093692e-32,
+                0.0,
+                1.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.4210854715202004e-14,
+                1.5,
+                0.0
+            ]
+        },
+        {
+            "children": [
+                14
+            ],
+            "name": "Armature_Bone.07",
+            "rotation": [
+                7.598130480346299e-08,
+                -0.588348388671875,
+                0.7071068286895752,
+                0.3922322988510132
+            ],
+            "scale": [
+                1.0,
+                1.0000001192092896,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        {
+            "name": "Armature_Bone.03",
+            "rotation": [
+                2.2690036516337386e-09,
+                1.862644971595273e-08,
+                -9.70858726745405e-10,
+                1.0
+            ],
+            "scale": [
+                1.0000001192092896,
+                1.0000001192092896,
+                1.0000001192092896
+            ],
+            "translation": [
+                -7.338258711797607e-08,
+                1.8027759790420532,
+                -3.8937727708798775e-08
+            ]
+        },
+        {
+            "children": [
+                16
+            ],
+            "name": "Armature_Bone.12",
+            "rotation": [
+                7.598130480346299e-08,
+                0.588348388671875,
+                -0.7071068286895752,
+                0.3922322988510132
+            ],
+            "scale": [
+                1.0,
+                1.0000001192092896,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        {
+            "name": "Armature_Bone.10",
+            "rotation": [
+                2.2690036516337386e-09,
+                -1.862644971595273e-08,
+                9.70858726745405e-10,
+                1.0
+            ],
+            "scale": [
+                1.0000001192092896,
+                1.0000001192092896,
+                1.0000001192092896
+            ],
+            "translation": [
+                7.338258711797607e-08,
+                1.8027759790420532,
+                -3.8937727708798775e-08
+            ]
+        },
+        {
+            "children": [
+                0,
+                1
+            ],
+            "matrix": [
+                -1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "name": "Scene_root"
+        }
+    ],
+    "scene": 0,
+    "scenes": [
+        {
+            "extras": {
+                "active_camera": 0,
+                "background_color": [
+                    0.05087608844041824,
+                    0.05087608844041824,
+                    0.05087608844041824
+                ],
+                "frames_per_second": 24
+            },
+            "name": "Scene",
+            "nodes": [
+                17
+            ]
+        }
+    ],
+    "skins": [
+        {
+            "inverseBindMatrices": 7,
+            "joints": [
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                3
+            ],
+            "name": "Cube",
+            "skeleton": 3
+        }
+    ]
+}
