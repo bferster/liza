@@ -68,9 +68,9 @@ class Scene {
 		this.outliner=null;																			// Outline renderer
 		this.floor="wood.jpg";																		// Floor texture
 		this.frontWall="";																			// Wall texture
-		this.backWall="";																			// Wall texture
-		this.leftWall="";																			// Wall texture
-		this.tightWall="";																			// Wall texture
+		this.backWall="lib/wgl/map.jpg";															// Wall texture
+		this.leftWall="lib/wgl/map.jpg";															// Wall texture
+		this.rightWall="lib/wgl/map.jpg";															// Wall texture
 		this.Init();																				// Init 3D system
 		}
 
@@ -117,20 +117,32 @@ class Scene {
 
 	AddRoom()																					// ADD ROOM TO SCENE
 	{	
-		if (this.floor) {																			// If a floor spec'd
+		var _this=this;																				// Save context
+		if (this.floor) 	addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1)							// If a floor spec'd
+		if (!this.cartoonScene) {
+			if (this.backWall) 	addWall(0,128,-512,0,0,0,256,this.backWall,0)						// If a back wall spec'd
+			if (this.frontWall) addWall(0,128,512,Math.PI,0,Math.PI,256,this.frontWall,0)			// If a front wall spec'd
+			if (this.leftWall) 	addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0)				// If a left wall spec'd
+			if (this.rightWall) addWall(512,128,0,0,-Math.PI/2,0,256,this.rightWall,0)				// If a right wall spec'd
+			}
+		function addWall(x, y, z, xr, yr, zr, h, texture, wrap) {									// ADD WALL
 			var mat=new THREE.MeshPhongMaterial();													// Make material
 			mat.color=new THREE.Color(0xeeeeee);													// Set color
-			if (!this.cartoonScene) {																// If a cartoon scene
-				var tex=this.textureLoader.load(this.floor);										// Load texture
-				tex.wrapS=tex.wrapT=THREE.RepeatWrapping;											// Wrap and repeat
-				tex.repeat.set(4,4);																// 4 by 4
+			if (!_this.cartoonScene) {																// If a cartoon scene
+				mat.userData.outlineParameters= { visible: false };									// Hide outline
+				var tex=_this.textureLoader.load(texture);											// Load texture
+				if (wrap) {																			// If wrapping
+					tex.wrapS=tex.wrapT=THREE.RepeatWrapping;										// Wrap and repeat
+					tex.repeat.set(4,4);															// 4 by 4
+					}
 				mat.map=tex;																		// Add texture
 				}
-			var cbg=new THREE.PlaneGeometry(1024,1024,1,1);											// Make grid
+			var cbg=new THREE.PlaneGeometry(1024,h,1,1);											// Make grid
 			var mesh=new THREE.Mesh(cbg,mat);														// Make mesh
-			mesh.rotation.x=-Math.PI/2;																// Rotate to bottom
-			this.scene.add(mesh);																	// Add to scene		
-			}
+			mesh.rotation.x=xr;		mesh.rotation.y=yr;		mesh.rotation.z=zr;						// Rotate 
+			mesh.position.x=x; 		mesh.position.y=y;		mesh.position.z=z;						// Position
+			_this.scene.add(mesh);																	// Add to scene		
+		}
 	}
 
 	AddModel(src, x, z, y, scale, rot, tex)														// ADD MODEL TO SCENE
@@ -186,10 +198,10 @@ class Scene {
 	sc.AddModel("desk2.json",-100,200,0,20,-10,tex);				
 	sc.AddModel("desk2.json",0,200,0,20,5,tex)
 	sc.AddModel("desk2.json",100,200,0,20,0,tex);				
-	sc.AddModel("body.gltf",100,210,-30,25,0,0xffffff);				
+	sc.AddModel("body.gltf",100,210,-32,25,0,0xffffff);				
 	animate();																				// Alloc scene	
 
-tt=0
+tt=0;
 
 	function animate() {														// ANIMATE LOOP
 		sc.controls.update();														// Update control time
@@ -197,13 +209,11 @@ tt=0
 		sc.renderer.render(sc.scene,sc.camera);										// Render scene
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
 		if (sc.models[0] && sc.models[0].bones[0]) {
-tt++
 
-if (tt <100) return;
-
-sc.models[0].bones[xxx].rotation.z=Math.cos(tt/50*3.14)*.05
-sc.models[0].bones[xxx].rotation.y=Math.cos(tt/50*3.14)*.1
-sc.models[0].bones[xxx].rotation.x=Math.cos(tt/50*3.14)*.1
+if (tt++ <200) return;
+sc.models[0].bones[16].rotation.z=Math.cos(tt/50*3.14)*.02
+sc.models[0].bones[16].rotation.y=Math.cos(tt/50*3.14)*.05
+sc.models[0].bones[16].rotation.x=Math.cos(tt/50*3.14)*.05
 		}
 
 	}
@@ -260,7 +270,6 @@ sc.models[0].bones[xxx].rotation.x=Math.cos(tt/50*3.14)*.1
 
 var app=null;															// Holds app
 var isMobile=false;														// Flag for mobile devices
-var xxx=16
 
 $(window).resize(function() {                                         	// ON WINDOW RESIZE
 	sc.Resize();															// Resize 3D
@@ -285,7 +294,6 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		window.attachEvent("message",html5MessageHandler);					// Add handler
 
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
-		trace(xxx++)	
 	
 	});
  
