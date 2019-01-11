@@ -179,14 +179,16 @@ class Scene {
 
 	var tex="lib/wgl/map.jpg";
 	var sc=new Scene();	
-	sc.AddModel("char.gltf",-100,0,0,25,0,0xffffff);				
+	sc.AddModel("desk.json",-100,0,0,25,0,tex);				
 	sc.AddModel("desk.json",0,0,0,20,0,tex)
 	sc.AddModel("desk.json",100,0,0,20,30,tex);				
 	sc.AddModel("desk.json",-100,200,0,20,-10,tex);				
 	sc.AddModel("desk.json",0,200,0,20,5,tex)
 	sc.AddModel("desk.json",100,200,0,20,0,tex);				
-	sc.AddModel("body.json",100,200,0,45,0,0xffffff);				
+	sc.AddModel("body.gltf",100,190,0,25,0,0xffffff);				
 	animate();																				// Alloc scene	
+
+tt=0
 
 	function animate() {														// ANIMATE LOOP
 		sc.controls.update();														// Update control time
@@ -194,9 +196,16 @@ class Scene {
 		sc.renderer.render(sc.scene,sc.camera);										// Render scene
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
 		if (sc.models[0] && sc.models[0].bones[0]) {
-//			sc.models[0].bones[0].rotation.x+=.03
-			sc.models[0].bones[2].rotation.z+=.05
-			sc.models[0].bones[3].rotation.x+=.1
+
+
+			///			sc.models[0].bones[0].rotation.x+=.03
+//			sc.models[0].bones[1].rotation.z+=.05
+tt++
+
+
+sc.models[0].bones[xxx].rotation.z=Math.cos(tt/50*3.14)*.05
+sc.models[0].bones[xxx].rotation.y=Math.cos(tt/50*3.14)*.1
+sc.models[0].bones[xxx].rotation.x=Math.cos(tt/50*3.14)*.1
 		}
 
 	}
@@ -253,7 +262,7 @@ class Scene {
 
 var app=null;															// Holds app
 var isMobile=false;														// Flag for mobile devices
-var xxx=0
+var xxx=16
 
 $(window).resize(function() {                                         	// ON WINDOW RESIZE
 	sc.Resize();															// Resize 3D
