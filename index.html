@@ -58,6 +58,7 @@ class Scene {
 
 	constructor()																				// CONSTRUCTOR
 	{
+		this.cartoonScene=window.location.search.match(/real/i) ? false : true;						// Render scene as cartoon?	   		
 		this.models=[];																				// Holds models
 		this.container=$("#mainDiv")[0];															// Div container														
 		this.camera=null;																			// Camera object
@@ -71,18 +72,18 @@ class Scene {
 		this.leftWall="";																			// Wall texture
 		this.tightWall="";																			// Wall texture
 		this.Init();																				// Init 3D system
-	}
+		}
 
 	Init()																						// INIT 3D SYSTEM
 	{
 		this.scene=new THREE.Scene();																// Alloc new scene
+		if (this.cartoonScene) 	this.scene.background=new THREE.Color(0xffffff);					// White background
 		this.manager=new THREE.LoadingManager();													// Loading manager
-		this.manager.onProgress=function(item, loaded, total ) { console.log(item,loaded,total); };	// Show progress
+		this.manager.onProgress=function(item, loaded, total ) { console.log(loaded,total); };		// Show progress
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
-		this.AddCamera(0,200,500,.4);																// Add camera
+		this.AddCamera(0,150,500,.4);																// Add camera
 		this.renderer=new THREE.WebGLRenderer();													// Init renderer
 		this.renderer.setPixelRatio(window.devicePixelRatio);										// Set ratio
-		this.renderer.shadowMap.enabled=true;														// Support shadows
 		this.AddLights();																			// Add lights
 		this.Resize();																				// Resize 3D space
 		this.container.appendChild(this.renderer.domElement);										// Add to div
@@ -93,10 +94,9 @@ class Scene {
 	{
 		var light=new THREE.DirectionalLight("#222222");											// Made directional light
 		light.position.set(0,0,1);																	// Set angle
-		light.castShadow=true;            															// Cast a shadow
 		this.scene.add(light);																		// Add directioal light
-		this.scene.add(new THREE.AmbientLight(0xcccccc, 0.8));										// Add ambient light
-		this.outliner=new THREE.OutlineEffect(this.renderer);										// Add outliner
+		this.scene.add(new THREE.AmbientLight(0xffffff, 1));										// Add ambient light
+		this.outliner=new THREE.OutlineEffect(this.renderer, { defaultThickness:.0035 } );			// Add outliner
 	}
 
 	Resize()																					// RESIZE 3D SPACE
@@ -118,14 +118,16 @@ class Scene {
 	AddRoom()																					// ADD ROOM TO SCENE
 	{	
 		if (this.floor) {																			// If a floor spec'd
-			var tex=this.textureLoader.load(this.floor);											// Load texture
-			tex.wrapS=tex.wrapT=THREE.RepeatWrapping;												// Wrap and repeat
-			tex.repeat.set(4,4);																	// 4 by 4
-			var mat=new THREE.MeshPhongMaterial({ map:tex });										// Make material
-			mat.userData.outlineParameters= { visible:false };										// No outline
+			var mat=new THREE.MeshPhongMaterial();													// Make material
+			mat.color=new THREE.Color(0xeeeeee);													// Set color
+			if (!this.cartoonScene) {																// If a cartoon scene
+				var tex=this.textureLoader.load(this.floor);										// Load texture
+				tex.wrapS=tex.wrapT=THREE.RepeatWrapping;											// Wrap and repeat
+				tex.repeat.set(4,4);																// 4 by 4
+				mat.map=tex;																		// Add texture
+				}
 			var cbg=new THREE.PlaneGeometry(1024,1024,1,1);											// Make grid
 			var mesh=new THREE.Mesh(cbg,mat);														// Make mesh
-			mesh.receiveShadow=true;																// Catch shadow
 			mesh.rotation.x=-Math.PI/2;																// Rotate to bottom
 			this.scene.add(mesh);																	// Add to scene		
 			}
@@ -168,23 +170,22 @@ class Scene {
 					}							
 				});
 
-				object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
+			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
 			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
 			object.rotation.y=rot*Math.PI/180;														// Rotation
-			object.castShadow=true; 																// Cast a shadow
 			_this.scene.add(object);																// Add model to scene
 		}
 	}																								// SCENE CLOSURE
 }  // CLOSURE
 
-	var tex="lib/wgl/map.jpg";
-	var sc=new Scene();	
-	sc.AddModel("desk.json",-100,0,0,25,0,tex);				
-	sc.AddModel("desk.json",0,0,0,20,0,tex)
-	sc.AddModel("desk.json",100,0,0,20,30,tex);				
-	sc.AddModel("desk.json",-100,200,0,20,-10,tex);				
-	sc.AddModel("desk.json",0,200,0,20,5,tex)
-	sc.AddModel("desk.json",100,200,0,20,0,tex);				
+	var sc=new Scene();																				// Make new scene		
+	var tex=sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";											// Desks cartoon or real				
+	sc.AddModel("desk2.json",-100,0,0,20,0,tex);				
+	sc.AddModel("desk2.json",0,0,0,20,0,tex)
+	sc.AddModel("desk2.json",100,0,0,20,30,tex);				
+	sc.AddModel("desk2.json",-100,200,0,20,-10,tex);				
+	sc.AddModel("desk2.json",0,200,0,20,5,tex)
+	sc.AddModel("desk2.json",100,200,0,20,0,tex);				
 	sc.AddModel("body.gltf",100,210,-30,25,0,0xffffff);				
 	animate();																				// Alloc scene	
 
@@ -196,12 +197,9 @@ tt=0
 		sc.renderer.render(sc.scene,sc.camera);										// Render scene
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
 		if (sc.models[0] && sc.models[0].bones[0]) {
-
-
-			///			sc.models[0].bones[0].rotation.x+=.03
-//			sc.models[0].bones[1].rotation.z+=.05
 tt++
 
+if (tt <100) return;
 
 sc.models[0].bones[xxx].rotation.z=Math.cos(tt/50*3.14)*.05
 sc.models[0].bones[xxx].rotation.y=Math.cos(tt/50*3.14)*.1
