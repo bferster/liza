@@ -170,8 +170,9 @@ class Scene {
 				texture=_this.textureLoader.load(tex);												// Load texture
 			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF)			
 			
+			var i=0;
 			object.traverse(function(child) {														// Go thru model
-				if (child.isBone) cm.bones.push(child); 											// If a bone, add to list
+				if (child.isBone) cm.bones.push(child),trace(i++,child.name,child.rotation.y); 											// If a bone, add to list
 				if (child.isMesh) { 																// If a mesh
 					if (texture)		child.material.map=texture;									// If has texture, add it
 					if (!isNaN(tex)) {																// If a cartoon shading
@@ -182,23 +183,45 @@ class Scene {
 					}							
 				});
 
+if (_this.models.length ==1) {
+	_this.SetBone(0,27,0,20,90)		// RUL
+	_this.SetBone(0,28,0,20,-90)	// RL
+	_this.SetBone(0,2,0,-10,-90)	// LUL
+	_this.SetBone(0,3,0,-10,90)		// LL
+	_this.SetBone(0,10,0,0,120)		// LA
+	_this.SetBone(0,20,0,80,0)		// RA
+	_this.SetBone(0,20,-20,-30,0)	// RF
+}
+   
 			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
 			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
 			object.rotation.y=rot*Math.PI/180;														// Rotation
 			_this.scene.add(object);																// Add model to scene
 		}
-	}																								// SCENE CLOSURE
+	}	
+	
+ 	SetBone(model, num, x, y, z)																// ROTATE A BONE
+	{
+		x*=Math.PI/180;	y*=Math.PI/180;	z*=Math.PI/180;												// Convert degrees to radians
+		x+=this.models[model].bones[num].rotation.x;												// Add current rotations
+		y+=this.models[model].bones[num].rotation.y;
+		this.models[model].bones[num].rotation.z;
+		this.models[model].bones[num].rotation.x=x;													// Rotate 						
+		this.models[model].bones[num].rotation.y=y;													
+		this.models[model].bones[num].rotation.z=z;													
+	}
+																								// SCENE CLOSURE
 }  // CLOSURE
 
 	var sc=new Scene();																				// Make new scene		
 	var tex=sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";											// Desks cartoon or real				
-	sc.AddModel("desk2.json",-100,-100,0,20,0,tex);				
-	sc.AddModel("desk2.json",0,-100,0,20,0,tex)
-	sc.AddModel("desk2.json",100,-100,0,20,30,tex);				
-	sc.AddModel("desk2.json",-100,100,0,20,-10,tex);				
-	sc.AddModel("desk2.json",0,100,0,20,5,tex)
-	sc.AddModel("desk2.json",100,100,0,20,0,tex);				
-	sc.AddModel("body.gltf",100,110,-32,25,0,0xffffff);				
+	sc.AddModel("desk2.json",-100,-100,0,19,0,tex);				
+	sc.AddModel("desk2.json",0,-100,0,19,0,tex)
+	sc.AddModel("desk2.json",100,-100,0,19,30,tex);				
+	sc.AddModel("desk2.json",-100,100,0,19,-10,tex);				
+	sc.AddModel("desk2.json",0,100,0,19,5,tex)
+	sc.AddModel("desk2.json",100,100,0,19,0,tex);				
+	sc.AddModel("body.gltf",100,90,-40,20,0,0xffffff);				
 	animate();																				// Alloc scene	
 
 tt=0;
@@ -217,8 +240,6 @@ sc.models[0].bones[16].rotation.x=Math.cos(tt/50*3.14)*.05
 		}
 
 	}
-
-
 
 
 
