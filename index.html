@@ -52,7 +52,9 @@
 	</div>
 
 <script>
-	
+
+var aniTimer=0;	
+
 class Scene {
 
 	constructor()																				// CONSTRUCTOR
@@ -154,14 +156,13 @@ class Scene {
 		loader.load(src, (obj)=> { 																	// Load model
 			loadModel(obj);
 			if (src == "body.gltf") {																// If a student
-				_this.SetBone(0,27,0,20,90)		// RUL
-				_this.SetBone(0,28,0,20,90)		// RL
-				_this.SetBone(0,2,0,-10,-90)	// LUL
-				_this.SetBone(0,3,0,-10,-90)	// LL
-				_this.SetBone(0,10,0,0,120)		// LA
-				_this.SetBone(0,20,0,80,0)		// RA
-				_this.SetBone(0,20,-20,-30,0)	// RF
-				tt=1;							// Start animation
+				_this.SetBone(0,"body_RightUpLeg",0,20,90)		// RUL
+				_this.SetBone(0,"body_RightLeg",0,20,90)		// RL
+				_this.SetBone(0,"body_LeftUpLeg",0,-10,-90)		// LUL
+				_this.SetBone(0,"body_LeftLeg",0,-10,-90)		// LL
+				_this.SetBone(0,"body_LeftArm",0,0,120)			// LA
+				_this.SetBone(0,"body_RightArm",-20,50,0)		// RA
+				aniTimer=1;																			// Start animation
 				}
 		}, onProgress, onError );																	// Load
 
@@ -183,16 +184,15 @@ class Scene {
 			
 			var i=0;
 			object.traverse(function(child) {														// Go thru model
-				if (child.isBone) cm.bones.push(child),trace(i++,child.name,child.rotation.y); 											// If a bone, add to list
+				if (child.isBone) cm.bones[child.name]=child; 										// If a bone, add to list
 				if (child.isMesh) { 																// If a mesh
 					if (texture)		child.material.map=texture;									// If has texture, add it
-					if (!isNaN(tex)) {																// If a cartoon shading
+					if (!isNaN(tex)) 																// If a cartoon shading
 						child.material.color=new THREE.Color(tex);									// Set color
-						}
 					if (child.material.userData)													// If user data
 						child.material.userData.outlineParameters= { visible:!isNaN(tex) };			// Outline if a number
 					}							
-				});
+			});
 
 			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
 			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
@@ -201,15 +201,15 @@ class Scene {
 		}
 	}
 	
-	SetBone(model, num, x, y, z)																// ROTATE A BONE
+	SetBone(model, name, x, y, z)																// ROTATE A BONE
 	{
 		x*=Math.PI/180;	y*=Math.PI/180;	z*=Math.PI/180;												// Convert degrees to radians
-		x+=this.models[model].bones[num].rotation.x;												// Add current rotations
-		y+=this.models[model].bones[num].rotation.y;
-		z+=this.models[model].bones[num].rotation.z;
-		this.models[model].bones[num].rotation.x=x;													// Rotate 						
-		this.models[model].bones[num].rotation.y=y;													
-		this.models[model].bones[num].rotation.z=z;													
+		x+=this.models[model].bones[name].rotation.x;												// Add current rotations
+		y+=this.models[model].bones[name].rotation.y;
+		z+=this.models[model].bones[name].rotation.z;
+		this.models[model].bones[name].rotation.x=x;												// Rotate 						
+		this.models[model].bones[name].rotation.y=y;													
+		this.models[model].bones[name].rotation.z=z;													
 	}
 																								// SCENE CLOSURE
 }  // CLOSURE
@@ -223,24 +223,19 @@ class Scene {
 	sc.AddModel("desk2.json",0,100,0,19,5,tex)
 	sc.AddModel("desk2.json",100,100,0,19,0,tex);				
 	sc.AddModel("body.gltf",100,90,-40,20,0,0xffffff);				
-	animate();																				// Alloc scene	
-
-tt=0;
+	animate();																						// Animate
 
 	function animate() {														// ANIMATE LOOP
 		sc.controls.update();														// Update control time
 		requestAnimationFrame(animate);												// Set timer
 		sc.renderer.render(sc.scene,sc.camera);										// Render scene
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
-		if (sc.models[0] && sc.models[0].bones[0]) {
 
-if (tt) {
-
-sc.models[0].bones[16].rotation.z=Math.cos(++tt/50*3.14)*.02
-sc.models[0].bones[16].rotation.y=Math.cos(tt/50*3.14)*.05
-sc.models[0].bones[16].rotation.x=Math.cos(tt/50*3.14)*.05
-}		
-}
+		if (aniTimer) {
+			sc.models[0].bones["body_Neck"].rotation.z=Math.cos(++aniTimer/50*3.14)*.02
+			sc.models[0].bones["body_Neck"].rotation.y=Math.cos(aniTimer/50*3.14)*.05
+			sc.models[0].bones["body_Neck"].rotation.x=Math.cos(aniTimer/50*3.14)*.05
+			}
 
 	}
 
