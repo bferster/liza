@@ -4,7 +4,7 @@
 	<meta charset="UTF-8" />
 	<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
 	<title>liza</title>
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width" user-scalable=no">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link   rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>	
@@ -16,13 +16,15 @@
 	
 	<style>
 		 body { 			font-family:Verdana,Geneva,sans-serif;font-size:13px; box-sizing:border-box; 
-							padding:0;margin:0; 
+							padding:0;margin:0; position: fixed; width:100%;
 							}
-		.lz-splash { 		width:100%; color:#999; text-align:center; margin-top:10%;  display:none;
+		.lz-splash { 		color:#999; text-align:center; margin-top:10%;  display:none;
 							}
 		.lz-about { 		position: relative; width:100%; max-width:800px; height:calc(100vh - 28px); margin: 12px auto; border:none; 
 							}
 		.lz-main { 			width:100%; height:100%; background-color: #ddd; display:none; text-align:center;
+							}
+		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
@@ -44,8 +46,7 @@
 </head>
 <body>
 	
-	<div id="mainDiv" class="lz-main">
-		</div>
+	<div id="mainDiv" class="lz-main"></div>
 	<div id="splashDiv" class="lz-splash">
 		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br><br>
 		<br><p style="color:#000;font-size:14px"><em>A tool for engaging people in highly affective script-driven discourse<br>for learning and practicing goal-directed behaviors.</em></p>
@@ -68,10 +69,10 @@ class Scene {
 		this.controls=null;																			// Controls object
 		this.outliner=null;																			// Outline renderer
 		this.floor="wood.jpg";																		// Floor texture
-		this.frontWall="blackboard.png";															// Blackboard texture
-		this.backWall="lib/wgl/map.jpg";															// Wall texture
-		this.leftWall="lib/wgl/map.jpg";															// Wall texture
-		this.rightWall="lib/wgl/map.jpg";															// Wall texture
+		this.frontWall="blackboard.png";															// Front wall texture
+		this.backWall="blackboard.png";																// Back wall texture
+		this.leftWall="";																			// Side wall texture
+		this.rightWall="";																			// Side wall texture
 		this.Init();																				// Init 3D system
 		}
 
@@ -119,16 +120,15 @@ class Scene {
 	AddRoom()																					// ADD ROOM TO SCENE
 	{	
 		var _this=this;																				// Save context
-		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,this.cartoonScene)	// If a floor spec'd
-		if (this.frontWall) 	addWall(0,128,512,Math.PI,0,Math.PI,256,this.frontWall,0,0)			// If a front wall spec'd
-		if (!this.cartoonScene) {
-			if (this.backWall) 	addWall(0,128,-512,0,0,0,256,this.backWall,0,0)						// If a back wall spec'd
-			if (this.leftWall) 	addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0,0)				// If a left wall spec'd
-			if (this.rightWall) addWall(512,128,0,0,-Math.PI/2,0,256,this.rightWall,0,0)			// If a right wall spec'd
-			}
+		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,this.cartoonScene);	// If a floor spec'd
+		if (this.frontWall) 	addWall(0,128,512,Math.PI,0,Math.PI,256,this.frontWall,0,0);		// If a front wall spec'd
+		if (this.backWall) 		addWall(0,128,-512,0,0,0,256,this.backWall,0,0);					// If a back wall spec'd
+		if (this.leftWall) 		addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0,0);			// If a left wall spec'd
+		if (this.rightWall)	 	addWall(512,128,0,0,-Math.PI/2,0,256,this.rightWall,0,0);			// If a right wall spec'd
+
 		function addWall(x, y, z, xr, yr, zr, h, texture, wrap, cartoon) {							// ADD WALL
 			var mat=new THREE.MeshPhongMaterial();													// Make material
-			mat.color=new THREE.Color(0xeeeeee);													// Set color
+			mat.color=new THREE.Color(cartoon ? 0xeeeeee : 0xffffff);								// Set color
 			if (!cartoon) {																			// If a cartoon scene
 				mat.userData.outlineParameters= { visible: false };									// Hide outline
 				var tex=_this.textureLoader.load(texture);											// Load texture
@@ -146,7 +146,7 @@ class Scene {
 		}
 	}
 
-	AddModel(src, x, z, y, scale, rot, tex)														// ADD MODEL TO SCENE
+	AddModel(id, src, x, z, y, scale, rot, tex)													// ADD MODEL TO SCENE
 	{
 		var loader;
 		var _this=this;																				// Save context
@@ -154,14 +154,14 @@ class Scene {
 		if (src.match(/obj/i))	loader=new THREE.OBJLoader(this.manager);							// If OBJ
 		if (src.match(/gltf/i))	loader=new THREE.GLTFLoader(this.manager);							// If GLTF
 		loader.load(src, (obj)=> { 																	// Load model
-			loadModel(obj);
-			if (src == "body.gltf") {																// If a student
-				_this.SetBone(0,"body_RightUpLeg",0,20,90)		// RUL
-				_this.SetBone(0,"body_RightLeg",0,20,90)		// RL
-				_this.SetBone(0,"body_LeftUpLeg",0,-10,-90)		// LUL
-				_this.SetBone(0,"body_LeftLeg",0,-10,-90)		// LL
-				_this.SetBone(0,"body_LeftArm",0,0,120)			// LA
-				_this.SetBone(0,"body_RightArm",-20,50,0)		// RA
+			loadModel(id, obj, src, tex);
+			if (id == "body6") {																	// If a student
+				_this.SetBone(id,"body_RightUpLeg",0,20,90);	// RUL
+				_this.SetBone(id,"body_RightLeg",0,20,90);		// RL
+				_this.SetBone(id,"body_LeftUpLeg",0,-10,-90);	// LUL
+				_this.SetBone(id,"body_LeftLeg",0,-10,-90);		// LL
+				_this.SetBone(id,"body_LeftArm",0,0,120);		// LA
+				_this.SetBone(id,"body_RightArm",-20,50,0);		// RA
 				aniTimer=1;																			// Start animation
 				}
 		}, onProgress, onError );																	// Load
@@ -174,14 +174,14 @@ class Scene {
 			}
 		function onError(err) {	console.log(err) };													// ON ERROR
 
-		function loadModel(object) {															// ON LOAD
+		function loadModel(id, object, src, tex) {													// ON LOAD
 			var texture=null;
-			_this.models.push({ name:src, bones:[] });												// Add new model	
-			var cm=_this.models[_this.models.length-1];												// Point at model slot
+			_this.models[id]=({ name:src, bones:[] });												// Add new model	
+			var cm=_this.models[id];																// Point at new model
 			if (tex && isNaN(tex)) 																	// If a textur
 				texture=_this.textureLoader.load(tex);												// Load texture
 			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF)			
-			
+
 			var i=0;
 			object.traverse(function(child) {														// Go thru model
 				if (child.isBone) cm.bones[child.name]=child; 										// If a bone, add to list
@@ -201,28 +201,28 @@ class Scene {
 		}
 	}
 	
-	SetBone(model, name, x, y, z)																// ROTATE A BONE
+	SetBone(model, bone, x, y, z)																// ROTATE A BONE
 	{
 		x*=Math.PI/180;	y*=Math.PI/180;	z*=Math.PI/180;												// Convert degrees to radians
-		x+=this.models[model].bones[name].rotation.x;												// Add current rotations
-		y+=this.models[model].bones[name].rotation.y;
-		z+=this.models[model].bones[name].rotation.z;
-		this.models[model].bones[name].rotation.x=x;												// Rotate 						
-		this.models[model].bones[name].rotation.y=y;													
-		this.models[model].bones[name].rotation.z=z;													
+		x+=this.models[model].bones[bone].rotation.x;												// Add current rotations
+		y+=this.models[model].bones[bone].rotation.y;
+		z+=this.models[model].bones[bone].rotation.z;
+		this.models[model].bones[bone].rotation.x=x;												// Rotate 						
+		this.models[model].bones[bone].rotation.y=y;													
+		this.models[model].bones[bone].rotation.z=z;													
 	}
 																								// SCENE CLOSURE
 }  // CLOSURE
 
 	var sc=new Scene();																				// Make new scene		
 	var tex=sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";											// Desks cartoon or real				
-	sc.AddModel("desk2.json",-100,-100,0,19,0,tex);				
-	sc.AddModel("desk2.json",0,-100,0,19,0,tex)
-	sc.AddModel("desk2.json",100,-100,0,19,30,tex);				
-	sc.AddModel("desk2.json",-100,100,0,19,-10,tex);				
-	sc.AddModel("desk2.json",0,100,0,19,5,tex)
-	sc.AddModel("desk2.json",100,100,0,19,0,tex);				
-	sc.AddModel("body.gltf",100,90,-40,20,0,0xffffff);				
+	sc.AddModel("desk1","desk2.json",-100,-100,0,19,0,tex);				
+	sc.AddModel("desk2","desk2.json",0,-100,0,19,0,tex)
+	sc.AddModel("desk3","desk2.json",100,-100,0,19,30,tex);				
+	sc.AddModel("desk4","desk2.json",-100,100,0,19,-10,tex);				
+	sc.AddModel("desk5","desk2.json",0,100,0,19,5,tex)
+	sc.AddModel("desk6","desk2.json",100,100,0,19,0,tex);				
+	sc.AddModel("body6","body.gltf",100,90,-40,20,0,0xffffff);				
 	animate();																						// Animate
 
 	function animate() {														// ANIMATE LOOP
@@ -232,9 +232,9 @@ class Scene {
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
 
 		if (aniTimer) {
-			sc.models[0].bones["body_Neck"].rotation.z=Math.cos(++aniTimer/50*3.14)*.02
-			sc.models[0].bones["body_Neck"].rotation.y=Math.cos(aniTimer/50*3.14)*.05
-			sc.models[0].bones["body_Neck"].rotation.x=Math.cos(aniTimer/50*3.14)*.05
+			sc.models["body6"].bones["body_Neck"].rotation.z=Math.cos(++aniTimer/50*3.14)*.02
+			sc.models["body6"].bones["body_Neck"].rotation.y=Math.cos(aniTimer/50*3.14)*.05
+			sc.models["body6"].bones["body_Neck"].rotation.x=Math.cos(aniTimer/50*3.14)*.05
 			}
 
 	}
@@ -311,6 +311,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		window.addEventListener("message",html5MessageHandler,false);		// Add event handler
 	else																	// Use other method
 		window.attachEvent("message",html5MessageHandler);					// Add handler
+	
 
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
 	
@@ -446,6 +447,16 @@ class App  {																								 // APP
 			console.log(msg,p1);
 		else
 			console.log(msg);
+	}
+
+	function trace2(msg, p1, p2)											// VISIBLE CONSOLE (FOR IOS)
+	{
+		msg+=(p1 != undefined) ? (","+p1) : ""; 								// Add with comma
+		msg+=(p2 != undefined) ? (","+p2) : ""; 
+		if (!$("#errorDiv")[0])													// If not initted
+			$("body").append("<div id='errorDiv' class='lz-error'></div>");		// Add div
+		$("#errorDiv").append(msg+"<br> ");										// Print msg
+		console.log(msg);														// On console too
 	}
 
 	function Sound(sound, mute)												// PLAY SOUND

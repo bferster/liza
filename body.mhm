@@ -19,12 +19,11 @@ modifier armslegs/r-upperarm-shoulder-muscle-decr|incr 0.406000
 modifier armslegs/r-hand-fingers-distance-decr|incr 0.038000
 modifier armslegs/r-hand-trans-in|out 0.038000
 modifier macrodetails-universal/Weight 0.487000
-skeleton cmu_mb.mhskel
+proxy male1591 d7e4934e-daed-4ad5-a055-18c9cba487dc
 eyes Low-Poly 1cc97a30-85a1-42e6-a9f7-b3e753732baa
 clothes shoes01 6e0c552e-e207-44df-8f70-c9bfdeddd8c6
 clothesHideFaces True
 expression smile04.mhpose
 skinMaterial skins/default.mhmat
-material shoes01 6e0c552e-e207-44df-8f70-c9bfdeddd8c6 shoes01.mhmat
 material Low-Poly 1cc97a30-85a1-42e6-a9f7-b3e753732baa eyes/materials/brown.mhmat
 subdivide False
