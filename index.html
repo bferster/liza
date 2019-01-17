@@ -11,6 +11,7 @@
 	<script src="lib/wgl/three.min.js"></script>
 	<script src="lib/wgl/OBJLoader.js"></script>
 	<script src="lib/wgl/GLTFLoader.js"></script>
+	<script src="lib/wgl/ColladaLoader.js"></script>
 	<script src="lib/wgl/OrbitControls.js"></script>
 	<script src="lib/wgl/OutlineEffect.js"></script>
 	
@@ -150,9 +151,11 @@ class Scene {
 	{
 		var loader;
 		var _this=this;																				// Save context
-		if (src.match(/json/i))	loader=new THREE.ObjectLoader(this.manager);						// If JSON model format
-		if (src.match(/obj/i))	loader=new THREE.OBJLoader(this.manager);							// If OBJ
-		if (src.match(/gltf/i))	loader=new THREE.GLTFLoader(this.manager);							// If GLTF
+		if (src.match(/\.json/i))	loader=new THREE.ObjectLoader(this.manager);					// If JSON model format
+		if (src.match(/\.obj/i))	loader=new THREE.OBJLoader(this.manager);						// If OBJ
+		if (src.match(/\.gltf/i))	loader=new THREE.GLTFLoader(this.manager);						// If GLTF
+		if (src.match(/\.dae/i))	loader=new THREE.ColladaLoader(this.manager);					// If DAE
+
 		loader.load(src, (obj)=> { 																	// Load model
 			loadModel(id, obj, src, tex);
 			if (id == "body6") {																	// If a student
@@ -180,7 +183,7 @@ class Scene {
 			var cm=_this.models[id];																// Point at new model
 			if (tex && isNaN(tex)) 																	// If a textur
 				texture=_this.textureLoader.load(tex);												// Load texture
-			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF)			
+			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF/DAE)			
 
 			var i=0;
 			object.traverse(function(child) {														// Go thru model
