@@ -159,13 +159,13 @@ class Scene {
 		loader.load(src, (obj)=> { 																	// Load model
 			loadModel(id, obj, src, tex);
 			if (id == "body6") {																	// If a student
-				_this.SetBone(id,"body_RightUpLeg",0,20,90);	// RUL
+/*				_this.SetBone(id,"body_RightUpLeg",0,20,90);	// RUL
 				_this.SetBone(id,"body_RightLeg",0,20,90);		// RL
 				_this.SetBone(id,"body_LeftUpLeg",0,-10,-90);	// LUL
 				_this.SetBone(id,"body_LeftLeg",0,-10,-90);		// LL
 				_this.SetBone(id,"body_LeftArm",0,0,120);		// LA
 				_this.SetBone(id,"body_RightArm",-20,50,0);		// RA
-				aniTimer=1;																			// Start animation
+*/				aniTimer=1;																			// Start animation
 				}
 		}, onProgress, onError );																	// Load
 
@@ -225,7 +225,7 @@ class Scene {
 	sc.AddModel("desk4","desk2.json",-100,100,0,19,-10,tex);				
 	sc.AddModel("desk5","desk2.json",0,100,0,19,5,tex)
 	sc.AddModel("desk6","desk2.json",100,100,0,19,0,tex);				
-	sc.AddModel("body6","body1.gltf",100,90,0,13,0,0xffffff);				
+	sc.AddModel("body6","body2.dae",100,90,0,13,0,0xffffff);				
 	animate();																						// Animate
 
 	function animate() {														// ANIMATE LOOP
@@ -235,9 +235,9 @@ class Scene {
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
 
 		if (aniTimer) {
-			sc.models["body6"].bones["body_Neck"].rotation.z=Math.cos(++aniTimer/50*3.14)*.02
-			sc.models["body6"].bones["body_Neck"].rotation.y=Math.cos(aniTimer/50*3.14)*.05
-			sc.models["body6"].bones["body_Neck"].rotation.x=Math.cos(aniTimer/50*3.14)*.05
+			sc.models["body6"].bones["neck"].rotation.z=Math.cos(++aniTimer/50*-3.14)*.02
+			sc.models["body6"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
+			sc.models["body6"].bones["neck"].rotation.x=Math.cos(aniTimer/50*-3.14)*.05
 			}
 
 	}
