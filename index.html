@@ -158,15 +158,15 @@ class Scene {
 
 		loader.load(src, (obj)=> { 																	// Load model
 			loadModel(id, obj, src, tex);
-			if (id == "body6") {																	// If a student
-/*				_this.SetBone(id,"body_RightUpLeg",0,20,90);	// RUL
-				_this.SetBone(id,"body_RightLeg",0,20,90);		// RL
-				_this.SetBone(id,"body_LeftUpLeg",0,-10,-90);	// LUL
-				_this.SetBone(id,"body_LeftLeg",0,-10,-90);		// LL
-				_this.SetBone(id,"body_LeftArm",0,0,120);		// LA
-				_this.SetBone(id,"body_RightArm",-20,50,0);		// RA
-*/				aniTimer=1;																			// Start animation
-				}
+		if (id == "body6") {																		// If a student
+			_this.SetBone(id,"thighR",0,20,-90);	// RT
+			_this.SetBone(id,"legR",0,20,90);		// RL
+			_this.SetBone(id,"thighL",0,-10,-90);	// LT
+			_this.SetBone(id,"legL",0,10,90);		// LL
+			_this.SetBone(id,"armL",120,-60,0);		// LA
+			_this.SetBone(id,"forearmR",0,-60,-15);	// RA
+			aniTimer=1;																			// Start animation
+			}
 		}, onProgress, onError );																	// Load
 
 		function onProgress(xhr) {																	// ON PROGRESS
@@ -204,6 +204,13 @@ class Scene {
 		}
 	}
 	
+	SetPull(model, bone, x, y, z)																// PLACE A BONE
+	{
+		this.models[model].bones[bone].position.x=x;												// Rotate 						
+		this.models[model].bones[bone].position.y=y;													
+		this.models[model].bones[bone].position.z=z;													
+	}
+
 	SetBone(model, bone, x, y, z)																// ROTATE A BONE
 	{
 		x*=Math.PI/180;	y*=Math.PI/180;	z*=Math.PI/180;												// Convert degrees to radians
@@ -225,7 +232,7 @@ class Scene {
 	sc.AddModel("desk4","desk2.json",-100,100,0,19,-10,tex);				
 	sc.AddModel("desk5","desk2.json",0,100,0,19,5,tex)
 	sc.AddModel("desk6","desk2.json",100,100,0,19,0,tex);				
-	sc.AddModel("body6","body2.dae",100,90,0,13,0,0xffffff);				
+	sc.AddModel("body6","body.dae",100,90,-40,16,0,0xffffff);				
 	animate();																						// Animate
 
 	function animate() {														// ANIMATE LOOP
@@ -235,11 +242,11 @@ class Scene {
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
 
 		if (aniTimer) {
-			sc.models["body6"].bones["neck"].rotation.z=Math.cos(++aniTimer/50*-3.14)*.02
+			aniTimer++;
+			sc.models["body6"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
 			sc.models["body6"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
-			sc.models["body6"].bones["neck"].rotation.x=Math.cos(aniTimer/50*-3.14)*.05
+			sc.models["body6"].bones["forearmL"].rotation.z=Math.cos(aniTimer/30*-3.14)*.3
 			}
-
 	}
 
 
