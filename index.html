@@ -27,6 +27,9 @@
 							}
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
+		.lz-bonesEditor {	position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #999;
+							padding:16px; border-radius: 16px; width: 600px;
+							}
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							}
@@ -34,7 +37,7 @@
 							border-radius: 8px; background-color: #eee; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							font-size: 14px; text-align:center; display: none;
 							}
-		.lz-is {			border-radius:.8em;padding-left:.6em;padding-right:.6em;padding-top:1px;
+		.lz-is {			border-radius:.8em;padding-left:.6em;padding-right:.6em;padding-top:1px ;width:100px;
 							border:1px solid #999; font-size:1em; height: 1.66em; width:16.66em;
 							}
 		.lz-bs {			cursor: pointer; color:#fff; 
@@ -158,15 +161,15 @@ class Scene {
 
 		loader.load(src, (obj)=> { 																	// Load model
 			loadModel(id, obj, src, tex);
-		if (id == "body6") {																		// If a student
-			_this.SetBone(id,"thighR",0,20,-90);	// RT
-			_this.SetBone(id,"legR",0,20,90);		// RL
-			_this.SetBone(id,"thighL",0,-10,-90);	// LT
-			_this.SetBone(id,"legL",0,10,90);		// LL
-			_this.SetBone(id,"armL",120,-60,0);		// LA
-			_this.SetBone(id,"forearmR",0,-60,-15);	// RA
-			aniTimer=1;																			// Start animation
-			}
+			if (id == "body6") {																	// If a student
+				_this.SetBone(id,"thighR",0,0,-90);			// RT
+				_this.SetBone(id,"legR",0,0,76);			// RL
+				_this.SetBone(id,"thighL",0,8,-87);			// LT
+				_this.SetBone(id,"legL",0,10,90);			// LL
+				_this.SetBone(id,"armL",81,-55,-14);		// LA
+				_this.SetBone(id,"forearmR",-9,-64,-19);	// RA
+				aniTimer=1;																			// Start animation
+				}
 		}, onProgress, onError );																	// Load
 
 		function onProgress(xhr) {																	// ON PROGRESS
@@ -187,7 +190,12 @@ class Scene {
 
 			var i=0;
 			object.traverse(function(child) {														// Go thru model
-				if (child.isBone) cm.bones[child.name]=child; 										// If a bone, add to list
+				if (child.isBone) {																	// If a bone,
+					cm.bones[child.name]=child; 													// Add to list
+					child.oxr=child.rotation.x;														// Save original x rotation
+					child.oyr=child.rotation.y;														// Y
+					child.ozr=child.rotation.z;														// Z
+				}
 				if (child.isMesh) { 																// If a mesh
 					if (texture)		child.material.map=texture;									// If has texture, add it
 					if (!isNaN(tex)) 																// If a cartoon shading
@@ -196,7 +204,7 @@ class Scene {
 						child.material.userData.outlineParameters= { visible:!isNaN(tex) };			// Outline if a number
 					}							
 			});
-
+			
 			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
 			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
 			object.rotation.y=rot*Math.PI/180;														// Rotation
@@ -204,22 +212,92 @@ class Scene {
 		}
 	}
 	
-	SetPull(model, bone, x, y, z)																// PLACE A BONE
-	{
-		this.models[model].bones[bone].position.x=x;												// Rotate 						
-		this.models[model].bones[bone].position.y=y;													
-		this.models[model].bones[bone].position.z=z;													
-	}
-
 	SetBone(model, bone, x, y, z)																// ROTATE A BONE
 	{
 		x*=Math.PI/180;	y*=Math.PI/180;	z*=Math.PI/180;												// Convert degrees to radians
-		x+=this.models[model].bones[bone].rotation.x;												// Add current rotations
-		y+=this.models[model].bones[bone].rotation.y;
-		z+=this.models[model].bones[bone].rotation.z;
+		x+=this.models[model].bones[bone].oxr;														// Add initial rotations
+		y+=this.models[model].bones[bone].oyr;
+		z+=this.models[model].bones[bone].ozr;
 		this.models[model].bones[bone].rotation.x=x;												// Rotate 						
 		this.models[model].bones[bone].rotation.y=y;													
 		this.models[model].bones[bone].rotation.z=z;													
+	}
+
+	BonesEditor()																				// BONES EDITOR
+	{
+		var _this=this;
+		$("#bonesEditor").remove();																	// Remove old one
+		var str="<div id='bonesEditor' class='lz-bonesEditor'>";
+		str+="<img src='img/scalelogo.png' style='vertical-align:-6px' width='32'><span style='font-size:24px;margin-left:16px'><b>Bones editor</b></span><br><br>";	
+		str+="<table>";
+		str+="<tr><td>Model </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6'>";									// Model id
+		str+="&nbsp;&nbsp;&nbsp;Bone&nbsp;"+MakeSelect("beBone",false,["Choose bone"]);
+		str+="<div class='lz-bs' id='beZero' style='float:right;margin-right:12px'>0</div></td></tr>";													// Bone id/zero
+		str+="<tr><td>&nbsp;</td></tr>";
+		str+="<tr><td>X&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:480px' id='beXaxis'>"					// X slider
+		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beXval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// X slider value
+		str+="<tr><td>Y&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:480px' id='beYaxis'>"					// Y
+		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beYval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// Y
+		str+="<tr><td>Z&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:480px' id='beZaxis'>"					// Z
+		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beZval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// Z
+	
+		str+="</table><br>";																			
+		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
+		str+="<div class='lz-bs' onclick='$(\"#bonesEditor\").remove();aniTimer=1'>Done</div>";																		
+		str+="</div>";
+
+		aniTimer=0;																					// Stop animation
+		$("body").append(str);																		// Add to body
+		addBones();																					// Load new bones for pulldown
+		$("#bonesEditor").draggable();																// Make it drqaggable
+		$("#bonesEditor").mousedown( (e)=> { e.stopPropagation() } );								// Don't move orbiter
+		$("#beXaxis").on("input",  function(e) { $("#beXval").val(this.value); moveBone(); } );		// Show x value	
+		$("#beXval").on("change",  function(e) { $("#beXaxis").val(this.value); moveBone(); } );	// Set x value manually	
+		$("#beYaxis").on("input",  function(e) { $("#beYval").val(this.value); moveBone(); } );		// Y
+		$("#beYval").on("change",  function(e) { $("#beYaxis").val(this.value); moveBone(); } );	// Y	
+		$("#beZaxis").on("input",  function(e) { $("#beZval").val(this.value); moveBone(); } );		// Z
+		$("#beZval").on("change",  function(e) { $("#beZaxis").val(this.value); moveBone(); } );	// Z
+		$("#beModel").on("change", function(e) { addBones(); } )									// Add current bones
+		$("#beBone").on("change",  function(e) {
+			var v;
+			var model=$("#beModel").val();															// Model id
+			var bone=$("#beBone").val();															// Bone id
+			v=(Math.round((_this.models[model].bones[bone].rotation.x-_this.models[model].bones[bone].oxr)*180/Math.PI)*100)/100;	// Get X degrees
+			$("#beXval").val(v);	$("#beXaxis").val(v);											// Set slider
+			v=(Math.round((_this.models[model].bones[bone].rotation.y-_this.models[model].bones[bone].oyr)*180/Math.PI)*100)/100;	// Get Y degrees
+			$("#beYval").val(v);	$("#beYaxis").val(v);											// Set slider
+			v=(Math.round((_this.models[model].bones[bone].rotation.z-_this.models[model].bones[bone].ozr)*180/Math.PI)*100)/100;	// Get Z degrees
+			$("#beZval").val(v);	$("#beZaxis").val(v);											// Set slider
+			});
+
+		$("#beZero").on("click", ()=>  {															// ZERO BONE TO ORIGINAL STATE	
+			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
+			$("#beXaxis").val(0);	$("#beYaxis").val(0);	$("#beZaxis").val(0);					// Set slider
+			this.SetBone($("#beModel").val(),$("#beBone").val(),0,0,0);								// Set bone						
+			});
+
+		$("#beReset").on("click", ()=>  {															// REST ALL BONES TO ORIGINAL STATE	
+			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
+			$("#beXaxis").val(0);	$("#beYaxis").val(0);	$("#beZaxis").val(0);					// Set slider
+			var base=this.models[$("#beModel").val()].bones;										// Point at bones array
+			for (var bone in base) 	this.SetBone($("#beModel").val(),bone,0,0,0);					// Set bone						
+			});
+
+		function addBones() {																		// FILL BONES PULLDOWN
+			var v=[];
+			$("#beBone").empty();																	// Clear select
+			$("#beBone").append("<option>Choose bone</option>");									// Add choose
+			var base=_this.models[$("#beModel").val()].bones;										// Point at bones array
+			for (var bone in base) 			v.push(bone);											// Add bone to array
+			v.sort();																				// Sort bones
+			for (var i=0;i<v.length;++i) 	$("#beBone").append("<option>"+v[i]+"</option>");		// Add option
+			}
+
+		function moveBone() {																		// Move the bone
+			_this.SetBone($("#beModel").val(),$("#beBone").val(),$("#beXaxis").val(),$("#beYaxis").val(),$("#beZaxis").val())
+			}
+		
+
 	}
 																								// SCENE CLOSURE
 }  // CLOSURE
@@ -240,7 +318,6 @@ class Scene {
 		requestAnimationFrame(animate);												// Set timer
 		sc.renderer.render(sc.scene,sc.camera);										// Render scene
 		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
-
 		if (aniTimer) {
 			aniTimer++;
 			sc.models["body6"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
@@ -323,9 +400,9 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	else																	// Use other method
 		window.attachEvent("message",html5MessageHandler);					// Add handler
 	
-
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
-	
+		if ((e.which == 84) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+T)
+			sc.BonesEditor();
 	});
  
  });									
