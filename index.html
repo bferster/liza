@@ -71,20 +71,37 @@ class App  {
 	constructor(id)   																			// CONSTRUCTOR
 	{
 		app=this;
-		this.sc=new Scene();																			// Make new scene		
-		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";									// Desks cartoon or real				
-		this.sc.AddModel("desk1","desk2.json",-100,-100,0,19,0,tex);				
-		this.sc.AddModel("desk2","desk2.json",0,-100,0,19,0,tex)
-		this.sc.AddModel("desk3","desk2.json",100,-100,0,19,30,tex);				
-		this.sc.AddModel("desk4","desk2.json",-100,100,0,19,-10,tex);				
-		this.sc.AddModel("desk5","desk2.json",0,100,0,19,5,tex)
-		this.sc.AddModel("desk6","desk2.json",100,100,0,19,0,tex);				
-		this.sc.AddModel("body6","body.dae",100,90,-40,16,0,0xffffff);				
-		this.sc.Animate();																				// Animate
+		this.sc=new Scene();																		// Make new scene		
+		this.poses=[];																				// Holds poses
+		this.desks=[];																				// Holds desks	
+		this.students=[];																			// Holds students	
+		this.LoadProject("myFile");																	// Load project file
+		this.LoadModels();																			// Load 3D models
+		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
+		this.Draw();																				// Start 
 	}
 
-	Draw(index) 																				// REDRAW
+	LoadProject(file)																			// LOAD PRIOJECT DATA
 	{
+		this.desks.push({ id:"desk1", src:"desk2.json", x:-100, y:-100, z:0, s:19, r:0, tex:0xffffff} );	
+		this.desks.push({ id:"desk2", src:"desk2.json", x:0, y:-100, z:0, s:19, r:0, tex:0xffffff} );		
+		this.desks.push({ id:"desk3", src:"desk2.json", x:100, y:-100, z:0, s:19, r:30, tex:0xffffff} );		
+		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:19, r:-10, tex:0xffffff} );		
+		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:19, r:0, tex:0xffffff} );		
+		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:19, r:0, tex:0xffffff} );		
+		this.students.push({ id:"body6", src:"body.dae", x:100, y:90, z:-40, s:16, r:0, tex:0xffffff} );		
+	}
+
+	LoadModels() 																				// LOAD 3D MODELS
+	{
+		var i;
+		for (i=0;i<this.desks.length;++i)  		this.sc.AddModel(this.desks[i]);					// Load each desk		
+		for (i=0;i<this.students.length;++i)  	this.sc.AddModel(this.students[i]);					// Load each student		
+	}
+
+	Draw() 																						// REDRAW
+	{
+		this.sc.Animate();																			// Animate
 
 	}
 
@@ -109,8 +126,8 @@ class Scene {
 		this.floor="wood.jpg";																		// Floor texture
 		this.frontWall="blackboard.png";															// Front wall texture
 		this.backWall="blackboard.png";																// Back wall texture
-		this.leftWall="";																			// Side wall texture
-		this.rightWall="";																			// Side wall texture
+		this.leftWall="blankwall.png";																// Side wall texture
+		this.rightWall="blankwall.png";																// Side wall texture
 		this.Init();																				// Init 3D system
 		}
 
@@ -159,10 +176,10 @@ class Scene {
 	{	
 		var _this=this;																				// Save context
 		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,this.cartoonScene);	// If a floor spec'd
-		if (this.frontWall) 	addWall(0,128,512,Math.PI,0,Math.PI,256,this.frontWall,0,0);		// If a front wall spec'd
-		if (this.backWall) 		addWall(0,128,-512,0,0,0,256,this.backWall,0,0);					// If a back wall spec'd
-		if (this.leftWall) 		addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0,0);			// If a left wall spec'd
-		if (this.rightWall)	 	addWall(512,128,0,0,-Math.PI/2,0,256,this.rightWall,0,0);			// If a right wall spec'd
+		if (this.frontWall) 	addWall(0,512,128,0,Math.PI,0,256,this.frontWall,0,0);				// If a front wall spec'd
+		if (this.backWall) 		addWall(0,-512,128,0,0,0,256,this.backWall,0,0);					// If a back wall spec'd
+		if (this.leftWall) 		addWall(-512,0,128,0,Math.PI/2,0,256,this.leftWall,0,0);			// If a left wall spec'd
+		if (this.rightWall)	 	addWall(512,0,128,0,-Math.PI/2,0,256,this.rightWall,0,0);			// If a right wall spec'd
 
 		function addWall(x, y, z, xr, yr, zr, h, texture, wrap, cartoon) {							// ADD WALL
 			var mat=new THREE.MeshPhongMaterial();													// Make material
@@ -179,29 +196,29 @@ class Scene {
 			var cbg=new THREE.PlaneGeometry(1024,h,1,1);											// Make grid
 			var mesh=new THREE.Mesh(cbg,mat);														// Make mesh
 			mesh.rotation.x=xr;		mesh.rotation.y=yr;		mesh.rotation.z=zr;						// Rotate 
-			mesh.position.x=x; 		mesh.position.y=y;		mesh.position.z=z;						// Position
+			mesh.position.x=x; 		mesh.position.y=z;		mesh.position.z=y;						// Position
 			_this.scene.add(mesh);																	// Add to scene		
 		}
 	}
 
-	AddModel(id, src, x, z, y, scale, rot, tex)													// ADD MODEL TO SCENE
+	AddModel(o)																					// ADD MODEL TO SCENE
 	{
 		var loader;
 		var _this=this;																				// Save context
-		if (src.match(/\.json/i))	loader=new THREE.ObjectLoader(this.manager);					// If JSON model format
-		if (src.match(/\.obj/i))	loader=new THREE.OBJLoader(this.manager);						// If OBJ
-		if (src.match(/\.gltf/i))	loader=new THREE.GLTFLoader(this.manager);						// If GLTF
-		if (src.match(/\.dae/i))	loader=new THREE.ColladaLoader(this.manager);					// If DAE
+		if (o.src.match(/\.json/i))	loader=new THREE.ObjectLoader(this.manager);					// If JSON model format
+		if (o.src.match(/\.obj/i))	loader=new THREE.OBJLoader(this.manager);						// If OBJ
+		if (o.src.match(/\.gltf/i))	loader=new THREE.GLTFLoader(this.manager);						// If GLTF
+		if (o.src.match(/\.dae/i))	loader=new THREE.ColladaLoader(this.manager);					// If DAE
 
-		loader.load(src, (obj)=> { 																	// Load model
-			loadModel(id, obj, src, tex);
-			if (id == "body6") {																	// If a student
-				_this.SetBone(id,"thighR",-90,0,0);			// RT
-				_this.SetBone(id,"legR",90,0,0);			// RL
-				_this.SetBone(id,"thighL",-90,0,0);			// LT
-				_this.SetBone(id,"legL",90,0,0);			// LL
-				_this.SetBone(id,"armL",81,-55,-14);		// LA
-				_this.SetBone(id,"forearmR",-9,-64,-19);	// RA
+		loader.load(o.src, (obj)=> { 																// Load model
+			loadModel(obj);																			// Load it
+			if (o.id == "body6") {																	// If a student
+				_this.SetBone(o.id,"thighR",-90,0,0);			// RT
+				_this.SetBone(o.id,"legR",90,0,0);			// RL
+				_this.SetBone(o.id,"thighL",-90,0,0);			// LT
+				_this.SetBone(o.id,"legL",90,0,0);			// LL
+				_this.SetBone(o.id,"armL",81,-55,-14);		// LA
+				_this.SetBone(o.id,"forearmR",-9,-64,-19);	// RA
 				aniTimer=1;																			// Start animation
 				}
 		}, onProgress, onError );																	// Load
@@ -214,15 +231,14 @@ class Scene {
 			}
 		function onError(err) {	console.log(err) };													// ON ERROR
 
-		function loadModel(id, object, src, tex) {													// ON LOAD
-			var texture=null;
-			_this.models[id]=({ name:src, bones:[] });												// Add new model	
-			var cm=_this.models[id];																// Point at new model
-			if (tex && isNaN(tex)) 																	// If a textur
-				texture=_this.textureLoader.load(tex);												// Load texture
+		function loadModel(object) {															// ON LOAD
+			var i=0,texture=null;
+			_this.models[o.id]=({ name:o.src, bones:[] });											// Add new model	
+			var cm=_this.models[o.id];																// Point at new model
+			if (o.tex && isNaN(o.tex)) 																// If a texture
+				texture=_this.textureLoader.load(o.tex);											// Load it
 			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF/DAE)			
 
-			var i=0;
 			object.traverse(function(child) {														// Go thru model
 				if (child.isBone) {																	// If a bone,
 					cm.bones[child.name]=child; 													// Add to list
@@ -232,16 +248,16 @@ class Scene {
 				}
 				if (child.isMesh) { 																// If a mesh
 					if (texture)		child.material.map=texture;									// If has texture, add it
-					if (!isNaN(tex)) 																// If a cartoon shading
-						child.material.color=new THREE.Color(tex);									// Set color
+					if (!isNaN(o.tex)) 																// If a cartoon shading
+						child.material.color=new THREE.Color(o.tex);								// Set color
 					if (child.material.userData)													// If user data
-						child.material.userData.outlineParameters= { visible:!isNaN(tex) };			// Outline if a number
+						child.material.userData.outlineParameters= { visible:!isNaN(o.tex) };		// Outline if a number
 					}							
 			});
 			
-			object.scale.x=object.scale.y=object.scale.z=scale;										// Scale up
-			object.position.x=x;	object.position.y=y;	object.position.z=z;					// Position
-			object.rotation.y=rot*Math.PI/180;														// Rotation
+			object.scale.x=object.scale.y=object.scale.z=o.s;										// Scale 
+			object.position.x=o.x;	object.position.z=o.y;	object.position.y=o.z;					// Position
+			object.rotation.y=o.r*Math.PI/180;														// Rotation
 			_this.scene.add(object);																// Add model to scene
 		}
 	}
@@ -403,7 +419,7 @@ class Scene {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 $(window).resize(function() {                                         	// ON WINDOW RESIZE
-	sc.Resize();															// Resize 3D
+	app.sc.Resize();														// Resize 3D
 	if (app && app.allowResize)												// If app loaded and allowing resizing
 		app.Draw();															// Redraw to fit screen
 	});
@@ -426,7 +442,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
 		if ((e.which == 84) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+T)
-			sc.BonesEditor();
+			app.sc.BonesEditor();
 	});
  
  });									
