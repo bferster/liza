@@ -59,8 +59,42 @@
 <script>
 
 var aniTimer=0;	
+var app=null;															// Holds app
+var isMobile=false;														// Flag for mobile devices
 
-class Scene {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// APP
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class App  {																					
+
+	constructor(id)   																			// CONSTRUCTOR
+	{
+		app=this;
+		this.sc=new Scene();																			// Make new scene		
+		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";									// Desks cartoon or real				
+		this.sc.AddModel("desk1","desk2.json",-100,-100,0,19,0,tex);				
+		this.sc.AddModel("desk2","desk2.json",0,-100,0,19,0,tex)
+		this.sc.AddModel("desk3","desk2.json",100,-100,0,19,30,tex);				
+		this.sc.AddModel("desk4","desk2.json",-100,100,0,19,-10,tex);				
+		this.sc.AddModel("desk5","desk2.json",0,100,0,19,5,tex)
+		this.sc.AddModel("desk6","desk2.json",100,100,0,19,0,tex);				
+		this.sc.AddModel("body6","body.dae",100,90,-40,16,0,0xffffff);				
+		this.sc.Animate();																				// Animate
+	}
+
+	Draw(index) 																				// REDRAW
+	{
+
+	}
+
+} // Class closure
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 3D SYSTEM
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Scene {																				 
 
 	constructor()																				// CONSTRUCTOR
 	{
@@ -162,10 +196,10 @@ class Scene {
 		loader.load(src, (obj)=> { 																	// Load model
 			loadModel(id, obj, src, tex);
 			if (id == "body6") {																	// If a student
-				_this.SetBone(id,"thighR",0,0,-90);			// RT
-				_this.SetBone(id,"legR",0,0,76);			// RL
-				_this.SetBone(id,"thighL",0,8,-87);			// LT
-				_this.SetBone(id,"legL",0,10,90);			// LL
+				_this.SetBone(id,"thighR",-90,0,0);			// RT
+				_this.SetBone(id,"legR",90,0,0);			// RL
+				_this.SetBone(id,"thighL",-90,0,0);			// LT
+				_this.SetBone(id,"legL",90,0,0);			// LL
 				_this.SetBone(id,"armL",81,-55,-14);		// LA
 				_this.SetBone(id,"forearmR",-9,-64,-19);	// RA
 				aniTimer=1;																			// Start animation
@@ -296,36 +330,29 @@ class Scene {
 		function moveBone() {																		// Move the bone
 			_this.SetBone($("#beModel").val(),$("#beBone").val(),$("#beXaxis").val(),$("#beYaxis").val(),$("#beZaxis").val())
 			}
-		
-
 	}
+
+	Animate() 																					// ANIMATE LOOP
+	{
+		app.sc.controls.update();																	// Update control time
+		requestAnimationFrame(app.sc.Animate);														// Set timer
+		app.sc.renderer.render(app.sc.scene,app.sc.camera);											// Render scene
+		if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );				// Render outline
+		if (aniTimer) {
+			aniTimer++;
+			app.sc.models["body6"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
+			app.sc.models["body6"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
+			app.sc.models["body6"].bones["forearmL"].rotation.z=Math.cos(aniTimer/30*-3.14)*.3
+//			app.sc.models["body6"].bones["mouth"].rotation.x=Math.cos(aniTimer/30*-3.14)*.2
+			}
+	}
+
+
+
 																								// SCENE CLOSURE
 }  // CLOSURE
 
-	var sc=new Scene();																				// Make new scene		
-	var tex=sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";											// Desks cartoon or real				
-	sc.AddModel("desk1","desk2.json",-100,-100,0,19,0,tex);				
-	sc.AddModel("desk2","desk2.json",0,-100,0,19,0,tex)
-	sc.AddModel("desk3","desk2.json",100,-100,0,19,30,tex);				
-	sc.AddModel("desk4","desk2.json",-100,100,0,19,-10,tex);				
-	sc.AddModel("desk5","desk2.json",0,100,0,19,5,tex)
-	sc.AddModel("desk6","desk2.json",100,100,0,19,0,tex);				
-	sc.AddModel("body6","body.dae",100,90,-40,16,0,0xffffff);				
-	animate();																						// Animate
 
-	function animate() {														// ANIMATE LOOP
-		sc.controls.update();														// Update control time
-		requestAnimationFrame(animate);												// Set timer
-		sc.renderer.render(sc.scene,sc.camera);										// Render scene
-		if (sc.outliner) 	sc.outliner.render(sc.scene, sc.camera );				// Render outline
-		if (aniTimer) {
-			aniTimer++;
-			sc.models["body6"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
-			sc.models["body6"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
-			sc.models["body6"].bones["forearmL"].rotation.z=Math.cos(aniTimer/30*-3.14)*.3
-//			sc.models["body6"].bones["mouth"].rotation.x=Math.cos(aniTimer/30*-3.14)*.2
-			}
-	}
 
 
 
@@ -375,9 +402,6 @@ class Scene {
 // MAIN 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-var app=null;															// Holds app
-var isMobile=false;														// Flag for mobile devices
-
 $(window).resize(function() {                                         	// ON WINDOW RESIZE
 	sc.Resize();															// Resize 3D
 	if (app && app.allowResize)												// If app loaded and allowing resizing
@@ -413,22 +437,6 @@ function html5MessageHandler(e)											// ON HTML5 MESSAGE
 //		trace(e);												// Route
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// APP
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class App  {																								 // APP
-
-	constructor(id)   																							// CONSTRUCTOR
-	{
-		app=this;
-	}
-
-	Draw(index) 																								// REDRAW
-	{
-	}
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
