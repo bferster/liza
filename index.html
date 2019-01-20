@@ -91,7 +91,16 @@ class App  {
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:19, r:0, tex:0xffffff} );		
 		this.students.push({ id:"body6*", src:"body.dae", x:100, y:90, z:-40, s:16, r:0, tex:0xffffff} );
 		this.poses["body6*"]="thighR,-90,0,0,legR,90,0,0,thighL,-90,0,0,legL,90,0,0,armL,81,-55,-14,forearmR,-9,-64,-19";
-		}
+		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
+		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
+		this.poses["headLeft"]="neck,0,60,0";			this.poses["headRight"]="neck,0,-60,0";
+		this.poses["LeftLegStretch"]="legL,50,0,0";		this.poses["LeftLegSit"]="legL,90,0,0";	
+		this.poses["RightLegStretch"]="legR,50,0,0";	this.poses["RightLegSit"]="legR,90,0,0";	
+		this.poses["LeftArmDesk"]="armL,-30,100,0,foreArmL,-20,-50,-95";
+		this.poses["RightArmDesk"]="armR,-30,100,0,foreArmR,-20,50,95";
+	
+	
+	}
 
 	LoadModels() 																				// LOAD 3D MODELS
 	{
@@ -214,7 +223,7 @@ class Scene {
 		loader.load(o.src, (obj)=> { 																// Load model
 			loadModel(obj);																			// Load it
 			if (o.id.match(/\*/)) {																	// If a student
-				_this.SetPose(o.id,true);															// Clear bones and set starting pose
+				_this.SetPose(o.id,o.id);															// Clear bones and set starting pose
 				aniTimer=1;																			// Start animation
 				}
 		}, onProgress, onError );																	// Load
@@ -260,6 +269,7 @@ class Scene {
 	
 	SetBone(model, bone, x, y, z)																// ROTATE A BONE
 	{
+		if (!this.models[model] || !this.models[model].bones[bone])	return;							// Quit on bad model or bone
 		x*=Math.PI/180;	y*=Math.PI/180;	z*=Math.PI/180;												// Convert degrees to radians
 		x+=this.models[model].bones[bone].oxr;														// Add initial rotations
 		y+=this.models[model].bones[bone].oyr;
@@ -269,12 +279,14 @@ class Scene {
 		this.models[model].bones[bone].rotation.z=z;													
 	}
 
-	SetPose(id)																					// SET A POSE
+	SetPose(model, id)																			// SET A POSE FOR A MODEL
 	{
 		var i;
-		var v=app.poses[id].split(",");																// Get bones positions
+		var v=app.poses[id];																		// Get pose string
+		if (!v || !model)	return;																	// Quit if no string or model
+		v=v.split(",");																				// Get bone positions
 		for (i=0;i<v.length;i+=4)																	// Stride by 4
-			this.SetBone(id,v[i],v[i+1]-0,v[i+2]-0,v[i+3]-0);										// Set bone
+			this.SetBone(model,v[i],v[i+1]-0,v[i+2]-0,v[i+3]-0);										// Set bone
 		}
 
 	BonesEditor()																				// BONES EDITOR
@@ -284,8 +296,9 @@ class Scene {
 		var str="<div id='bonesEditor' class='lz-bonesEditor'>";
 		str+="<img src='img/scalelogo.png' style='vertical-align:-6px' width='32'><span style='font-size:24px;margin-left:16px'><b>Pose editor</b></span><br><br>";	
 		str+="<table>";
-		str+="<tr><td>Model </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6*'>";									// Model id
-		str+="&nbsp;&nbsp;&nbsp;Bone&nbsp;"+MakeSelect("beBone",false,["Choose bone"]);
+		str+="<tr><td>Model: </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6*'>";									// Model id
+		str+="&nbsp;&nbsp;&nbsp;Pose:&nbsp;"+MakeSelect("bePose",false,[]);																				// Pose
+		str+="&nbsp;&nbsp;&nbsp;Bone:&nbsp;"+MakeSelect("beBone",false,[]);																				// Bone
 		str+="<div class='lz-bs' id='beZero' style='float:right;margin-right:12px'>0</div></td></tr>";													// Bone id/zero
 		str+="<tr><td>&nbsp;</td></tr>";
 		str+="<tr><td>X&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:480px' id='beXaxis'>"					// X slider
@@ -304,6 +317,7 @@ class Scene {
 		aniTimer=0;																					// Stop animation
 		$("body").append(str);																		// Add to body
 		addBones();																					// Load new bones for pulldown
+		addPoses();																					// Load poses for pulldown
 		$("#bonesEditor").draggable();																// Make it drqaggable
 		$("#bonesEditor").mousedown( (e)=> { e.stopPropagation() } );								// Don't move orbiter
 		$("#beXaxis").on("input",  function(e) { $("#beXval").val(this.value); moveBone(); } );		// Show x value	
@@ -313,6 +327,7 @@ class Scene {
 		$("#beZaxis").on("input",  function(e) { $("#beZval").val(this.value); moveBone(); } );		// Z
 		$("#beZval").on("change",  function(e) { $("#beZaxis").val(this.value); moveBone(); } );	// Z
 		$("#beModel").on("change", function(e) { addBones(); } )									// Add current bones
+		$("#bePose").on("change", function(e) { app.sc.SetPose($("#beModel").val(),this.value); addBones(); } ); // Add new pose
 		$("#beBone").on("change",  function(e) {
 			var v;
 			var model=$("#beModel").val();															// Model id
@@ -372,6 +387,16 @@ class Scene {
 			for (var bone in base) 			v.push(bone);											// Add bone to array
 			v.sort();																				// Sort bones
 			for (var i=0;i<v.length;++i) 	$("#beBone").append("<option>"+v[i]+"</option>");		// Add option
+			}
+
+		function addPoses() {																		// FILL POSES PULLDOWN
+			var v=[];
+			$("#bePose").empty();																	// Clear select
+			$("#bePose").append("<option>Choose pose</option>");									// Add choose
+			var base=app.poses;																		// Point at poses array
+			for (var p in app.poses) 			v.push(p);											// Add pose to array
+			v.sort();																				// Sort bones
+			for (var i=0;i<v.length;++i) 	$("#bePose").append("<option>"+v[i]+"</option>");		// Add option
 			}
 
 		function moveBone() {																		// Move the bone
