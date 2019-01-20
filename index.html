@@ -89,8 +89,9 @@ class App  {
 		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:19, r:-10, tex:0xffffff} );		
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:19, r:0, tex:0xffffff} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:19, r:0, tex:0xffffff} );		
-		this.students.push({ id:"body6", src:"body.dae", x:100, y:90, z:-40, s:16, r:0, tex:0xffffff} );		
-	}
+		this.students.push({ id:"body6*", src:"body.dae", x:100, y:90, z:-40, s:16, r:0, tex:0xffffff} );
+		this.poses["body6*"]="thighR,-90,0,0,legR,90,0,0,thighL,-90,0,0,legL,90,0,0,armL,81,-55,-14,forearmR,-9,-64,-19";
+		}
 
 	LoadModels() 																				// LOAD 3D MODELS
 	{
@@ -212,13 +213,8 @@ class Scene {
 
 		loader.load(o.src, (obj)=> { 																// Load model
 			loadModel(obj);																			// Load it
-			if (o.id == "body6") {																	// If a student
-				_this.SetBone(o.id,"thighR",-90,0,0);			// RT
-				_this.SetBone(o.id,"legR",90,0,0);			// RL
-				_this.SetBone(o.id,"thighL",-90,0,0);			// LT
-				_this.SetBone(o.id,"legL",90,0,0);			// LL
-				_this.SetBone(o.id,"armL",81,-55,-14);		// LA
-				_this.SetBone(o.id,"forearmR",-9,-64,-19);	// RA
+			if (o.id.match(/\*/)) {																	// If a student
+				_this.SetPose(o.id,true);															// Clear bones and set starting pose
 				aniTimer=1;																			// Start animation
 				}
 		}, onProgress, onError );																	// Load
@@ -273,14 +269,22 @@ class Scene {
 		this.models[model].bones[bone].rotation.z=z;													
 	}
 
+	SetPose(id)																					// SET A POSE
+	{
+		var i;
+		var v=app.poses[id].split(",");																// Get bones positions
+		for (i=0;i<v.length;i+=4)																	// Stride by 4
+			this.SetBone(id,v[i],v[i+1]-0,v[i+2]-0,v[i+3]-0);										// Set bone
+		}
+
 	BonesEditor()																				// BONES EDITOR
 	{
 		var _this=this;
 		$("#bonesEditor").remove();																	// Remove old one
 		var str="<div id='bonesEditor' class='lz-bonesEditor'>";
-		str+="<img src='img/scalelogo.png' style='vertical-align:-6px' width='32'><span style='font-size:24px;margin-left:16px'><b>Bones editor</b></span><br><br>";	
+		str+="<img src='img/scalelogo.png' style='vertical-align:-6px' width='32'><span style='font-size:24px;margin-left:16px'><b>Pose editor</b></span><br><br>";	
 		str+="<table>";
-		str+="<tr><td>Model </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6'>";									// Model id
+		str+="<tr><td>Model </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6*'>";									// Model id
 		str+="&nbsp;&nbsp;&nbsp;Bone&nbsp;"+MakeSelect("beBone",false,["Choose bone"]);
 		str+="<div class='lz-bs' id='beZero' style='float:right;margin-right:12px'>0</div></td></tr>";													// Bone id/zero
 		str+="<tr><td>&nbsp;</td></tr>";
@@ -292,8 +296,9 @@ class Scene {
 		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beZval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// Z
 	
 		str+="</table><br>";																			
-		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
 		str+="<div class='lz-bs' onclick='$(\"#bonesEditor\").remove();aniTimer=1'>Done</div>";																		
+		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
+		str+="<div class='lz-bs' id='beCopy' style='float:right;margin-right:12px'>Copy to clipboard</div>"																		
 		str+="</div>";
 
 		aniTimer=0;																					// Stop animation
@@ -326,6 +331,32 @@ class Scene {
 			this.SetBone($("#beModel").val(),$("#beBone").val(),0,0,0);								// Set bone						
 			});
 
+		$("#beCopy").on("click", ()=>  {															// COPY BONES TO CLIPBOARD
+			var v=[];
+			var str='this.poses["'+$("#beModel").val()+'"]="';										// Start of setting
+			var base=this.models[$("#beModel").val()].bones;										// Point at bones array
+			for (var bone in base) 	v.push(bone);													// Add bone to array
+			v.sort();																				// Sort bones
+			for (var i=0;i<v.length;++i) {															// For each bone
+				str+=v[i]+",";																		// Id
+				str+=(Math.round((base[v[i]].rotation.x-base[v[i]].oxr)*180/Math.PI)*100)/100+",";	// Set X degrees
+				str+=(Math.round((base[v[i]].rotation.y-base[v[i]].oyr)*180/Math.PI)*100)/100+",";	// Y
+				str+=(Math.round((base[v[i]].rotation.z-base[v[i]].ozr)*180/Math.PI)*100)/100+",";	// Z
+				}
+			str=str.substr(0,str.length-1);															// Remove last comma
+			str+='";\n'																				// Add end
+			$("body").append("<textarea id='outputDiv' style='width:1px;height:1px;opacity:.01'></textarea></div>"); // Add div
+			$("#outputDiv").val(str);																// Show it
+			$("#outputDiv")[0].select();															// Select div
+			try {
+				if (document.execCommand('copy')) {													// Copy to clipboard
+					Sound("ding");																	// Ding
+					}
+				} catch (err) { console.log("Clipboard copy error")}								// Show error
+			$("#outputDiv").remove();																// Remove div
+			});
+		
+		
 		$("#beReset").on("click", ()=>  {															// REST ALL BONES TO ORIGINAL STATE	
 			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
 			$("#beXaxis").val(0);	$("#beYaxis").val(0);	$("#beZaxis").val(0);					// Set slider
@@ -356,9 +387,9 @@ class Scene {
 		if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );				// Render outline
 		if (aniTimer) {
 			aniTimer++;
-			app.sc.models["body6"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
-			app.sc.models["body6"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
-			app.sc.models["body6"].bones["forearmL"].rotation.z=Math.cos(aniTimer/30*-3.14)*.3
+			app.sc.models["body6*"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
+			app.sc.models["body6*"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
+			app.sc.models["body6*"].bones["forearmL"].rotation.z=Math.cos(aniTimer/30*-3.14)*.3
 //			app.sc.models["body6"].bones["mouth"].rotation.x=Math.cos(aniTimer/30*-3.14)*.2
 			}
 	}
