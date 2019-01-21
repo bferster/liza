@@ -81,25 +81,25 @@ class App  {
 		this.Draw();																				// Start 
 	}
 
-	LoadProject(file)																			// LOAD PRIOJECT DATA
+	LoadProject(file)																			// LOAD PROJECT DATA
 	{
-		this.desks.push({ id:"desk1", src:"desk2.json", x:-100, y:-100, z:0, s:19, r:0, tex:0xffffff} );	
-		this.desks.push({ id:"desk2", src:"desk2.json", x:0, y:-100, z:0, s:19, r:0, tex:0xffffff} );		
-		this.desks.push({ id:"desk3", src:"desk2.json", x:100, y:-100, z:0, s:19, r:30, tex:0xffffff} );		
-		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:19, r:-10, tex:0xffffff} );		
-		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:19, r:0, tex:0xffffff} );		
-		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:19, r:0, tex:0xffffff} );		
-		this.students.push({ id:"body6*", src:"body.dae", x:100, y:90, z:-40, s:16, r:0, tex:0xffffff} );
-		this.poses["body6*"]="thighR,-90,0,0,legR,90,0,0,thighL,-90,0,0,legL,90,0,0,armL,81,-55,-14,forearmR,-9,-64,-19";
+		this.desks.push({ id:"desk1", src:"desk2.json", x:-100, y:-100, z:0, s:20, r:0, tex:0xffffff} );	
+		this.desks.push({ id:"desk2", src:"desk2.json", x:0, y:-100, z:0, s:20, r:0, tex:0xffffff} );		
+		this.desks.push({ id:"desk3", src:"desk2.json", x:100, y:-100, z:0, s:20, r:30, tex:0xffffff} );		
+		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:0xffffff} );		
+		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:0xffffff} );		
+		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:0xffffff} );		
+		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-40, s:15, r:0, tex:0xffffff} );
+		this.poses["body6*"]="thighR,-90,0,0,legR,90,0,0,thighL,-90,0,0,legL,90,0,0,armL,75,-30,0,forearmL,-40,-25,-50,wristL,0,33,0,armR,40,0,0,forearmR,-55,-45,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
 		this.poses["headLeft"]="neck,0,60,0";			this.poses["headRight"]="neck,0,-60,0";
 		this.poses["LeftLegStretch"]="legL,50,0,0";		this.poses["LeftLegSit"]="legL,90,0,0";	
 		this.poses["RightLegStretch"]="legR,50,0,0";	this.poses["RightLegSit"]="legR,90,0,0";	
-		this.poses["LeftArmDesk"]="armL,-30,100,0,foreArmL,-20,-50,-95";
-		this.poses["RightArmDesk"]="armR,-30,100,0,foreArmR,-20,50,95";
-	
-	
+		this.poses["LeftArmDesk"]="armL,30,0,0,forearmL,-90,0,22,wristL,0,60,0";
+		this.poses["RightArmDesk"]="armR,40,0,0,forearmR,-55,-45,0,wristL,0,60,0";
+		this.poses["handUp"]="armL,75,-30,0,forearmL,-40,-25,-50,wristL,0,33,0";		this.poses["handDown"]="armL,30,0,0,forearmL,-90,0,22,wristL,0,60,0";
+		this.poses["sleep"]="neck,33,50,0,chest,41,0,0,armL,-30,0,0,forearmL,0,35,-52,wristL,0,53,0,armR,-30,0,0,forearmR,20,-30,60,";
 	}
 
 	LoadModels() 																				// LOAD 3D MODELS
@@ -327,7 +327,15 @@ class Scene {
 		$("#beZaxis").on("input",  function(e) { $("#beZval").val(this.value); moveBone(); } );		// Z
 		$("#beZval").on("change",  function(e) { $("#beZaxis").val(this.value); moveBone(); } );	// Z
 		$("#beModel").on("change", function(e) { addBones(); } )									// Add current bones
-		$("#bePose").on("change", function(e) { app.sc.SetPose($("#beModel").val(),this.value); addBones(); } ); // Add new pose
+	
+		$("#bePose").on("change", function(e) { 													// Add new pose
+			app.sc.SetPose($("#beModel").val(),this.value);											// Set bones
+			addBones(); 
+			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
+			$("#beXaxis").val(0);	$("#beYaxis").val(0);	$("#beZaxis").val(0);					// Set slider
+			$("#bePose").prop("selectedIndex",0);			$("#beBone").prop("selectedIndex",0);	// Reset pulldowns
+			}); 
+	
 		$("#beBone").on("change",  function(e) {
 			var v;
 			var model=$("#beModel").val();															// Model id
@@ -414,8 +422,8 @@ class Scene {
 			aniTimer++;
 			app.sc.models["body6*"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
 			app.sc.models["body6*"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
-			app.sc.models["body6*"].bones["forearmL"].rotation.z=Math.cos(aniTimer/30*-3.14)*.3
-//			app.sc.models["body6"].bones["mouth"].rotation.x=Math.cos(aniTimer/30*-3.14)*.2
+//			app.sc.models["body6*"].bones["forearmL"].rotation.z=Math.cos(aniTimer/30*-3.14)*.3
+			app.sc.SetBone("body6*","mouth",Math.cos(aniTimer/30*Math.PI)*6+6*.01,0,0)
 			}
 	}
 
