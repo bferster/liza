@@ -27,7 +27,7 @@
 							}
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
-		.lz-bonesEditor {	position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #999;
+		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #999;
 							padding:16px; border-radius: 16px; width: 600px;
 							}
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
@@ -71,7 +71,7 @@ class App  {
 	constructor(id)   																			// CONSTRUCTOR
 	{
 		app=this;
-		this.sc=new Scene();																		// Make new scene		
+		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.poses=[];																				// Holds poses
 		this.desks=[];																				// Holds desks	
 		this.students=[];																			// Holds students	
@@ -90,7 +90,7 @@ class App  {
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:0xffffff} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:0xffffff} );		
 		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-40, s:15, r:0, tex:0xffffff} );
-		this.poses["body6*"]="thighR,-90,0,0,legR,90,0,0,thighL,-90,0,0,legL,90,0,0,armL,75,-30,0,forearmL,-40,-25,-50,wristL,0,33,0,armR,40,0,0,forearmR,-55,-45,0";
+		this.poses["body6*"]="armL,75,-30,0,armR,40,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,-40,-25,-50,forearmR,-55,-45,0,legL,90,0,0,legR,90,0,0,mouth,6,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-90,0,0,thighR,-90,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,33,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
 		this.poses["headLeft"]="neck,0,60,0";			this.poses["headRight"]="neck,0,-60,0";
@@ -99,7 +99,7 @@ class App  {
 		this.poses["LeftArmDesk"]="armL,30,0,0,forearmL,-90,0,22,wristL,0,60,0";
 		this.poses["RightArmDesk"]="armR,40,0,0,forearmR,-55,-45,0,wristL,0,60,0";
 		this.poses["handUp"]="armL,75,-30,0,forearmL,-40,-25,-50,wristL,0,33,0";		this.poses["handDown"]="armL,30,0,0,forearmL,-90,0,22,wristL,0,60,0";
-		this.poses["sleep"]="neck,33,50,0,chest,41,0,0,armL,-30,0,0,forearmL,0,35,-52,wristL,0,53,0,armR,-30,0,0,forearmR,20,-30,60,";
+		this.poses["sleep"]="neck,25,50,0,chest,41,0,0,armL,-30,0,0,forearmL,0,35,-52,wristL,0,53,0,armR,-30,0,0,forearmR,20,-30,60,";
 	}
 
 	LoadModels() 																				// LOAD 3D MODELS
@@ -123,11 +123,11 @@ class App  {
 
 class Scene {																				 
 
-	constructor()																				// CONSTRUCTOR
+	constructor(div)																				// CONSTRUCTOR
 	{
 		this.cartoonScene=window.location.search.match(/real/i) ? false : true;						// Render scene as cartoon?	   		
 		this.models=[];																				// Holds models
-		this.container=$("#mainDiv")[0];															// Div container														
+		this.container=$("#"+div)[0];																// Div container														
 		this.camera=null;																			// Camera object
 		this.renderer=null;																			// Renderer object
 		this.scene=null;																			// Scene object
@@ -136,8 +136,8 @@ class Scene {
 		this.floor="wood.jpg";																		// Floor texture
 		this.frontWall="blackboard.png";															// Front wall texture
 		this.backWall="blackboard.png";																// Back wall texture
-		this.leftWall="blankwall.png";																// Side wall texture
-		this.rightWall="blankwall.png";																// Side wall texture
+		this.leftWall="";																			// Side wall texture
+		this.rightWall="";																			// Side wall texture
 		this.Init();																				// Init 3D system
 		}
 
@@ -279,24 +279,25 @@ class Scene {
 		this.models[model].bones[bone].rotation.z=z;													
 	}
 
-	SetPose(model, id)																			// SET A POSE FOR A MODEL
+	SetPose(model, id, time)																	// SET A POSE FOR A MODEL
 	{
 		var i;
 		var v=app.poses[id];																		// Get pose string
 		if (!v || !model)	return;																	// Quit if no string or model
 		v=v.split(",");																				// Get bone positions
 		for (i=0;i<v.length;i+=4)																	// Stride by 4
-			this.SetBone(model,v[i],v[i+1]-0,v[i+2]-0,v[i+3]-0);										// Set bone
+			this.SetBone(model,v[i],v[i+1]-0,v[i+2]-0,v[i+3]-0);									// Set bone
 		}
 
-	BonesEditor()																				// BONES EDITOR
+	PoseEditor()																				// POSE EDITOR
 	{
 		var _this=this;
-		$("#bonesEditor").remove();																	// Remove old one
-		var str="<div id='bonesEditor' class='lz-bonesEditor'>";
-		str+="<img src='img/scalelogo.png' style='vertical-align:-6px' width='32'><span style='font-size:24px;margin-left:16px'><b>Pose editor</b></span><br><br>";	
+		$("#poseEditor").remove();																	// Remove old one
+		var str="<div id='poseEditor' class='lz-dialog'>";
+		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:16px'>Pose editor</span>";	
+		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();aniTimer=1;'><br><br>";
 		str+="<table>";
-		str+="<tr><td>Model: </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6*'>";									// Model id
+		str+="<tr><td>Model: </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6*'>";								// Model id
 		str+="&nbsp;&nbsp;&nbsp;Pose:&nbsp;"+MakeSelect("bePose",false,[]);																				// Pose
 		str+="&nbsp;&nbsp;&nbsp;Bone:&nbsp;"+MakeSelect("beBone",false,[]);																				// Bone
 		str+="<div class='lz-bs' id='beZero' style='float:right;margin-right:12px'>0</div></td></tr>";													// Bone id/zero
@@ -309,7 +310,6 @@ class Scene {
 		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beZval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// Z
 	
 		str+="</table><br>";																			
-		str+="<div class='lz-bs' onclick='$(\"#bonesEditor\").remove();aniTimer=1'>Done</div>";																		
 		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
 		str+="<div class='lz-bs' id='beCopy' style='float:right;margin-right:12px'>Copy to clipboard</div>"																		
 		str+="</div>";
@@ -318,8 +318,8 @@ class Scene {
 		$("body").append(str);																		// Add to body
 		addBones();																					// Load new bones for pulldown
 		addPoses();																					// Load poses for pulldown
-		$("#bonesEditor").draggable();																// Make it drqaggable
-		$("#bonesEditor").mousedown( (e)=> { e.stopPropagation() } );								// Don't move orbiter
+		$("#poseEditor").draggable();																// Make it drqaggable
+		$("#poseEditor").mousedown( (e)=> { e.stopPropagation() } );								// Don't move orbiter
 		$("#beXaxis").on("input",  function(e) { $("#beXval").val(this.value); moveBone(); } );		// Show x value	
 		$("#beXval").on("change",  function(e) { $("#beXaxis").val(this.value); moveBone(); } );	// Set x value manually	
 		$("#beYaxis").on("input",  function(e) { $("#beYval").val(this.value); moveBone(); } );		// Y
@@ -422,13 +422,9 @@ class Scene {
 			aniTimer++;
 			app.sc.models["body6*"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
 			app.sc.models["body6*"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
-//			app.sc.models["body6*"].bones["forearmL"].rotation.z=Math.cos(aniTimer/30*-3.14)*.3
 			app.sc.SetBone("body6*","mouth",Math.cos(aniTimer/30*Math.PI)*6+6*.01,0,0)
 			}
 	}
-
-
-
 																								// SCENE CLOSURE
 }  // CLOSURE
 
@@ -499,6 +495,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	else																	// Debug
 		$("#mainDiv").fadeIn(0);											// Load fast
 
+
 	if (window.addEventListener) 											// If supported this way
 		window.addEventListener("message",html5MessageHandler,false);		// Add event handler
 	else																	// Use other method
@@ -506,17 +503,41 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
 		if ((e.which == 84) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+T)
-			app.sc.BonesEditor();
+			app.sc.PoseEditor();
 	});
  
- });									
+ });	
+ 
 
-function html5MessageHandler(e)											// ON HTML5 MESSAGE
-{
-//	if (e && e.data) 														// If a valid message				
-//		trace(e);												// Route
-}
+	function html5MessageHandler(e)										// ON HTML5 MESSAGE
+	{
+	//	if (e && e.data) 													// If a valid message				
+	//		trace(e);														// Route
+	}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HELP SCREEN
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	$("body").append("<img src='img/helpicon.gif' id='helpBut' style='position:absolute;top:16px;left:16px;cursor:pointer'>");
+	$("#helpBut").on("click", ()=> {										// ON HELP BUTTON
+		$("#helpDiv").remove();												// Remove old one
+		var str="<div id='helpDiv' class='lz-dialog'style='height:66vh'>";
+		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:16px'>"
+		str+="Help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
+		str+="<div style='height:calc(100% - 70px);width:calc(100% - 24px);background-color:#fff;border-radius:6px;padding:12px;border:1px solid #999'>";
+		
+		str+="This is a very preliminary demo of the Liza teacher simulator.<br><br>"
+		str+="Explore the 3D class by dragging your moouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
+		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking <a href='javascript:app.sc.PoseEditor()'>here</a>.<br><br>"
+
+		str+="<hr><br><img src='img/UVAlogo128.png' width='96' style='float:left;margin-right:16px'>";
+		str+="Bill Ferster<br>Curry School of Education<br>Center for Contemplative Studies<br>bferster@virginia.edu<br></div></div>"
+		$("body").append(str);													// Add to body
+		$("#helpDiv").draggable();												// Make it drqaggable
+		$("#helpDiv").mousedown( (e)=> { e.stopPropagation() } );				// Don't move orbiter
+		});
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
