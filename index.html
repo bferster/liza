@@ -4,7 +4,7 @@
 	<meta charset="UTF-8" />
 	<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
 	<title>liza</title>
-	<meta name="viewport" content="width=device-width" user-scalable=no">
+	<meta name="viewport" content="width=device-width" initial-scale="1.0" user-scalable="no">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link   rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>	
@@ -89,17 +89,16 @@ class App  {
 		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:0xffffff} );		
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:0xffffff} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:0xffffff} );		
-		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-40, s:15, r:0, tex:0xffffff} );
-		this.poses["body6*"]="armL,75,-30,0,armR,40,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,-40,-25,-50,forearmR,-55,-45,0,legL,90,0,0,legR,90,0,0,mouth,6,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-90,0,0,thighR,-90,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,33,0,wristR,0,0,0";
+		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:0xffffff} );
+		this.poses["body6*"]="armL,25,0,0,armR,-60,0,45,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,68,-25,0,forearmR,0,0,45,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,-100,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
 		this.poses["headLeft"]="neck,0,60,0";			this.poses["headRight"]="neck,0,-60,0";
 		this.poses["LeftLegStretch"]="legL,50,0,0";		this.poses["LeftLegSit"]="legL,90,0,0";	
 		this.poses["RightLegStretch"]="legR,50,0,0";	this.poses["RightLegSit"]="legR,90,0,0";	
-		this.poses["LeftArmDesk"]="armL,30,0,0,forearmL,-90,0,22,wristL,0,60,0";
-		this.poses["RightArmDesk"]="armR,40,0,0,forearmR,-55,-45,0,wristL,0,60,0";
-		this.poses["handUp"]="armL,75,-30,0,forearmL,-40,-25,-50,wristL,0,33,0";		this.poses["handDown"]="armL,30,0,0,forearmL,-90,0,22,wristL,0,60,0";
-		this.poses["sleep"]="neck,25,50,0,chest,41,0,0,armL,-30,0,0,forearmL,0,35,-52,wristL,0,53,0,armR,-30,0,0,forearmR,20,-30,60,";
+		this.poses["LeftArmDesk"]="armL,-60,0,-45,forearmL,0,0,-45,wristL,0,100,0";	this.poses["RightArmDesk"]="armR,-60,0,45,forearmR,0,0,45,wristR,0,-100,0";
+		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";		this.poses["handDown"]="armL,-75,0,-45,forearmL,0,0,-45,wristL,0,110,10";
+		this.poses["sleep"]="neck,45,62,0,chest,48,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 	}
 
 	LoadModels() 																				// LOAD 3D MODELS
@@ -294,7 +293,7 @@ class Scene {
 		var _this=this;
 		$("#poseEditor").remove();																	// Remove old one
 		var str="<div id='poseEditor' class='lz-dialog'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:16px'>Pose editor</span>";	
+		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();aniTimer=1;'><br><br>";
 		str+="<table>";
 		str+="<tr><td>Model: </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6*'>";								// Model id
@@ -319,7 +318,7 @@ class Scene {
 		addBones();																					// Load new bones for pulldown
 		addPoses();																					// Load poses for pulldown
 		$("#poseEditor").draggable();																// Make it drqaggable
-		$("#poseEditor").mousedown( (e)=> { e.stopPropagation() } );								// Don't move orbiter
+		$("#poseEditor").mousedown( (e)=> { e.stopPropagation();  } );								// Don't move orbiter
 		$("#beXaxis").on("input",  function(e) { $("#beXval").val(this.value); moveBone(); } );		// Show x value	
 		$("#beXval").on("change",  function(e) { $("#beXaxis").val(this.value); moveBone(); } );	// Set x value manually	
 		$("#beYaxis").on("input",  function(e) { $("#beYval").val(this.value); moveBone(); } );		// Y
@@ -524,8 +523,8 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	$("#helpBut").on("click", ()=> {										// ON HELP BUTTON
 		$("#helpDiv").remove();												// Remove old one
 		var str="<div id='helpDiv' class='lz-dialog'style='height:66vh'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:16px'>"
-		str+="Help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
+		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
+		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
 		str+="<div style='height:calc(100% - 70px);width:calc(100% - 24px);background-color:#fff;border-radius:6px;padding:12px;border:1px solid #999'>";
 		
 		str+="This is a very preliminary demo of the Liza teacher simulator.<br><br>"
