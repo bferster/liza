@@ -72,12 +72,14 @@ class App  {
 	{
 		app=this;
 		this.sc=new Scene("mainDiv");																// Make new scene		
+		this.voice=new Voice(this.OnPhrase);															// Alloc 
 		this.poses=[];																				// Holds poses
 		this.desks=[];																				// Holds desks	
+		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
 		this.LoadProject("myFile");																	// Load project file
 		this.LoadModels();																			// Load 3D models
-		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
+//		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
 		this.Draw();																				// Start 
 	}
 
@@ -94,9 +96,9 @@ class App  {
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
 		this.poses["headLeft"]="neck,0,60,0";			this.poses["headRight"]="neck,0,-60,0";
-		this.poses["LeftLegStretch"]="legL,50,0,0";		this.poses["LeftLegSit"]="legL,90,0,0";	
-		this.poses["RightLegStretch"]="legR,50,0,0";	this.poses["RightLegSit"]="legR,90,0,0";	
-		this.poses["LeftArmDesk"]="armL,-60,0,-45,forearmL,0,0,-46";	this.poses["RightArmDesk"]="armR,-60,0,45,forearmR,0,0,46";
+		this.poses["leftLegStretch"]="legL,50,0,0";		this.poses["leftLegSit"]="legL,90,0,0";	
+		this.poses["rightLegStretch"]="legR,50,0,0";	this.poses["rightLegSit"]="legR,90,0,0";	
+		this.poses["leftArmDesk"]="armL,-60,0,-45,forearmL,0,0,-46";	this.poses["rightArmDesk"]="armR,-60,0,45,forearmR,0,0,46";
 		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";	
 		this.poses["sleep"]="neck,45,62,0,chest,48,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 	}
@@ -110,8 +112,22 @@ class App  {
 
 	Draw() 																						// REDRAW
 	{
-		this.sc.Animate();																			// Animate
+		this.sc.Render();																			// Render scene and animate
+	}
 
+	OnPhrase(text) 																				// ON PHRASE UTTERED
+	{
+		trace(text)
+		if (text && text.match(/liza|plaza|lies/i)) {
+			if (text.match(/sleep/i))	 					 app.sc.StartAnimation("body6*","sleep",1)								
+			if (text.match(/reset/))	 					 app.sc.StartAnimation("body6*","body6*",1)								
+			if (text.match(/head/i)	&& text.match(/up/i)) 	 app.sc.StartAnimation("body6*","headUp",1)								
+			if (text.match(/head/i)	&& text.match(/down/i))  app.sc.StartAnimation("body6*","headDown",1)								
+			if (text.match(/head/i)	&& text.match(/left/i))  app.sc.StartAnimation("body6*","headLeft",1)								
+			if (text.match(/head/i)	&& text.match(/right/i)) app.sc.StartAnimation("body6*","headRight",1)								
+			if (text.match(/arm/i)	&& text.match(/up/i)) 	 app.sc.StartAnimation("body6*","handUp",1)								
+			if (text.match(/arm/i)	&& text.match(/down/i))  app.sc.StartAnimation("body6*","leftArmDesk",1)								
+			}
 	}
 
 } // Class closure
@@ -265,7 +281,7 @@ class Scene {
 			_this.scene.add(object);																// Add model to scene
 		}
 	}
-	
+
 	SetBone(model, bone, x, y, z)																// ROTATE A BONE
 	{
 		if (!this.models[model] || !this.models[model].bones[bone])	return;							// Quit on bad model or bone
@@ -277,6 +293,9 @@ class Scene {
 		this.models[model].bones[bone].rotation.y=y;													
 		this.models[model].bones[bone].rotation.z=z;													
 	}
+
+
+// POSES ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	SetPose(model, id, time)																	// SET A POSE FOR A MODEL
 	{
@@ -328,7 +347,7 @@ class Scene {
 		$("#beModel").on("change", function(e) { addBones(); } )									// Add current bones
 	
 		$("#bePose").on("change", function(e) { 													// Add new pose
-			app.sc.SetPose($("#beModel").val(),this.value);											// Set bones
+			app.sc.StartAnimation($("#beModel").val(),this.value,1);								// Show new pose							
 			addBones(); 
 			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
 			$("#beXaxis").val(0);	$("#beYaxis").val(0);	$("#beZaxis").val(0);					// Set slider
@@ -410,20 +429,68 @@ class Scene {
 			_this.SetBone($("#beModel").val(),$("#beBone").val(),$("#beXaxis").val(),$("#beYaxis").val(),$("#beZaxis").val())
 			}
 	}
+	
+// ANIMATION ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Animate() 																					// ANIMATE LOOP
+	Render() 																					// RENDER LOOP
 	{
 		app.sc.controls.update();																	// Update control time
-		requestAnimationFrame(app.sc.Animate);														// Set timer
+		requestAnimationFrame(app.sc.Render);														// Set timer
+		app.sc.AnimateScene();																		// Animate models
 		app.sc.renderer.render(app.sc.scene,app.sc.camera);											// Render scene
 		if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );				// Render outline
+		}
+
+	AnimateScene()																			// CALLED EVERY FRAME BY ANIMATE
+	{
+		var i,j,pct;
+		var seq,bones,br,b;
+		var x,y,z;
+		var now=new Date().getTime();																// Get current time in ms
+		for (i=0;i<app.animateData.length;++i)	{													// For each sequence
+			seq=app.animateData[i];																	// Point at sequence
+			if (now > seq.start+seq.dur) {															// If past sequence
+				app.animateData.splice(i,1);														// Remove it
+				continue;																			// Ignore 
+				}
+			pct=(now-seq.start)/seq.dur;															// Get % in sequence
+			pct=1.0-((Math.cos(3.1414*pct)+1)/2.0);													// Full cosine curve
+			for (j=0;j<seq.bones.length;++j) {														// For each bone
+				b=seq.bones[j];																		// Point at bone 						
+				br=app.sc.models[seq.model].bones[b.bone].rotation;									// Point at rotation						
+				br.x=b.sx+(b.ex-b.sx)*pct;															// Interpolate x angle and set bone to it
+				br.y=b.sy+(b.ey-b.sy)*pct;															// Y
+				br.z=b.sz+(b.ez-b.sz)*pct;															// Z
+				}
+			}
+
 		if (aniTimer) {
-			aniTimer++;
-			app.sc.models["body6*"].bones["neck"].rotation.z=Math.cos(aniTimer/50*-3.14)*.02
-			app.sc.models["body6*"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
-			app.sc.SetBone("body6*","mouth",Math.cos(aniTimer/30*Math.PI)*6+6*.01,0,0)
+			++aniTimer;
+//			app.sc.models["body6*"].bones["neck"].rotation.z=Math.cos(++aniTimer/50*-3.14)*.02
+//			app.sc.models["body6*"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
+			app.sc.SetBone("body6*","mouth",Math.cos(aniTimer/15*Math.PI)*6+6*.01,0,0)
 			}
 	}
+
+	StartAnimation(model, poses, durSec)														// QUEUE UP ACTION SEQUENCE
+	{
+		var i,b,o;
+		var base=this.models[model].bones;															// Point at bones array
+		var bs=[];																					// Holds bones array
+		if (!app.poses[poses])	return;																// Bad pose
+		var v=app.poses[poses].split(",");															// Point at bones parts
+		for (i=0;i<v.length;i+=4) {																	// Stride by 4
+			o={ bone:v[i] };																		// Add bone namw
+			b=base[v[i]];																			// Point at bone
+			o.sx=b.rotation.x;	 			o.sy=b.rotation.y;  				o.sz=b.rotation.z;	// Start from current pos
+			o.ex=v[i+1]*Math.PI/180+b.oxr;	o.ey=v[i+2]*Math.PI/180+b.oyr;  	o.ez=v[i+3]*Math.PI/180+b.ozr;	// Normalized end pose (in radians)
+			bs.push(o);
+			}
+		var start=new Date().getTime();																// Start time
+		app.animateData.push({ model:model, start:start, dur:durSec*1000, bones:bs });				// Save animation data
+	}
+
+
 																								// SCENE CLOSURE
 }  // CLOSURE
 
@@ -444,9 +511,37 @@ class Scene {
 
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// VOICE
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Voice {																				 
+
+	constructor(callback)																			// CONSTRUCTOR
+	{
+		if (isMobile)	return;																			// Not on phones
+		this.recognition=new webkitSpeechRecognition();													// Init STT
+		this.recognition.continuous=true;																// Continual recognition
+		this.recognition.lang="en-US";																	// US English
+		this.recognition.start();																		// Start recognition
+		this.transcript="";																				// Clear transcript
+
+		this.recognition.onresult=(e)=> { 																// On some speech recognized
+			for (var i=e.resultIndex;i<e.results.length;++i) {											// For each result
+  				if (e.results[i].isFinal) {																// If final
+       				this.transcript+=e.results[i][0].transcript+".\n";									// Add to transcript
+					callback(e.results[i][0].transcript);												// Send text to callback
+					}
+				}
+			}
+
+		}
 
 
 
+
+	// SCENE CLOSURE
+}  // CLOSURE
 
 
 
@@ -484,9 +579,9 @@ $(window).resize(function() {                                         	// ON WIN
 	});
 			
 $(document).ready(function() {								           	// ON PAGE LOADED
+	isMobile=navigator.userAgent.match(/(ipad|iphone|ipod|android)/i) ? true : false; // Set mobile flag
 	var url=window.location.search.substring(1);						   	// Get query string
 	app=new App(url);                                                      	// Alloc app
-	isMobile=navigator.userAgent.match(/(ipad|iphone|ipod|android)/i) ? true : false; // Set mobile flag
 	if ((window.location.host != "localhost") && (url != "preview")) {		// Not in debug or preview
 		$("#splashDiv").fadeIn().delay(4000).fadeOut();						// Fade out splash
 		$("#mainDiv").delay(2000).fadeIn(2000);								// Wait, and fade in main
@@ -503,6 +598,10 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
 		if ((e.which == 84) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+T)
 			app.sc.PoseEditor();
+
+		if ((e.which == 65) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+A)
+			app.sc.StartAnimation("body6*","sleep",1)								
+
 	});
  
  });	
@@ -530,9 +629,11 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		str+="This is a very preliminary demo of the Liza teacher simulator.<br><br>"
 		str+="Explore the 3D class by dragging your moouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
 		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking <a href='javascript:app.sc.PoseEditor()'>here</a>.<br><br>"
+		str+="You can talk to Liza much like you do to an Amazon Echo (Alexa), by saying Liza, followed by one of the following poses: sleep, reset, arm-up, arm-down, head-up, head-down, head-left, and head-right (more to come) and the student will animate to  that pose.<br><br>"
+		str+="This currently works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
 
 		str+="<hr><br><img src='img/UVAlogo128.png' width='96' style='float:left;margin-right:16px'>";
-		str+="Bill Ferster<br>Curry School of Education<br>Center for Contemplative Studies<br>bferster@virginia.edu<br></div></div>"
+		str+="Bill Ferster<br>Curry School of Education<br>Center for Contemplative Studies<br>bferster@virginia.edu<br></div></div>";
 		$("body").append(str);													// Add to body
 		$("#helpDiv").draggable();												// Make it drqaggable
 		$("#helpDiv").mousedown( (e)=> { e.stopPropagation() } );				// Don't move orbiter
