@@ -91,7 +91,7 @@ class App  {
 		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:tex} );		
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:tex} );		
-		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:0xffffff} );
+		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:tex} );
 		this.poses["body6*"]="armL,25,0,0,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,68,-25,0,forearmR,0,0,45,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
@@ -272,6 +272,10 @@ class Scene {
 						child.material.color=new THREE.Color(o.tex);								// Set color
 					if (child.material.userData)													// If user data
 						child.material.userData.outlineParameters= { visible:!isNaN(o.tex) };		// Outline if a number
+//					if (child.material.length)
+//						for (i=0;i<child.material.length;++i)
+//							child.material[i].userData.outlineParameters= { visible:!isNaN(o.tex) };		// Outline if a number
+					
 					}							
 			});
 			
