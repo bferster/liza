@@ -79,18 +79,18 @@ class App  {
 		this.students=[];																			// Holds students	
 		this.LoadProject("myFile");																	// Load project file
 		this.LoadModels();																			// Load 3D models
-//		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
 		this.Draw();																				// Start 
 	}
 
 	LoadProject(file)																			// LOAD PROJECT DATA
 	{
-		this.desks.push({ id:"desk1", src:"desk2.json", x:-100, y:-100, z:0, s:20, r:0, tex:0xffffff} );	
-		this.desks.push({ id:"desk2", src:"desk2.json", x:0, y:-100, z:0, s:20, r:0, tex:0xffffff} );		
-		this.desks.push({ id:"desk3", src:"desk2.json", x:100, y:-100, z:0, s:20, r:30, tex:0xffffff} );		
-		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:0xffffff} );		
-		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:0xffffff} );		
-		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:0xffffff} );		
+		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
+		this.desks.push({ id:"desk1", src:"desk2.json", x:-100, y:-100, z:0, s:20, r:0, tex:tex} );	
+		this.desks.push({ id:"desk2", src:"desk2.json", x:0, y:-100, z:0, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk3", src:"desk2.json", x:100, y:-100, z:0, s:20, r:30, tex:tex} );		
+		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:tex} );		
+		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:0xffffff} );
 		this.poses["body6*"]="armL,25,0,0,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,68,-25,0,forearmR,0,0,45,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
@@ -119,14 +119,14 @@ class App  {
 	{
 		trace(text)
 		if (text && text.match(/liza|plaza|lies/i)) {
-			if (text.match(/sleep/i))	 					 app.sc.StartAnimation("body6*","sleep",1)								
-			if (text.match(/reset/))	 					 app.sc.StartAnimation("body6*","body6*",1)								
-			if (text.match(/head/i)	&& text.match(/up/i)) 	 app.sc.StartAnimation("body6*","headUp",1)								
-			if (text.match(/head/i)	&& text.match(/down/i))  app.sc.StartAnimation("body6*","headDown",1)								
-			if (text.match(/head/i)	&& text.match(/left/i))  app.sc.StartAnimation("body6*","headLeft",1)								
-			if (text.match(/head/i)	&& text.match(/right/i)) app.sc.StartAnimation("body6*","headRight",1)								
-			if (text.match(/arm/i)	&& text.match(/up/i)) 	 app.sc.StartAnimation("body6*","handUp",1)								
-			if (text.match(/arm/i)	&& text.match(/down/i))  app.sc.StartAnimation("body6*","leftArmDesk",1)								
+			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation("body6*","sleep",1)								
+			if (text.match(/sit|set/))	 					 	app.sc.StartAnimation("body6*","body6*",1)								
+			if (text.match(/head/i)	&& text.match(/up/i)) 	 	app.sc.StartAnimation("body6*","headUp",1)								
+			if (text.match(/head/i)	&& text.match(/down/i))  	app.sc.StartAnimation("body6*","headDown",1)								
+			if (text.match(/head/i)	&& text.match(/left/i))  	app.sc.StartAnimation("body6*","headLeft",1)								
+			if (text.match(/head/i)	&& text.match(/right/i)) 	app.sc.StartAnimation("body6*","headRight",1)								
+			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation("body6*","handUp",1)								
+			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation("body6*","leftArmDesk",1)								
 			}
 	}
 
@@ -151,8 +151,8 @@ class Scene {
 		this.floor="wood.jpg";																		// Floor texture
 		this.frontWall="blackboard.png";															// Front wall texture
 		this.backWall="blackboard.png";																// Back wall texture
-		this.leftWall="";																			// Side wall texture
-		this.rightWall="";																			// Side wall texture
+		this.leftWall=this.cartoonScene ? "" : "windowwall.png";									// Side wall texture
+		this.rightWall=this.cartoonScene ? "" : "windowwall.png";									// Side wall texture
 		this.Init();																				// Init 3D system
 		}
 
@@ -201,10 +201,10 @@ class Scene {
 	{	
 		var _this=this;																				// Save context
 		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,this.cartoonScene);	// If a floor spec'd
-		if (this.frontWall) 	addWall(0,512,128,0,Math.PI,0,256,this.frontWall,0,0);				// If a front wall spec'd
-		if (this.backWall) 		addWall(0,-512,128,0,0,0,256,this.backWall,0,0);					// If a back wall spec'd
-		if (this.leftWall) 		addWall(-512,0,128,0,Math.PI/2,0,256,this.leftWall,0,0);			// If a left wall spec'd
-		if (this.rightWall)	 	addWall(512,0,128,0,-Math.PI/2,0,256,this.rightWall,0,0);			// If a right wall spec'd
+		if (this.frontWall) 	addWall(0,128,512,0,Math.PI,0,256,this.frontWall,0,0);				// If a front wall spec'd
+		if (this.backWall) 		addWall(0,128,-512,0,0,0,256,this.backWall,0,0);					// If a back wall spec'd
+		if (this.leftWall) 		addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0,0);			// If a left wall spec'd
+		if (this.rightWall)	 	addWall(512,128,0,0,-Math.PI/2,0,256,this.rightWall,0,0);			// If a right wall spec'd
 
 		function addWall(x, y, z, xr, yr, zr, h, texture, wrap, cartoon) {							// ADD WALL
 			var mat=new THREE.MeshPhongMaterial();													// Make material
@@ -526,6 +526,8 @@ class Voice {
 		this.recognition.start();																		// Start recognition
 		this.transcript="";																				// Clear transcript
 
+		this.recognition.onend=(e)=> { 	this.recognition.start(); };									// On end, restart
+
 		this.recognition.onresult=(e)=> { 																// On some speech recognized
 			for (var i=e.resultIndex;i<e.results.length;++i) {											// For each result
   				if (e.results[i].isFinal) {																// If final
@@ -533,7 +535,7 @@ class Voice {
 					callback(e.results[i][0].transcript);												// Send text to callback
 					}
 				}
-			}
+			};
 
 		}
 
@@ -626,11 +628,12 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
 		str+="<div style='height:calc(100% - 70px);width:calc(100% - 24px);background-color:#fff;border-radius:6px;padding:12px;border:1px solid #999'>";
 		
-		str+="This is a very preliminary demo of the Liza teacher simulator.<br><br>"
-		str+="Explore the 3D class by dragging your moouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
+		str+="This is a very preliminary demo of the Liza teacher simulator. Right now only the 3D model for the classroom and student are completed.<br><br>"
+		str+="Explore the 3D class by dragging your mouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
 		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking <a href='javascript:app.sc.PoseEditor()'>here</a>.<br><br>"
-		str+="You can talk to Liza much like you do to an Amazon Echo (Alexa), by saying Liza, followed by one of the following poses: sleep, reset, arm-up, arm-down, head-up, head-down, head-left, and head-right (more to come) and the student will animate to  that pose.<br><br>"
-		str+="This currently works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
+		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, put your arm up or down, put your head up, down, left, or right</i> (more to come) and the student will animate to  that pose.<br><br>"
+		str+="Speech currently only works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
+		str+="We have chosen to represent the environment in a cartoon-like fashion. To see a fully rendered classroom version, click <a href='index.html?real'>here</a>.<br><br>"
 
 		str+="<hr><br><img src='img/UVAlogo128.png' width='96' style='float:left;margin-right:16px'>";
 		str+="Bill Ferster<br>Curry School of Education<br>Center for Contemplative Studies<br>bferster@virginia.edu<br></div></div>";
