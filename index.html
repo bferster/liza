@@ -127,6 +127,7 @@ class App  {
 			if (text.match(/head/i)	&& text.match(/right/i)) 	app.sc.StartAnimation("body6*","headRight",1)								
 			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation("body6*","handUp",1)								
 			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation("body6*","leftArmDesk",1)								
+			if (text.match(/talk/i))	 					 	app.voice.Talk("How are you today?");						
 			}
 	}
 
@@ -523,15 +524,26 @@ class Voice {
 
 	constructor(callback)																			// CONSTRUCTOR
 	{
+		var _this=this;
 		if (isMobile)	return;																			// Not on phones
 		this.recognition=new webkitSpeechRecognition();													// Init STT
 		this.recognition.continuous=true;																// Continual recognition
 		this.recognition.lang="en-US";																	// US English
 		this.recognition.start();																		// Start recognition
 		this.transcript="";																				// Clear transcript
-
+		this.tts=new SpeechSynthesisUtterance();														// Init TTS
+		this.tts.rate=1;																				// Set rate 
+		this.tts.pitch=1.1;																				// Set pitch 0-2
+		this.voices=[];																					// New array
+	
 		this.recognition.onend=(e)=> { 	this.recognition.start(); };									// On end, restart
 
+		speechSynthesis.onvoiceschanged=()=> {															// React to voice init
+			speechSynthesis.getVoices().forEach(function(voice,index) {									// For each voice
+			if (voice.lang == "en-US")		_this.voices.push(voice);									// Just look at English
+				});
+			};
+		
 		this.recognition.onresult=(e)=> { 																// On some speech recognized
 			for (var i=e.resultIndex;i<e.results.length;++i) {											// For each result
   				if (e.results[i].isFinal) {																// If final
@@ -543,11 +555,14 @@ class Voice {
 
 		}
 
+		Talk(text)
+		{
+			this.tts.text=text;
+			this.tts.voice=this.voices[2];
+			speechSynthesis.speak(this.tts);
+		}
 
-
-
-	// SCENE CLOSURE
-}  // CLOSURE
+}  // VOICE CLOSURE
 
 
 
@@ -606,7 +621,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 			app.sc.PoseEditor();
 
 		if ((e.which == 65) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+A)
-			app.sc.StartAnimation("body6*","sleep",1)								
+			app.voice.Talk("")
 
 	});
  
