@@ -54,6 +54,7 @@
 	<div id="splashDiv" class="lz-splash">
 		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br><br>
 		<br><p style="color:#000;font-size:14px"><em>A tool for engaging people in highly affective script-driven discourse<br>for learning and practicing goal-directed behaviors.</em></p>
+		<br><br><div id='startBut' class='lz-bs' onclick='app.voice.Talk("")'>Start</div>
 	</div>
 
 <script>
@@ -91,7 +92,7 @@ class App  {
 		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:tex} );		
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:tex} );		
-		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:tex} );
+		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:tex, sex: "female"} );
 		this.poses["body6*"]="armL,25,0,0,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,68,-25,0,forearmR,0,0,45,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
@@ -533,7 +534,7 @@ class Voice {
 		this.transcript="";																				// Clear transcript
 		this.tts=new SpeechSynthesisUtterance();														// Init TTS
 		this.tts.rate=1;																				// Set rate 
-		this.tts.pitch=1.1;																				// Set pitch 0-2
+		this.tts.pitch=1.3;																				// Set pitch 0-2
 		this.voices=[];																					// New array
 	
 		this.recognition.onend=(e)=> { 	this.recognition.start(); };									// On end, restart
@@ -558,7 +559,7 @@ class Voice {
 		Talk(text)
 		{
 			this.tts.text=text;
-			this.tts.voice=this.voices[2];
+			this.tts.voice=this.voices[1];
 			speechSynthesis.speak(this.tts);
 		}
 
@@ -604,12 +605,14 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	var url=window.location.search.substring(1);						   	// Get query string
 	app=new App(url);                                                      	// Alloc app
 	if ((window.location.host != "localhost") && (url != "preview")) {		// Not in debug or preview
-		$("#splashDiv").fadeIn().delay(4000).fadeOut();						// Fade out splash
-		$("#mainDiv").delay(2000).fadeIn(2000);								// Wait, and fade in main
-		}	
+		$("#splashDiv").fadeIn();											// Fade in splash page
+		$("#startBut").click( ()=> {										// On start button clicked
+			$("#splashDiv").fadeOut();										// Fade out splash
+			$("#mainDiv").fadeIn(2000);										// Fade in main
+			})
+		}
 	else																	// Debug
 		$("#mainDiv").fadeIn(0);											// Load fast
-
 
 	if (window.addEventListener) 											// If supported this way
 		window.addEventListener("message",html5MessageHandler,false);		// Add event handler
@@ -621,9 +624,9 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 			app.sc.PoseEditor();
 
 		if ((e.which == 65) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+A)
-			app.voice.Talk("")
+			app.voice.Talk("");												// Enable audio
 
-	});
+		});
  
  });	
  
