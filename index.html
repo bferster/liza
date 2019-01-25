@@ -119,16 +119,16 @@ class App  {
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
 		trace(text)
-		if (text && text.match(/liza|plaza|lies/i)) {
+		if (text && text.match(/liza|plaza|lies|alexa/i)) {
 			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation("body6*","sleep",1)								
-			if (text.match(/sit|set/))	 					 	app.sc.StartAnimation("body6*","body6*",1)								
+			if (text.match(/sit|set/i))	 					 	app.sc.StartAnimation("body6*","body6*",1)								
 			if (text.match(/head/i)	&& text.match(/up/i)) 	 	app.sc.StartAnimation("body6*","headUp",1)								
 			if (text.match(/head/i)	&& text.match(/down/i))  	app.sc.StartAnimation("body6*","headDown",1)								
 			if (text.match(/head/i)	&& text.match(/left/i))  	app.sc.StartAnimation("body6*","headLeft",1)								
 			if (text.match(/head/i)	&& text.match(/right/i)) 	app.sc.StartAnimation("body6*","headRight",1)								
 			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation("body6*","handUp",1)								
 			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation("body6*","leftArmDesk",1)								
-			if (text.match(/talk/i))	 					 	app.voice.Talk("How are you today?");						
+			if (text.match(/talk/i))	 					 	app.voice.Talk("My name is Liza. How are you today?");						
 			}
 	}
 
@@ -469,12 +469,13 @@ class Scene {
 				br.z=b.sz+(b.ez-b.sz)*pct;															// Z
 				}
 			}
+		if (app.voice.talking)																		// If talking
+			app.sc.SetBone("body6*","mouth",Math.cos(aniTimer/8*Math.PI)*4+4*.01,0,0);				// Animate mouth
 
 		if (aniTimer) {
 			++aniTimer;
 //			app.sc.models["body6*"].bones["neck"].rotation.z=Math.cos(++aniTimer/50*-3.14)*.02
 //			app.sc.models["body6*"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
-			app.sc.SetBone("body6*","mouth",Math.cos(aniTimer/15*Math.PI)*6+6*.01,0,0)
 			}
 	}
 
@@ -535,6 +536,7 @@ class Voice {
 		this.tts=new SpeechSynthesisUtterance();														// Init TTS
 		this.tts.rate=1;																				// Set rate 
 		this.tts.pitch=1.3;																				// Set pitch 0-2
+		this.talking=false;																				// Talking flag to move mouth
 		this.voices=[];																					// New array
 	
 		this.recognition.onend=(e)=> { 	this.recognition.start(); };									// On end, restart
@@ -543,8 +545,11 @@ class Voice {
 			speechSynthesis.getVoices().forEach(function(voice,index) {									// For each voice
 			if (voice.lang == "en-US")		_this.voices.push(voice);									// Just look at English
 				});
+			this.tts.voice=this.voices[1];																// Set voice
 			};
-		
+
+		this.tts.onend=(e)=> { 	this.talking=false;  app.sc.SetBone("body6*","mouth",0,0,0); };			// On end, stop talking animation
+
 		this.recognition.onresult=(e)=> { 																// On some speech recognized
 			for (var i=e.resultIndex;i<e.results.length;++i) {											// For each result
   				if (e.results[i].isFinal) {																// If final
@@ -554,13 +559,16 @@ class Voice {
 				}
 			};
 
+
+
+
 		}
 
-		Talk(text)
+		Talk(text)																					// SAY SOMETHING
 		{
-			this.tts.text=text;
-			this.tts.voice=this.voices[1];
-			speechSynthesis.speak(this.tts);
+			this.tts.text=text;																			// Set text
+			this.talking=true;																			// Trigger mouth animation
+			speechSynthesis.speak(this.tts);															// Speak
 		}
 
 }  // VOICE CLOSURE
