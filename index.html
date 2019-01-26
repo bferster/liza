@@ -92,7 +92,7 @@ class App  {
 		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:tex} );		
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:tex} );		
-		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:tex, sex: "female"} );
+		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female"} );
 		this.poses["body6*"]="armL,25,0,0,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,68,-25,0,forearmR,0,0,45,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
@@ -101,6 +101,7 @@ class App  {
 		this.poses["rightLegStretch"]="legR,50,0,0";	this.poses["rightLegSit"]="legR,90,0,0";	
 		this.poses["leftArmDesk"]="armL,-60,0,-45,forearmL,0,0,-46";	this.poses["rightArmDesk"]="armR,-60,0,45,forearmR,0,0,46";
 		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";	
+		this.poses["handRight"]="armL,25,0,0,forearmL,50,-25,0,wristL,0,-40,0";	
 		this.poses["sleep"]="neck,45,62,0,chest,48,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 	}
 
@@ -119,17 +120,21 @@ class App  {
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
 		trace(text)
+		var mod="body6*";
 		if (text && text.match(/liza|plaza|lies|alexa/i)) {
-			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation("body6*","sleep",1)								
-			if (text.match(/sit|set/i))	 					 	app.sc.StartAnimation("body6*","body6*",1)								
-			if (text.match(/head/i)	&& text.match(/up/i)) 	 	app.sc.StartAnimation("body6*","headUp",1)								
-			if (text.match(/head/i)	&& text.match(/down/i))  	app.sc.StartAnimation("body6*","headDown",1)								
-			if (text.match(/head/i)	&& text.match(/left/i))  	app.sc.StartAnimation("body6*","headLeft",1)								
-			if (text.match(/head/i)	&& text.match(/right/i)) 	app.sc.StartAnimation("body6*","headRight",1)								
-			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation("body6*","handUp",1)								
-			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation("body6*","leftArmDesk",1)								
-			if (text.match(/talk/i))	 					 	app.voice.Talk("My name is Liza. How are you today?");						
-			}
+			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation([{ model:mod, pose:"sleep", dur: 1 }],1);								
+			if (text.match(/sit|set/i))	 					 	app.sc.StartAnimation([{ model:mod, pose:"body6*", dur: 1 }],1);							
+			if (text.match(/head|had/i)	&& text.match(/up/i)) 	app.sc.StartAnimation([{ model:mod, pose:"headUp", dur: 1 }],1);								
+			if (text.match(/head|had/i)	&& text.match(/down/i)) app.sc.StartAnimation([{ model:mod, pose:"headDown", dur: 1 }],1);								
+			if (text.match(/head|had/i)	&& text.match(/left/i)) app.sc.StartAnimation([{ model:mod, pose:"headLeft", dur: 1 }],1);								
+			if (text.match(/head|had/i)	&& text.match(/right/i)) app.sc.StartAnimation([{ model:mod, pose:"headRight", dur: 1 }],1);								
+			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: 1 }],1);								
+			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation([{ model:mod, pose:"leftArmDesk", dur: 1 }],1);								
+			if (text.match(/wave|wade/i))						app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: .6 },{ model:mod, pose:"handRight", dur: .5 }],5);								
+			if (text.match(/talk/i))	 					 	app.voice.Talk("My name is Liza. How are you today? Would you like to play a game?");						
+
+
+		}
 	}
 
 } // Class closure
@@ -353,7 +358,7 @@ class Scene {
 		$("#beModel").on("change", function(e) { addBones(); } )									// Add current bones
 	
 		$("#bePose").on("change", function(e) { 													// Add new pose
-			app.sc.StartAnimation($("#beModel").val(),this.value,1);								// Show new pose							
+			app.sc.StartAnimation([{ model:$("#beModel").val(), pose: this.value, dur: 1 }],1);		// Show new pose							
 			addBones(); 
 			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
 			$("#beXaxis").val(0);	$("#beYaxis").val(0);	$("#beZaxis").val(0);					// Set slider
@@ -453,9 +458,10 @@ class Scene {
 		var seq,bones,br,b;
 		var x,y,z;
 		var now=new Date().getTime();																// Get current time in ms
-		for (i=0;i<app.animateData.length;++i)	{													// For each sequence
-			seq=app.animateData[i];																	// Point at sequence
-			if (now > seq.start+seq.dur) {															// If past sequence
+		for (i=0;i<app.animateData.length;++i)	{													// For each action
+			seq=app.animateData[i];																	// Point at action
+			if (now < seq.start) continue;															// Ignore if before action
+			if (now > seq.start+seq.dur) {															// If past action
 				app.animateData.splice(i,1);														// Remove it
 				continue;																			// Ignore 
 				}
@@ -479,27 +485,36 @@ class Scene {
 			}
 	}
 
-	StartAnimation(model, poses, durSec)														// QUEUE UP ACTION SEQUENCE
+	StartAnimation(seq, repeat)															// QUEUE UP ACTION SEQUENCE
 	{
-		var i,b,o;
-		var base=this.models[model].bones;															// Point at bones array
-		var bs=[];																					// Holds bones array
-		if (!app.poses[poses])	return;																// Bad pose
-		var v=app.poses[poses].split(",");															// Point at bones parts
-		for (i=0;i<v.length;i+=4) {																	// Stride by 4
-			o={ bone:v[i] };																		// Add bone namw
-			b=base[v[i]];																			// Point at bone
-			o.sx=b.rotation.x;	 			o.sy=b.rotation.y;  				o.sz=b.rotation.z;	// Start from current pos
-			o.ex=v[i+1]*Math.PI/180+b.oxr;	o.ey=v[i+2]*Math.PI/180+b.oyr;  	o.ez=v[i+3]*Math.PI/180+b.ozr;	// Normalized end pose (in radians)
-			bs.push(o);
+		var i,j,k,b,o,v;
+		var base,start,bs;
+		var cbs=[];																					// Holds state of bones during sequence
+		var start=new Date().getTime();																// Start time for sequence member
+
+		for (i=0;i<repeat;++i) {																	// For each time to do it
+			for (j=0;j<seq.length;++j) {															// For each sequence member
+				base=this.models[seq[j].model].bones;												// Point at bones array of model
+				for (b in base)	cbs[b]=base[b].rotation;											// Save rotation object for each bone			
+				if (!app.poses[seq[j].pose])	continue;											// Bad pose
+				v=app.poses[seq[j].pose].split(",");												// Point at bones parts
+				bs=[];																				// Clear bone array
+				for (k=0;k<v.length;k+=4) {															// Stride by 4
+					o={ bone:v[k] };																// Add bone name
+					b=base[v[k]];																	// Point at bone
+					o.sx=cbs[v[k]].x;	 o.sy=cbs[v[k]].y;  		o.sz=cbs[v[k]].z;				// Start from current pos
+					cbs[v[k]].x=o.ex=v[k+1]*Math.PI/180+b.oxr;										// Normalized end X pose, and set cbs (in radians)
+					cbs[v[k]].y=o.ey=v[k+2]*Math.PI/180+b.oyr;  									// Y
+					cbs[v[k]].z=o.ez=v[k+3]*Math.PI/180+b.ozr;										// Z
+					bs.push(o);
+					}
+				app.animateData.push({ model:seq[j].model, start:start, dur:seq[j].dur*1000, bones:bs });	// Save animation data
+				start+=seq[j].dur*1000;																// Start next member at end of last
+				}
 			}
-		var start=new Date().getTime();																// Start time
-		app.animateData.push({ model:model, start:start, dur:durSec*1000, bones:bs });				// Save animation data
 	}
 
-
-																								// SCENE CLOSURE
-}  // CLOSURE
+}  // SCENE CLOSURE
 
 
 
@@ -661,7 +676,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		str+="This is a very preliminary demo of the Liza teacher simulator. Right now only the 3D model for the classroom and student are completed.<br><br>"
 		str+="Explore the 3D class by dragging your mouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
 		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking <a href='javascript:app.sc.PoseEditor()'>here</a>.<br><br>"
-		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, put your arm up or down, put your head up, down, left, or right</i> (more to come) and the student will animate to  that pose.<br><br>"
+		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, wave,put your arm up or down, put your head up, down, left, or right</i> (more to come) and the student will animate to  that pose.<br><br>"
 		str+="Speech currently only works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
 		str+="We have chosen to represent the environment in a cartoon-like fashion. To see a fully rendered classroom version, click <a href='index.html?real'>here</a>.<br><br>"
 
