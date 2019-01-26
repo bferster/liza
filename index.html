@@ -92,7 +92,7 @@ class App  {
 		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:tex} );		
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:tex} );		
-		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:-30, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female"} );
+		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:0, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female"} );
 		this.poses["body6*"]="armL,25,0,0,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,68,-25,0,forearmR,0,0,45,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
@@ -103,6 +103,9 @@ class App  {
 		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";	
 		this.poses["handRight"]="armL,25,0,0,forearmL,50,-25,0,wristL,0,-40,0";	
 		this.poses["sleep"]="neck,45,62,0,chest,48,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
+		this.poses["standUp"]="armL,-70,0,0,armR,-70,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0";
+		this.poses["faceFront"]="base,0,0,0";			this.poses["faceLeft"]="base,0,75,0";	
+		this.poses["test"]="base,0,90,100"		
 	}
 
 	LoadModels() 																				// LOAD 3D MODELS
@@ -131,6 +134,7 @@ class App  {
 			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: 1 }],1);								
 			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation([{ model:mod, pose:"leftArmDesk", dur: 1 }],1);								
 			if (text.match(/wave|wade/i))						app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: .6 },{ model:mod, pose:"handRight", dur: .5 }],5);								
+			if (text.match(/stand/i))							app.sc.StartAnimation([{ model:mod, pose:"faceRight", dur: .6 },{ model:mod, pose:"standUp", dur: .5 },{ model:mod, pose:"faceFront", dur: .6 }],5);								
 			if (text.match(/talk/i))	 					 	app.voice.Talk("My name is Liza. How are you today? Would you like to play a game?");						
 
 
@@ -260,11 +264,11 @@ class Scene {
 
 		function loadModel(object) {															// ON LOAD
 			var i=0,texture=null;
-			_this.models[o.id]=({ name:o.src, bones:[] });											// Add new model	
+			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF/DAE)			
+			_this.models[o.id]=({ name:o.src, bones:[], model: object });							// Add new model	
 			var cm=_this.models[o.id];																// Point at new model
 			if (o.tex && isNaN(o.tex)) 																// If a texture
 				texture=_this.textureLoader.load(o.tex);											// Load it
-			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF/DAE)			
 
 			object.traverse(function(child) {														// Go thru model
 				if (child.isBone) {																	// If a bone,
@@ -286,6 +290,7 @@ class Scene {
 					}							
 			});
 			
+			object.oxp=o.x;		object.ozp=o.y;		object.oyp=o.z;	object.orp=o.r;					// Save start pos's
 			object.scale.x=object.scale.y=object.scale.z=o.s;										// Scale 
 			object.position.x=o.x;	object.position.z=o.y;	object.position.y=o.z;					// Position
 			object.rotation.y=o.r*Math.PI/180;														// Rotation
@@ -296,6 +301,11 @@ class Scene {
 	SetBone(model, bone, x, y, z)																// ROTATE A BONE
 	{
 		if (!this.models[model] || !this.models[model].bones[bone])	return;							// Quit on bad model or bone
+		if (bone == "base") {																		// X and Z axes set model positon directly, not via the bone
+			this.models[model].model.position.x=x*3+this.models[model].model.oxp;					// Set base X position via model
+			this.models[model].model.position.z=z*3+this.models[model].model.ozp;					// Z
+			x=z=0;
+			}
 		x*=Math.PI/180;	y*=Math.PI/180;	z*=Math.PI/180;												// Convert degrees to radians
 		x+=this.models[model].bones[bone].oxr;														// Add initial rotations
 		y+=this.models[model].bones[bone].oyr;
@@ -316,6 +326,8 @@ class Scene {
 		v=v.split(",");																				// Get bone positions
 		for (i=0;i<v.length;i+=4)																	// Stride by 4
 			this.SetBone(model,v[i],v[i+1]-0,v[i+2]-0,v[i+3]-0);									// Set bone
+		var angle=(this.models[model].bones["thighL"].rotation.x-this.models[model].bones["thighL"].oxr)*180/Math.PI;	// Angle of left thigh in degress
+		this.models[model].bones["base"].position.z=(angle < -45) ? angle/40 : 0;					// Left thigh controls height for sitting id < -45 degrees										
 		}
 
 	PoseEditor()																				// POSE EDITOR
@@ -454,8 +466,8 @@ class Scene {
 
 	AnimateScene()																			// CALLED EVERY FRAME BY ANIMATE
 	{
-		var i,j,pct;
-		var seq,bones,br,b;
+		var i,j,pct,a;
+		var seq,bones,model,br,b;
 		var x,y,z;
 		var now=new Date().getTime();																// Get current time in ms
 		for (i=0;i<app.animateData.length;++i)	{													// For each action
@@ -470,14 +482,27 @@ class Scene {
 			for (j=0;j<seq.bones.length;++j) {														// For each bone
 				b=seq.bones[j];																		// Point at bone 						
 				br=app.sc.models[seq.model].bones[b.bone].rotation;									// Point at rotation						
-				br.x=b.sx+(b.ex-b.sx)*pct;															// Interpolate x angle and set bone to it
-				br.y=b.sy+(b.ey-b.sy)*pct;															// Y
-				br.z=b.sz+(b.ez-b.sz)*pct;															// Z
-				}
+				if (b.bone == "base") {																// Base bone's X & Z axes set by object directly, not bone
+					br.x=app.sc.models[seq.model].bones[b.bone].oxr;								// Don't move XR
+					br.z=app.sc.models[seq.model].bones[b.bone].ozr;								// ZR
+					br.y=b.sy+(b.ey-b.sy)*pct;														// Y
+					model=this.models[seq.model].model;												// Point at model			
+					model.position.x=b.sx+(b.ex-b.sx)*pct*180/Math.PI+model.oxp;					// Set base X position via model
+					model.position.z=b.sz+(b.ez-b.sz)*pct*180/Math.PI+model.ozp;					// Z
+					}	
+				else{																				// Normal bone
+					br.x=b.sx+(b.ex-b.sx)*pct;														// Interpolate x angle and set bone to it
+					br.y=b.sy+(b.ey-b.sy)*pct;														// Y
+					br.z=b.sz+(b.ez-b.sz)*pct;														// Z
+					}
+				}															
+			a=(this.models[seq.model].bones["thighL"].rotation.x-this.models[seq.model].bones["thighL"].oxr)*180/Math.PI;	// Angle of left thigh in degress
+			this.models[seq.model].bones["base"].position.z=(a < -45) ? a/40 : 0;					// Left thigh controls height for sitting id < -45 degrees										
 			}
 		if (app.voice.talking)																		// If talking
 			app.sc.SetBone("body6*","mouth",Math.cos(aniTimer/8*Math.PI)*4+4*.01,0,0);				// Animate mouth
 
+		
 		if (aniTimer) {
 			++aniTimer;
 //			app.sc.models["body6*"].bones["neck"].rotation.z=Math.cos(++aniTimer/50*-3.14)*.02
@@ -573,9 +598,6 @@ class Voice {
 					}
 				}
 			};
-
-
-
 
 		}
 
