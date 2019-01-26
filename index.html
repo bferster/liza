@@ -103,9 +103,8 @@ class App  {
 		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";	
 		this.poses["handRight"]="armL,25,0,0,forearmL,50,-25,0,wristL,0,-40,0";	
 		this.poses["sleep"]="neck,45,62,0,chest,48,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
-		this.poses["standUp"]="armL,-70,0,0,armR,-70,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0";
+		this.poses["standUp"]="armL,-70,0,0,armR,-70,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,80,0,0";
 		this.poses["faceFront"]="base,0,0,0";			this.poses["faceLeft"]="base,0,75,0";	
-		this.poses["test"]="base,0,90,100"		
 	}
 
 	LoadModels() 																				// LOAD 3D MODELS
@@ -134,7 +133,7 @@ class App  {
 			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: 1 }],1);								
 			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation([{ model:mod, pose:"leftArmDesk", dur: 1 }],1);								
 			if (text.match(/wave|wade/i))						app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: .6 },{ model:mod, pose:"handRight", dur: .5 }],5);								
-			if (text.match(/stand/i))							app.sc.StartAnimation([{ model:mod, pose:"faceRight", dur: .6 },{ model:mod, pose:"standUp", dur: .5 },{ model:mod, pose:"faceFront", dur: .6 }],5);								
+			if (text.match(/stand/i))							app.sc.StartAnimation([{ model:mod, pose:"faceRight", dur: .6 },{ model:mod, pose:"standUp", dur: .5 }],1);								
 			if (text.match(/talk/i))	 					 	app.voice.Talk("My name is Liza. How are you today? Would you like to play a game?");						
 
 
@@ -698,7 +697,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		str+="This is a very preliminary demo of the Liza teacher simulator. Right now only the 3D model for the classroom and student are completed.<br><br>"
 		str+="Explore the 3D class by dragging your mouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
 		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking <a href='javascript:app.sc.PoseEditor()'>here</a>.<br><br>"
-		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, wave,put your arm up or down, put your head up, down, left, or right</i> (more to come) and the student will animate to  that pose.<br><br>"
+		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, stand up, wave, put your arm up or down, put your head up, down, left, or right</i> (more to come) and the student will animate to  that pose.<br><br>"
 		str+="Speech currently only works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
 		str+="We have chosen to represent the environment in a cartoon-like fashion. To see a fully rendered classroom version, click <a href='index.html?real'>here</a>.<br><br>"
 
