@@ -123,7 +123,7 @@ class App  {
 	{
 		trace(text)
 		var mod="body6*";
-		if (text && text.match(/liza|plaza|lies|alexa/i)) {
+		if (text && text.match(/liza|plaza|lies|alexa|alexis/i)) {
 			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation([{ model:mod, pose:"sleep", dur: 1 }],1);								
 			if (text.match(/sit|set/i))	 					 	app.sc.StartAnimation([{ model:mod, pose:"body6*", dur: 1 }],1);							
 			if (text.match(/head|had/i)	&& text.match(/up/i)) 	app.sc.StartAnimation([{ model:mod, pose:"headUp", dur: 1 }],1);								
@@ -133,7 +133,7 @@ class App  {
 			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: 1 }],1);								
 			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation([{ model:mod, pose:"leftArmDesk", dur: 1 }],1);								
 			if (text.match(/wave|wade/i))						app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: .6 },{ model:mod, pose:"handRight", dur: .5 }],5);								
-			if (text.match(/stand/i))							app.sc.StartAnimation([{ model:mod, pose:"faceRight", dur: .6 },{ model:mod, pose:"standUp", dur: .5 }],1);								
+			if (text.match(/stand/i))							app.sc.StartAnimation([{ model:mod, pose:"standUp", dur: 1 }],1);								
 			if (text.match(/talk/i))	 					 	app.voice.Talk("My name is Liza. How are you today? Would you like to play a game?");						
 
 
@@ -486,8 +486,8 @@ class Scene {
 					br.z=app.sc.models[seq.model].bones[b.bone].ozr;								// ZR
 					br.y=b.sy+(b.ey-b.sy)*pct;														// Y
 					model=this.models[seq.model].model;												// Point at model			
-					model.position.x=b.sx+(b.ex-b.sx)*pct*180/Math.PI+model.oxp;					// Set base X position via model
-					model.position.z=b.sz+(b.ez-b.sz)*pct*180/Math.PI+model.ozp;					// Z
+					model.position.x=b.sx+(b.ex-b.sx)*pct+model.oxp;								// Set base X position via model, not bone
+					model.position.z=b.sz+(b.ez-b.sz)*pct+model.ozp;								// Z
 					}	
 				else{																				// Normal bone
 					br.x=b.sx+(b.ex-b.sx)*pct;														// Interpolate x angle and set bone to it
@@ -512,24 +512,28 @@ class Scene {
 	StartAnimation(seq, repeat)															// QUEUE UP ACTION SEQUENCE
 	{
 		var i,j,k,b,o,v;
-		var base,start,bs;
+		var base,model,start,rad,bs;
 		var cbs=[];																					// Holds state of bones during sequence
 		var start=new Date().getTime();																// Start time for sequence member
 
 		for (i=0;i<repeat;++i) {																	// For each time to do it
 			for (j=0;j<seq.length;++j) {															// For each sequence member
-				base=this.models[seq[j].model].bones;												// Point at bones array of model
-				for (b in base)	cbs[b]=base[b].rotation;											// Save rotation object for each bone			
+				model=this.models[seq[j].model];													// Ploint at model
+				base=model.bones;																	// Point at bones array of model
+				for (b in base)	cbs[b]={ x:base[b].rotation.x, y:base[b].rotation.y, z:base[b].rotation.z };	// Save rotation for each bone			
+				cbs["base"].x=model.model.position.x-model.model.oxp;								// Get X position from model for base bone
+				cbs["base"].z=model.model.position.z-model.model.ozp;								// Z
 				if (!app.poses[seq[j].pose])	continue;											// Bad pose
 				v=app.poses[seq[j].pose].split(",");												// Point at bones parts
 				bs=[];																				// Clear bone array
 				for (k=0;k<v.length;k+=4) {															// Stride by 4
 					o={ bone:v[k] };																// Add bone name
+					rad=(v[k] == "base") ? 1 : Math.PI/180;											// Convert to radians on all bones except base
 					b=base[v[k]];																	// Point at bone
 					o.sx=cbs[v[k]].x;	 o.sy=cbs[v[k]].y;  		o.sz=cbs[v[k]].z;				// Start from current pos
-					cbs[v[k]].x=o.ex=v[k+1]*Math.PI/180+b.oxr;										// Normalized end X pose, and set cbs (in radians)
-					cbs[v[k]].y=o.ey=v[k+2]*Math.PI/180+b.oyr;  									// Y
-					cbs[v[k]].z=o.ez=v[k+3]*Math.PI/180+b.ozr;										// Z
+					cbs[v[k]].x=o.ex=v[k+1]*rad+b.oxr;												// Normalized end X pose, and set new cbs
+					cbs[v[k]].y=o.ey=v[k+2]*rad+b.oyr;  											// Y
+					cbs[v[k]].z=o.ez=v[k+3]*rad+b.ozr;												// Z
 					bs.push(o);
 					}
 				app.animateData.push({ model:seq[j].model, start:start, dur:seq[j].dur*1000, bones:bs });	// Save animation data
