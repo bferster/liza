@@ -60,9 +60,9 @@
 		<br><br><div id='startBut' class='lz-bs' onclick='app.voice.Talk("")'>Start</div>
 	</div>
 	<div id="controllerDiv" class="lz-controller">
-		<img id="writeBut" src="img/editBut.gif" style="cursor:pointer;margin-right:8px">
-		<img id="poseBut" src="img/poseBut.gif" style="cursor:pointer;margin-right:8px">
-		<img id="settingsBut" src="img/settingsBut.gif" style="cursor:pointer">
+		<img id="writeBut" src="img/editbut.gif" style="cursor:pointer;margin-right:8px">
+		<img id="poseBut" src="img/posebut.gif" style="cursor:pointer;margin-right:8px">
+		<img id="settingsBut" src="img/settingsbut.gif" style="cursor:pointer">
 		<img id="helpBut" src="img/helpicon.gif" style="cursor:pointer;float:right">
 	</div>
 
@@ -512,6 +512,43 @@ class Scene {
 			app.sc.SetBone("body6*","mouth",Math.cos(app.sc.aniTimer/10*Math.PI)*4+4*.01,0,0);		// Animate mouth
 		++app.sc.aniTimer;																			// Advance timer
 	}
+
+	StartAnimation(model, seqs)																	// QUEUE UP ACTION SEQUENCE
+	{
+		var i,j,k,b,o,v;
+		var cbs=[],rad,bs;
+		if (!seqs)	return;																			// Quit of no seqs
+		seqs=seqs.split(",");																		// Get parts
+		var repeat=seqs[seqs.length-1];																// Last element is repeat
+		if (!seqs.length%2)	repeat=1;																// If omitted, do it one time
+		var modObj=this.models[model].model;														// Point at model object
+		var bones=this.models[model].bones;															// Point at bones array of model
+		for (b in bones)	cbs[b]={ x:bones[b].rotation.x, y:bones[b].rotation.y, z:bones[b].rotation.z }; // Save rotation for each bone			
+		cbs["base"].x=modObj.position.x-modObj.oxp;													// Get X position from model for base bone
+		cbs["base"].z=modObj.position.z-modObj.ozp;													// Z
+		var start=new Date().getTime();																// Start time for sequence member
+
+		for (i=0;i<repeat;++i) {																	// For each time to do it
+			for (j=0;j<seqs.length-1;j+=2) {														// For each sequence member bone/time pair
+				if (!app.poses[seqs[j]])	continue;												// Bad pose
+				v=app.poses[seqs[j]].split(",");													// Point at bones parts
+				bs=[];																				// Clear bone array
+				for (k=0;k<v.length;k+=4) {															// Stride by 4
+					o={ bone:v[k] };																// Add bone name
+					rad=(v[k] == "base") ? 1 : Math.PI/180;											// Convert to radians on all bones except base
+					b=bones[v[k]];																	// Point at bone
+					o.sx=cbs[v[k]].x;	 o.sy=cbs[v[k]].y;  		o.sz=cbs[v[k]].z;				// Start from current pos
+					cbs[v[k]].x=o.ex=v[k+1]*rad+b.oxr;												// Normalized end X pose, and set new cbs
+					cbs[v[k]].y=o.ey=v[k+2]*rad+b.oyr;  											// Y
+					cbs[v[k]].z=o.ez=v[k+3]*rad+b.ozr;												// Z
+					bs.push(o);
+					}
+				app.animateData.push({ model:model, start:start, dur:seqs[j+1]*1000, bones:bs });	// Save animation data
+				start+=seqs[j+1]*1000;																// Start next member at end of last
+				}
+			}
+	}
+
 
 }  // SCENE CLOSURE
 
