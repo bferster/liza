@@ -27,6 +27,9 @@
 							}
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
+		.lz-controller {	position: absolute; top: calc(100vh - 40px); left:16px; background-color: #fff; border: 1px solid #999;
+							padding:4px 10px; border-radius: 16px; width: 300px; height:18px;
+							}
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #999;
 							padding:16px; border-radius: 16px; width: 600px;
 							}
@@ -56,10 +59,15 @@
 		<br><p style="color:#000;font-size:14px"><em>A tool for engaging people in highly affective script-driven discourse<br>for learning and practicing goal-directed behaviors.</em></p>
 		<br><br><div id='startBut' class='lz-bs' onclick='app.voice.Talk("")'>Start</div>
 	</div>
+	<div id="controllerDiv" class="lz-controller">
+		<img id="writeBut" src="img/editBut.gif" style="cursor:pointer;margin-right:8px">
+		<img id="poseBut" src="img/poseBut.gif" style="cursor:pointer;margin-right:8px">
+		<img id="settingsBut" src="img/settingsBut.gif" style="cursor:pointer">
+		<img id="helpBut" src="img/helpicon.gif" style="cursor:pointer;float:right">
+	</div>
 
 <script>
 
-var aniTimer=0;	
 var app=null;															// Holds app
 var isMobile=false;														// Flag for mobile devices
 
@@ -73,8 +81,9 @@ class App  {
 	{
 		app=this;
 		this.sc=new Scene("mainDiv");																// Make new scene		
-		this.voice=new Voice(this.OnPhrase);															// Alloc 
+		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.poses=[];																				// Holds poses
+		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
@@ -93,6 +102,7 @@ class App  {
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:0, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female"} );
+		
 		this.poses["body6*"]="armL,25,0,0,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,68,-25,0,forearmR,0,0,45,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
@@ -105,7 +115,19 @@ class App  {
 		this.poses["sleep"]="neck,45,62,0,chest,48,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 		this.poses["standUp"]="armL,-70,0,0,armR,-70,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,80,0,0";
 		this.poses["faceFront"]="base,0,0,0";			this.poses["faceLeft"]="base,0,75,0";	
-	}
+		
+		this.seqs["sleep"]="sleep,1";
+		this.seqs["sit"]="body6*,1";
+		this.seqs["wave"]="handUp,.6,handRight,.5,5";
+		this.seqs["headUp"]="headUp,1";
+		this.seqs["headDown"]="headDown,1";
+		this.seqs["headLeft"]="headLeft,1";
+		this.seqs["headRight"]="headRight,1";
+		this.seqs["armUp"]="handUp,1";
+		this.seqs["armDown"]="leftArmDesk,1";
+		this.seqs["standUp"]="standUp,1";
+		}
+
 
 	LoadModels() 																				// LOAD 3D MODELS
 	{
@@ -124,19 +146,17 @@ class App  {
 		trace(text)
 		var mod="body6*";
 		if (text && text.match(/liza|plaza|lies|alexa|alexis/i)) {
-			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation([{ model:mod, pose:"sleep", dur: 1 }],1);								
-			if (text.match(/sit|set/i))	 					 	app.sc.StartAnimation([{ model:mod, pose:"body6*", dur: 1 }],1);							
-			if (text.match(/head|had/i)	&& text.match(/up/i)) 	app.sc.StartAnimation([{ model:mod, pose:"headUp", dur: 1 }],1);								
-			if (text.match(/head|had/i)	&& text.match(/down/i)) app.sc.StartAnimation([{ model:mod, pose:"headDown", dur: 1 }],1);								
-			if (text.match(/head|had/i)	&& text.match(/left/i)) app.sc.StartAnimation([{ model:mod, pose:"headLeft", dur: 1 }],1);								
-			if (text.match(/head|had/i)	&& text.match(/right/i)) app.sc.StartAnimation([{ model:mod, pose:"headRight", dur: 1 }],1);								
-			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: 1 }],1);								
-			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation([{ model:mod, pose:"leftArmDesk", dur: 1 }],1);								
-			if (text.match(/wave|wade/i))						app.sc.StartAnimation([{ model:mod, pose:"handUp", dur: .6 },{ model:mod, pose:"handRight", dur: .5 }],5);								
-			if (text.match(/stand/i))							app.sc.StartAnimation([{ model:mod, pose:"standUp", dur: 1 }],1);								
+			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation(mod,app.seqs["sleep"]);								
+			if (text.match(/sit|set/i))	 					 	app.sc.StartAnimation(mod,app.seqs["sit"]);							
+			if (text.match(/head|had/i)	&& text.match(/up/i)) 	app.sc.StartAnimation(mod,app.seqs["headUp"]);								
+			if (text.match(/head|had/i)	&& text.match(/down/i)) app.sc.StartAnimation(mod,app.seqs["headDown"]);									
+			if (text.match(/head|had/i)	&& text.match(/left/i)) app.sc.StartAnimation(mod,app.seqs["headLeft"]);								
+			if (text.match(/head|had/i)	&& text.match(/right/i)) app.sc.StartAnimation(mod,app.seqs["headRight"]);								
+			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation(mod,app.seqs["armUp"]);								
+			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation(mod,app.seqs["armDown"]);								
+			if (text.match(/wave|wade/i))						app.sc.StartAnimation(mod,app.seqs["wave"]);								
+			if (text.match(/stand/i))							app.sc.StartAnimation(mod,app.seqs["standUp"]);								
 			if (text.match(/talk/i))	 					 	app.voice.Talk("My name is Liza. How are you today? Would you like to play a game?");						
-
-
 		}
 	}
 
@@ -163,6 +183,7 @@ class Scene {
 		this.backWall="blackboard.png";																// Back wall texture
 		this.leftWall=this.cartoonScene ? "" : "windowwall.png";									// Side wall texture
 		this.rightWall=this.cartoonScene ? "" : "windowwall.png";									// Side wall texture
+		this.aniTimer=0;																			// Times talking anf fidgeting
 		this.Init();																				// Init 3D system
 		}
 
@@ -247,11 +268,8 @@ class Scene {
 
 		loader.load(o.src, (obj)=> { 																// Load model
 			loadModel(obj);																			// Load it
-			if (o.id.match(/\*/)) {																	// If a student
-				_this.SetPose(o.id,o.id);															// Clear bones and set starting pose
-				aniTimer=1;																			// Start animation
-				}
-		}, onProgress, onError );																	// Load
+			if (o.id.match(/\*/)) _this.SetPose(o.id,o.id);											// If a student set starting pose
+			}, onProgress, onError );																// Load
 
 		function onProgress(xhr) {																	// ON PROGRESS
 			if (xhr.lengthComputable ) {															// If a length
@@ -301,8 +319,8 @@ class Scene {
 	{
 		if (!this.models[model] || !this.models[model].bones[bone])	return;							// Quit on bad model or bone
 		if (bone == "base") {																		// X and Z axes set model positon directly, not via the bone
-			this.models[model].model.position.x=x*3+this.models[model].model.oxp;					// Set base X position via model
-			this.models[model].model.position.z=z*3+this.models[model].model.ozp;					// Z
+			this.models[model].model.position.x=x-0+this.models[model].model.oxp;					// Set base X position via model
+			this.models[model].model.position.z=z-0+this.models[model].model.ozp;					// Z
 			x=z=0;
 			}
 		x*=Math.PI/180;	y*=Math.PI/180;	z*=Math.PI/180;												// Convert degrees to radians
@@ -326,7 +344,7 @@ class Scene {
 		for (i=0;i<v.length;i+=4)																	// Stride by 4
 			this.SetBone(model,v[i],v[i+1]-0,v[i+2]-0,v[i+3]-0);									// Set bone
 		var angle=(this.models[model].bones["thighL"].rotation.x-this.models[model].bones["thighL"].oxr)*180/Math.PI;	// Angle of left thigh in degress
-		this.models[model].bones["base"].position.z=(angle < -45) ? angle/40 : 0;					// Left thigh controls height for sitting id < -45 degrees										
+		this.models[model].bones["base"].position.z=angle/40;										// Left thigh controls height for sitting									
 		}
 
 	PoseEditor()																				// POSE EDITOR
@@ -335,7 +353,7 @@ class Scene {
 		$("#poseEditor").remove();																	// Remove old one
 		var str="<div id='poseEditor' class='lz-dialog'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
-		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();aniTimer=1;'><br><br>";
+		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();'><br><br>";
 		str+="<table>";
 		str+="<tr><td>Model: </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6*'>";								// Model id
 		str+="&nbsp;&nbsp;&nbsp;Pose:&nbsp;"+MakeSelect("bePose",false,[]);																				// Pose
@@ -350,15 +368,15 @@ class Scene {
 		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beZval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// Z
 	
 		str+="</table><br>";																			
+		str+="Sequence:&nbsp;"+MakeSelect("beSeqs",false,[]);																			
 		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
-		str+="<div class='lz-bs' id='beCopy' style='float:right;margin-right:12px'>Copy to clipboard</div>"																		
 		str+="</div>";
 
-		aniTimer=0;																					// Stop animation
 		$("body").append(str);																		// Add to body
 		addBones();																					// Load new bones for pulldown
 		addPoses();																					// Load poses for pulldown
-		$("#poseEditor").draggable();																// Make it drqaggable
+		addSeqs();																					// Load sequences for pulldown
+		$("#poseEditor").draggable();																// Make it draggable
 		$("#poseEditor").mousedown( (e)=> { e.stopPropagation();  } );								// Don't move orbiter
 		$("#beXaxis").on("input",  function(e) { $("#beXval").val(this.value); moveBone(); } );		// Show x value	
 		$("#beXval").on("change",  function(e) { $("#beXaxis").val(this.value); moveBone(); } );	// Set x value manually	
@@ -369,8 +387,8 @@ class Scene {
 		$("#beModel").on("change", function(e) { addBones(); } )									// Add current bones
 	
 		$("#bePose").on("change", function(e) { 													// Add new pose
-			app.sc.StartAnimation([{ model:$("#beModel").val(), pose: this.value, dur: 1 }],1);		// Show new pose							
-			addBones(); 
+			app.sc.SetPose($("#beModel").val(),this.value);											// Show new pose							
+			addBones(); 																			// Reset
 			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
 			$("#beXaxis").val(0);	$("#beYaxis").val(0);	$("#beZaxis").val(0);					// Set slider
 			$("#bePose").prop("selectedIndex",0);			$("#beBone").prop("selectedIndex",0);	// Reset pulldowns
@@ -394,31 +412,11 @@ class Scene {
 			this.SetBone($("#beModel").val(),$("#beBone").val(),0,0,0);								// Set bone						
 			});
 
-		$("#beCopy").on("click", ()=>  {															// COPY BONES TO CLIPBOARD
-			var v=[];
-			var str='this.poses["'+$("#beModel").val()+'"]="';										// Start of setting
-			var base=this.models[$("#beModel").val()].bones;										// Point at bones array
-			for (var bone in base) 	v.push(bone);													// Add bone to array
-			v.sort();																				// Sort bones
-			for (var i=0;i<v.length;++i) {															// For each bone
-				str+=v[i]+",";																		// Id
-				str+=(Math.round((base[v[i]].rotation.x-base[v[i]].oxr)*180/Math.PI)*100)/100+",";	// Set X degrees
-				str+=(Math.round((base[v[i]].rotation.y-base[v[i]].oyr)*180/Math.PI)*100)/100+",";	// Y
-				str+=(Math.round((base[v[i]].rotation.z-base[v[i]].ozr)*180/Math.PI)*100)/100+",";	// Z
-				}
-			str=str.substr(0,str.length-1);															// Remove last comma
-			str+='";\n'																				// Add end
-			$("body").append("<textarea id='outputDiv' style='width:1px;height:1px;opacity:.01'></textarea></div>"); // Add div
-			$("#outputDiv").val(str);																// Show it
-			$("#outputDiv")[0].select();															// Select div
-			try {
-				if (document.execCommand('copy')) {													// Copy to clipboard
-					Sound("ding");																	// Ding
-					}
-				} catch (err) { console.log("Clipboard copy error")}								// Show error
-			$("#outputDiv").remove();																// Remove div
+		$("#beSeqs").on("change", ()=>  {															// RUN SEQUENCE
+			this.StartAnimation($("#beModel").val(),app.seqs[$("#beSeqs").val()]);					// Start animating
+			if ($("#beSeqs").val() == "talk")	app.voice.Talk("My name is Liza. How are you today? Would you like to play a game?");
+			$("#beSeqs").prop("selectedIndex",0);		$("#beBone").prop("selectedIndex",0);		// Reset pulldowns
 			});
-		
 		
 		$("#beReset").on("click", ()=>  {															// REST ALL BONES TO ORIGINAL STATE	
 			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
@@ -447,8 +445,20 @@ class Scene {
 			for (var i=0;i<v.length;++i) 	$("#bePose").append("<option>"+v[i]+"</option>");		// Add option
 			}
 
+		function addSeqs() {																		// FILL SEQS PULLDOWN
+			var v=[];
+			$("#beSeqs").empty();																	// Clear select
+			$("#beSeqs").append("<option>Choose sequence</option>");								// Add choose
+			for (var p in app.seqs) 			v.push(p);											// Add sequence to array
+			v.sort();																				// Sort bones
+			for (var i=0;i<v.length;++i) 	$("#beSeqs").append("<option>"+v[i]+"</option>");		// Add option
+			$("#beSeqs").append("<option>talk</option>");											// Add talk
+			}
+
 		function moveBone() {																		// Move the bone
-			_this.SetBone($("#beModel").val(),$("#beBone").val(),$("#beXaxis").val(),$("#beYaxis").val(),$("#beZaxis").val())
+			var x=$("#beXaxis").val(),y=$("#beYaxis").val(),z=$("#beZaxis").val();					// Get vals
+			if ($("#beBone").val() == "base")	x=x*3,z=z*3;										// Scale up base x & z
+			_this.SetBone($("#beModel").val(),$("#beBone").val(),x,y,z);							// Set bone
 			}
 	}
 	
@@ -463,7 +473,7 @@ class Scene {
 		if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );				// Render outline
 		}
 
-	AnimateScene()																			// CALLED EVERY FRAME BY ANIMATE
+	AnimateScene()																				// CALLED EVERY FRAME BY ANIMATE FUNCTION
 	{
 		var i,j,pct,a;
 		var seq,bones,model,br,b;
@@ -496,50 +506,11 @@ class Scene {
 					}
 				}															
 			a=(this.models[seq.model].bones["thighL"].rotation.x-this.models[seq.model].bones["thighL"].oxr)*180/Math.PI;	// Angle of left thigh in degress
-			this.models[seq.model].bones["base"].position.z=(a < -45) ? a/40 : 0;					// Left thigh controls height for sitting id < -45 degrees										
+			this.models[seq.model].bones["base"].position.z=a/40;									// Left thigh controls height for sitting									
 			}
 		if (app.voice.talking)																		// If talking
-			app.sc.SetBone("body6*","mouth",Math.cos(aniTimer/8*Math.PI)*4+4*.01,0,0);				// Animate mouth
-
-		
-		if (aniTimer) {
-			++aniTimer;
-//			app.sc.models["body6*"].bones["neck"].rotation.z=Math.cos(++aniTimer/50*-3.14)*.02
-//			app.sc.models["body6*"].bones["neck"].rotation.y=Math.cos(aniTimer/50*-3.14)*.05
-			}
-	}
-
-	StartAnimation(seq, repeat)															// QUEUE UP ACTION SEQUENCE
-	{
-		var i,j,k,b,o,v;
-		var base,model,start,rad,bs;
-		var cbs=[];																					// Holds state of bones during sequence
-		var start=new Date().getTime();																// Start time for sequence member
-
-		for (i=0;i<repeat;++i) {																	// For each time to do it
-			for (j=0;j<seq.length;++j) {															// For each sequence member
-				model=this.models[seq[j].model];													// Ploint at model
-				base=model.bones;																	// Point at bones array of model
-				for (b in base)	cbs[b]={ x:base[b].rotation.x, y:base[b].rotation.y, z:base[b].rotation.z };	// Save rotation for each bone			
-				cbs["base"].x=model.model.position.x-model.model.oxp;								// Get X position from model for base bone
-				cbs["base"].z=model.model.position.z-model.model.ozp;								// Z
-				if (!app.poses[seq[j].pose])	continue;											// Bad pose
-				v=app.poses[seq[j].pose].split(",");												// Point at bones parts
-				bs=[];																				// Clear bone array
-				for (k=0;k<v.length;k+=4) {															// Stride by 4
-					o={ bone:v[k] };																// Add bone name
-					rad=(v[k] == "base") ? 1 : Math.PI/180;											// Convert to radians on all bones except base
-					b=base[v[k]];																	// Point at bone
-					o.sx=cbs[v[k]].x;	 o.sy=cbs[v[k]].y;  		o.sz=cbs[v[k]].z;				// Start from current pos
-					cbs[v[k]].x=o.ex=v[k+1]*rad+b.oxr;												// Normalized end X pose, and set new cbs
-					cbs[v[k]].y=o.ey=v[k+2]*rad+b.oyr;  											// Y
-					cbs[v[k]].z=o.ez=v[k+3]*rad+b.ozr;												// Z
-					bs.push(o);
-					}
-				app.animateData.push({ model:seq[j].model, start:start, dur:seq[j].dur*1000, bones:bs });	// Save animation data
-				start+=seq[j].dur*1000;																// Start next member at end of last
-				}
-			}
+			app.sc.SetBone("body6*","mouth",Math.cos(app.sc.aniTimer/10*Math.PI)*4+4*.01,0,0);		// Animate mouth
+		++app.sc.aniTimer;																			// Advance timer
 	}
 
 }  // SCENE CLOSURE
@@ -686,13 +657,11 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// HELP SCREEN
+// CONTROLLER BAR
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-	$("body").append("<img src='img/helpicon.gif' id='helpBut' style='position:absolute;top:16px;left:16px;cursor:pointer'>");
 	$("#helpBut").on("click", ()=> {										// ON HELP BUTTON
-		$("#helpDiv").remove();												// Remove old one
+		$("#helpDiv").remove();													// Remove old one
 		var str="<div id='helpDiv' class='lz-dialog'style='height:66vh'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
@@ -700,8 +669,8 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		
 		str+="This is a very preliminary demo of the Liza teacher simulator. Right now only the 3D model for the classroom and student are completed.<br><br>"
 		str+="Explore the 3D class by dragging your mouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
-		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking <a href='javascript:app.sc.PoseEditor()'>here</a>.<br><br>"
-		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, stand up, wave, put your arm up or down, put your head up, down, left, or right</i> (more to come) and the student will animate to  that pose.<br><br>"
+		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking on the pose editor in the controller bar.<br><br>"
+		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, stand up, wave, put your arm up or down, put your head up, down, left, or right</i> and the student will animate to  that pose.<br><br>"
 		str+="Speech currently only works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
 		str+="We have chosen to represent the environment in a cartoon-like fashion. To see a fully rendered classroom version, click <a href='index.html?real'>here</a>.<br><br>"
 
@@ -712,6 +681,9 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		$("#helpDiv").mousedown( (e)=> { e.stopPropagation() } );				// Don't move orbiter
 		});
 
+	$("#poseBut").on("click", ()=> { app.sc.PoseEditor() });				// ON POSE BUTTON
+	$("#writeBut").on("click", ()=> {  });									// ON WRITE BUTTON
+	$("#settingsBut").on("click", ()=> {  });								// ON SETTINGS BUTTON
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS
