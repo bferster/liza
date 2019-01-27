@@ -90,6 +90,7 @@ class App  {
 		this.LoadProject("myFile");																	// Load project file
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
+		this.fidget=0;																				// Fidget flag
 	}
 
 	LoadProject(file)																			// LOAD PROJECT DATA
@@ -369,6 +370,7 @@ class Scene {
 	
 		str+="</table><br>";																			
 		str+="Sequence:&nbsp;"+MakeSelect("beSeqs",false,[]);																			
+		str+="&nbsp;&nbsp;&nbsp;Fidget?&nbsp;<td><input type='checkbox' id='beFidget'"+(app.fidget ? " checked" : "")+">" ;																			
 		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
 		str+="</div>";
 
@@ -384,7 +386,7 @@ class Scene {
 		$("#beYval").on("change",  function(e) { $("#beYaxis").val(this.value); moveBone(); } );	// Y	
 		$("#beZaxis").on("input",  function(e) { $("#beZval").val(this.value); moveBone(); } );		// Z
 		$("#beZval").on("change",  function(e) { $("#beZaxis").val(this.value); moveBone(); } );	// Z
-		$("#beModel").on("change", function(e) { addBones(); } )									// Add current bones
+		$("#beFidget").on("click", function(e) { app.fidget=$(this).prop("checked") ? 1 : 0 });		// Toggle fidget flag
 	
 		$("#bePose").on("change", function(e) { 													// Add new pose
 			app.sc.SetPose($("#beModel").val(),this.value);											// Show new pose							
@@ -510,6 +512,8 @@ class Scene {
 			}
 		if (app.voice.talking)																		// If talking
 			app.sc.SetBone("body6*","mouth",Math.cos(app.sc.aniTimer/10*Math.PI)*4+4*.01,0,0);		// Animate mouth
+		if (app.fidget)																				// If fidgeting
+			app.sc.SetBone("body6*","thighR",-83,Math.cos(app.sc.aniTimer/30*Math.PI)*10+10*.01,0);	// Animate thigh
 		++app.sc.aniTimer;																			// Advance timer
 	}
 
