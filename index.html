@@ -106,12 +106,11 @@ class App  {
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
 		this.fidget=0;																				// Fidget flag
-		$("#poseBut").on("click", ()=> { app.sc.PoseEditor() });									// On pose button click
+		$("#poseBut").on("click", ()=> { app.sc.PoseEditor();  });									// On pose button click
 		$("#writeBut").on("click", ()=> { $("#blackboardDiv").toggle("slide",{ direction:"down"}) }); // On write button click
 		$("#settingsBut").on("click", ()=> {   				});										// On settings button click
-		$("#BB-DrawBut").on("click",  ()=> { this.bb.Draw(false) });								// On draw button click, draw
-		$("#BB-ImageBut").on("click", ()=> { this.bb.ChoosePic(false) });							// On image button click, draw
-		$("#BB-EraseBut").on("click", ()=> { this.bb.Draw(true) });									// On erase button click, erase
+		$("#helpBut").on("click", ()=> {app.ShowHelp() });											// On help button click
+		$("[id^=BB-]").on("click", function() { app.bb.ButtonRoute(this.id)	});						// On BB Drawing menu button click
 	}
 
 	LoadProject(file)																			// LOAD PROJECT DATA
@@ -161,6 +160,32 @@ class App  {
 	{
 		this.sc.Render();																			// Render scene and animate
 	}
+
+	ShowHelp() 																					// SHOW HELP
+	{
+		if ($("#helpDiv").length) {																// If already up, bring it down
+			$("#helpDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#helpDiv").remove(); } }); // Slide down
+			return;																				// Quit																					
+			}
+		var str="<div id='helpDiv' class='lz-dialog'style='height:calc(100vh - 90px);display:none;'>";
+		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
+		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
+		str+="<div style='height:calc(100% - 70px);width:calc(100% - 24px);background-color:#fff;border-radius:6px;padding:12px;border:1px solid #999'>";
+		
+		str+="This is a very preliminary demo of the Liza teacher simulator. Right now only the 3D model for the classroom and student are completed.<br><br>"
+		str+="Explore the 3D class by dragging your mouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
+		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking on the pose editor in the controller bar.<br><br>"
+		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, stand up, wave, put your arm up or down, put your head up, down, left, or right</i> and the student will animate to  that pose.<br><br>"
+		str+="Speech currently only works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
+		str+="We have chosen to represent the environment in a cartoon-like fashion. To see a fully rendered classroom version, click <a href='index.html?real'>here</a>.<br><br>"
+
+		str+="<hr><br><img src='img/UVAlogo128.png' width='96' style='float:left;margin-right:16px'>";
+		str+="Bill Ferster<br>Curry School of Education<br>Center for Contemplative Studies<br>bferster@virginia.edu<br></div></div>";
+		$("body").append(str);																	// Add to body
+		$("#helpDiv").show("slide",{ direction:"down" });										// Slide up
+		$("#helpDiv").draggable();																// Make it draggable
+		$("#helpDiv").mousedown( (e)=> { e.stopPropagation() } );								// Don't move orbiter
+		}
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
@@ -219,31 +244,40 @@ class Blackboard  {
 		this.map.needsUpdate=true;																		// Flag the map as needing updating
 	}
 
+	ButtonRoute(but)																				// ROUTE BASED ON BUTTON PICK
+	{
+		this.mode=but;																					// Set mode
+		this.paint=false;																				// Reset paint flag
+		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
+		$("#"+but).css("box-shadow","0 0 16px 4px #fff");												// Highlight button
+		$("#BBImagePicker").remove();																	// Remove old picker
+		if (but == "BB-DrawBut")		this.Draw(false);												// Drawing
+		else if (but == "BB-EraseBut")	this.Draw(true);												// Erasing
+		else if (but == "BB-ImageBut")	this.ChoosePic();												// Image
+		else if (but == "BB-TextBut")	this.Text();													// Text
+		$("#blackboardCan").css("cursor","auto");														// Normal curson
+		}
+
 	Draw(erase)																						// DRAW/ERASE LINES & TEXT
 	{
 		var _this=this;																					// JS context
 		this.paint=false;																				// Reset paint flag		
-
-		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
-		if (erase)	$("#BB-EraseBut").css("box-shadow","0 0 16px 4px #fff");							// Highlight erase button
-		else		$("#BB-DrawBut").css("box-shadow","0 0 16px 4px #fff");								// Or draw
-		$("#BBImagePicker").remove();																	// Remove old image picker
-
-
-		$("#blackboardCan").css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "");			// Set eraser cursor
+		this.context.lineWidth=(erase) ? 20: 1;															// Line width
+		this.context.strokeStyle=(erase) ? "#333": "#fff";												// Line color
 
 		$("#blackboardCan").on("mousedown", (e)=> {														// ON MOUSE DOWN
-			this.paint=true;																			// Set paint flag
-			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Set start point 
-			this.context.beginPath();
+			e.stopPropagation();																		// Don't move orbiter
+			if ((this.mode == "BB-DrawBut") || (this.mode == "BB-EraseBut")) {							// Right mode
+				this.paint=true;																		// Set paint flag
+				this.startPosX=e.offsetX;	this.startPosY=e.offsetY;									// Set start point 
+				this.context.beginPath();
+				}
 			});
 
 		$("#blackboardCan").on("mousemove", (e)=> {														// ON MOUSE MOVE
-			e.stopPropagation();																		// Don't move orbiter
 			if (!this.paint) return;																	// Quit if not painting
+			$("#blackboardCan").css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "auto");	// Set eraser cursor
 			this.context.moveTo(this.startPosX, this.startPosY);										// Starting point
-			this.context.lineWidth=(erase) ? 20: 1;														// Line width
-			this.context.strokeStyle=(erase) ? "#333": "#fff";											// Line color
 			this.context.lineTo(e.offsetX, e.offsetY);													// Set end point
 			this.context.stroke();																		// Draw line
 			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Reset drawing start position to current position
@@ -251,16 +285,12 @@ class Blackboard  {
 			});
 
 		$("#blackboardCan").on("mouseup", (e)=>		{ this.paint=false; this.context.closePath(); });	// ON MOUSE UP, Paint flag off
-		$("#blackboardCan").on("mouseleave", (e)=> 	{ this.paint=false; });								// ON MOUSE LEAVE, Paint flag off
 	}
-
 
 	ChoosePic()																						// CHOOSE PIC TO SHOW																			
 	{
 		var trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
 		trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"' onclick='app.bb.SetPic($(this).text())' ";
-		this.paint=false;																				// Reset paint flag
-		$("#BBImagePicker").remove();																	// Remove old picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		$("#BB-ImageBut").css("box-shadow","0 0 16px 4px #009900");										// Highlight button
 		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
@@ -274,15 +304,18 @@ class Blackboard  {
 
 	SetPic(label)																						// SHOW PIC																			
 	{
-	trace(label)
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		var imageObj=new Image();
 		if (label == "Founding fathers")	imageObj.src="FoundingFathers.jpg";
 		if (label == "US map")				imageObj.src="USMap.png";
 		if (label == "Math Lesson")			imageObj.src="BB1.png";
-		imageObj.onload=function() { app.bb.context.drawImage(this,0,0,512,256);  };							// Add image after loading
+		imageObj.onload=function() { app.bb.context.drawImage(this,0,0,512,256);  };					// Add image after loading
 		this.map.needsUpdate=true;																		// Flag the map as needing updating
+	}
+
+	Text()																							// DRAW TEXT
+	{
 	}
 
 	Clear()																							// CLEAR CANVAS
@@ -465,7 +498,6 @@ class Scene {
 		this.models[model].bones[bone].rotation.z=z;													
 	}
 
-
 // POSES ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	SetPose(model, id, time)																	// SET A POSE FOR A MODEL
@@ -483,8 +515,11 @@ class Scene {
 	PoseEditor()																				// POSE EDITOR
 	{
 		var _this=this;
-		$("#poseEditor").remove();																	// Remove old one
-		var str="<div id='poseEditor' class='lz-dialog'>";
+		if ($("#poseEditor").length) {																// If already up, bring it down
+			$("#poseEditor").hide("slide",{ direction:"down", complete: ()=>{ $("#poseEditor").remove(); } }); // Slide down
+			return;																					// Quit																					
+			}
+		var str="<div id='poseEditor' class='lz-dialog' style='display:none;top:calc(100vh - 300px) '>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();'><br><br>";
 		str+="<table>";
@@ -507,6 +542,7 @@ class Scene {
 		str+="</div>";
 
 		$("body").append(str);																		// Add to body
+		$("#poseEditor").show("slide",{ direction:"down"});											// Bring up	
 		addBones();																					// Load new bones for pulldown
 		addPoses();																					// Load poses for pulldown
 		addSeqs();																					// Load sequences for pulldown
@@ -828,32 +864,6 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	//	if (e && e.data) 													// If a valid message				
 	//		trace(e);														// Route
 	}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// HELP
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	$("#helpBut").on("click", ()=> {										// ON HELP BUTTON
-		$("#helpDiv").remove();													// Remove old one
-		var str="<div id='helpDiv' class='lz-dialog'style='height:66vh'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
-		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
-		str+="<div style='height:calc(100% - 70px);width:calc(100% - 24px);background-color:#fff;border-radius:6px;padding:12px;border:1px solid #999'>";
-		
-		str+="This is a very preliminary demo of the Liza teacher simulator. Right now only the 3D model for the classroom and student are completed.<br><br>"
-		str+="Explore the 3D class by dragging your mouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
-		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking on the pose editor in the controller bar.<br><br>"
-		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, stand up, wave, put your arm up or down, put your head up, down, left, or right</i> and the student will animate to  that pose.<br><br>"
-		str+="Speech currently only works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
-		str+="We have chosen to represent the environment in a cartoon-like fashion. To see a fully rendered classroom version, click <a href='index.html?real'>here</a>.<br><br>"
-
-		str+="<hr><br><img src='img/UVAlogo128.png' width='96' style='float:left;margin-right:16px'>";
-		str+="Bill Ferster<br>Curry School of Education<br>Center for Contemplative Studies<br>bferster@virginia.edu<br></div></div>";
-		$("body").append(str);													// Add to body
-		$("#helpDiv").draggable();												// Make it drqaggable
-		$("#helpDiv").mousedown( (e)=> { e.stopPropagation() } );				// Don't move orbiter
-		});
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS
