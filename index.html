@@ -266,9 +266,9 @@ class Blackboard  {
 		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
 		str+="max-height:232px;position:absolute;left:82px;top:calc(100vh - 308px);overflow-y:auto'>";
 		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
-		str+="<div"+trsty+">Image 1</div>"
-		str+="<div"+trsty+">Image 2</div>"
-		str+="<div"+trsty+">Image 3</div>"
+		str+="<div"+trsty+">Founding fathers</div>"
+		str+="<div"+trsty+">US map</div>"
+		str+="<div"+trsty+">Math Lesson</div>"
 		$("body").append(str+"</div");																	// Add popup	
 	}
 
@@ -278,8 +278,10 @@ class Blackboard  {
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		var imageObj=new Image();
-		imageObj.src="windowwall.png"
-		imageObj.onload=function() { app.bb.context.drawImage(this,0,0);  };							// Add image after loading
+		if (label == "Founding fathers")	imageObj.src="FoundingFathers.jpg";
+		if (label == "US map")				imageObj.src="USMap.png";
+		if (label == "Math Lesson")			imageObj.src="BB1.png";
+		imageObj.onload=function() { app.bb.context.drawImage(this,0,0,512,256);  };							// Add image after loading
 		this.map.needsUpdate=true;																		// Flag the map as needing updating
 	}
 
