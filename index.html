@@ -33,6 +33,11 @@
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #999;
 							padding:16px; border-radius: 16px; width: 600px;
 							}
+		.lz-blackboard {	position: absolute; left:16px; top: calc(100vh - 332px); width: 550px; height: 256px;  display:none;
+							background-color: #999; border: 1px solid #999;	padding:12px; border-radius: 8px; 
+							}
+		.lz-canvas {		position: absolute; left:50px; top: 12px; width: 512px; height:256px; border-radius: 4px; 
+							}
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							}
@@ -49,7 +54,8 @@
 							}
 
 		 table {			border-spacing: 0px;  }
-		 @font-face {  		font-family: Chalk;  	src: url(img/inkfree.ttf);   }
+
+		 @font-face {  		font-family: Chalk; src: url(img/inkfree.ttf);   }
 
 </style>
 </head>
@@ -67,7 +73,13 @@
 		<img id="settingsBut" src="img/settingsbut.gif" style="cursor:pointer">
 		<img id="helpBut" src="img/helpicon.gif" style="cursor:pointer;float:right">
 	</div>
-
+	<div id='blackboardDiv' class='lz-blackboard'>
+		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer"><br><br>
+		<img id="BB-TextBut" src="img/text-icon.png" style="cursor:pointer"><br><br>
+		<img id="BB-ImageBut" src="img/image-icon.png" style="cursor:pointer"><br><br>
+		<img id="BB-EraseBut" src="img/trash-icon.png" style="cursor:pointer">
+		<canvas id="blackboardCan" height=256 width=512 class='lz-canvas'></canvas>
+		</div>
 <script>
 
 var app=null;															// Holds app
@@ -83,6 +95,7 @@ class App  {
 	{
 		app=this;
 		this.sc=new Scene("mainDiv");																// Make new scene		
+		this.bb=new Blackboard({});																	// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.poses=[];																				// Holds poses
 		this.seqs=[];																				// Holds pose sequences
@@ -93,6 +106,12 @@ class App  {
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
 		this.fidget=0;																				// Fidget flag
+		$("#poseBut").on("click", ()=> { app.sc.PoseEditor() });									// On pose button click
+		$("#writeBut").on("click", ()=> { $("#blackboardDiv").toggle("slide",{ direction:"down"}) }); // On write button click
+		$("#settingsBut").on("click", ()=> {   				});										// On settings button click
+		$("#BB-DrawBut").on("click",  ()=> { this.bb.Draw(false) });								// On draw button click, draw
+		$("#BB-ImageBut").on("click", ()=> { this.bb.ChoosePic(false) });							// On image button click, draw
+		$("#BB-EraseBut").on("click", ()=> { this.bb.Draw(true) });									// On erase button click, erase
 	}
 
 	LoadProject(file)																			// LOAD PROJECT DATA
@@ -131,7 +150,6 @@ class App  {
 		this.seqs["standUp"]="standUp,1";
 		}
 
-
 	LoadModels() 																				// LOAD 3D MODELS
 	{
 		var i;
@@ -164,6 +182,116 @@ class App  {
 	}
 
 } // Class closure
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// BLACKBOARD
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Blackboard  {																					
+
+	constructor(map)   																				// CONSTRUCTOR
+	{
+		this.curSide=0;																					// Currently active blackboard side
+		this.context=null;																				// Holds context
+		this.paint=false;																				// Painting flag
+		this.startPosX=0;																				// Start pos X
+		this.startPosY=0;																				// Start pos Y
+		this.map=map;																					// Points to material map
+		this.InitCanvas(552,276,"#333");
+	}
+
+	InitCanvas(width, height, color)																// SET UP CANVAS
+	{
+		this.hgt=height;		this.wid=width;															// Save sizes
+		this.context=$("#blackboardCan")[0].getContext('2d');											// Holds canvas context
+		this.context.fillStyle=color;																	// Starting color
+		this.context.fillRect(0,0,width,height);														// Clear
+		this.map.needsUpdate=true;																		// Flag the map as needing updating
+	}
+
+	Draw(erase)																						// DRAW/ERASE LINES & TEXT
+	{
+		var _this=this;																					// JS context
+		this.paint=false;																				// Reset paint flag		
+
+		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
+		if (erase)	$("#BB-EraseBut").css("box-shadow","0 0 16px 4px #fff");							// Highlight erase button
+		else		$("#BB-DrawBut").css("box-shadow","0 0 16px 4px #fff");								// Or draw
+		$("#BBImagePicker").remove();																	// Remove old image picker
+
+
+		$("#blackboardCan").css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "");			// Set eraser cursor
+
+		$("#blackboardCan").on("mousedown", (e)=> {														// ON MOUSE DOWN
+			this.paint=true;																			// Set paint flag
+			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Set start point 
+			this.context.beginPath();
+			});
+
+		$("#blackboardCan").on("mousemove", (e)=> {														// ON MOUSE MOVE
+			e.stopPropagation();																		// Don't move orbiter
+			if (!this.paint) return;																	// Quit if not painting
+			this.context.moveTo(this.startPosX, this.startPosY);										// Starting point
+			this.context.lineWidth=(erase) ? 20: 1;														// Line width
+			this.context.strokeStyle=(erase) ? "#333": "#fff";											// Line color
+			this.context.lineTo(e.offsetX, e.offsetY);													// Set end point
+			this.context.stroke();																		// Draw line
+			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Reset drawing start position to current position
+			this.map.needsUpdate=true;																	// Flag the map as needing updating
+			});
+
+		$("#blackboardCan").on("mouseup", (e)=>		{ this.paint=false; this.context.closePath(); });	// ON MOUSE UP, Paint flag off
+		$("#blackboardCan").on("mouseleave", (e)=> 	{ this.paint=false; });								// ON MOUSE LEAVE, Paint flag off
+	}
+
+
+	ChoosePic()																						// CHOOSE PIC TO SHOW																			
+	{
+		var trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
+		trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"' onclick='app.bb.SetPic($(this).text())' ";
+		this.paint=false;																				// Reset paint flag
+		$("#BBImagePicker").remove();																	// Remove old picker
+		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
+		$("#BB-ImageBut").css("box-shadow","0 0 16px 4px #009900");										// Highlight button
+		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
+		str+="max-height:232px;position:absolute;left:82px;top:calc(100vh - 308px);overflow-y:auto'>";
+		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
+		str+="<div"+trsty+">Image 1</div>"
+		str+="<div"+trsty+">Image 2</div>"
+		str+="<div"+trsty+">Image 3</div>"
+		$("body").append(str+"</div");																	// Add popup	
+	}
+
+	SetPic(label)																						// SHOW PIC																			
+	{
+	trace(label)
+		$("#BBImagePicker").remove();																	// Remove picker
+		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
+		var imageObj=new Image();
+		imageObj.src="windowwall.png"
+		imageObj.onload=function() { app.bb.context.drawImage(this,0,0);  };							// Add image after loading
+		this.map.needsUpdate=true;																		// Flag the map as needing updating
+	}
+
+	Clear()																							// CLEAR CANVAS
+	{
+	}
+
+} // Class closure
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 3D SYSTEM
@@ -700,7 +828,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// CONTROLLER BAR
+// HELP
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	$("#helpBut").on("click", ()=> {										// ON HELP BUTTON
@@ -724,9 +852,6 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		$("#helpDiv").mousedown( (e)=> { e.stopPropagation() } );				// Don't move orbiter
 		});
 
-	$("#poseBut").on("click", ()=> { app.sc.PoseEditor() });				// ON POSE BUTTON
-	$("#writeBut").on("click", ()=> {  });									// ON WRITE BUTTON
-	$("#settingsBut").on("click", ()=> {  });								// ON SETTINGS BUTTON
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS
