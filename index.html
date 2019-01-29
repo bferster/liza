@@ -55,7 +55,7 @@
 
 		 table {			border-spacing: 0px;  }
 
-		 @font-face {  		font-family: Chalk; src: url(img/inkfree.ttf);   }
+		 @font-face {  		font-family: Chalk; src: url(img/Inkfree.ttf);   }
 
 </style>
 </head>
@@ -77,8 +77,8 @@
 		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer;margin-bottom:12px;;margin-top:-12px" title="Draw"><br>
 		<img id="BB-EraseBut" src="img/eraser-icon.png" style="cursor:pointer;margin-bottom:12px" title="Erase"><br>
 		<img id="BB-TextBut" src="img/text-icon.png" style="cursor:pointer;margin-bottom:12px" title="Text"><br>
-		<img id="BB-ImageBut" src="img/image-icon.png" style="cursor:pointer;margin-bottom:64px" title="Pics"><br>
-		<img id="BBClearBut" src="img/trash-icon.png" style="cursor:pointer" title="Clear all">
+		<img id="BB-ImageBut" src="img/image-icon.png" style="cursor:pointer;margin-bottom:60px" title="Pics"><br>
+		<img id="BBClearBut" src="img/trash-icon.png" style="cursor:pointer;margin-bottom:4px" title="Clear all">
 		<div id="BBSideBut" style="cursor:pointer;color:#fff;font-size:11px;margin-left:-5px" title="Side">&nbsp;LEFT</div>
 		<canvas id="blackboardCan-0" height=256 width=512 class='lz-canvas' tabindex='1'></canvas>
 		<canvas id="blackboardCan-1" height=256 width=512 class='lz-canvas' tabindex='1'></canvas>
@@ -97,8 +97,8 @@ class App  {
 	constructor(id)   																			// CONSTRUCTOR
 	{
 		app=this;
+		this.bb=new Blackboard();																	// Make bb		
 		this.sc=new Scene("mainDiv");																// Make new scene		
-		this.bb=new Blackboard({});																	// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.poses=[];																				// Holds poses
 		this.seqs=[];																				// Holds pose sequences
@@ -135,23 +135,21 @@ class App  {
 		this.poses["headLeft"]="neck,0,60,0";			this.poses["headRight"]="neck,0,-60,0";
 		this.poses["leftLegStretch"]="legL,50,0,0";		this.poses["leftLegSit"]="legL,90,0,0";	
 		this.poses["rightLegStretch"]="legR,50,0,0";	this.poses["rightLegSit"]="legR,90,0,0";	
-		this.poses["leftArmDesk"]="armL,-60,0,-45,forearmL,0,0,-46";	this.poses["rightArmDesk"]="armR,-60,0,45,forearmR,0,0,46";
-		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";	
-		this.poses["handDown"]="armL,-51,0,-44,forearmL,0,0,-45,wristL,0,0,0";	
+		this.poses["leftArmDesk"]="armL,-60,0,-45,forearmL,0,0,-46";			this.poses["rightArmDesk"]="armR,-60,0,45,forearmR,0,0,46";
+		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";	this.poses["handDown"]="armL,-51,0,-44,forearmL,0,0,-45,wristL,0,0,0";	
+		this.poses["handRight"]="forearmL,50,-25,0";	
+		this.poses["twistLeft"]="neck,0,30,0,spine,0,30,0";						this.poses["twistRight"]="neck,0,-30,0,spine,0,-60,0";			
 		this.poses["sleep"]="neck,45,62,0,chest,48,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 		this.poses["standUp"]="armL,-70,0,0,armR,-70,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,80,0,0";
-		this.poses["faceFront"]="base,0,0,0";			this.poses["faceLeft"]="base,0,75,0";	
-		
+			
 		this.seqs["sleep"]="sleep,1";
+		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="body6*,1";
 		this.seqs["wave"]="handUp,.6,handRight,.5,5";
-		this.seqs["headUp"]="headUp,1";
-		this.seqs["headDown"]="headDown,1";
-		this.seqs["headLeft"]="headLeft,1";
-		this.seqs["headRight"]="headRight,1";
-		this.seqs["armUp"]="handUp,1";
-		this.seqs["armDown"]="leftArmDesk,1";
-		this.seqs["standUp"]="standUp,1";
+		this.seqs["headUp"]="headUp,1";			this.seqs["headDown"]="headDown,1";			
+		this.seqs["headLeft"]="headLeft,1";		this.seqs["headRight"]="headRight,1";
+		this.seqs["armUp"]="handUp,1";			this.seqs["armDown"]="leftArmDesk,1";
+		this.seqs["twistLeft"]="twistLeft,1";	this.seqs["twistRight"]="twistRight,1";
 		}
 
 	LoadModels() 																				// LOAD 3D MODELS
@@ -194,6 +192,8 @@ class App  {
 			if (text.match(/head|had/i)	&& text.match(/down/i)) app.sc.StartAnimation(mod,app.seqs["headDown"]);									
 			if (text.match(/head|had/i)	&& text.match(/left/i)) app.sc.StartAnimation(mod,app.seqs["headLeft"]);								
 			if (text.match(/head|had/i)	&& text.match(/right/i)) app.sc.StartAnimation(mod,app.seqs["headRight"]);								
+			if (text.match(/twist/i)	&& text.match(/left/i)) app.sc.StartAnimation(mod,app.seqs["twistLeft"]);								
+			if (text.match(/twist/i)	&& text.match(/right/i)) app.sc.StartAnimation(mod,app.seqs["twistRight"]);								
 			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation(mod,app.seqs["armUp"]);								
 			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation(mod,app.seqs["armDown"]);								
 			if (text.match(/wave|wade/i))						app.sc.StartAnimation(mod,app.seqs["wave"]);								
@@ -211,157 +211,6 @@ class App  {
 
 
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// BLACKBOARD
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Blackboard  {																					
-
-	constructor(map)   																				// CONSTRUCTOR
-	{
-		this.curSide=0;																					// Currently active blackboard side
-		this.context=null;																				// Holds context
-		this.paint=false;																				// Painting flag
-		this.startPosX=0;																				// Start pos X
-		this.startPosY=0;																				// Start pos Y
-		this.fontHgt=25;																				// Height of text
-		this.hgt=276;																					// Height
-		this.wid=552;																					// Width
-		this.map=map;																					// Points to material map
-		this.backCol="#333";																			// Background color
-		this.curSideId="#blackboardCan-0";																// Currently active blackboard side
-		this.InitCanvas(); 																				// Init left and right canvas
-		this.SetSide(this.curSide);																		// Set proper side
-	}
-
-	InitCanvas()																					// SET UP CANVASES
-	{
-		this.context=$("#blackboardCan-1")[0].getContext('2d');											// Get right side context
-		this.context.font=this.fontHgt+"px Chalk";														// Font
-		this.context.fillStyle=this.backCol;															// Color
-		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear
-		this.context=$("#blackboardCan-0")[0].getContext('2d');											// Left
-		this.context.font=this.fontHgt+"px Chalk";														// Font
-		this.context.fillStyle=this.backCol;															// Color
-		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear 
-		this.map.needsUpdate=true;																		// Flag the map as needing updating
-	}
-
-	ButtonRoute(but)																				// ROUTE BASED ON BUTTON PICK
-	{
-		this.mode=but;																					// Set mode
-		this.paint=false;																				// Reset paint flag
-		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
-		$("#"+but).css("box-shadow","0 0 16px 4px #fff");												// Highlight button
-		$("#BBImagePicker").remove();																	// Remove old picker
-		$(this.curSideId).off("mousedown");		$(this.curSideId).off("mouseup");						// Unbind events	
-		$(this.curSideId).off("mousemove");		$(this.curSideId).off("keypress");			
-		if (but == "BB-DrawBut")		this.Draw(false);												// Drawing
-		else if (but == "BB-EraseBut")	this.Draw(true);												// Erasing
-		else if (but == "BB-ImageBut")	this.ChoosePic();												// Image
-		else if (but == "BB-TextBut")	this.Text();													// Text
-		$(this.curSideId).css("cursor","auto");															// Normal curson
-		}
-
-	Draw(erase)																						// DRAW/ERASE LINES & TEXT
-	{
-		var _this=this;																					// JS context
-		this.paint=false;																				// Reset paint flag		
-		this.context.lineWidth=(erase) ? 20: 1;															// Line width
-		this.context.strokeStyle=(erase) ? "#333": "#fff";												// Line color
-
-		$(this.curSideId).on("mousedown", (e)=> {														// ON MOUSE DOWN
-			e.stopPropagation();																		// Don't move orbiter
-			this.paint=true;																			// Set paint flag
-			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Set start point 
-			this.context.beginPath();
-			});
-
-		$(this.curSideId).on("mousemove", (e)=> {														// ON MOUSE MOVE
-			$(this.curSideId).css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "url('img/chalk.png') 0 12,auto");	// Set cursor
-			if (!this.paint) return;																	// Quit if not painting
-			this.context.moveTo(this.startPosX, this.startPosY);										// Starting point
-			this.context.lineTo(e.offsetX, e.offsetY);													// Set end point
-			this.context.stroke();																		// Draw line
-			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Reset drawing start position to current position
-			this.map.needsUpdate=true;																	// Flag the map as needing updating
-			});
-		$(this.curSideId).on("mouseup", (e)=>		{ this.paint=false; this.context.closePath(); });	// ON MOUSE UP, Paint flag off
-	}
-
-	ChoosePic()																						// CHOOSE PIC TO SHOW																			
-	{
-		var trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
-		trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"' onclick='app.bb.SetPic($(this).text())' ";
-		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
-		$("#BB-ImageBut").css("box-shadow","0 0 16px 4px #009900");										// Highlight button
-		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
-		str+="max-height:232px;position:absolute;left:82px;top:calc(100vh - 308px);overflow-y:auto'>";
-		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
-		str+="<div"+trsty+">Founding fathers</div>"
-		str+="<div"+trsty+">US map</div>"
-		str+="<div"+trsty+">Math Lesson</div>"
-		$("body").append(str+"</div");																	// Add popup	
-	}
-
-	SetPic(label)																						// SHOW PIC																			
-	{
-		$("#BBImagePicker").remove();																	// Remove picker
-		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
-		var imageObj=new Image();
-		if (label == "Founding fathers")	imageObj.src="FoundingFathers.jpg";
-		if (label == "US map")				imageObj.src="USMap.png";
-		if (label == "Math Lesson")			imageObj.src="BB1.png";
-		imageObj.onload=function() { app.bb.context.drawImage(this,0,0,512,256);  };					// Add image after loading
-		this.map.needsUpdate=true;																		// Flag the map as needing updating
-	}
-
-	Text()																							// DRAW TEXT
-	{
-		this.context.fillStyle="#fff";																	// Color
-		$(this.curSideId).focus();																		// Give it focus
-		
-		$(this.curSideId).on("mousemove", (e)=> {														// ON MOUSE MOVE
-			$(this.curSideId).css("cursor","text");														// Set cursor
-			});
-
-		$(this.curSideId).on("mousedown", (e)=> {														// ON MOUSE DOWN
-			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;	this.nextPosX=e.offsetX				// Reset drawing start position to current position
-			});
-
-		$(this.curSideId).on("keypress", (e)=> {														// ON KEYPRESS
-			if (e.key == "Enter") {																		// New line
-				this.nextPosX=this.startPosX;															// CR
-				this.startPosY+=this.fontHgt*1.5;														// LF
-				return;																					// Don't draw
-				}				
-			this.context.fillText(e.key, this.nextPosX,this.startPosY);									// Draw letter		
-			this.nextPosX+=this.context.measureText(e.key).width;										// New start point to draw next letter					
-			});
-	}
-
-
-	Clear()																							// CLEAR CANVAS
-	{
-		this.context.fillStyle=this.backCol;															// Color
-		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear
-	}
-
-	SetSide(side)																					// CHANGE SIDE
-	{
-		this.curSide=side;																				// Set flag
-		this.curSideId="#blackboardCan-"+this.curSide;													// Set id
-		$("#BBSideBut").html(this.curSide ? "RIGHT" : "&nbsp;LEFT");									// Show side
-		$("#blackboardCan-"+this.curSide).css("display","block");										// Show current canvas side
-		$("#blackboardCan-"+(1-this.curSide)).css("display","none");									// Hide
-		this.context=$(this.curSideId)[0].getContext('2d');												// Set context
-		this.ButtonRoute("BB-DrawBut");																	// Start out drawing
-	}
-
-} // Class closure
 
 
 
@@ -406,6 +255,7 @@ class Scene {
 		this.Resize();																				// Resize 3D space
 		this.container.appendChild(this.renderer.domElement);										// Add to div
 		this.AddRoom();																				// Add room walls
+		this.AddBlackboards();																		// Add blackboards
 	}
 
 	AddLights()																					// ADD LIGHTS
@@ -460,6 +310,22 @@ class Scene {
 			mesh.position.x=x; 		mesh.position.y=y;		mesh.position.z=z;						// Position
 			_this.scene.add(mesh);																	// Add to scene		
 		}
+	}
+
+	AddBlackboards()																			// ADD BLACKBOARDS TO WALL
+	{
+		var mat=new THREE.MeshPhongMaterial();														// Make material
+		var cbg=new THREE.PlaneGeometry(256,128,1);													// Make grid
+		var mesh=new THREE.Mesh(cbg,mat);															// Make mesh
+		app.bb.texMap[0]=mat.map=new THREE.CanvasTexture($("#blackboardCan-0")[0]);					// Left blackboard
+		mesh.position.x=-200; 		mesh.position.y=150;		mesh.position.z=-511;				// Position
+		this.scene.add(mesh);																		// Add to scene		
+		mat=new THREE.MeshPhongMaterial();															// Make material
+		cbg=new THREE.PlaneGeometry(256,128,1);														// Make grid
+		mesh=new THREE.Mesh(cbg,mat);																// Make mesh
+		app.bb.texMap[1]=mat.map=new THREE.CanvasTexture($("#blackboardCan-1")[0]);					// Left blackboard
+		mesh.position.x=200; 		mesh.position.y=150;		mesh.position.z=-511;				// Position
+		this.scene.add(mesh);																		// Add to scene		
 	}
 
 	AddModel(o)																					// ADD MODEL TO SCENE
@@ -777,6 +643,164 @@ class Scene {
 
 
  
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// BLACKBOARD
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Blackboard  {																					
+
+	constructor()   																				// CONSTRUCTOR
+	{
+		this.curSide=0;																					// Currently active blackboard side
+		this.context=null;																				// Holds context
+		this.paint=false;																				// Painting flag
+		this.startPosX=0;																				// Start pos X
+		this.startPosY=0;																				// Start pos Y
+		this.fontHgt=25;																				// Height of text
+		this.hgt=276;																					// Height
+		this.wid=552;																					// Width
+		this.texMap=[{},{}];																			// Points to material maps
+		this.backCol="#333";																			// Background color
+		this.curSideId="#blackboardCan-0";																// Currently active blackboard side
+		this.InitCanvas(); 																				// Init left and right canvas
+		this.SetSide(this.curSide);																		// Set proper side
+	}
+
+	InitCanvas()																					// SET UP CANVASES
+	{
+		this.context=$("#blackboardCan-1")[0].getContext('2d');											// Get right side context
+		this.context.font=this.fontHgt+"px Chalk";														// Font
+		this.context.fillStyle=this.backCol;															// Color
+		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear
+		this.context=$("#blackboardCan-0")[0].getContext('2d');											// Left
+		this.context.font=this.fontHgt+"px Chalk";														// Font
+		this.context.fillStyle=this.backCol;															// Color
+		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear 
+	}
+
+	ButtonRoute(but)																				// ROUTE BASED ON BUTTON PICK
+	{
+		this.mode=but;																					// Set mode
+		this.paint=false;																				// Reset paint flag
+		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
+		$("#"+but).css("box-shadow","0 0 16px 4px #fff");												// Highlight button
+		$("#BBImagePicker").remove();																	// Remove old picker
+		$(this.curSideId).off("mousedown");		$(this.curSideId).off("mouseup");						// Unbind events	
+		$(this.curSideId).off("mousemove");		$(this.curSideId).off("keypress");			
+		if (but == "BB-DrawBut")		this.Draw(false);												// Drawing
+		else if (but == "BB-EraseBut")	this.Draw(true);												// Erasing
+		else if (but == "BB-ImageBut")	this.ChoosePic();												// Image
+		else if (but == "BB-TextBut")	this.Text();													// Text
+		$(this.curSideId).css("cursor","auto");															// Normal curson
+		}
+
+	Draw(erase)																						// DRAW/ERASE LINES & TEXT
+	{
+		var _this=this;																					// JS context
+		this.paint=false;																				// Reset paint flag		
+		this.context.lineWidth=(erase) ? 20: 1;															// Line width
+		this.context.strokeStyle=(erase) ? "#333": "#fff";												// Line color
+
+		$(this.curSideId).on("mousedown", (e)=> {														// ON MOUSE DOWN
+			e.stopPropagation();																		// Don't move orbiter
+			this.paint=true;																			// Set paint flag
+			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Set start point 
+			this.context.beginPath();
+			});
+
+		$(this.curSideId).on("mousemove", (e)=> {														// ON MOUSE MOVE
+			$(this.curSideId).css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "url('img/chalk.png') 0 12,auto");	// Set cursor
+			if (!this.paint) return;																	// Quit if not painting
+			this.context.moveTo(this.startPosX, this.startPosY);										// Starting point
+			this.context.lineTo(e.offsetX, e.offsetY);													// Set end point
+			this.context.stroke();																		// Draw line
+			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Reset drawing start position to current position
+			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
+			});
+		$(this.curSideId).on("mouseup", (e)=>		{ this.paint=false; this.context.closePath(); });	// ON MOUSE UP, Paint flag off
+	}
+
+	ChoosePic()																						// CHOOSE PIC TO SHOW																			
+	{
+		var trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
+		trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"' onclick='app.bb.SetPic($(this).text())' ";
+		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
+		$("#BB-ImageBut").css("box-shadow","0 0 16px 4px #009900");										// Highlight button
+		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
+		str+="max-height:232px;position:absolute;left:82px;top:calc(100vh - 308px);overflow-y:auto'>";
+		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
+		str+="<div"+trsty+">Founding fathers</div>"
+		str+="<div"+trsty+">US map</div>"
+		str+="<div"+trsty+">Math Lesson</div>"
+		$("body").append(str+"</div");																	// Add popup	
+	}
+
+	SetPic(label)																						// SHOW PIC																			
+	{
+		$("#BBImagePicker").remove();																	// Remove picker
+		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
+		var imageObj=new Image();
+		if (label == "Founding fathers")	imageObj.src="FoundingFathers.jpg";
+		if (label == "US map")				imageObj.src="USMap.png";
+		if (label == "Math Lesson")			imageObj.src="BB1.png";
+		imageObj.onload=function() { 																	// When loaded
+			app.bb.context.drawImage(this,0,0,512,256);													// Add image 				
+			app.bb.texMap[app.bb.curSide].needsUpdate=true;												// Flag the tex map as needing updating
+			}
+	}
+
+	Text()																							// DRAW TEXT
+	{
+		this.context.fillStyle="#fff";																	// Color
+		$(this.curSideId).focus();																		// Give it focus
+		
+		$(this.curSideId).on("mousemove", (e)=> {														// ON MOUSE MOVE
+			$(this.curSideId).css("cursor","text");														// Set cursor
+			});
+
+		$(this.curSideId).on("mousedown", (e)=> {														// ON MOUSE DOWN
+			this.startPosX=e.offsetX;	this.startPosY=e.offsetY+6;	this.nextPosX=e.offsetX				// Reset drawing start position to current position
+			});
+
+		$(this.curSideId).on("keypress", (e)=> {														// ON KEYPRESS
+			if (e.key == "Enter") {																		// New line
+				this.nextPosX=this.startPosX;															// CR
+				this.startPosY+=this.fontHgt*1.5;														// LF
+				return;																					// Don't draw
+				}				
+			this.context.fillText(e.key, this.nextPosX,this.startPosY);									// Draw letter		
+			this.nextPosX+=this.context.measureText(e.key).width;										// New start point to draw next letter					
+			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
+			});
+	}
+
+	Clear()																							// CLEAR CANVAS
+	{
+		this.context.fillStyle=this.backCol;															// Color
+		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear
+		this.texMap[this.curSide].needsUpdate=true;														// Flag the tex map as needing updating
+	}
+
+	SetSide(side)																					// CHANGE SIDE
+	{
+		this.curSide=side;																				// Set flag
+		this.curSideId="#blackboardCan-"+this.curSide;													// Set id
+		$("#BBSideBut").html(this.curSide ? "RIGHT" : "&nbsp;LEFT");									// Show side
+		$("#blackboardCan-"+this.curSide).css("display","block");										// Show current canvas side
+		$("#blackboardCan-"+(1-this.curSide)).css("display","none");									// Hide
+		this.context=$(this.curSideId)[0].getContext('2d');												// Set context
+		this.ButtonRoute("BB-DrawBut");																	// Start out drawing
+	}
+
+} // Class closure
+
+
+
+
+
+
 
 
 
