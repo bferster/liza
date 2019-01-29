@@ -121,11 +121,11 @@ class App  {
 	LoadProject(file)																			// LOAD PROJECT DATA
 	{
 		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
-		this.desks.push({ id:"desk1", src:"desk2.json", x:-100, y:-100, z:0, s:20, r:0, tex:tex} );	
-		this.desks.push({ id:"desk2", src:"desk2.json", x:0, y:-100, z:0, s:20, r:0, tex:tex} );		
-		this.desks.push({ id:"desk3", src:"desk2.json", x:100, y:-100, z:0, s:20, r:30, tex:tex} );		
-		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:0, s:20, r:-10, tex:tex} );		
-		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk1", src:"desk2.json", x:-100, y:-100, z:1, s:20, r:0, tex:tex} );	
+		this.desks.push({ id:"desk2", src:"desk2.json", x:0, y:-100, z:1, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk3", src:"desk2.json", x:100, y:-100, z:1, s:20, r:30, tex:tex} );		
+		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:1, s:20, r:-10, tex:tex} );		
+		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:0, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female"} );
 		
@@ -249,7 +249,7 @@ class Scene {
 		this.manager.onProgress=function(item, loaded, total ) { console.log(loaded,total); };		// Show progress
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
 		this.AddCamera(0,150,500,.4);																// Add camera
-		this.renderer=new THREE.WebGLRenderer();													// Init renderer
+		this.renderer=new THREE.WebGLRenderer({ antialias: true });									// Init renderer
 		this.renderer.setPixelRatio(window.devicePixelRatio);										// Set ratio
 		this.AddLights();																			// Add lights
 		this.Resize();																				// Resize 3D space
@@ -264,14 +264,15 @@ class Scene {
 		light.position.set(0,0,1);																	// Set angle
 		this.scene.add(light);																		// Add directioal light
 		this.scene.add(new THREE.AmbientLight(0xffffff, 1));										// Add ambient light
-		this.outliner=new THREE.OutlineEffect(this.renderer, { defaultThickness:.0035 } );			// Add outliner
+		this.outliner=new THREE.OutlineEffect(this.renderer, { /*defaultThickness:.0035 */ });		// Add outliner
 	}
 
 	Resize()																					// RESIZE 3D SPACE
 	{
 		this.camera.aspect=window.innerWidth/window.innerHeight;									// Set aspect
 		this.camera.updateProjectionMatrix();														// Reset matrix
-		this.renderer.setSize(window.innerWidth,window.innerHeight-3);								// Reset render size
+		if (this.scene && this.scene.outliner) 	this.outliner.setSize(window.innerWidth,window.innerHeight-3);	// Reset render size		
+		else if (this.scene)					this.renderer.setSize(window.innerWidth,window.innerHeight-3);	
 	}
 
 	AddCamera(x, y, z, light)																	// ADD CAMERA
@@ -544,8 +545,9 @@ class Scene {
 		app.sc.controls.update();																	// Update control time
 		requestAnimationFrame(app.sc.Render);														// Set timer
 		app.sc.AnimateScene();																		// Animate models
-		app.sc.renderer.render(app.sc.scene,app.sc.camera);											// Render scene
 		if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );				// Render outline
+		else					app.sc.renderer.render(app.sc.scene,app.sc.camera);					// Render scene
+
 		}
 
 	AnimateScene()																				// CALLED EVERY FRAME BY ANIMATE FUNCTION
