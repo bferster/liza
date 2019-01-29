@@ -74,11 +74,14 @@
 		<img id="helpBut" src="img/helpicon.gif" style="cursor:pointer;float:right">
 	</div>
 	<div id='blackboardDiv' class='lz-blackboard'>
-		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer"><br><br>
-		<img id="BB-TextBut" src="img/text-icon.png" style="cursor:pointer"><br><br>
-		<img id="BB-ImageBut" src="img/image-icon.png" style="cursor:pointer"><br><br>
-		<img id="BB-EraseBut" src="img/trash-icon.png" style="cursor:pointer">
-		<canvas id="blackboardCan" height=256 width=512 class='lz-canvas'></canvas>
+		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer;margin-bottom:12px;;margin-top:-12px" title="Draw"><br>
+		<img id="BB-EraseBut" src="img/eraser-icon.png" style="cursor:pointer;margin-bottom:12px" title="Erase"><br>
+		<img id="BB-TextBut" src="img/text-icon.png" style="cursor:pointer;margin-bottom:12px" title="Text"><br>
+		<img id="BB-ImageBut" src="img/image-icon.png" style="cursor:pointer;margin-bottom:64px" title="Pics"><br>
+		<img id="BBClearBut" src="img/trash-icon.png" style="cursor:pointer" title="Clear all">
+		<div id="BBSideBut" style="cursor:pointer;color:#fff;font-size:11px;margin-left:-5px" title="Side">&nbsp;LEFT</div>
+		<canvas id="blackboardCan-0" height=256 width=512 class='lz-canvas' tabindex='1'></canvas>
+		<canvas id="blackboardCan-1" height=256 width=512 class='lz-canvas' tabindex='1'></canvas>
 		</div>
 <script>
 
@@ -109,7 +112,9 @@ class App  {
 		$("#poseBut").on("click", ()=> { app.sc.PoseEditor();  });									// On pose button click
 		$("#writeBut").on("click", ()=> { $("#blackboardDiv").toggle("slide",{ direction:"down"}) }); // On write button click
 		$("#settingsBut").on("click", ()=> {   				});										// On settings button click
-		$("#helpBut").on("click", ()=> {app.ShowHelp() });											// On help button click
+		$("#helpBut").on("click", ()=> { app.ShowHelp(); });										// On help button click
+		$("#BBClearBut").on("click", ()=> { app.bb.Clear(); });										// On clear button click
+		$("#BBSideBut").on("click", ()=> { app.bb.SetSide(1-this.bb.curSide);	});					// On side click, toggle
 		$("[id^=BB-]").on("click", function() { app.bb.ButtonRoute(this.id)	});						// On BB Drawing menu button click
 	}
 
@@ -170,17 +175,8 @@ class App  {
 		var str="<div id='helpDiv' class='lz-dialog'style='height:calc(100vh - 90px);display:none;'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
-		str+="<div style='height:calc(100% - 70px);width:calc(100% - 24px);background-color:#fff;border-radius:6px;padding:12px;border:1px solid #999'>";
-		
-		str+="This is a very preliminary demo of the Liza teacher simulator. Right now only the 3D model for the classroom and student are completed.<br><br>"
-		str+="Explore the 3D class by dragging your mouse up down to rotate the class. Holding the Shift key will move the scene instead of rotating it.<br><br>"
-		str+="You can bring up the pose editor, where you can create and view poses for the student model by clicking on the pose editor in the controller bar.<br><br>"
-		str+="You can talk to Liza much like you do to Alexa, by saying <i>Liza</i> followed by one of the following poses: <i>sleep, sit down, stand up, wave, put your arm up or down, put your head up, down, left, or right</i> and the student will animate to  that pose.<br><br>"
-		str+="Speech currently only works on the Chrome browse and you need to allow use of the microphone for the site.<br><br>"
-		str+="We have chosen to represent the environment in a cartoon-like fashion. To see a fully rendered classroom version, click <a href='index.html?real'>here</a>.<br><br>"
-
-		str+="<hr><br><img src='img/UVAlogo128.png' width='96' style='float:left;margin-right:16px'>";
-		str+="Bill Ferster<br>Curry School of Education<br>Center for Contemplative Studies<br>bferster@virginia.edu<br></div></div>";
+		str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vTXAsMJ-YlQaNtT49RtKvEnT5v5Xzz-TKPyVlo2px-23vDt-4lZFB7JujSKyDXs38hiSMISQoulYXB5/pub?embedded=true' ";
+		str+="style='border: 1px solid #999;width:100%;height:calc(100vh - 140px)'></iframe></div>";
 		$("body").append(str);																	// Add to body
 		$("#helpDiv").show("slide",{ direction:"down" });										// Slide up
 		$("#helpDiv").draggable();																// Make it draggable
@@ -231,16 +227,26 @@ class Blackboard  {
 		this.paint=false;																				// Painting flag
 		this.startPosX=0;																				// Start pos X
 		this.startPosY=0;																				// Start pos Y
+		this.fontHgt=25;																				// Height of text
+		this.hgt=276;																					// Height
+		this.wid=552;																					// Width
 		this.map=map;																					// Points to material map
-		this.InitCanvas(552,276,"#333");
+		this.backCol="#333";																			// Background color
+		this.curSideId="#blackboardCan-0";																// Currently active blackboard side
+		this.InitCanvas(); 																				// Init left and right canvas
+		this.SetSide(this.curSide);																		// Set proper side
 	}
 
-	InitCanvas(width, height, color)																// SET UP CANVAS
+	InitCanvas()																					// SET UP CANVASES
 	{
-		this.hgt=height;		this.wid=width;															// Save sizes
-		this.context=$("#blackboardCan")[0].getContext('2d');											// Holds canvas context
-		this.context.fillStyle=color;																	// Starting color
-		this.context.fillRect(0,0,width,height);														// Clear
+		this.context=$("#blackboardCan-1")[0].getContext('2d');											// Get right side context
+		this.context.font=this.fontHgt+"px Chalk";														// Font
+		this.context.fillStyle=this.backCol;															// Color
+		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear
+		this.context=$("#blackboardCan-0")[0].getContext('2d');											// Left
+		this.context.font=this.fontHgt+"px Chalk";														// Font
+		this.context.fillStyle=this.backCol;															// Color
+		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear 
 		this.map.needsUpdate=true;																		// Flag the map as needing updating
 	}
 
@@ -251,11 +257,13 @@ class Blackboard  {
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		$("#"+but).css("box-shadow","0 0 16px 4px #fff");												// Highlight button
 		$("#BBImagePicker").remove();																	// Remove old picker
+		$(this.curSideId).off("mousedown");		$(this.curSideId).off("mouseup");						// Unbind events	
+		$(this.curSideId).off("mousemove");		$(this.curSideId).off("keypress");			
 		if (but == "BB-DrawBut")		this.Draw(false);												// Drawing
 		else if (but == "BB-EraseBut")	this.Draw(true);												// Erasing
 		else if (but == "BB-ImageBut")	this.ChoosePic();												// Image
 		else if (but == "BB-TextBut")	this.Text();													// Text
-		$("#blackboardCan").css("cursor","auto");														// Normal curson
+		$(this.curSideId).css("cursor","auto");															// Normal curson
 		}
 
 	Draw(erase)																						// DRAW/ERASE LINES & TEXT
@@ -265,26 +273,23 @@ class Blackboard  {
 		this.context.lineWidth=(erase) ? 20: 1;															// Line width
 		this.context.strokeStyle=(erase) ? "#333": "#fff";												// Line color
 
-		$("#blackboardCan").on("mousedown", (e)=> {														// ON MOUSE DOWN
+		$(this.curSideId).on("mousedown", (e)=> {														// ON MOUSE DOWN
 			e.stopPropagation();																		// Don't move orbiter
-			if ((this.mode == "BB-DrawBut") || (this.mode == "BB-EraseBut")) {							// Right mode
-				this.paint=true;																		// Set paint flag
-				this.startPosX=e.offsetX;	this.startPosY=e.offsetY;									// Set start point 
-				this.context.beginPath();
-				}
+			this.paint=true;																			// Set paint flag
+			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Set start point 
+			this.context.beginPath();
 			});
 
-		$("#blackboardCan").on("mousemove", (e)=> {														// ON MOUSE MOVE
+		$(this.curSideId).on("mousemove", (e)=> {														// ON MOUSE MOVE
+			$(this.curSideId).css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "url('img/chalk.png') 0 12,auto");	// Set cursor
 			if (!this.paint) return;																	// Quit if not painting
-			$("#blackboardCan").css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "auto");	// Set eraser cursor
 			this.context.moveTo(this.startPosX, this.startPosY);										// Starting point
 			this.context.lineTo(e.offsetX, e.offsetY);													// Set end point
 			this.context.stroke();																		// Draw line
 			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Reset drawing start position to current position
 			this.map.needsUpdate=true;																	// Flag the map as needing updating
 			});
-
-		$("#blackboardCan").on("mouseup", (e)=>		{ this.paint=false; this.context.closePath(); });	// ON MOUSE UP, Paint flag off
+		$(this.curSideId).on("mouseup", (e)=>		{ this.paint=false; this.context.closePath(); });	// ON MOUSE UP, Paint flag off
 	}
 
 	ChoosePic()																						// CHOOSE PIC TO SHOW																			
@@ -316,10 +321,43 @@ class Blackboard  {
 
 	Text()																							// DRAW TEXT
 	{
+		this.context.fillStyle="#fff";																	// Color
+		$(this.curSideId).focus();																		// Give it focus
+		
+		$(this.curSideId).on("mousemove", (e)=> {														// ON MOUSE MOVE
+			$(this.curSideId).css("cursor","text");														// Set cursor
+			});
+
+		$(this.curSideId).on("mousedown", (e)=> {														// ON MOUSE DOWN
+			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;	this.nextPosX=e.offsetX				// Reset drawing start position to current position
+			});
+
+		$(this.curSideId).on("keypress", (e)=> {														// ON KEYPRESS
+			if (e.key == "Enter") {																		// New line
+				this.nextPosX=this.startPosX;															// CR
+				this.startPosY+=this.fontHgt*1.5;														// LF
+				return;																					// Don't draw
+				}				
+			this.context.fillText(e.key, this.nextPosX,this.startPosY);									// Draw letter		
+			this.nextPosX+=this.context.measureText(e.key).width;										// New start point to draw next letter					
+			});
 	}
 
 	Clear()																							// CLEAR CANVAS
 	{
+		this.context.fillStyle=this.backCol;															// Color
+		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear
+	}
+
+	SetSide(side)																					// CHANGE SIDE
+	{
+		this.curSide=side;																				// Set flag
+		this.curSideId="#blackboardCan-"+this.curSide;													// Set id
+		$("#BBSideBut").html(this.curSide ? "RIGHT" : "&nbsp;LEFT");									// Show side
+		$("#blackboardCan-"+this.curSide).css("display","block");										// Show current canvas side
+		$("#blackboardCan-"+(1-this.curSide)).css("display","none");									// Hide
+		this.context=$(this.curSideId)[0].getContext('2d');												// Set context
+		this.ButtonRoute("BB-DrawBut");																	// Start out drawing
 	}
 
 } // Class closure
