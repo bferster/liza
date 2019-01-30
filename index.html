@@ -4,9 +4,10 @@
 	<meta charset="UTF-8" />
 	<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
 	<title>liza</title>
-	<meta name="viewport" content="width=device-width" initial-scale="1.0" user-scalable="no">
+	<meta name="viewport" content="width=device-width", initial-scale=1.0, user-scalable=no>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link   rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<link rel="preload" href="Inkfree.ttf" as="font" type="font/ttf" crossorigin>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>	
 	<script src="lib/wgl/three.min.js"></script>
 	<script src="lib/wgl/OBJLoader.js"></script>
@@ -28,7 +29,7 @@
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
 		.lz-controller {	position: absolute; top: calc(100vh - 40px); left:16px; background-color: #fff; border: 1px solid #999;
-							padding:4px 10px; border-radius: 16px; width: 300px; height:18px;
+							padding:4px 10px; border-radius: 16px; width: 300px; height:18px;  display:none;
 							}
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #999;
 							padding:16px; border-radius: 16px; width: 600px;
@@ -177,8 +178,8 @@ class App  {
 		str+="style='border: 1px solid #999;width:100%;height:calc(100vh - 140px)'></iframe></div>";
 		$("body").append(str);																	// Add to body
 		$("#helpDiv").show("slide",{ direction:"down" });										// Slide up
-		$("#helpDiv").draggable();																// Make it draggable
-		$("#helpDiv").mousedown( (e)=> { e.stopPropagation() } );								// Don't move orbiter
+		if (!isMobile)	$("#helpDiv").draggable();												// Make it draggable on desktop
+		$("#helpDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 		}
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
@@ -452,8 +453,10 @@ class Scene {
 		addBones();																					// Load new bones for pulldown
 		addPoses();																					// Load poses for pulldown
 		addSeqs();																					// Load sequences for pulldown
-		$("#poseEditor").draggable();																// Make it draggable
-		$("#poseEditor").mousedown( (e)=> { e.stopPropagation();  } );								// Don't move orbiter
+		if (!isMobile)	$("#poseEditor").draggable();												// Make it draggable on desktop
+
+		$("#poseEditor").on("mousedown touchdown", (e)=> { e.stopPropagation();  } );				// Don't move orbiter
+		$("#poseEditor").on("touchmove", (e)=> { e.stopPropagation();  } );							// Don't move orbiter
 		$("#beXaxis").on("input",  function(e) { $("#beXval").val(this.value); moveBone(); } );		// Show x value	
 		$("#beXval").on("change",  function(e) { $("#beXaxis").val(this.value); moveBone(); } );	// Set x value manually	
 		$("#beYaxis").on("input",  function(e) { $("#beYval").val(this.value); moveBone(); } );		// Y
@@ -700,28 +703,36 @@ class Blackboard  {
 
 	Draw(erase)																						// DRAW/ERASE LINES & TEXT
 	{
-		var _this=this;																					// JS context
 		this.paint=false;																				// Reset paint flag		
 		this.context.lineWidth=(erase) ? 20: 1;															// Line width
 		this.context.strokeStyle=(erase) ? "#333": "#fff";												// Line color
 
-		$(this.curSideId).on("mousedown", (e)=> {														// ON MOUSE DOWN
+		$(this.curSideId).on("mousedown touchstart", (e)=> {											// ON MOUSE DOWN
 			e.stopPropagation();																		// Don't move orbiter
 			this.paint=true;																			// Set paint flag
 			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Set start point 
+			if (e.touches) {																			// If a touch event
+				this.startPosX=e.touches[0].clientX-$(this.curSideId).offset().left;					// Set start point X from touch event
+				this.startPosY=e.touches[0].clientY-$(this.curSideId).offset().top;						// Y		
+				}
 			this.context.beginPath();
 			});
 
-		$(this.curSideId).on("mousemove", (e)=> {														// ON MOUSE MOVE
+		$(this.curSideId).on("mousemove touchmove", (e)=> {												// ON MOUSE MOVE
 			$(this.curSideId).css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "url('img/chalk.png') 0 12,auto");	// Set cursor
 			if (!this.paint) return;																	// Quit if not painting
+			var x=e.offsetX, y=e.offsetY;																// Get pos
+			if (e.touches) {																			// If a touch event
+				x=e.touches[0].clientX-$(this.curSideId).offset().left;									// Set start point X from touch event
+				y=e.touches[0].clientY-$(this.curSideId).offset().top;									// Y		
+				}
 			this.context.moveTo(this.startPosX, this.startPosY);										// Starting point
-			this.context.lineTo(e.offsetX, e.offsetY);													// Set end point
+			this.context.lineTo(x,y);																	// Set end point
 			this.context.stroke();																		// Draw line
-			this.startPosX=e.offsetX;	this.startPosY=e.offsetY;										// Reset drawing start position to current position
+			this.startPosX=x;	this.startPosY=y;														// Reset drawing start position to current position
 			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
 			});
-		$(this.curSideId).on("mouseup", (e)=>		{ this.paint=false; this.context.closePath(); });	// ON MOUSE UP, Paint flag off
+		$(this.curSideId).on("mouseup touchend", (e)=> { this.paint=false; this.context.closePath(); }); // ON MOUSE UP, Paint flag off
 	}
 
 	ChoosePic()																						// CHOOSE PIC TO SHOW																			
@@ -758,12 +769,16 @@ class Blackboard  {
 		this.context.fillStyle="#fff";																	// Color
 		$(this.curSideId).focus();																		// Give it focus
 		
-		$(this.curSideId).on("mousemove", (e)=> {														// ON MOUSE MOVE
+		$(this.curSideId).on("mousemove touchmove", (e)=> {												// ON MOUSE MOVE
 			$(this.curSideId).css("cursor","text");														// Set cursor
 			});
 
-		$(this.curSideId).on("mousedown", (e)=> {														// ON MOUSE DOWN
+		$(this.curSideId).on("mousedown touchdown", (e)=> {												// ON MOUSE DOWN
 			this.startPosX=e.offsetX;	this.startPosY=e.offsetY+6;	this.nextPosX=e.offsetX				// Reset drawing start position to current position
+			if (e.touches) {																			// If a touch event
+				this.startPosX=e.touches[0].clientX-$(this.curSideId).offset().left;					// Set start point X from touch event
+				this.startPosY=e.touches[0].clientY-$(this.curSideId).offset().top;						// Y		
+				}
 			});
 
 		$(this.curSideId).on("keypress", (e)=> {														// ON KEYPRESS
@@ -902,10 +917,13 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		$("#startBut").click( ()=> {										// On start button clicked
 			$("#splashDiv").fadeOut();										// Fade out splash
 			$("#mainDiv").fadeIn(2000);										// Fade in main
+			$("#controllerDiv").fadeIn(2000);								// Fade in controller
 			})
 		}
-	else																	// Debug
+	else{																	// Debug
 		$("#mainDiv").fadeIn(0);											// Load fast
+		$("#controllerDiv").fadeIn(0);										// Controller too
+			}
 
 	if (window.addEventListener) 											// If supported this way
 		window.addEventListener("message",html5MessageHandler,false);		// Add event handler
