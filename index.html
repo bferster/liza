@@ -6,8 +6,8 @@
 	<title>liza</title>
 	<meta name="viewport" content="width=device-width", initial-scale=1.0, user-scalable=no>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<link   rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-	<link rel="preload" href="Inkfree.ttf" as="font" type="font/ttf" crossorigin>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<link rel="preload" href="img/Inkfree.ttf" as="font" type="font/ttf" crossorigin>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>	
 	<script src="lib/wgl/three.min.js"></script>
 	<script src="lib/wgl/OBJLoader.js"></script>
@@ -666,6 +666,7 @@ class Blackboard  {
 		this.fontHgt=25;																				// Height of text
 		this.hgt=276;																					// Height
 		this.wid=552;																					// Width
+		this.chars=[];																					// Chars typed for backspacing
 		this.texMap=[{},{}];																			// Points to material maps
 		this.backCol="#333";																			// Background color
 		this.curSideId="#blackboardCan-0";																// Currently active blackboard side
@@ -775,19 +776,32 @@ class Blackboard  {
 
 		$(this.curSideId).on("mousedown touchdown", (e)=> {												// ON MOUSE DOWN
 			this.startPosX=e.offsetX;	this.startPosY=e.offsetY+6;	this.nextPosX=e.offsetX				// Reset drawing start position to current position
+			this.chars=[];																				// Reset char array
 			if (e.touches) {																			// If a touch event
 				this.startPosX=e.touches[0].clientX-$(this.curSideId).offset().left;					// Set start point X from touch event
 				this.startPosY=e.touches[0].clientY-$(this.curSideId).offset().top;						// Y		
 				}
 			});
 
-		$(this.curSideId).on("keypress", (e)=> {														// ON KEYPRESS
+		$(this.curSideId).on("keyup", (e)=> {															// ON KEYPRESS
+			
 			if (e.key == "Enter") {																		// New line
 				this.nextPosX=this.startPosX;															// CR
 				this.startPosY+=this.fontHgt*1.5;														// LF
 				return;																					// Don't draw
 				}				
+			if ((e.keyCode == 8) && (this.chars.length)) {												// Delete
+				this.nextPosX=this.chars[this.chars.length-1].x;										// Get pos X
+				this.startPosY=this.chars[this.chars.length-1].y;										// Y
+				this.context.fillStyle=this.backCol;													// Erasure color
+				this.context.fillRect(this.nextPosX,this.startPosY-this.fontHgt*.75,this.fontHgt,this.fontHgt);		// Clear last char
+				this.context.fillStyle="#fff";															// Text color
+				this.chars.pop();
+				return;																					// Quit	
+				}
+			if (e.keyCode < 32)	return;																	// No control chars																		
 			this.context.fillText(e.key, this.nextPosX,this.startPosY);									// Draw letter		
+			this.chars.push({ x:this.nextPosX, y:this.startPosY });										// Save char start												
 			this.nextPosX+=this.context.measureText(e.key).width;										// New start point to draw next letter					
 			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
 			});
