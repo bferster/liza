@@ -109,7 +109,7 @@ class App  {
 		this.LoadProject("myFile");																	// Load project file
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
-		this.fidget=0;																				// Fidget flag
+this.fidget=0;																				// Fidget flag (Move to scene)
 		$("#poseBut").on("click", ()=> { app.sc.PoseEditor();  });									// On pose button click
 		$("#writeBut").on("click", ()=> { $("#blackboardDiv").toggle("slide",{ direction:"down"}) }); // On write button click
 		$("#settingsBut").on("click", ()=> {   				});										// On settings button click
@@ -128,9 +128,16 @@ class App  {
 		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:1, s:20, r:-10, tex:tex} );		
 		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:1, s:20, r:0, tex:tex} );		
-		this.students.push({ id:"body6*", src:"body.dae", x:100, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female"} );
+		if (window.location.search.match(/all/i)) {
+			this.students.push({ id:"body1", src:"body.dae", x:-100, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female" } );
+			this.students.push({ id:"body2", src:"body.dae", x:0, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female" } );
+//			this.students.push({ id:"body3", src:"body.dae", x:100, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female" } );
+			this.students.push({ id:"body4", src:"body.dae", x:-100, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female" } );
+			this.students.push({ id:"body5", src:"body.dae", x:0, y:84, z:1, s:15, r:0, tex:"body5skin.png", sex: "female" } );
+			}
+		this.students.push({ id:"body6", src:"body.dae", x:100, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female"} );
 		
-		this.poses["body6*"]="armL,25,0,0,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,68,-25,0,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
+		this.poses["startUp"]="armL,-51,0,-44,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
 		this.poses["headLeft"]="neck,0,60,0";			this.poses["headRight"]="neck,0,-60,0";
@@ -145,7 +152,7 @@ class App  {
 			
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
-		this.seqs["sit"]="body6*,1";
+		this.seqs["sit"]="startUp,1";
 		this.seqs["wave"]="handUp,.6,handRight,.5,5";
 		this.seqs["headUp"]="headUp,1";			this.seqs["headDown"]="headDown,1";			
 		this.seqs["headLeft"]="headLeft,1";		this.seqs["headRight"]="headRight,1";
@@ -185,7 +192,7 @@ class App  {
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
 		trace(text)
-		var mod="body6*";
+		var mod="body6";
 		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) {
 			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation(mod,app.seqs["sleep"]);								
 			if (text.match(/sit|set/i))	 					 	app.sc.StartAnimation(mod,app.seqs["sit"]);							
@@ -332,15 +339,12 @@ class Scene {
 
 		loader.load(o.src, (obj)=> { 																// Load model
 			loadModel(obj);																			// Load it
-			if (o.id.match(/\*/)) _this.SetPose(o.id,o.id);											// If a student set starting pose
+			if (o.sex) 				_this.SetPose(o.id,"startUp");									// If a student set starting pose
+			if (o.id == "body6") 	_this.SetPose(o.id,"handUp");									// Raise arm											
 			}, onProgress, onError );																// Load
 
-		function onProgress(xhr) {																	// ON PROGRESS
-			if (xhr.lengthComputable ) {															// If a length
-				var percentComplete=xhr.loaded/xhr.total*100;										// Percent
-				console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded');			// Message
-				}
-			}
+		function onProgress(xhr) {}																	// ON PROGRESS
+
 		function onError(err) {	console.log(err) };													// ON ERROR
 
 		function loadModel(object) {															// ON LOAD
@@ -357,17 +361,13 @@ class Scene {
 					child.oxr=child.rotation.x;														// Save original x rotation
 					child.oyr=child.rotation.y;														// Y
 					child.ozr=child.rotation.z;														// Z
-				}
+					}
 				if (child.isMesh) { 																// If a mesh
 					if (texture)		child.material.map=texture;									// If has texture, add it
 					if (!isNaN(o.tex)) 																// If a cartoon shading
 						child.material.color=new THREE.Color(o.tex);								// Set color
 					if (child.material.userData)													// If user data
-						child.material.userData.outlineParameters= { visible:!isNaN(o.tex) };		// Outline if a number
-//					if (child.material.length)
-//						for (i=0;i<child.material.length;++i)
-//							child.material[i].userData.outlineParameters= { visible:!isNaN(o.tex) };		// Outline if a number
-					
+						child.material.userData.outlineParameters= { visible:app.sc.cartoonScene }; // Outline if cartoon
 					}							
 			});
 			
@@ -421,7 +421,7 @@ class Scene {
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();'><br><br>";
 		str+="<table>";
-		str+="<tr><td>Model: </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6*'>";								// Model id
+		str+="<tr><td>Model: </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6'>";								// Model id
 		str+="&nbsp;&nbsp;&nbsp;Pose:&nbsp;"+MakeSelect("bePose",false,[]);																				// Pose
 		str+="&nbsp;&nbsp;&nbsp;Bone:&nbsp;"+MakeSelect("beBone",false,[]);																				// Bone
 		str+="<div class='lz-bs' id='beZero' style='float:right;margin-right:12px'>0</div></td></tr>";													// Bone id/zero
@@ -582,9 +582,9 @@ class Scene {
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
 		if (app.voice.talking)																		// If talking
-			app.sc.SetBone("body6*","mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);				// Animate mouth
+			app.sc.SetBone("body6","mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);				// Animate mouth
 		if (app.fidget)																				// If fidgeting
-			app.sc.SetBone("body6*","thighR",-83,Math.cos(app.sc.aniTimer/30*Math.PI)*10+10*.01,0);	// Animate thigh
+			app.sc.SetBone("body6","thighR",-83,Math.cos(app.sc.aniTimer/30*Math.PI)*10+10*.01,0);	// Animate thigh
 		++app.sc.aniTimer;																			// Advance timer
 	}
 
