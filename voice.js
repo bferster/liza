@@ -16,7 +16,7 @@ class Voice {
 			this.transcript="";																			// Clear transcript
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
 			this.tts.rate=1;																			// Set rate 
-			this.tts.pitch=1.3;																			// Set pitch 0-2
+																						// Set pitch 0-2
 			this.talking=false;																			// Talking flag to move mouth
 			this.voices=[];																				// New array
 			this.dictionary=['liza' , 'eliza' , 'alexa', 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave'];	// Dictionary of words
@@ -27,8 +27,10 @@ class Voice {
 				speechSynthesis.getVoices().forEach(function(voice,index) {								// For each voice
 				if (voice.lang == "en-US")		_this.voices.push(voice);								// Just look at English
 					});
-				this.tts.voice=this.voices[1];															// Set voice
-				};
+			this.tts.pitch=1.3;
+			if (window.navigator.platform == "MacIntel") this.tts.voice=this.voices[4],this.tts.pitch=1;// Set voice for mac		
+			else										this.tts.voice=this.voices[1];					// Windows
+			};
 
 			this.tts.onend=(e)=> { 	this.talking=false;  app.sc.SetBone("body6*","mouth",0,0,0); };		// On end, stop talking animation
 		
