@@ -49,7 +49,8 @@ class Voice {
 			this.tts.text=text;																			// Set text
 			this.talking=true;																			// Trigger mouth animation
 			speechSynthesis.speak(this.tts);															// Speak
-		} 	catch(e) { trace("Speech error",e) };														// Catch
+			}
+		catch(e) { trace("Speech error",e) };															// Catch
 }
 
 	AddGrammarList(heading, dictionary)																// ADD WORDS TO GRAMMAR LIST

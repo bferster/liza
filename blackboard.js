@@ -42,7 +42,7 @@ class Blackboard  {
 		$("#"+but).css("box-shadow","0 0 16px 4px #fff");												// Highlight button
 		$("#BBImagePicker").remove();																	// Remove old picker
 		$(this.curSideId).off("mousedown");		$(this.curSideId).off("mouseup");						// Unbind events	
-		$(this.curSideId).off("mousemove");		$(this.curSideId).off("keypress");			
+		$(this.curSideId).off("mousemove");		$(this.curSideId).off("keyup");			
 		if (but == "BB-DrawBut")		this.Draw(false);												// Drawing
 		else if (but == "BB-EraseBut")	this.Draw(true);												// Erasing
 		else if (but == "BB-ImageBut")	this.ChoosePic();												// Image
