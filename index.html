@@ -130,13 +130,13 @@ class App  {
 		this.desks.push({ id:"desk5", src:"assests/desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"assests/desk2.json", x:130, y:100, z:1, s:20, r:0, tex:tex} );		
 		if (!window.location.search.match(/one/i)) {
-			this.students.push({ id:"freddy", src:"assests/body.dae", x:-130, y:-116, z:1, s:15, r:0, tex:"assests/freddyskin.png", sex: "male" } );
-//			this.students.push({ id:"joe", src:"assests/body.dae", x:0, y:-116, z:1, s:15, r:0, tex:"assests/joeskin.png", sex: "male" } );
-//			this.students.push({ id:"body3", src:"assests/body.dae", x:130, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "assests/skin1.png", sex: "female" } );
-			this.students.push({ id:"sara", src:"assests/body.dae", x:-130, y:84, z:1, s:15, r:0, tex:"assests/saraskin.png", sex: "female" } );
-			this.students.push({ id:"robert", src:"assests/body.dae", x:0, y:84, z:1, s:15, r:0, tex:"assests/robertskin.png", sex: "male" } );
+			this.students.push({ id:"freddy", src:"assests/body.dae", x:-130, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/freddyskin.png" : "assests/skin1.png", sex: "male" } );
+//			this.students.push({ id:"joe", src:"assests/body.dae", x:0, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/joeskin.png" : "assests/skin1.png", sex: "male" } );
+//			this.students.push({ id:"sally", src:"assests/body.dae", x:130, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/sallyskin.png" : "assests/skin1.png", sex: "female"  } );
+			this.students.push({ id:"sara", src:"assests/body.dae", x:-130, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/saraskin.png" : "assests/skin1.png", sex: "female"  } );
+			this.students.push({ id:"robert", src:"assests/body.dae", x:0, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/robertskin.png" : "assests/skin1.png", sex: "male" } );
 			}
-		this.students.push({ id:"liza", src:"assests/body.dae", x:130, y:84, z:1, s:15, r:0, tex:"assests/lizaskin.png", sex: "female"} );
+		this.students.push({ id:"liza", src:"assests/body.dae", x:130, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/lizaskin.png" : "assests/skin1.png", sex: "female" } );
 		
 		this.poses["startUp"]="armL,-51,0,-44,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
@@ -204,7 +204,7 @@ class App  {
 			}
 		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah|sarah|robert|freddy/i)) {
 			if (text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) mod="liza",app.curStudent=3;
-			if (text.match(/freddy|ready/i)) 						mod="freddy",app.curStudent=0;
+			if (text.match(/freddy|ready|pretty/i)) 				mod="freddy",app.curStudent=0;
 			if (text.match(/robert/i)) 								mod="robert",app.curStudent=2;
 			if (text.match(/sara/i)) 								mod="sara",app.curStudent=1;
 			if (text.match(/sleep/i))	 					 		app.sc.StartAnimation(mod,app.seqs["sleep"]);								
@@ -247,8 +247,8 @@ class Scene {
 		this.controls=null;																			// Controls object
 		this.outliner=null;																			// Outline renderer
 		this.floor="assests/wood.jpg";																// Floor texture
-		this.frontWall="assests/blackboard.png";													// Front wall texture
 		this.backWall="assests/blackboard.png";														// Back wall texture
+		this.frontWall=this.cartoonScene ? "" : "assests/blackboard.png";							// Front wall texture
 		this.leftWall=this.cartoonScene ? "" : "assests/windowwall.png";							// Side wall texture
 		this.rightWall=this.cartoonScene ? "" : "assests/windowwall.png";							// Side wall texture
 		this.aniTimer=0;																			// Timer for talking and fidgeting
