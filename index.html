@@ -98,6 +98,7 @@ class App  {
 	constructor(id)   																			// CONSTRUCTOR
 	{
 		app=this;
+		this.fidget=0;																				// Fidget flag
 		this.bb=new Blackboard();																	// Make bb		
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
@@ -109,7 +110,7 @@ class App  {
 		this.LoadProject("myFile");																	// Load project file
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
-this.fidget=0;																				// Fidget flag (Move to scene)
+
 		$("#poseBut").on("click", ()=> { app.sc.PoseEditor();  });									// On pose button click
 		$("#writeBut").on("click", ()=> { $("#blackboardDiv").toggle("slide",{ direction:"down"}) }); // On write button click
 		$("#settingsBut").on("click", ()=> {   				});										// On settings button click
@@ -122,20 +123,20 @@ this.fidget=0;																				// Fidget flag (Move to scene)
 	LoadProject(file)																			// LOAD PROJECT DATA
 	{
 		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
-		this.desks.push({ id:"desk1", src:"desk2.json", x:-100, y:-100, z:1, s:20, r:0, tex:tex} );	
-		this.desks.push({ id:"desk2", src:"desk2.json", x:0, y:-100, z:1, s:20, r:0, tex:tex} );		
-		this.desks.push({ id:"desk3", src:"desk2.json", x:100, y:-100, z:1, s:20, r:30, tex:tex} );		
-		this.desks.push({ id:"desk4", src:"desk2.json", x:-100, y:100, z:1, s:20, r:-10, tex:tex} );		
-		this.desks.push({ id:"desk5", src:"desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
-		this.desks.push({ id:"desk6", src:"desk2.json", x:100, y:100, z:1, s:20, r:0, tex:tex} );		
-		if (window.location.search.match(/all/i)) {
-			this.students.push({ id:"body1", src:"body.dae", x:-100, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female" } );
-			this.students.push({ id:"body2", src:"body.dae", x:0, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female" } );
-//			this.students.push({ id:"body3", src:"body.dae", x:100, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female" } );
-			this.students.push({ id:"body4", src:"body.dae", x:-100, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female" } );
-			this.students.push({ id:"body5", src:"body.dae", x:0, y:84, z:1, s:15, r:0, tex:"body5skin.png", sex: "female" } );
+		this.desks.push({ id:"desk1", src:"assests/desk2.json", x:-130, y:-100, z:1, s:20, r:0, tex:tex} );	
+		this.desks.push({ id:"desk2", src:"assests/desk2.json", x:0, y:-100, z:1, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk3", src:"assests/desk2.json", x:130, y:-100, z:1, s:20, r:30, tex:tex} );		
+		this.desks.push({ id:"desk4", src:"assests/desk2.json", x:-130, y:100, z:1, s:20, r:-10, tex:tex} );		
+		this.desks.push({ id:"desk5", src:"assests/desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk6", src:"assests/desk2.json", x:130, y:100, z:1, s:20, r:0, tex:tex} );		
+		if (!window.location.search.match(/one/i)) {
+			this.students.push({ id:"freddy", src:"assests/body.dae", x:-130, y:-116, z:1, s:15, r:0, tex:"assests/freddyskin.png", sex: "male" } );
+//			this.students.push({ id:"joe", src:"assests/body.dae", x:0, y:-116, z:1, s:15, r:0, tex:"assests/joeskin.png", sex: "male" } );
+//			this.students.push({ id:"body3", src:"assests/body.dae", x:130, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "assests/skin1.png", sex: "female" } );
+			this.students.push({ id:"sara", src:"assests/body.dae", x:-130, y:84, z:1, s:15, r:0, tex:"assests/saraskin.png", sex: "female" } );
+			this.students.push({ id:"robert", src:"assests/body.dae", x:0, y:84, z:1, s:15, r:0, tex:"assests/robertskin.png", sex: "male" } );
 			}
-		this.students.push({ id:"body6", src:"body.dae", x:100, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? 0xffffff : "skin1.png", sex: "female"} );
+		this.students.push({ id:"liza", src:"assests/body.dae", x:130, y:84, z:1, s:15, r:0, tex:"assests/lizaskin.png", sex: "female"} );
 		
 		this.poses["startUp"]="armL,-51,0,-44,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
@@ -148,7 +149,7 @@ this.fidget=0;																				// Fidget flag (Move to scene)
 		this.poses["handRight"]="forearmL,50,-25,0";	
 		this.poses["twistLeft"]="neck,0,30,0,spine,0,30,0";						this.poses["twistRight"]="neck,0,-30,0,spine,0,-60,0";			
 		this.poses["sleep"]="neck,45,62,0,chest,46,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
-		this.poses["standUp"]="armL,-70,0,0,armR,-70,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,80,0,0";
+		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,60,0,0";
 			
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
@@ -158,7 +159,8 @@ this.fidget=0;																				// Fidget flag (Move to scene)
 		this.seqs["headLeft"]="headLeft,1";		this.seqs["headRight"]="headRight,1";
 		this.seqs["armUp"]="handUp,1";			this.seqs["armDown"]="leftArmDesk,1";
 		this.seqs["twistLeft"]="twistLeft,1";	this.seqs["twistRight"]="twistRight,1";
-		}
+		this.curStudent=this.students.length-1;
+	}
 
 	LoadModels() 																				// LOAD 3D MODELS
 	{
@@ -192,23 +194,36 @@ this.fidget=0;																				// Fidget flag (Move to scene)
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
 		trace(text)
-		var mod="body6";
-		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) {
-			if (text.match(/sleep/i))	 					 	app.sc.StartAnimation(mod,app.seqs["sleep"]);								
-			if (text.match(/sit|set/i))	 					 	app.sc.StartAnimation(mod,app.seqs["sit"]);							
-			if (text.match(/head|had/i)	&& text.match(/up/i)) 	app.sc.StartAnimation(mod,app.seqs["headUp"]);								
-			if (text.match(/head|had/i)	&& text.match(/down/i)) app.sc.StartAnimation(mod,app.seqs["headDown"]);									
-			if (text.match(/head|had/i)	&& text.match(/left/i)) app.sc.StartAnimation(mod,app.seqs["headLeft"]);								
-			if (text.match(/head|had/i)	&& text.match(/right/i)) app.sc.StartAnimation(mod,app.seqs["headRight"]);								
-			if (text.match(/twist/i)	&& text.match(/left/i)) app.sc.StartAnimation(mod,app.seqs["twistLeft"]);								
-			if (text.match(/twist/i)	&& text.match(/right/i)) app.sc.StartAnimation(mod,app.seqs["twistRight"]);								
-			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 	app.sc.StartAnimation(mod,app.seqs["armUp"]);								
-			if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation(mod,app.seqs["armDown"]);								
-			if (text.match(/wave|wade/i))						app.sc.StartAnimation(mod,app.seqs["wave"]);								
-			if (text.match(/stand/i))							app.sc.StartAnimation(mod,app.seqs["standUp"]);								
-			if (text.match(/talk/i))	 					 	app.voice.Talk("My name is Liza. How are you today? Would you like to play a game?");						
-		}
-	}
+		var mod=app.students[app.curStudent].id;
+		if (text && text.match(/talk to|Dr/i)) {		
+			if (text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) app.curStudent=3,app.voice.Talk("Hi. My name is Liza")
+			if (text.match(/freddy|ready|pretty/i)) 				app.curStudent=0,app.voice.Talk("Hi. My name is Freddy")
+			if (text.match(/robert/i)) 								app.curStudent=2,app.voice.Talk("Hi. My name is Robert")
+			if (text.match(/sara/i)) 								app.curStudent=1,app.voice.Talk("Hi. My name is Sara")
+			return;
+			}
+		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah|sarah|robert|freddy/i)) {
+			if (text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) mod="liza",app.curStudent=3;
+			if (text.match(/freddy|ready/i)) 						mod="freddy",app.curStudent=0;
+			if (text.match(/robert/i)) 								mod="robert",app.curStudent=2;
+			if (text.match(/sara/i)) 								mod="sara",app.curStudent=1;
+			if (text.match(/sleep/i))	 					 		app.sc.StartAnimation(mod,app.seqs["sleep"]);								
+			if (text.match(/sit|set/i))	 					 		app.sc.StartAnimation(mod,app.seqs["sit"]);							
+			if (text.match(/head|had/i)	&& text.match(/up/i)) 		app.sc.StartAnimation(mod,app.seqs["headUp"]);								
+			if (text.match(/head|had/i)	&& text.match(/down/i)) 	app.sc.StartAnimation(mod,app.seqs["headDown"]);									
+			if (text.match(/head|had/i)	&& text.match(/left/i)) 	app.sc.StartAnimation(mod,app.seqs["headLeft"]);								
+			if (text.match(/head|had/i)	&& text.match(/right/i))	app.sc.StartAnimation(mod,app.seqs["headRight"]);								
+			if (text.match(/twist/i)	&& text.match(/left/i)) 	app.sc.StartAnimation(mod,app.seqs["twistLeft"]);								
+			if (text.match(/twist/i)	&& text.match(/right/i)) 	app.sc.StartAnimation(mod,app.seqs["twistRight"]);								
+			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 		app.sc.StartAnimation(mod,app.seqs["armUp"]);								
+			if (text.match(/arm|hand/i)	&& text.match(/down/i)) 	app.sc.StartAnimation(mod,app.seqs["armDown"]);								
+			if (text.match(/wave|wade/i))							app.sc.StartAnimation(mod,app.seqs["wave"]);								
+			if (text.match(/stand/i))								app.sc.StartAnimation(mod,app.seqs["standUp"]);								
+			if (text.match(/talk/i))	 					 		app.voice.Talk("My name is "+mod+". How are you today?");						
+			if (text.match(/fidget/i))								app.fidget=true;							
+			if (text.match(/fidget/i) && text.match(/stop/i))		app.fidget=false;							
+}
+			}
 
 } // Class closure
 
@@ -231,12 +246,12 @@ class Scene {
 		this.scene=null;																			// Scene object
 		this.controls=null;																			// Controls object
 		this.outliner=null;																			// Outline renderer
-		this.floor="wood.jpg";																		// Floor texture
-		this.frontWall="blackboard.png";															// Front wall texture
-		this.backWall="blackboard.png";																// Back wall texture
-		this.leftWall=this.cartoonScene ? "" : "windowwall.png";									// Side wall texture
-		this.rightWall=this.cartoonScene ? "" : "windowwall.png";									// Side wall texture
-		this.aniTimer=0;																			// Times talking anf fidgeting
+		this.floor="assests/wood.jpg";																// Floor texture
+		this.frontWall="assests/blackboard.png";													// Front wall texture
+		this.backWall="assests/blackboard.png";														// Back wall texture
+		this.leftWall=this.cartoonScene ? "" : "assests/windowwall.png";							// Side wall texture
+		this.rightWall=this.cartoonScene ? "" : "assests/windowwall.png";							// Side wall texture
+		this.aniTimer=0;																			// Timer for talking and fidgeting
 		this.Init();																				// Init 3D system
 		}
 
@@ -340,7 +355,7 @@ class Scene {
 		loader.load(o.src, (obj)=> { 																// Load model
 			loadModel(obj);																			// Load it
 			if (o.sex) 				_this.SetPose(o.id,"startUp");									// If a student set starting pose
-			if (o.id == "body6") 	_this.SetPose(o.id,"handUp");									// Raise arm											
+			if (o.id == "liza") 	_this.SetPose(o.id,"handUp");									// Raise hand											
 			}, onProgress, onError );																// Load
 
 		function onProgress(xhr) {}																	// ON PROGRESS
@@ -421,16 +436,16 @@ class Scene {
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();'><br><br>";
 		str+="<table>";
-		str+="<tr><td>Model: </td><td><input type='text' class='lz-is' id='beModel' style='width:80px' value='body6'>";								// Model id
-		str+="&nbsp;&nbsp;&nbsp;Pose:&nbsp;"+MakeSelect("bePose",false,[]);																				// Pose
-		str+="&nbsp;&nbsp;&nbsp;Bone:&nbsp;"+MakeSelect("beBone",false,[]);																				// Bone
-		str+="<div class='lz-bs' id='beZero' style='float:right;margin-right:12px'>0</div></td></tr>";													// Bone id/zero
+		str+="<tr><td>Student: </td><td>"+MakeSelect("beModel",false,[]);									// Model id
+		str+="&nbsp;&nbsp;&nbsp;Pose:&nbsp;"+MakeSelect("bePose",false,[]);									// Pose
+		str+="&nbsp;&nbsp;&nbsp;Bone:&nbsp;"+MakeSelect("beBone",false,[]);									// Bone
+		str+="<div class='lz-bs' id='beZero' style='float:right;margin-right:12px'>0</div></td></tr>";		// Bone id/zero
 		str+="<tr><td>&nbsp;</td></tr>";
-		str+="<tr><td>X&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:480px' id='beXaxis'>"					// X slider
+		str+="<tr><td>X&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:470px' id='beXaxis'>"					// X slider
 		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beXval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// X slider value
-		str+="<tr><td>Y&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:480px' id='beYaxis'>"					// Y
+		str+="<tr><td>Y&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:470px' id='beYaxis'>"					// Y
 		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beYval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// Y
-		str+="<tr><td>Z&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:480px' id='beZaxis'>"					// Z
+		str+="<tr><td>Z&nbsp;axis&nbsp;&nbsp;</td><td><input type='range' min=-180 max=180 value=0 style='width:470px' id='beZaxis'>"					// Z
 		str+="&nbsp;&nbsp;<input type='text' class='lz-is' id='beZval' value=0 style='width:30px;vertical-align:6px;text-align:center'></td></tr>";		// Z
 	
 		str+="</table><br>";																			
@@ -441,7 +456,8 @@ class Scene {
 
 		$("body").append(str);																		// Add to body
 		$("#poseEditor").show("slide",{ direction:"down"});											// Bring up	
-		addBones();																					// Load new bones for pulldown
+		addModels();																				// Load models for pulldown
+		addBones();																					// Load bones for pulldown
 		addPoses();																					// Load poses for pulldown
 		addSeqs();																					// Load sequences for pulldown
 		if (!isMobile)	$("#poseEditor").draggable();												// Make it draggable on desktop
@@ -494,6 +510,16 @@ class Scene {
 			var base=this.models[$("#beModel").val()].bones;										// Point at bones array
 			for (var bone in base) 	this.SetBone($("#beModel").val(),bone,0,0,0);					// Set bone						
 			});
+
+		function addModels() {																		// FILL MODELS PULLDOWN
+			var i, v=[];
+			$("#beModel").empty();																	// Clear select
+			$("#beModel").append("<option>Choose student</option>");								// Add choose
+			for (i=0;i<app.students.length;++i)	v.push(app.students[i].id);							// Get all students
+			v.sort();																				// Sort 
+			for (i=0;i<v.length;++i) 	$("#beModel").append("<option>"+v[i]+"</option>");			// Add option
+			$("#beModel").val(app.students[app.curStudent].id);										// Current student
+		}
 
 		function addBones() {																		// FILL BONES PULLDOWN
 			var v=[];
@@ -582,9 +608,9 @@ class Scene {
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
 		if (app.voice.talking)																		// If talking
-			app.sc.SetBone("body6","mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);				// Animate mouth
+			app.sc.SetBone(app.students[app.curStudent].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);		// Animate mouth
 		if (app.fidget)																				// If fidgeting
-			app.sc.SetBone("body6","thighR",-83,Math.cos(app.sc.aniTimer/30*Math.PI)*10+10*.01,0);	// Animate thigh
+			app.sc.SetBone(app.students[app.curStudent].id,"thighR",-83,Math.cos(app.sc.aniTimer/30*Math.PI)*10+10*.01,0);	// Animate thigh
 		++app.sc.aniTimer;																			// Advance timer
 	}
 

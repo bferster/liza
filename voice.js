@@ -15,7 +15,8 @@ class Voice {
 			this.recognition.start();																	// Start recognition
 			this.transcript="";																			// Clear transcript
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			this.tts.rate=1;																			// Set rate 
+			this.tts.pitch=1.5;																			// Set pitch
+			this.tts.rate=1.3;																			// Set rate 
 			this.talking=false;																			// Talking flag to move mouth
 			this.voices=[];																				// New array
 			this.dictionary=['liza' , 'eliza' , 'alexa', 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave'];	// Dictionary of words
@@ -23,13 +24,10 @@ class Voice {
 			this.recognition.onend=(e)=> { 	this.recognition.start(); };								// On end, restart
 
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
-				speechSynthesis.getVoices().forEach(function(voice,index) {								// For each voice
-				if (voice.lang == "en-US")		_this.voices.push(voice);								// Just look at English
+				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
+					if (voice.lang == "en-US")		_this.voices.push(voice);							// Just look at English
 					});
-			this.tts.pitch=1.3;																			// Set pitch 0-2
-			if (window.navigator.platform == "MacIntel") this.tts.voice=this.voices[4],this.tts.pitch=1;// Set voice for mac		
-			else										this.tts.voice=this.voices[1];					// Windows
-			};
+				};
 
 			this.tts.onend=(e)=> { 	this.talking=false;  app.sc.SetBone("body6*","mouth",0,0,0); };		// On end, stop talking animation
 		
@@ -47,6 +45,12 @@ class Voice {
 	Talk(text)																						// SAY SOMETHING
 	{
 		try{																							// Try
+			if (app.students[app.curStudent].sex == "male")
+				if (window.navigator.platform == "MacIntel") this.tts.voice=this.voices[1];				// Set voice for mac		
+				else										 this.tts.voice=this.voices[0];				// Windows
+			else 
+				if (window.navigator.platform == "MacIntel") this.tts.voice=this.voices[0],this.tts.pitch=1.2;	// Set voice for mac		
+				else										 this.tts.voice=this.voices[1];				// Windows
 			this.tts.text=text;																			// Set text
 			this.talking=true;																			// Trigger mouth animation
 			speechSynthesis.speak(this.tts);															// Speak
