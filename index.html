@@ -122,17 +122,17 @@ class App  {
 	LoadProject(file)																			// LOAD PROJECT DATA
 	{
 		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
-		this.desks.push({ id:"desk1", src:"assets/desk2.json", x:-120, y:-100, z:1, s:20, r:0, tex:tex} );	
-		this.desks.push({ id:"desk2", src:"assets/desk2.json", x:0, y:-100, z:1, s:20, r:0, tex:tex} );		
-		this.desks.push({ id:"desk3", src:"assets/desk2.json", x:120, y:-100, z:1, s:20, r:30, tex:tex} );		
-		this.desks.push({ id:"desk4", src:"assets/desk2.json", x:-120, y:100, z:1, s:20, r:0, tex:tex} );		
-		this.desks.push({ id:"desk5", src:"assets/desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
-		this.desks.push({ id:"desk6", src:"assets/desk2.json", x:120, y:100, z:1, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk1", src:"assets/desk.dae", x:-120, y:-100, z:0, s:20, r:0, tex:tex} );	
+		this.desks.push({ id:"desk2", src:"assets/desk.dae", x:0, y:-100, z:0, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk3", src:"assets/desk.dae", x:120, y:-100, z:0, s:20, r:30, tex:tex} );		
+		this.desks.push({ id:"desk4", src:"assets/desk.dae", x:-120, y:100, z:0, s:20, r:-10, tex:tex} );		
+		this.desks.push({ id:"desk5", src:"assets/desk.dae", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk6", src:"assets/desk.dae", x:120, y:100, z:0, s:20, r:0, tex:tex} );		
 		if (!window.location.search.match(/one/i)) {
 			this.students.push({ id:"freddy", src:"assets/body.dae", x:-120, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/freddyskin.png" : "assets/skin1.png", sex: "male", fidget:0} );
 //			this.students.push({ id:"joe", src:"assets/body.dae", x:0, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/joeskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
 //			this.students.push({ id:"sally", src:"assets/body.dae", x:120, y:-112, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/sallyskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
-			this.students.push({ id:"sara", src:"assets/body.dae", x:-120, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/saraskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
+			this.students.push({ id:"sara", src:"assets/body.dae", x:-120, y:88, z:0, s:15, r:-10, tex:this.sc.cartoonScene ? "assets/saraskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
 			this.students.push({ id:"robert", src:"assets/body.dae", x:0, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
 			}
 		this.students.push({ id:"liza", src:"assets/body.dae", x:120, y:88, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/lizaskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
@@ -398,7 +398,7 @@ class Scene {
 			object.oxp=o.x;		object.ozp=o.y;		object.oyp=o.z;	object.orp=o.r;					// Save start pos's
 			object.scale.x=object.scale.y=object.scale.z=o.s;										// Scale 
 			object.position.x=o.x;	object.position.z=o.y;	object.position.y=o.z;					// Position
-			object.rotation.y=o.r*Math.PI/180;														// Rotation
+			object.rotation.z=o.r*Math.PI/180;														// Rotation
 			_this.scene.add(object);																// Add model to scene
 		}
 	}
