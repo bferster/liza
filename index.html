@@ -125,19 +125,19 @@ class App  {
 		this.desks.push({ id:"desk1", src:"assets/desk2.json", x:-120, y:-100, z:1, s:20, r:0, tex:tex} );	
 		this.desks.push({ id:"desk2", src:"assets/desk2.json", x:0, y:-100, z:1, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk3", src:"assets/desk2.json", x:120, y:-100, z:1, s:20, r:30, tex:tex} );		
-		this.desks.push({ id:"desk4", src:"assets/desk2.json", x:-120, y:100, z:1, s:20, r:-10, tex:tex} );		
+		this.desks.push({ id:"desk4", src:"assets/desk2.json", x:-120, y:100, z:1, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk5", src:"assets/desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"assets/desk2.json", x:120, y:100, z:1, s:20, r:0, tex:tex} );		
 		if (!window.location.search.match(/one/i)) {
-			this.students.push({ id:"freddy", src:"assets/body.dae", x:-120, y:-115, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/freddyskin.png" : "assets/skin1.png", sex: "male", fidget:0} );
-//			this.students.push({ id:"joe", src:"assets/body.dae", x:0, y:-115, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/joeskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
-//			this.students.push({ id:"sally", src:"assets/body.dae", x:120, y:-115, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/sallyskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
-			this.students.push({ id:"sara", src:"assets/body.dae", x:-120, y:85, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/saraskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
-			this.students.push({ id:"robert", src:"assets/body.dae", x:0, y:85, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
+			this.students.push({ id:"freddy", src:"assets/body.dae", x:-120, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/freddyskin.png" : "assets/skin1.png", sex: "male", fidget:0} );
+//			this.students.push({ id:"joe", src:"assets/body.dae", x:0, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/joeskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
+//			this.students.push({ id:"sally", src:"assets/body.dae", x:120, y:-112, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/sallyskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
+			this.students.push({ id:"sara", src:"assets/body.dae", x:-120, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/saraskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
+			this.students.push({ id:"robert", src:"assets/body.dae", x:0, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
 			}
-		this.students.push({ id:"liza", src:"assets/body.dae", x:130, y:85, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/lizaskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
+		this.students.push({ id:"liza", src:"assets/body.dae", x:120, y:88, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/lizaskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
 		
-		this.poses["startUp"]="armL,-51,0,-44,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
+		this.poses["startUp"]="armL,-51,4,-44,armR,-51,-4,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-78,-8,0,thighR,-78,10,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-50,0,wristR,8,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,40,0,0";
 		this.poses["headLeft"]="neck,0,60,0";			this.poses["headRight"]="neck,0,-60,0";
@@ -147,7 +147,7 @@ class App  {
 		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";	this.poses["handDown"]="armL,-51,0,-44,forearmL,0,0,-45,wristL,0,0,0";	
 		this.poses["handRight"]="forearmL,50,-25,0";	
 		this.poses["twistLeft"]="neck,0,30,0,spine,0,33,0";						this.poses["twistRight"]="neck,0,-30,0,spine,0,-60,0";			
-		this.poses["sleep"]="neck,45,62,0,chest,46,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
+		this.poses["sleep"]="neck,45,62,0,chest,49,0,0,armL,-12,53,0,wristL,0,0,0,forearmL,120,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,50,0,0";
 			
 		this.seqs["sleep"]="sleep,1";
@@ -459,7 +459,7 @@ class Scene {
 	
 		str+="</table><br>";																			
 		str+="Sequence:&nbsp;"+MakeSelect("beSeqs",false,[]);																			
-		str+="&nbsp;&nbsp;&nbsp;Fidget?&nbsp;<td><input type='checkbox' id='beFidget'"+(app.fidget ? " checked" : "")+">" ;																			
+		str+="&nbsp;&nbsp;&nbsp;Fidget?&nbsp;<td><input type='checkbox' id='beFidget'"+(app.students[app.curStudent].fidget ? " checked" : "")+">" ;																			
 		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
 		str+="</div>";
 
@@ -479,20 +479,26 @@ class Scene {
 		$("#beYval").on("change",  function(e) { $("#beYaxis").val(this.value); moveBone(); } );	// Y	
 		$("#beZaxis").on("input",  function(e) { $("#beZval").val(this.value); moveBone(); } );		// Z
 		$("#beZval").on("change",  function(e) { $("#beZaxis").val(this.value); moveBone(); } );	// Z
-		$("#beFidget").on("click", function(e) { app.fidget=$(this).prop("checked") ? 1 : 0 });		// Toggle fidget flag
+		$("#beFidget").on("click", function(e) { app.students[app.curStudent].fidget=$(this).prop("checked") ? 1 : 0 });		// Toggle fidget flag
 	
+		$("#beModel").on("change", function(e) { 													// Change model
+			for (var i=0;i<app.students.length;++i) 
+				if ($(this).val() == app.students[i].id)	app.curStudent=i;						// Make it current student	
+			});
+		
 		$("#bePose").on("change", function(e) { 													// Add new pose
 			app.sc.SetPose($("#beModel").val(),this.value);											// Show new pose							
-			addBones(); 																			// Reset
 			$("#beXval").val(0);	$("#beYval").val(0);	$("#beZval").val(0);					// Set indicator
 			$("#beXaxis").val(0);	$("#beYaxis").val(0);	$("#beZaxis").val(0);					// Set slider
-			$("#bePose").prop("selectedIndex",0);			$("#beBone").prop("selectedIndex",0);	// Reset pulldowns
-			}); 
-	
+			$("#bePose").prop("selectedIndex",0);													// Reset pulldown
+			$("#beBone").trigger("change"); 														// Force bone to update
+			});
+			
 		$("#beBone").on("change",  function(e) {
 			var v;
 			var model=$("#beModel").val();															// Model id
 			var bone=$("#beBone").val();															// Bone id
+			if (bone == "Choose bone")	return;														// Quit on no bone
 			v=(Math.round((_this.models[model].bones[bone].rotation.x-_this.models[model].bones[bone].oxr)*180/Math.PI)*100)/100;	// Get X degrees
 			$("#beXval").val(v);	$("#beXaxis").val(v);											// Set slider
 			v=(Math.round((_this.models[model].bones[bone].rotation.y-_this.models[model].bones[bone].oyr)*180/Math.PI)*100)/100;	// Get Y degrees
