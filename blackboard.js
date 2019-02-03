@@ -20,6 +20,9 @@ class Blackboard  {
 		this.curSideId="#blackboardCan-0";																// Currently active blackboard side
 		this.InitCanvas(); 																				// Init left and right canvas
 		this.SetSide(this.curSide);																		// Set proper side
+		this.record=[];																					// Holds drawing actions
+
+		//		var now=new Date().getTime();																// Get current time in ms
 	}
 
 	InitCanvas()																					// SET UP CANVASES
@@ -64,6 +67,7 @@ class Blackboard  {
 				this.startPosX=e.touches[0].clientX-$(this.curSideId).offset().left;					// Set start point X from touch event
 				this.startPosY=e.touches[0].clientY-$(this.curSideId).offset().top;						// Y		
 				}
+			this.record.push({ t:new Date().getTime(), x:e.offsetX, y:e.offsetY, o:'M', s:this.curSide });	 // Add to record
 			this.context.beginPath();
 			});
 
@@ -79,9 +83,14 @@ class Blackboard  {
 			this.context.lineTo(x,y);																	// Set end point
 			this.context.stroke();																		// Draw line
 			this.startPosX=x;	this.startPosY=y;														// Reset drawing start position to current position
+			this.record.push({ t:new Date().getTime(), x:x, y:y, o: erase ? 'E' : 'D', s:this.curSide });	 // Add to record
 			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
 			});
-		$(this.curSideId).on("mouseup touchend", (e)=> { this.paint=false; this.context.closePath(); }); // ON MOUSE UP, Paint flag off
+			
+		$(this.curSideId).on("mouseup touchend", (e)=> { 												// ON MOUSE UP
+			this.paint=false; this.context.closePath(); 												// Close
+			this.record.push({ t:new Date().getTime(), o:'U', s:this.curSide });	 					// Add to record
+			}); 
 	}
 
 	ChoosePic()																						// CHOOSE PIC TO SHOW																			
@@ -99,7 +108,7 @@ class Blackboard  {
 		$("body").append(str+"</div");																	// Add popup	
 	}
 
-	SetPic(label)																						// SHOW PIC																			
+	SetPic(label, playing)																						// SHOW PIC																			
 	{
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
@@ -107,6 +116,8 @@ class Blackboard  {
 		if (label == "Founding fathers")	imageObj.src="assets/FoundingFathers.jpg";
 		if (label == "US map")				imageObj.src="assets/USMap.png";
 		if (label == "Math Lesson")			imageObj.src="assets/BB1.png";
+		if (!playing)																					// If playing bacl
+			this.record.push({ t:new Date().getTime(), o: 'P', p: label, s:this.curSide }); 			// Add to record
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.context.drawImage(this,0,0,512,256);													// Add image 				
 			app.bb.texMap[app.bb.curSide].needsUpdate=true;												// Flag the tex map as needing updating
@@ -132,7 +143,6 @@ class Blackboard  {
 			});
 
 		$(this.curSideId).on("keyup", (e)=> {															// ON KEYPRESS
-			
 			if (e.key == "Enter") {																		// New line
 				this.nextPosX=this.startPosX;															// CR
 				this.startPosY+=this.fontHgt*1.5;														// LF
@@ -145,9 +155,11 @@ class Blackboard  {
 				this.context.fillRect(this.nextPosX,this.startPosY-this.fontHgt*.75,this.fontHgt,this.fontHgt);		// Clear last char
 				this.context.fillStyle="#fff";															// Text color
 				this.chars.pop();
+				this.record.push({ t:new Date().getTime(), o:'X', x:this.nextPosX, y:this.startPosY, s:this.curSide });	// Add to record
 				return;																					// Quit	
 				}
 			if (e.keyCode < 32)	return;																	// No control chars																		
+			this.record.push({ t:new Date().getTime(), x:Math.round(this.nextPosX), y:Math.round(this.startPosY), c:e.key, o:'T', s:this.curSide });	// Add to record
 			this.context.fillText(e.key, this.nextPosX,this.startPosY);									// Draw letter		
 			this.chars.push({ x:this.nextPosX, y:this.startPosY });										// Save char start												
 			this.nextPosX+=this.context.measureText(e.key).width;										// New start point to draw next letter					
@@ -160,17 +172,68 @@ class Blackboard  {
 		this.context.fillStyle=this.backCol;															// Color
 		this.context.fillRect(0,0,this.wid,this.hgt);													// Clear
 		this.texMap[this.curSide].needsUpdate=true;														// Flag the tex map as needing updating
+		this.record.push({ t:new Date().getTime(), o:'C', s:this.curSide });							// Add to record
 	}
 
 	SetSide(side)																					// CHANGE SIDE
 	{
 		this.curSide=side;																				// Set flag
 		this.curSideId="#blackboardCan-"+this.curSide;													// Set id
+		this.context=$(this.curSideId)[0].getContext('2d');												// Set context
 		$("#BBSideBut").html(this.curSide ? "RIGHT" : "&nbsp;LEFT");									// Show side
 		$("#blackboardCan-"+this.curSide).css("display","block");										// Show current canvas side
 		$("#blackboardCan-"+(1-this.curSide)).css("display","none");									// Hide
-		this.context=$(this.curSideId)[0].getContext('2d');												// Set context
 		this.ButtonRoute("BB-DrawBut");																	// Start out drawing
+	}
+
+	Playback()																						// RESTORE DRAWING
+	{
+		var _this=this;
+		var i,o,ctx=[],ss=0,now,sx,sy;
+		ctx[0]=$("#blackboardCan-0")[0].getContext('2d');												// Set context to left
+		ctx[1]=$("#blackboardCan-1")[0].getContext('2d');												// Right
+		ctx[0].fillStyle=this.backCol;			ctx[0].fillRect(0,0,this.wid,this.hgt);					// Clear left
+		ctx[1].fillStyle=this.backCol;			ctx[1].fillRect(0,0,this.wid,this.hgt);					// Right
+		this.texMap[0].needsUpdate=true;		this.texMap[1].needsUpdate=true;						// Update txms
+		var off=new Date().getTime()-app.startTime;														// Get offset
+		var sTimer=setInterval(drawSegs,2);																// Set time
+
+		function drawSegs() {																			// DRAW SEGMENTS FROM RECORD
+			if (ss == _this.record.length)																// If done
+				clearInterval(sTimer);																	// Kill timer
+			now=(new Date().getTime()-off);																// Get now
+			for (i=ss;i<_this.record.length;++i) {														// For each action
+				o=_this.record[i];																		// Point at segment
+				drawSeg(o);																				// Draw segment			
+				if (o.t > now) 	{ ++ss; break; };														// If after now point, skip ahead
+				}
+			}	
+			
+		function drawSeg(o) {																			// DRAW SEGMENT FROM RECORD
+			if (o.o == "M") { sx=o.x;	sy=o.y;  ctx[o.s].beginPath(); }								// Start draw/erase
+			else if (o.o == "D") { 																		// Draw
+				ctx[o.s].lineWidth=1;		ctx[o.s].strokeStyle="#fff";								// Line width/color
+				ctx[o.s].moveTo(sx,sy);		ctx[o.s].lineTo(o.x,o.y);									// Set up line
+				ctx[o.s].stroke();			sx=o.x;			sy=o.y										// Draw
+				}
+			else if (o.o == "E") { 																		// Draw
+				ctx[o.s].lineWidth=20;		ctx[o.s].strokeStyle="#333";								// Line width/color
+				ctx[o.s].moveTo(sx,sy);		ctx[o.s].lineTo(o.x,o.y);									// Set up line
+				ctx[o.s].stroke();			sx=o.x;			sy=o.y										// Draw
+				}
+			else if (o.o == "U") { ctx[o.s].closePath(); }												// End draw/erase
+			else if (o.o == "T") { ctx[o.s].fillStyle="#fff";	ctx[o.s].fillText(o.c, o.x, o.y);	}	// Draw letter		
+			else if (o.o == "X") { 																		// Erase letter
+				ctx[o.s].fillStyle=_this.backCol;														// Erasure color
+				ctx[o.s].fillRect(o.x,o.y-_this.fontHgt*.75,_this.fontHgt,_this.fontHgt);				// Clear last char
+				}
+			else if (o.o == "P") { 	_this.SetPic(o.p, true);  }											// Pic
+			else if (o.o == "C") { 																		// Clear
+				ctx[o.s].fillStyle=_this.backCol;														// Color
+				ctx[o.s].fillRect(0,0,_this.wid,_this.hgt);												// Clear
+				}	
+			_this.texMap[0].needsUpdate=true;		_this.texMap[1].needsUpdate=true;					// Update texture maps
+			}
 	}
 
 } // Class closure

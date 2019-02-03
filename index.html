@@ -109,7 +109,7 @@ class App  {
 		this.LoadProject("myFile");																	// Load project file
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
-
+		this.startTime=new Date().getTime();														// Session start time
 		$("#poseBut").on("click", ()=> { app.sc.PoseEditor();  });									// On pose button click
 		$("#writeBut").on("click", ()=> { $("#blackboardDiv").toggle("slide",{ direction:"down"}) }); // On write button click
 		$("#settingsBut").on("click", ()=> {   				});										// On settings button click
@@ -719,7 +719,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
 		if ((e.which == 84) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+T)
-			app.sc.PoseEditor();
+			app.bb.Playback();
 
 		if ((e.which == 65) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+A)
 			app.voice.Talk("");												// Enable audio
