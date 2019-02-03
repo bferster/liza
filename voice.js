@@ -9,23 +9,28 @@ class Voice {
 		var _this=this;
 		try {																							// Try
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
+			this.femaleVoice=1;																			// Female voice
+			this.maleVoice=0;																			// Male voice
 			this.recognition=new SpeechRecognition();													// Init STT
 			this.recognition.continuous=false;															// Continual recognition
 			this.recognition.lang="en-US";																// US English
 			this.recognition.start();																	// Start recognition
 			this.transcript="";																			// Clear transcript
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			this.tts.pitch=1.5;																			// Set pitch
+			this.tts.pitch=1.8;																			// Set pitch
 			this.tts.rate=1.3;																			// Set rate 
 			this.talking=false;																			// Talking flag to move mouth
 			this.voices=[];																				// New array
-			this.dictionary=['liza' , 'eliza' , 'alexa', 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave'];	// Dictionary of words
+			this.dictionary=['liza' , 'eliza' , 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave', 'sure'];	// Dictionary of words
 			this.AddGrammarList("lizaWords");															// Add to grammar list
 			this.recognition.onend=(e)=> { 	this.recognition.start(); };								// On end, restart
 
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
+				this.voices=[];																			// Clear list
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
 					if (voice.lang == "en-US")		_this.voices.push(voice);							// Just look at English
+					if (voice.name == "Samantha")	_this.femaleVoice=_this.voices.length-1,_this.tts.pitch=1,_this.tts.rate=1;	// Use Samantha is available on Mac
+					if (voice.name == "Alex")		_this.maleVoice=_this.voices.length-1,_this.tts.pitch=1,_this.tts.rate=1;	// Alex 
 					});
 				};
 
@@ -45,12 +50,8 @@ class Voice {
 	Talk(text)																						// SAY SOMETHING
 	{
 		try{																							// Try
-			if (app.students[app.curStudent].sex == "male")
-				if (window.navigator.platform == "MacIntel") this.tts.voice=this.voices[1];				// Set voice for mac		
-				else										 this.tts.voice=this.voices[0];				// Windows
-			else 
-				if (window.navigator.platform == "MacIntel") this.tts.voice=this.voices[0],this.tts.pitch=1.2;	// Set voice for mac		
-				else										 this.tts.voice=this.voices[1];				// Windows
+			if (app.students[app.curStudent].sex == "male")	this.tts.voice=this.voices[this.maleVoice];		// Set male voice
+			else 											this.tts.voice=this.voices[this.femaleVoice];	// Set female voice
 			this.tts.text=text;																			// Set text
 			this.talking=true;																			// Trigger mouth animation
 			speechSynthesis.speak(this.tts);															// Speak

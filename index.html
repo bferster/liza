@@ -98,7 +98,6 @@ class App  {
 	constructor(id)   																			// CONSTRUCTOR
 	{
 		app=this;
-		this.fidget=0;																				// Fidget flag
 		this.bb=new Blackboard();																	// Make bb		
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
@@ -123,20 +122,20 @@ class App  {
 	LoadProject(file)																			// LOAD PROJECT DATA
 	{
 		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
-		this.desks.push({ id:"desk1", src:"assests/desk2.json", x:-130, y:-100, z:1, s:20, r:0, tex:tex} );	
-		this.desks.push({ id:"desk2", src:"assests/desk2.json", x:0, y:-100, z:1, s:20, r:0, tex:tex} );		
-		this.desks.push({ id:"desk3", src:"assests/desk2.json", x:130, y:-100, z:1, s:20, r:30, tex:tex} );		
-		this.desks.push({ id:"desk4", src:"assests/desk2.json", x:-130, y:100, z:1, s:20, r:-10, tex:tex} );		
-		this.desks.push({ id:"desk5", src:"assests/desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
-		this.desks.push({ id:"desk6", src:"assests/desk2.json", x:130, y:100, z:1, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk1", src:"assets/desk2.json", x:-120, y:-100, z:1, s:20, r:0, tex:tex} );	
+		this.desks.push({ id:"desk2", src:"assets/desk2.json", x:0, y:-100, z:1, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk3", src:"assets/desk2.json", x:120, y:-100, z:1, s:20, r:30, tex:tex} );		
+		this.desks.push({ id:"desk4", src:"assets/desk2.json", x:-120, y:100, z:1, s:20, r:-10, tex:tex} );		
+		this.desks.push({ id:"desk5", src:"assets/desk2.json", x:0, y:100, z:1, s:20, r:0, tex:tex} );		
+		this.desks.push({ id:"desk6", src:"assets/desk2.json", x:120, y:100, z:1, s:20, r:0, tex:tex} );		
 		if (!window.location.search.match(/one/i)) {
-			this.students.push({ id:"freddy", src:"assests/body.dae", x:-130, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/freddyskin.png" : "assests/skin1.png", sex: "male" } );
-//			this.students.push({ id:"joe", src:"assests/body.dae", x:0, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/joeskin.png" : "assests/skin1.png", sex: "male" } );
-//			this.students.push({ id:"sally", src:"assests/body.dae", x:130, y:-116, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/sallyskin.png" : "assests/skin1.png", sex: "female"  } );
-			this.students.push({ id:"sara", src:"assests/body.dae", x:-130, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/saraskin.png" : "assests/skin1.png", sex: "female"  } );
-			this.students.push({ id:"robert", src:"assests/body.dae", x:0, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/robertskin.png" : "assests/skin1.png", sex: "male" } );
+			this.students.push({ id:"freddy", src:"assets/body.dae", x:-120, y:-115, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/freddyskin.png" : "assets/skin1.png", sex: "male", fidget:0} );
+//			this.students.push({ id:"joe", src:"assets/body.dae", x:0, y:-115, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/joeskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
+//			this.students.push({ id:"sally", src:"assets/body.dae", x:120, y:-115, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/sallyskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
+			this.students.push({ id:"sara", src:"assets/body.dae", x:-120, y:85, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/saraskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
+			this.students.push({ id:"robert", src:"assets/body.dae", x:0, y:85, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
 			}
-		this.students.push({ id:"liza", src:"assests/body.dae", x:130, y:84, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assests/lizaskin.png" : "assests/skin1.png", sex: "female" } );
+		this.students.push({ id:"liza", src:"assets/body.dae", x:130, y:85, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/lizaskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
 		
 		this.poses["startUp"]="armL,-51,0,-44,armR,-51,0,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-83,0,0,thighR,-83,0,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-40,0,wristR,0,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
@@ -147,9 +146,9 @@ class App  {
 		this.poses["leftArmDesk"]="armL,-60,0,-45,forearmL,0,0,-46";			this.poses["rightArmDesk"]="armR,-60,0,45,forearmR,0,0,46";
 		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";	this.poses["handDown"]="armL,-51,0,-44,forearmL,0,0,-45,wristL,0,0,0";	
 		this.poses["handRight"]="forearmL,50,-25,0";	
-		this.poses["twistLeft"]="neck,0,30,0,spine,0,30,0";						this.poses["twistRight"]="neck,0,-30,0,spine,0,-60,0";			
+		this.poses["twistLeft"]="neck,0,30,0,spine,0,33,0";						this.poses["twistRight"]="neck,0,-30,0,spine,0,-60,0";			
 		this.poses["sleep"]="neck,45,62,0,chest,46,0,0,armL,-12,45,0,wristL,0,0,0,forearmL,111,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
-		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,60,0,0";
+		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,50,0,0";
 			
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
@@ -195,35 +194,46 @@ class App  {
 	{
 		trace(text)
 		var mod=app.students[app.curStudent].id;
-		if (text && text.match(/talk to|Dr/i)) {		
-			if (text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) app.curStudent=3,app.voice.Talk("Hi. My name is Liza")
-			if (text.match(/freddy|ready|pretty/i)) 				app.curStudent=0,app.voice.Talk("Hi. My name is Freddy")
-			if (text.match(/robert/i)) 								app.curStudent=2,app.voice.Talk("Hi. My name is Robert")
-			if (text.match(/sara/i)) 								app.curStudent=1,app.voice.Talk("Hi. My name is Sara")
-			return;
-			}
 		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah|sarah|robert|freddy/i)) {
 			if (text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) mod="liza",app.curStudent=3;
-			if (text.match(/freddy|ready|pretty/i)) 				mod="freddy",app.curStudent=0;
-			if (text.match(/robert/i)) 								mod="robert",app.curStudent=2;
-			if (text.match(/sara/i)) 								mod="sara",app.curStudent=1;
-			if (text.match(/sleep/i))	 					 		app.sc.StartAnimation(mod,app.seqs["sleep"]);								
-			if (text.match(/sit|set/i))	 					 		app.sc.StartAnimation(mod,app.seqs["sit"]);							
-			if (text.match(/head|had/i)	&& text.match(/up/i)) 		app.sc.StartAnimation(mod,app.seqs["headUp"]);								
-			if (text.match(/head|had/i)	&& text.match(/down/i)) 	app.sc.StartAnimation(mod,app.seqs["headDown"]);									
-			if (text.match(/head|had/i)	&& text.match(/left/i)) 	app.sc.StartAnimation(mod,app.seqs["headLeft"]);								
-			if (text.match(/head|had/i)	&& text.match(/right/i))	app.sc.StartAnimation(mod,app.seqs["headRight"]);								
-			if (text.match(/twist/i)	&& text.match(/left/i)) 	app.sc.StartAnimation(mod,app.seqs["twistLeft"]);								
-			if (text.match(/twist/i)	&& text.match(/right/i)) 	app.sc.StartAnimation(mod,app.seqs["twistRight"]);								
-			if (text.match(/arm|hand/i)	&& text.match(/up/i)) 		app.sc.StartAnimation(mod,app.seqs["armUp"]);								
-			if (text.match(/arm|hand/i)	&& text.match(/down/i)) 	app.sc.StartAnimation(mod,app.seqs["armDown"]);								
-			if (text.match(/wave|wade/i))							app.sc.StartAnimation(mod,app.seqs["wave"]);								
-			if (text.match(/stand/i))								app.sc.StartAnimation(mod,app.seqs["standUp"]);								
-			if (text.match(/talk/i))	 					 		app.voice.Talk("My name is "+mod+". How are you today?");						
-			if (text.match(/fidget/i))								app.fidget=true;							
-			if (text.match(/fidget/i) && text.match(/stop/i))		app.fidget=false;							
-}
+			else if (text.match(/freddy|ready|pretty/i)) 				mod="freddy",app.curStudent=0;
+			else if (text.match(/robert/i)) 							mod="robert",app.curStudent=2;
+			else if (text.match(/sara/i)) 								mod="sara",app.curStudent=1;
+		
+			if (text.match(/sleep/i))	 					 			app.sc.StartAnimation(mod,app.seqs["sleep"]);								
+			else if (text.match(/sit|set|wake/i))	 					app.sc.StartAnimation(mod,app.seqs["sit"]);							
+				else if (text.match(/head|had/i) && text.match(/up/i)) 	app.sc.StartAnimation(mod,app.seqs["headUp"]);								
+			else if (text.match(/head|had/i) && text.match(/down/i)) 	app.sc.StartAnimation(mod,app.seqs["headDown"]);									
+			else if (text.match(/head|had/i) && text.match(/left/i)) 	app.sc.StartAnimation(mod,app.seqs["headLeft"]);								
+			else if (text.match(/head|had/i) && text.match(/right/i))	app.sc.StartAnimation(mod,app.seqs["headRight"]);								
+			else if (text.match(/twist/i)	 && text.match(/left/i)) 	app.sc.StartAnimation(mod,app.seqs["twistLeft"]);								
+			else if (text.match(/twist/i)	 && text.match(/right/i)) 	app.sc.StartAnimation(mod,app.seqs["twistRight"]);								
+			else if (text.match(/arm|hand/i)&& text.match(/up/i)) 		app.sc.StartAnimation(mod,app.seqs["armUp"]);								
+			else if (text.match(/arm|hand/i)	&& text.match(/down/i)) app.sc.StartAnimation(mod,app.seqs["armDown"]);								
+			else if (text.match(/wave|wade/i))							app.sc.StartAnimation(mod,app.seqs["wave"]);								
+			else if (text.match(/stand/i))								app.sc.StartAnimation(mod,app.seqs["standUp"]);								
+			else if (text.match(/talk/i))	 					 		app.voice.Talk("My name is "+mod+". How are you today?");						
+			else if (text.match(/fidget/i) && text.match(/top/i))		app.students[app.curStudent].fidget=0;							
+			else if (text.match(/fidget/i))								app.students[app.curStudent].fidget=1;							
+			else 														app.ParseDialog(text);				
 			}
+		else 															app.ParseDialog(text);				
+		}
+
+	ParseDialog(text) 																				// PARSE DIALOG
+	{
+		trace("P",text) 
+		if (text.match(/what/i)) {
+			if (text.match(/2.*\+.2*/i))			app.voice.Talk("2 + 2 = 4");
+			else if (text.match(/4.*\+.* 4/i))		app.voice.Talk("4 + 4 = 8");
+			else if (text.match(/time is it/i))		app.voice.Talk("It is now time for all men to come to the aid of their country");
+			}
+		else if (text.match(/who/i) && text.match(/knows/i))	
+			app.curStudent=1,app.voice.Talk("I do, I do, choose me!"),app.sc.StartAnimation("sara",app.seqs["wave"])
+		else if (text.match(/sure/i))				app.voice.Talk("Yes I am sure")
+	}
+
+
 
 } // Class closure
 
@@ -246,11 +256,11 @@ class Scene {
 		this.scene=null;																			// Scene object
 		this.controls=null;																			// Controls object
 		this.outliner=null;																			// Outline renderer
-		this.floor="assests/wood.jpg";																// Floor texture
-		this.backWall="assests/blackboard.png";														// Back wall texture
-		this.frontWall=this.cartoonScene ? "" : "assests/blackboard.png";							// Front wall texture
-		this.leftWall=this.cartoonScene ? "" : "assests/windowwall.png";							// Side wall texture
-		this.rightWall=this.cartoonScene ? "" : "assests/windowwall.png";							// Side wall texture
+		this.floor="assets/wood.jpg";																// Floor texture
+		this.backWall="assets/blackboard.png";														// Back wall texture
+		this.frontWall=this.cartoonScene ? "" : "assets/blackboard.png";							// Front wall texture
+		this.leftWall= this.cartoonScene ? "" : "assets/windowwall.png";							// Side wall texture
+		this.rightWall=this.cartoonScene ? "" : "assets/windowwall.png";							// Side wall texture
 		this.aniTimer=0;																			// Timer for talking and fidgeting
 		this.Init();																				// Init 3D system
 		}
@@ -260,7 +270,6 @@ class Scene {
 		this.scene=new THREE.Scene();																// Alloc new scene
 		if (this.cartoonScene) 	this.scene.background=new THREE.Color(0xffffff);					// White background
 		this.manager=new THREE.LoadingManager();													// Loading manager
-		this.manager.onProgress=function(item, loaded, total ) { console.log(loaded,total); };		// Show progress
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
 		this.AddCamera(0,150,500,.4);																// Add camera
 		this.renderer=new THREE.WebGLRenderer({ antialias: true });									// Init renderer
@@ -609,8 +618,9 @@ class Scene {
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
 		if (app.voice.talking)																		// If talking
 			app.sc.SetBone(app.students[app.curStudent].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);		// Animate mouth
-		if (app.fidget)																				// If fidgeting
-			app.sc.SetBone(app.students[app.curStudent].id,"thighR",-83,Math.cos(app.sc.aniTimer/30*Math.PI)*10+10*.01,0);	// Animate thigh
+		for (i=0;i<app.students.length;++i)															// For each student
+			if (app.students[i].fidget)																// If fidgeting
+				app.sc.SetBone(app.students[i].id,"thighR",-83,Math.cos(app.sc.aniTimer/30*Math.PI)*10+10*.01,0);	// Animate fidget
 		++app.sc.aniTimer;																			// Advance timer
 	}
 

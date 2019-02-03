@@ -104,9 +104,9 @@ class Blackboard  {
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		var imageObj=new Image();
-		if (label == "Founding fathers")	imageObj.src="FoundingFathers.jpg";
-		if (label == "US map")				imageObj.src="USMap.png";
-		if (label == "Math Lesson")			imageObj.src="BB1.png";
+		if (label == "Founding fathers")	imageObj.src="assets/FoundingFathers.jpg";
+		if (label == "US map")				imageObj.src="assets/USMap.png";
+		if (label == "Math Lesson")			imageObj.src="assets/BB1.png";
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.context.drawImage(this,0,0,512,256);													// Add image 				
 			app.bb.texMap[app.bb.curSide].needsUpdate=true;												// Flag the tex map as needing updating
