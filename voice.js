@@ -23,7 +23,7 @@ class Voice {
 			this.voices=[];																				// New array
 			this.dictionary=['liza' , 'eliza' , 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave', 'sure'];	// Dictionary of words
 			this.AddGrammarList("lizaWords");															// Add to grammar list
-			this.recognition.onend=(e)=> { 	this.recognition.start(); };								// On end, restart
+			this.recognition.onend=(e)=> {  this.recognition.start(); };								// On end, restart
 
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
 				this.voices=[];																			// Clear list
@@ -34,8 +34,12 @@ class Voice {
 					});
 				};
 
-			this.tts.onend=(e)=> { 	this.talking=false;  app.sc.SetBone("body6*","mouth",0,0,0); };		// On end, stop talking animation
-		
+			this.tts.onend=()=> { 																		// ON TALKING END
+				this.talking=false;  																	// Stop talking animation
+				this.recognition.abort();																// Flush recognition cache
+				app.sc.SetBone(app.students[app.curStudent],"mouth",0,0,0); 							// Neutral mouth 
+				};	
+
 			this.recognition.onresult=(e)=> { 															// On some speech recognized
 				for (var i=e.resultIndex;i<e.results.length;++i) {										// For each result
 					if (e.results[i].isFinal) {															// If final
