@@ -35,7 +35,7 @@ class Voice {
 				};
 
 			this.tts.onend=()=> { 																		// ON TALKING END
-				this.talking=0;  																	// Stop talking animation
+				this.talking=0;  																		// Stop talking animation
 				this.recognition.abort();																// Flush recognition cache
 				app.sc.SetBone(app.students[app.curStudent],"mouth",0,0,0); 							// Neutral mouth 
 				};	
@@ -55,11 +55,11 @@ class Voice {
 	{
 		try{																							// Try
 			var oldPitch=this.tts.pitch;																// Save old pitch
-			if (instructor) this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;			// Lower pitch if instructor
+			if (instructor) this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;				// Lower pitch if instructor
 			else if (app.students[app.curStudent].sex == "male")	this.tts.voice=this.voices[this.maleVoice];		// Set male voice
 			else 													this.tts.voice=this.voices[this.femaleVoice];	// Set female voice
 			this.tts.text=text;																			// Set text
-			this.talking=1+instructor;																	// Trigger mouth animation
+			this.talking=instructor ? 2 : 1;															// Trigger mouth animation
 			speechSynthesis.speak(this.tts);															// Speak
 			this.tts.pitch=oldPitch;																	// Restore pitch	
 		}

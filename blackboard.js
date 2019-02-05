@@ -35,6 +35,7 @@ class Blackboard  {
 		this.ctx[1].fillStyle=this.backCol;																// Right
 		this.ctx[0].fillRect(0,0,this.wid,this.hgt);													// Left clear
 		this.ctx[1].fillRect(0,0,this.wid,this.hgt);													// Right
+		this.SetPic("Math Lesson",1);	this.SetPic("Tips",2);											// Put up initial slides
 	}
 
 	ButtonRoute(but)																				// ROUTE BASED ON BUTTON PICK
@@ -108,18 +109,21 @@ class Blackboard  {
 		$("body").append(str+"</div");																	// Add popup	
 	}
 
-	SetPic(label)																					// SHOW PIC																			
+	SetPic(label, init)																					// SHOW PIC																			
 	{
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		var imageObj=new Image();
 		if (label == "Founding fathers")	imageObj.src="assets/FoundingFathers.jpg";
 		if (label == "US map")				imageObj.src="assets/USMap.png";
-		if (label == "Math Lesson")			imageObj.src="assets/BB1.png";
-		app.AddToRecord({ o: 'P', p: label, s:this.curSide }); 											// Add to record
+		if (label == "Math Lesson")			imageObj.src="assets/BB2.png";
+		if (label == "Tips")				imageObj.src="assets/BB1.png";
+		if (!init)	app.AddToRecord({ o: 'P', p: label, s:this.curSide }); 								// Add to record, unless initting
+
 		imageObj.onload=function() { 																	// When loaded
-			app.bb.ctx[app.bb.curSide].drawImage(this,0,0,512,256);										// Add image 				
-			app.bb.texMap[app.bb.curSide].needsUpdate=true;												// Flag the tex map as needing updating
+			var side=init ? init-1 : app.bb.curSide;													// Set side
+			app.bb.ctx[side].drawImage(this,0,0,512,256);												// Add image 				
+			app.bb.texMap[side].needsUpdate=true;														// Flag the tex map as needing updating
 			}
 	}
 

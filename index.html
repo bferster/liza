@@ -221,7 +221,7 @@ class App  {
 			else if (text.match(/nod/i)	 	 && text.match(/no/i)) 		app.sc.StartAnimation(mod,app.seqs["nodNo"]);								
 			else if (text.match(/wave|wade/i))							app.sc.StartAnimation(mod,app.seqs["wave"]);								
 			else if (text.match(/stand/i))								app.sc.StartAnimation(mod,app.seqs["standUp"]);								
-			else if (text.match(/talk/i))	 					 		app.voice.Talk("My name is "+mod+". How are you today?");						
+			else if (text.match(/talk|chalk|caulk/i))	 				app.voice.Talk("My name is "+mod+". How are you today?");						
 			else if (text.match(/fidget/i) && text.match(/top/i)) app.students[app.curStudent].fidget=0;							
 			else if (text.match(/fidget|picket/i))						app.students[app.curStudent].fidget=1;							
 			else 														app.ParseDialog(text);				
