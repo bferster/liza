@@ -19,7 +19,7 @@ class Voice {
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
 			this.tts.pitch=1.8;																			// Set pitch
 			this.tts.rate=1.3;																			// Set rate 
-			this.talking=false;																			// Talking flag to move mouth
+			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
 			this.dictionary=['liza' , 'eliza' , 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave', 'sure'];	// Dictionary of words
 			this.AddGrammarList("lizaWords");															// Add to grammar list
@@ -35,7 +35,7 @@ class Voice {
 				};
 
 			this.tts.onend=()=> { 																		// ON TALKING END
-				this.talking=false;  																	// Stop talking animation
+				this.talking=0;  																	// Stop talking animation
 				this.recognition.abort();																// Flush recognition cache
 				app.sc.SetBone(app.students[app.curStudent],"mouth",0,0,0); 							// Neutral mouth 
 				};	
@@ -51,15 +51,18 @@ class Voice {
 			} catch(e) { trace("Voice error",e) };														// On error
 	}
 
-	Talk(text)																						// SAY SOMETHING
+	Talk(text, instructor)																			// SAY SOMETHING
 	{
 		try{																							// Try
-			if (app.students[app.curStudent].sex == "male")	this.tts.voice=this.voices[this.maleVoice];		// Set male voice
-			else 											this.tts.voice=this.voices[this.femaleVoice];	// Set female voice
+			var oldPitch=this.tts.pitch;																// Save old pitch
+			if (instructor) this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;			// Lower pitch if instructor
+			else if (app.students[app.curStudent].sex == "male")	this.tts.voice=this.voices[this.maleVoice];		// Set male voice
+			else 													this.tts.voice=this.voices[this.femaleVoice];	// Set female voice
 			this.tts.text=text;																			// Set text
-			this.talking=true;																			// Trigger mouth animation
+			this.talking=1+instructor;																	// Trigger mouth animation
 			speechSynthesis.speak(this.tts);															// Speak
-			}
+			this.tts.pitch=oldPitch;																	// Restore pitch	
+		}
 		catch(e) { trace("Speech error",e) };															// Catch
 }
 

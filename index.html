@@ -86,8 +86,8 @@
 		</div>
 <script>
 
-var app=null;															// Holds app
-var isMobile=false;														// Flag for mobile devices
+var app=null;																					// Holds app
+var isMobile=false;																				// Flag for mobile devices
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // APP
@@ -106,17 +106,20 @@ class App  {
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
+		this.record=[];																				// Holds record of actions
 		this.LoadProject("myFile");																	// Load project file
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
 		this.startTime=new Date().getTime();														// Session start time
+		this.inPlayback=false;																		// In playback mode?
 		$("#poseBut").on("click", ()=> { app.sc.PoseEditor();  });									// On pose button click
-		$("#writeBut").on("click", ()=> { $("#blackboardDiv").toggle("slide",{ direction:"down"}) }); // On write button click
 		$("#settingsBut").on("click", ()=> {   				});										// On settings button click
 		$("#helpBut").on("click", ()=> { app.ShowHelp(); });										// On help button click
-		$("#BBClearBut").on("click", ()=> { app.bb.Clear(); });										// On clear button click
-		$("#BBSideBut").on("click", ()=> { app.bb.SetSide(1-this.bb.curSide);	});					// On side click, toggle
-		$("[id^=BB-]").on("click", function() { app.bb.ButtonRoute(this.id)	});						// On BB Drawing menu button click
+		$("#writeBut").on("click", ()=> { 
+			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
+			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// On write button click
+			this.AddToRecord({ o:'B', m:m }); 														// Add to record
+			}); 
 	}
 
 	LoadProject(file)																			// LOAD PROJECT DATA
@@ -153,9 +156,9 @@ class App  {
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
-		this.seqs["wave"]="handUp,.6,handRight,.5,5";
+		this.seqs["wave"]="handUp,.6,handRight,.5,4";
 		this.seqs["nodYes"]="headBack,.6,headDown,.5,headUp,.5,2";
-		this.seqs["nodNo"]="headLeft,.3,headRight,.3,headCenter,.3,3";
+		this.seqs["nodNo"]="headLeft,.3,headRight,.3,headCenter,.3,2";
 		this.seqs["headUp"]="headUp,1";			this.seqs["headDown"]="headDown,1";			
 		this.seqs["headLeft"]="headLeft,1";		this.seqs["headRight"]="headRight,1";
 		this.seqs["armUp"]="handUp,1";			this.seqs["armDown"]="leftArmDesk,1";
@@ -192,12 +195,13 @@ class App  {
 		$("#helpDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 		}
 
-	OnPhrase(text) 																				// ON PHRASE UTTERED
+	OnPhrase(text, playingBack) 																// ON PHRASE UTTERED
 	{
-		trace(text,app.voice.talking)
-		if (app.voice.talking) 	return;																// Not while talking																
-		var mod=app.students[app.curStudent].id;
-		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah|sarah|robert|freddy/i)) {
+		trace(text)
+		app.AddToRecord({ o:'S', w:text });															// Add to recording if not playing back
+		if (app.voice.talking == 1) 	return;														// Not while student is talking																
+		var mod=app.students[app.curStudent].id;													// Get model id
+		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah|sarah|robert|freddy/i)) {		// A student name
 			if (text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) mod="liza",app.curStudent=3;
 			else if (text.match(/freddy|ready|pretty/i)) 				mod="freddy",app.curStudent=0;
 			else if (text.match(/robert/i)) 							mod="robert",app.curStudent=2;
@@ -218,8 +222,8 @@ class App  {
 			else if (text.match(/wave|wade/i))							app.sc.StartAnimation(mod,app.seqs["wave"]);								
 			else if (text.match(/stand/i))								app.sc.StartAnimation(mod,app.seqs["standUp"]);								
 			else if (text.match(/talk/i))	 					 		app.voice.Talk("My name is "+mod+". How are you today?");						
-			else if (text.match(/fidget/i) && text.match(/top/i))		app.students[app.curStudent].fidget=0;							
-			else if (text.match(/fidget/i))								app.students[app.curStudent].fidget=1;							
+			else if (text.match(/fidget/i) && text.match(/top/i)) app.students[app.curStudent].fidget=0;							
+			else if (text.match(/fidget|picket/i))						app.students[app.curStudent].fidget=1;							
 			else 														app.ParseDialog(text);				
 			}
 		else 															app.ParseDialog(text);				
@@ -233,17 +237,55 @@ class App  {
 			else if (text.match(/4.*\+.* 4/i))		app.voice.Talk("4 + 4 = 8");
 			else if (text.match(/time is it/i))		app.voice.Talk("It is now time for all men to come to the aid of their country.");
 			}
+		else if (text.match(/replay/i) && text.match(/class/i))	app.record.pop(),app.Playback();
 		else if (text.match(/who/i) && text.match(/knows/i)) {
 			var i=Math.floor(Math.random()*app.students.length);	
 			app.curStudent=i;
-			app.voice.Talk("I do, I do, choose me!");
+			app.voice.Talk("I do, I do, it's "+app.students[i].id+", please choose me!");
 			app.sc.StartAnimation(app.students[i].id,app.seqs["wave"]);
 			}
 		else if (text.match(/sure/i))				app.voice.Talk("Yes I am sure.")
 		else if (text.match(/final/i))				app.voice.Talk("Yes, this is my final answer.")
 	}
 
+	AddToRecord(data)																				// ADD ACTION TO RECORD
+	{
+		if (this.inPlayback) {																			// Playing back
+			if (data.o == 'S')	app.voice.Talk(data.w,true);											// Speak as instructor
+			return;																						// Don't add
+			}
+		data.t=new Date().getTime();																	// Capture time
+		app.record.push(data);																			// Add to array																	
+	}
 
+	Playback()																						// PLAYBACK ACTION IN RECORD
+	{
+		var i,o,now,s=0;
+		var sTimer=setInterval(actions,2);																// Set time
+		this.inPlayback=true;																			// In playback mode
+		this.sc.SetCamera(0,150,500,-.291457,0,0);														// Reset camera
+		for (i=0;i<this.students.length;++i)															// For each student
+			this.sc.SetPose(this.students[i].id,"startUp",20);											// Return to startup pose
+		app.bb.Playback({ o:'B', s:0, m:0 });															// Close bb editor, set to left side
+		app.bb.Playback({ o:'C', s:0 }); app.bb.Playback({ o:'C', s:1 });								// Clear bbs																		
+		var off=new Date().getTime()-this.startTime;													// Get offset from 1st event
+		function actions() {																			// PERFORM ACTIONS IN RECORD
+			if (s >= app.record.length)	{																// If done
+				clearInterval(sTimer);																	// Kill timer
+				app.inPlayback=false;																	// In normal mode
+				return;
+				}
+			now=new Date().getTime()-off;																// Get now
+			for (i=s;i<app.record.length;++i) {															// For each action
+				o=app.record[i];																		// Point at segment
+				if (now < o.t) 		break;																// If before time of action quit
+				if (now >= o.t)		++s;																// Done this one
+				if (o.o == 'S')		app.OnPhrase(o.w,true);												// Speaking if S
+//				if (o.o == 'O')		app.sc.SetCamera(o.x,o.y,o.z,o.xr,o.yr,o.zr);						// Move camera if O
+				else				app.bb.Playback(o);													// Draw segment	if B, M, D, E, U, T, X, P, or C		
+				}
+			}	
+	}
 
 } // Class closure
 
@@ -282,6 +324,11 @@ class Scene {
 		this.manager=new THREE.LoadingManager();													// Loading manager
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
 		this.AddCamera(0,150,500,.4);																// Add camera
+		this.controls.addEventListener('end',(e)=> {												// On control change
+			app.AddToRecord( {o:'O',																// Add to record
+				xr:this.camera.rotation.x, yr:this.camera.rotation.y, zr:this.camera.rotation.z,	// Rotation
+				x:this.camera.position.x,  y:this.camera.position.y,  z:this.camera.position.z});	// Position
+				});
 		this.renderer=new THREE.WebGLRenderer({ antialias: true });									// Init renderer
 		this.renderer.setPixelRatio(window.devicePixelRatio);										// Set ratio
 		this.AddLights();																			// Add lights
@@ -308,13 +355,19 @@ class Scene {
 		else if (this.scene)					this.renderer.setSize(window.innerWidth,window.innerHeight-3);	
 	}
 
-	AddCamera(x, y, z, light)																	// ADD CAMERA
+	AddCamera(x, y, z)																			// ADD CAMERA
 	{
 		this.camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,2000);	// Add 45 degree POV
-		this.camera.position.x=x;	this.camera.position.y=y;	this.camera.position.z=z;			// Camera position
 		this.scene.add(this.camera);																// Add camera to scene
+		this.SetCamera(x,y,z,0,0,0);																// Position camera
 		this.controls=new THREE.OrbitControls(this.camera);											// Add orbiter control
 		this.controls.damping=0.2;																	// Set dampening
+	}
+
+	SetCamera(x, y, z, xr, yr, zr)																	// SET CAMERA
+	{
+		this.camera.position.x=x;	this.camera.position.y=y;	this.camera.position.z=z;			// Camera position
+		this.camera.rotation.x=xr;	this.camera.rotation.y=yr;	this.camera.rotation.z=zr;			// Rotation
 	}
 
 	AddRoom()																					// ADD ROOM TO SCENE
@@ -592,7 +645,6 @@ class Scene {
 		app.sc.AnimateScene();																		// Animate models
 		if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );				// Render outline
 		else					app.sc.renderer.render(app.sc.scene,app.sc.camera);					// Render scene
-
 		}
 
 	AnimateScene()																				// CALLED EVERY FRAME BY ANIMATE FUNCTION
@@ -632,7 +684,7 @@ class Scene {
 			}
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
-		if (app.voice.talking)																		// If talking
+		if (app.voice.talking == 1)																	// If student talking
 			app.sc.SetBone(app.students[app.curStudent].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);		// Animate mouth
 		for (i=0;i<app.students.length;++i)															// For each student
 			if (app.students[i].fidget)	{															// If fidgeting
@@ -734,7 +786,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	
 	$(window).on("keydown",function(e) {									// HANDLE KEYPRESS
 		if ((e.which == 84) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+T)
-			app.bb.Playback();
+			app.Playback();													// Playback actions
 
 		if ((e.which == 65) && e.altKey && e.ctrlKey)						// Test key (Ctrl+Alt+A)
 			app.voice.Talk("");												// Enable audio
