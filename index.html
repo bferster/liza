@@ -42,8 +42,8 @@
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							}
-		.lz-popup {			position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top: calc(50% - 50px);
-							border-radius: 8px; background-color: #eee; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
+		.lz-popup {			position: absolute;  width: auto; padding: 4px; left: 16px; top: calc(100vh - 80px);
+							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							font-size: 14px; text-align:center; display: none;
 							}
 		.lz-is {			border-radius:.8em;padding-left:.6em;padding-right:.6em;padding-top:1px ;width:100px;
@@ -201,10 +201,10 @@ class App  {
 		app.AddToRecord({ o:'S', w:text });															// Add to recording if not playing back
 		if (app.voice.talking == 1) 	return;														// Not while student is talking																
 		var mod=app.students[app.curStudent].id;													// Get model id
-		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah|sarah|robert|freddy/i)) {		// A student name
-			if (text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) mod="liza",app.curStudent=3;
+		if (text && text.match(/liza|plaza|lies|alexa|alexis|elijah|sarah|robert|robertson|freddy/i)) {		// A student name
+			if (text.match(/liza|plaza|lies|alexa|alexis|elijah/i)) 	mod="liza",app.curStudent=3;
 			else if (text.match(/freddy|ready|pretty/i)) 				mod="freddy",app.curStudent=0;
-			else if (text.match(/robert/i)) 							mod="robert",app.curStudent=2;
+			else if (text.match(/robert|robertson/i)) 					mod="robert",app.curStudent=2;
 			else if (text.match(/sara/i)) 								mod="sara",app.curStudent=1;
 		
 			if (text.match(/sleep/i))	 					 			app.sc.StartAnimation(mod,app.seqs["sleep"]);								
@@ -231,7 +231,6 @@ class App  {
 
 	ParseDialog(text) 																				// PARSE DIALOG
 	{
-		trace("P",text) 
 		if (text.match(/what/i)) {
 			if (text.match(/2.*\+.2*/i))			app.voice.Talk("2 + 2 = 4");
 			else if (text.match(/4.*\+.* 4/i))		app.voice.Talk("4 + 4 = 8");
@@ -246,6 +245,7 @@ class App  {
 			}
 		else if (text.match(/sure/i))				app.voice.Talk("Yes I am sure.")
 		else if (text.match(/final/i))				app.voice.Talk("Yes, this is my final answer.")
+		else 										PopUp("Huh? - "+text);
 	}
 
 	AddToRecord(data)																				// ADD ACTION TO RECORD
@@ -891,7 +891,7 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		str+=msg+"</div>"; 														// Add div
 		$(div ? "#"+div : "body").append(str);									// Add popup to div or body
 		$("#pu-close").click(function() { $("#popupDiv").remove(); });			// Remove on click of close but
-		$("#popupDiv").fadeIn(500).delay(time ? time : 2000).fadeOut(500)		// Animate in and out		
+		$("#popupDiv").fadeIn(500).delay(time ? time : 3000).fadeOut(500)		// Animate in and out		
 	}
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 

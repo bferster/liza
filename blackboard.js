@@ -35,7 +35,7 @@ class Blackboard  {
 		this.ctx[1].fillStyle=this.backCol;																// Right
 		this.ctx[0].fillRect(0,0,this.wid,this.hgt);													// Left clear
 		this.ctx[1].fillRect(0,0,this.wid,this.hgt);													// Right
-		this.SetPic("Math Lesson",1);	this.SetPic("Tips",2);											// Put up initial slides
+		this.SetPic("Math lesson",1);	this.SetPic("Liza tips",2);										// Put up initial slides
 	}
 
 	ButtonRoute(but)																				// ROUTE BASED ON BUTTON PICK
@@ -73,7 +73,7 @@ class Blackboard  {
 			});
 
 		$(this.curSideId).on("mousemove touchmove", (e)=> {												// ON MOUSE MOVE
-			$(this.curSideId).css("cursor",(erase) ? "url('img/eraser.png') -12 12,auto" : "url('img/chalk.png') 0 12,auto");	// Set cursor
+			$(this.curSideId).css("cursor",(erase) ? "url('img/eraser.png') 6 12,auto" : "url('img/chalk.png') 0 12,auto");	// Set cursor
 			if (!this.paint) return;																	// Quit if not painting
 			var x=e.offsetX, y=e.offsetY;																// Get pos
 			if (e.touches) {																			// If a touch event
@@ -105,7 +105,8 @@ class Blackboard  {
 		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
 		str+="<div"+trsty+">Founding fathers</div>"
 		str+="<div"+trsty+">US map</div>"
-		str+="<div"+trsty+">Math Lesson</div>"
+		str+="<div"+trsty+">Math lesson</div>"
+		str+="<div"+trsty+">Liza tips</div>"
 		$("body").append(str+"</div");																	// Add popup	
 	}
 
@@ -116,8 +117,8 @@ class Blackboard  {
 		var imageObj=new Image();
 		if (label == "Founding fathers")	imageObj.src="assets/FoundingFathers.jpg";
 		if (label == "US map")				imageObj.src="assets/USMap.png";
-		if (label == "Math Lesson")			imageObj.src="assets/BB2.png";
-		if (label == "Tips")				imageObj.src="assets/BB1.png";
+		if (label == "Math lesson")			imageObj.src="assets/BB2.png";
+		if (label == "Liza tips")				imageObj.src="assets/BB1.png";
 		if (!init)	app.AddToRecord({ o: 'P', p: label, s:this.curSide }); 								// Add to record, unless initting
 
 		imageObj.onload=function() { 																	// When loaded
