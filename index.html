@@ -198,6 +198,27 @@ class App  {
 	OnPhrase(text, playingBack) 																// ON PHRASE UTTERED
 	{
 		trace(text)
+		try {
+			if (!window.location.search.match(/noai/i))
+				$.ajax({ url: 'https://api.wit.ai/message',
+					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },
+					dataType: "jsonp", method: "GET",
+					success: (r)=> {
+						var i,str="";
+						if (r.error) trace("Wit error: "+r.error)	
+						for (var entity in r.entities) {
+							str+=entity.toUpperCase()+": ";
+							for (i=0;i<r.entities[entity].length;++i) {
+								str+=r.entities[entity][i].value+ " (";
+								str+=Math.floor(r.entities[entity][i].confidence*100)+"%) ";
+								}
+							str+="\n";
+							}
+						trace(str+"\n");
+						}
+				});
+		} catch(e) { trace(" WIT ERROR: "+e) }
+
 		app.AddToRecord({ o:'S', w:text });															// Add to recording if not playing back
 		if (app.voice.talking == 1) 	return;														// Not while student is talking																
 		var mod=app.students[app.curStudent].id;													// Get model id
