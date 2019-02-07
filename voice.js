@@ -29,8 +29,8 @@ class Voice {
 				this.voices=[];																			// Clear list
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
 					if (voice.lang == "en-US")		_this.voices.push(voice);							// Just look at English
-					if (voice.name == "Samantha")	_this.femaleVoice=_this.voices.length-1,_this.tts.pitch=1,_this.tts.rate=1;	// Use Samantha is available on Mac
-					if (voice.name == "Alex")		_this.maleVoice=_this.voices.length-1,_this.tts.pitch=1,_this.tts.rate=1;	// Alex 
+					if (voice.name == "Samantha")	_this.femaleVoice=_this.voices.length-1,_this.tts.pitch=1.5;	// Use Samantha is available on Mac
+					if (voice.name == "Alex")		_this.maleVoice=_this.voices.length-1,_this.tts.pitch=1.0;	// Alex 
 					});
 				};
 
