@@ -1,4 +1,56 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
+// PARSER
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Parser {																				 
+
+	constructor()																				// CONSTRUCTOR
+	{
+	}
+
+	Parse(text, callback)																			// PARSE TEXT STRING
+	{
+		try {
+			if (!window.location.search.match(/noai/i))												// Unless turned off
+				$.ajax({ url: 'https://api.wit.ai/message',											// Send to WIT
+					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },			// Text and api id
+					dataType: "jsonp", method: "GET",												// JSONP
+					success: (r)=> {																// When parsed
+						var i,str="";
+						if (r.error) {																// If an error
+							trace("Wit error: "+r.error);											// Show error
+							return;																	// Quit
+							}	
+						var o={ o:'W' };															// Record object
+						for (var entity in r.entities) {											// For each entity parsed
+							o[entity]=[];															// Add entity array
+							str+=entity.toUpperCase()+": ";
+							for (i=0;i<r.entities[entity].length;++i) {								// For each entity instance
+								o[entity].push({v:r.entities[entity][i].value, c:Math.floor(r.entities[entity][i].confidence*100) })
+								str+=r.entities[entity][i].value+ " (";
+								str+=Math.floor(r.entities[entity][i].confidence*100)+"%) ";
+								}
+							str+="\n";
+							}
+						trace(str+"\n");
+						app.AddToRecord(o); 														// Add to record
+						callback(o);																// Return entities to callback	
+						}
+				});
+		} catch(e) { trace(" WIT ERROR: "+e) }
+	}
+
+	DoActions(o)																				// RESPOND TO ACTIONS
+	{
+		trace(o)
+	}
+
+}  // PARSE CLOSURE
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // VOICE
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
