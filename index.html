@@ -236,8 +236,8 @@ class App  {
 			else if (act.match(/wave/i))							app.sc.StartAnimation(mod,app.seqs["wave"]);						
 			else if (act.match(/stand/i))							app.sc.StartAnimation(mod,app.seqs["standUp"]);								
 			else if (act.match(/say/i))	 							app.voice.Talk("My name is "+mod+". How are you today?");						
-			else 													return false;						// Return noy handled
-			return true;																				// Return andled		
+			else 													return false;					// Return not handled
+			return true;																			// Return andled		
 		}
 
 	ParseDialog(text) 																				// PARSE DIALOG

@@ -18,7 +18,7 @@ class Parser {
 					success: (r)=> {																// When parsed
 						var i,str="";
 						if (r.error) {																// If an error
-							trace("Wit error: "+r.error);											// Show error
+							trace("*****************\nWit error: "+r.error+"\n***********");		// Show error
 							return;																	// Quit
 							}	
 						var o={ o:'W' };															// Record object
@@ -37,7 +37,7 @@ class Parser {
 						callback(o);																// Return entities to callback	
 						}
 				});
-		} catch(e) { trace(" WIT ERROR: "+e) }
+		} catch(e) { trace("*****************\nWIT error: "+e.error+"\n***********"); }				// Show error
 	}
 
 	DoActions(o)																				// RESPOND TO ACTIONS
