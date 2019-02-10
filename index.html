@@ -28,13 +28,13 @@
 							}
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
-		.lz-controller {	position: absolute; top: calc(100vh - 40px); left:16px; background-color: #fff; border: 1px solid #999;
-							padding:4px 10px; border-radius: 16px; width: 300px; height:18px;  display:none;
+		.lz-controller {	position: absolute; top: calc(100vh - 40px); left:0; background-color: #999; border: 1px solid #999;
+							padding:6px 12px; width: calc(100vw - 24px); height:24px;  display:none;
 							}
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #999;
 							padding:16px; border-radius: 16px; width: 600px;
 							}
-		.lz-blackboard {	position: absolute; left:16px; top: calc(100vh - 332px); width: 550px; height: 256px;  display:none;
+		.lz-blackboard {	position: absolute; left:16px; top: calc(100vh - 336px); width: 550px; height: 256px;  display:none;
 							background-color: #999; border: 1px solid #999;	padding:12px; border-radius: 8px; 
 							}
 		.lz-canvas {		position: absolute; left:50px; top: 12px; width: 512px; height:256px; border-radius: 4px; 
@@ -42,9 +42,11 @@
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							}
-		.lz-popup {			position: absolute;  width: auto; padding: 4px; left: 16px; top: calc(100vh - 80px);
+		.lz-popup {			position: absolute;  width: auto; padding: 4px; left: 16px; top: calc(100vh - 90px);
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							font-size: 14px; text-align:center; display: none;
+							}
+		.lz-prompt {		color:#fff; width:100%;	vertical-align: 3px; margin-left:16px; font-size:16px;
 							}
 		.lz-is {			border-radius:.8em;padding-left:.6em;padding-right:.6em;padding-top:1px ;width:100px;
 							border:1px solid #999; font-size:1em; height: 1.66em; width:16.66em;
@@ -69,10 +71,14 @@
 		<br><br><div id='startBut' class='lz-bs' onclick='app.voice.Talk("hello")'>Start</div>
 	</div>
 	<div id="controllerDiv" class="lz-controller">
-		<img id="writeBut" src="img/editbut.gif" style="cursor:pointer;margin-right:8px">
-		<img id="poseBut" src="img/posebut.gif" style="cursor:pointer;margin-right:8px">
-		<img id="settingsBut" src="img/settingsbut.gif" style="cursor:pointer">
-		<img id="helpBut" src="img/helpicon.gif" style="cursor:pointer;float:right">
+		<span id="talkSpan">
+			<img id="talkBut" src="img/talkbut.png" title="Click to talk" style="cursor:pointer">
+		</span>
+		<img id="writeBut" src="img/editbut.gif" title="Draw on blackboard" style="cursor:pointer;margin-left:24px">
+		<span id='promptSpan' class='lz-prompt'></span>
+
+		<img id="helpBut" src="img/helpicon.gif" style="cursor:pointer;margin-right:4px;float:right">
+		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
 	</div>
 	<div id='blackboardDiv' class='lz-blackboard'>
 		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer;margin-bottom:12px;;margin-top:-12px" title="Draw"><br>
@@ -113,14 +119,22 @@ class App  {
 		this.Draw();																				// Start 
 		this.startTime=new Date().getTime();														// Session start time
 		this.inPlayback=false;																		// In playback mode?
-		$("#poseBut").on("click", ()=> { app.sc.PoseEditor();  });									// On pose button click
-		$("#settingsBut").on("click", ()=> {   				});										// On settings button click
-		$("#helpBut").on("click", ()=> { app.ShowHelp(); });										// On help button click
-		$("#writeBut").on("click", ()=> { 
+		if (!this.voice.hasRecognition) 															// This platform doesn't have voice recognition
+			$("#talkSpan").html("<input id='talkInput' type='text' class='lz-is' placeholder='Talk by tyoing here'>");				// Put in text input field
+		$("#settingsBut").on("click", ()=> { app.sc.PoseEditor();  });								// On settings button click	
+		$("#talkBut").on("click", ()=> { app.voice.Listen(); });									// On talk button click, start listening
+		$("#helpBut").on("click", ()=> { app.ShowHelp(); });										// On help button click, show help
+		$("#writeBut").on("click", ()=> { 															// On BB button clck
 			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
-			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// On write button click
+			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			this.AddToRecord({ o:'B', m:m }); 														// Add to record
 			}); 
+		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
+		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
+		$("body").on("keydown", (e)=> {																// On key hit
+			if ((e.target == document.body) && (e.keyCode == 32) && this.voice.hasRecognition)		// Spacebar in body
+				 app.voice.Listen();																// Start listening	
+			});															
 	}
 
 	LoadProject(file)																			// LOAD PROJECT DATA
@@ -185,11 +199,11 @@ class App  {
 			$("#helpDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#helpDiv").remove(); } }); // Slide down
 			return;																				// Quit																					
 			}
-		var str="<div id='helpDiv' class='lz-dialog'style='height:calc(100vh - 90px);display:none;'>";
+		var str="<div id='helpDiv' class='lz-dialog'style='height:calc(100vh - 106px);display:none;'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
 		str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vTXAsMJ-YlQaNtT49RtKvEnT5v5Xzz-TKPyVlo2px-23vDt-4lZFB7JujSKyDXs38hiSMISQoulYXB5/pub?embedded=true' ";
-		str+="style='border: 1px solid #999;width:100%;height:calc(100vh - 140px)'></iframe></div>";
+		str+="style='border: 1px solid #999;width:100%;height:calc(100vh - 154px)'></iframe></div>";
 		$("body").append(str);																	// Add to body
 		$("#helpDiv").show("slide",{ direction:"down" });										// Slide up
 		if (!isMobile)	$("#helpDiv").draggable();												// Make it draggable on desktop
@@ -256,7 +270,7 @@ class App  {
 			}
 		else if (text.match(/sure/i))				app.voice.Talk("Yes I am sure.")
 		else if (text.match(/final/i))				app.voice.Talk("Yes, this is my final answer.")
-		else 										PopUp("Huh? - "+text);
+		else 										Prompt("Huh? - "+text);
 	}
 
 	AddToRecord(data)																				// ADD ACTION TO RECORD
@@ -903,6 +917,13 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 		$(div ? "#"+div : "body").append(str);									// Add popup to div or body
 		$("#pu-close").click(function() { $("#popupDiv").remove(); });			// Remove on click of close but
 		$("#popupDiv").fadeIn(500).delay(time ? time : 3000).fadeOut(500)		// Animate in and out		
+	}
+
+	function Prompt(msg, time)												// TIMED PROMPT
+	{
+		var str="";
+		$("#promptSpan").html(msg);												// Add message
+		$("#promptSpan").fadeIn(500).delay(time ? time : 3000).fadeOut(500)		// Animate in and out		
 	}
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 

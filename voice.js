@@ -59,6 +59,7 @@ class Voice {
 	constructor(callback)																			// CONSTRUCTOR
 	{
 		var _this=this;
+		this.hasRecognition=false;																		// Assume no STT
 		try {																							// Try
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.femaleVoice=1;																			// Female voice
@@ -66,7 +67,6 @@ class Voice {
 			this.recognition=new SpeechRecognition();													// Init STT
 			this.recognition.continuous=false;															// Continual recognition
 			this.recognition.lang="en-US";																// US English
-			this.recognition.start();																	// Start recognition
 			this.transcript="";																			// Clear transcript
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
 			this.tts.pitch=1.8;																			// Set pitch
@@ -75,7 +75,8 @@ class Voice {
 			this.voices=[];																				// New array
 			this.dictionary=['liza' , 'eliza' , 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave', 'sure'];	// Dictionary of words
 			this.AddGrammarList("lizaWords");															// Add to grammar list
-			this.recognition.onend=(e)=> {  this.recognition.start(); };								// On end, restart
+			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png")};				// On end, restore button
+			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
 				this.voices=[];																			// Clear list
@@ -101,6 +102,12 @@ class Voice {
 					}
 				};
 			} catch(e) { trace("Voice error",e) };														// On error
+	}
+
+	Listen()																						// TURN ON SPEECH RECOGNITIOM
+	{
+		try { this.recognition.start(); } catch(e) { trace("Voice error",e) };							// Start recognition
+		$("#talkBut").prop("src","img/intalkbut.png");													// Talking but
 	}
 
 	Talk(text, instructor)																			// SAY SOMETHING
