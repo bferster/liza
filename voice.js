@@ -60,24 +60,16 @@ class Voice {
 	{
 		var _this=this;
 		this.hasRecognition=false;																		// Assume no STT
+
 		try {																							// Try
-			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.femaleVoice=1;																			// Female voice
 			this.maleVoice=0;																			// Male voice
-			this.recognition=new SpeechRecognition();													// Init STT
-			this.recognition.continuous=false;															// Continual recognition
-			this.recognition.lang="en-US";																// US English
-			this.transcript="";																			// Clear transcript
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
 			this.tts.pitch=1.8;																			// Set pitch
 			this.tts.rate=1.3;																			// Set rate 
 			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
-			this.dictionary=['liza' , 'eliza' , 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave', 'sure'];	// Dictionary of words
-			this.AddGrammarList("lizaWords");															// Add to grammar list
-			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png")};				// On end, restore button
-			this.hasRecognition=true;																	// Has speechrecognition capabilities														
-
+		
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
 				this.voices=[];																			// Clear list
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
@@ -89,16 +81,26 @@ class Voice {
 
 			this.tts.onend=()=> { 																		// ON TALKING END
 				this.talking=0;  																		// Stop talking animation
-				this.recognition.abort();																// Flush recognition cache
+				if (this.recognition)	this.recognition.abort();										// Flush recognition cache
 				app.sc.SetBone(app.students[app.curStudent],"mouth",0,0,0); 							// Neutral mouth 
 				};	
 
+			} catch(e) { trace("TTS error",e) };														// On error
+		try {																							// Try
+			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
+			this.recognition=new SpeechRecognition();													// Init STT
+			this.recognition.continuous=false;															// Continual recognition
+			this.recognition.lang="en-US";																// US English
+			this.dictionary=['liza' , 'eliza' , 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave', 'sure'];	// Dictionary of words
+			this.AddGrammarList("lizaWords");															// Add to grammar list
+			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png")};				// On end, restore button
+			this.hasRecognition=true;																	// Has speechrecognition capabilities														
+
+
 			this.recognition.onresult=(e)=> { 															// On some speech recognized
 				for (var i=e.resultIndex;i<e.results.length;++i) {										// For each result
-					if (e.results[i].isFinal) {															// If final
-						this.transcript+=e.results[i][0].transcript+".\n";								// Add to transcript
+					if (e.results[i].isFinal)															// If final
 						callback(e.results[i][0].transcript);											// Send text to callback
-						}
 					}
 				};
 			} catch(e) { trace("Voice error",e) };														// On error

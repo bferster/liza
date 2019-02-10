@@ -28,10 +28,10 @@
 							}
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
-		.lz-controller {	position: absolute; top: calc(100vh - 40px); left:0; background-color: #999; border: 1px solid #999;
-							padding:6px 12px; width: calc(100vw - 24px); height:24px;  display:none;
+		.lz-controller {	position: fixed; top: calc(100% - 39px); left:0; background-color: #aaa; border: 1px solid #999;
+							padding:6px 12px; width: calc(100% - 24px); height:25px;  display:none;
 							}
-		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #999;
+		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							padding:16px; border-radius: 16px; width: 600px;
 							}
 		.lz-blackboard {	position: absolute; left:16px; top: calc(100vh - 336px); width: 550px; height: 256px;  display:none;
@@ -48,8 +48,8 @@
 							}
 		.lz-prompt {		color:#fff; width:100%;	vertical-align: 3px; margin-left:16px; font-size:16px;
 							}
-		.lz-is {			border-radius:.8em;padding-left:.6em;padding-right:.6em;padding-top:1px ;width:100px;
-							border:1px solid #999; font-size:1em; height: 1.66em; width:16.66em;
+		.lz-is {			border-radius:16px; padding:0 8px; width:200px; height: 24px;
+							border:1px solid #999; font-size: 13px;
 							}
 		.lz-bs {			cursor: pointer; color:#fff; 
 							text-align: center; border-radius: 16px; display: inline-block; user-select: none;
@@ -120,7 +120,7 @@ class App  {
 		this.startTime=new Date().getTime();														// Session start time
 		this.inPlayback=false;																		// In playback mode?
 		if (!this.voice.hasRecognition) 															// This platform doesn't have voice recognition
-			$("#talkSpan").html("<input id='talkInput' type='text' class='lz-is' placeholder='Talk by tyoing here'>");				// Put in text input field
+			$("#talkSpan").html("<input id='talkInput' type='text' class='lz-is' style='vertical-align:4px' placeholder='Talk by typing here'>");	// Put in text input field
 		$("#settingsBut").on("click", ()=> { app.sc.PoseEditor();  });								// On settings button click	
 		$("#talkBut").on("click", ()=> { app.voice.Listen(); });									// On talk button click, start listening
 		$("#helpBut").on("click", ()=> { app.ShowHelp(); });										// On help button click, show help
