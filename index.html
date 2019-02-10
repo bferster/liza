@@ -42,8 +42,8 @@
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							}
-		.lz-popup {			position: absolute;  width: auto; padding: 4px; left: 16px; top: calc(100vh - 90px);
-							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
+		.lz-popup {			position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top: calc(50% - 50px);
+							border-radius: 8px; background-color: #eee; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							font-size: 14px; text-align:center; display: none;
 							}
 		.lz-prompt {		color:#fff; width:100%;	vertical-align: 3px; margin-left:16px; font-size:16px;
@@ -105,6 +105,8 @@ class App  {
 	{
 		app=this;
 		this.bb=new Blackboard();																	// Make bb		
+		this.arc=new ARC();																			// Make new ARC tree		
+		this.arc.Load("1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU");								// Load from Google doc
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.parser=new Parser();																	// Alloc AI parser		
@@ -312,8 +314,56 @@ class App  {
 			}	
 	}
 
-} // Class closure
+} // App class closure
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ARC
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class ARC  {																					
+
+	constructor()   																				// CONSTRUCTOR
+	{
+		this.tree=[];
+	}
+
+	Load(id) 																						// LOAD DOC FROM GOOGLE DRIVE
+	{
+		var _this=this;																					// Save context
+		var str="https://docs.google.com/spreadsheets/d/"+id+"/export?format=tsv";						// Access tto
+		var xhr=new XMLHttpRequest();																	// Ajax
+		xhr.open("GET",str);																			// Set open url
+		xhr.onload=function() { 																		// When loaded
+			var i,o,v;
+			this.tree=[];																				// Clear tree
+			var tsv=xhr.responseText.replace(/\\r/,"");													// Remove CRs
+			tsv=tsv.split("\n");																		// Split into lines
+			for (i=1;i<tsv.length;++i) {																// For each line
+				v=tsv[i].split("\t");																	// Split into fields
+				if (v[1] == "A") 			  o=_this.tree[v[0]]={ text:v[2], res:[], con:[] };			// A new ARC
+				else if (v[1].match(/R\+/i))  o.res.push({ text:v[2], type:1 } );						// Right response
+				else if (v[1].match(/R\-/i))  o.res.push({ text:v[2], type:-1 } );						// Wrong 
+				else if (v[1].match(/C\+/i))  o.con.push({ text:v[2], type:1, next: v[3] } );			// Right consequence
+				else if (v[1].match(/C\-/i))  o.con.push({ text:v[2], type:-1, next: v[3] } );			// Wrong
+				else if (v[1].match(/C\?/i))  o.con.push({ text:v[2], type:0, next: v[3] } );			// None
+				}
+			};									
+		xhr.send();																						// Do it
+		
+		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
+			if ((xhr.readyState === 4) && (xhr.status !== 200)) {  										// Ready, but no load
+				Sound("delete");																		// Delete sound
+				PopUp("<p style='color:#990000'><b>Couldn't load Google Doc!</b></p>Make sure that <i>anyone</i><br>can view it in Google",5000); // Popup warning
+				}
+			};		
+		}
+
+
+} // ARC class closure
 
 
 
