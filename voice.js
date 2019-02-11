@@ -8,7 +8,7 @@ class Parser {
 	{
 	}
 
-	Parse(text, dataArray, callback)																			// PARSE TEXT STRING
+	Parse(text, data, callback)																			// PARSE TEXT STRING
 	{
 		try {
 			if (!window.location.search.match(/noai/i))												// Unless turned off
@@ -16,25 +16,25 @@ class Parser {
 					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },			// Text and api id
 					dataType: "jsonp", method: "GET",												// JSONP
 					success: (r)=> {																// When parsed
-						var o,i,str="";
+						var i,c,v,s="",str="";
 						if (r.error) {																// If an error
 							trace("*****************\nWit error: "+r.error+"\n***********");		// Show error
 							return;																	// Quit
 							}	
-						if (!dataArray)	dataArray=[];												// Make array if none	
 						for (var entity in r.entities) {											// For each entity parsed
 							str+=entity.toUpperCase()+": ";											// Print entity name
-							o={e:entity, v:[], c:[] };												// Add entity object
 							for (i=0;i<r.entities[entity].length;++i) {								// For each entity instance
-								o.v[i]=r.entities[entity][i].value;									// Add value
-								o.c[i]=Math.floor(r.entities[entity][i].confidence*100);			// Confidence
-								str+=o.v[i]+ " ("+o.c[i]+"%) ";										// Print value and confidence
+								v=r.entities[entity][i].value;										// Add value
+								c=Math.floor(r.entities[entity][i].confidence*100);					// Confidence
+								s+=entity+":"+v+", ";												// Add entities
+								str+=v+ " "+c+"% ";													// Print value and confidence
 								}
-							dataArray.push(o);														// Add to data
 							str+="\n";
 							}
 						trace(str+"\n");
-						if (callback) callback(dataArray);													// Return entities to callback	
+						s=s.substr(0,s.length-2)													// Remove last comma
+						if (data)		data.ents=s;												// Add to object
+						if (callback) 	callback(s);												// Return entities to callback	
 																						
 						}
 				});
