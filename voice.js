@@ -8,7 +8,7 @@ class Parser {
 	{
 	}
 
-	Parse(text, callback)																			// PARSE TEXT STRING
+	Parse(text, dataArray, callback)																			// PARSE TEXT STRING
 	{
 		try {
 			if (!window.location.search.match(/noai/i))												// Unless turned off
@@ -16,25 +16,26 @@ class Parser {
 					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },			// Text and api id
 					dataType: "jsonp", method: "GET",												// JSONP
 					success: (r)=> {																// When parsed
-						var i,str="";
+						var o,i,str="";
 						if (r.error) {																// If an error
 							trace("*****************\nWit error: "+r.error+"\n***********");		// Show error
 							return;																	// Quit
 							}	
-						var o={ o:'W' };															// Record object
+						if (!dataArray)	dataArray=[];												// Make array if none	
 						for (var entity in r.entities) {											// For each entity parsed
-							o[entity]=[];															// Add entity array
 							str+=entity.toUpperCase()+": ";
 							for (i=0;i<r.entities[entity].length;++i) {								// For each entity instance
-								o[entity].push({v:r.entities[entity][i].value, c:Math.floor(r.entities[entity][i].confidence*100) })
-								str+=r.entities[entity][i].value+ " (";
-								str+=Math.floor(r.entities[entity][i].confidence*100)+"%) ";
+								o={ e:entity };														// Add entity name
+								o.v=r.entities[entity][i].value;									// Add value
+								o.c=Math.floor(r.entities[entity][i].confidence*100);				// Confidence
+								if (dataArray)	dataArray.push(o);									// Add to data array if set
+								str+=o.v+ " ("+o.c+"%) ";
 								}
 							str+="\n";
 							}
 						trace(str+"\n");
-						app.AddToRecord(o); 														// Add to record
-						callback(o);																// Return entities to callback	
+						if (callback) callback(dataArray);													// Return entities to callback	
+																						
 						}
 				});
 		} catch(e) { trace("*****************\nWIT error: "+e.error+"\n***********"); }				// Show error
