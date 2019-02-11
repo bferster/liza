@@ -23,14 +23,14 @@ class Parser {
 							}	
 						if (!dataArray)	dataArray=[];												// Make array if none	
 						for (var entity in r.entities) {											// For each entity parsed
-							str+=entity.toUpperCase()+": ";
+							str+=entity.toUpperCase()+": ";											// Print entity name
+							o={e:entity, v:[], c:[] };												// Add entity object
 							for (i=0;i<r.entities[entity].length;++i) {								// For each entity instance
-								o={ e:entity };														// Add entity name
-								o.v=r.entities[entity][i].value;									// Add value
-								o.c=Math.floor(r.entities[entity][i].confidence*100);				// Confidence
-								if (dataArray)	dataArray.push(o);									// Add to data array if set
-								str+=o.v+ " ("+o.c+"%) ";
+								o.v[i]=r.entities[entity][i].value;									// Add value
+								o.c[i]=Math.floor(r.entities[entity][i].confidence*100);			// Confidence
+								str+=o.v[i]+ " ("+o.c[i]+"%) ";										// Print value and confidence
 								}
+							dataArray.push(o);														// Add to data
 							str+="\n";
 							}
 						trace(str+"\n");
