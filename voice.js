@@ -1,57 +1,4 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
-// PARSER
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Parser {																				 
-
-	constructor()																				// CONSTRUCTOR
-	{
-	}
-
-	Parse(text, data, callback)																			// PARSE TEXT STRING
-	{
-		try {
-			if (!window.location.search.match(/noai/i))												// Unless turned off
-				$.ajax({ url: 'https://api.wit.ai/message',											// Send to WIT
-					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },			// Text and api id
-					dataType: "jsonp", method: "GET",												// JSONP
-					success: (r)=> {																// When parsed
-						var i,c,v,s="",str="";
-						if (r.error) {																// If an error
-							trace("*****************\nWit error: "+r.error+"\n***********");		// Show error
-							return;																	// Quit
-							}	
-						for (var entity in r.entities) {											// For each entity parsed
-							str+=entity.toUpperCase()+": ";											// Print entity name
-							for (i=0;i<r.entities[entity].length;++i) {								// For each entity instance
-								v=r.entities[entity][i].value;										// Add value
-								c=Math.floor(r.entities[entity][i].confidence*100);					// Confidence
-								s+=entity+":"+v+", ";												// Add entities
-								str+=v+ " "+c+"% ";													// Print value and confidence
-								}
-							str+="\n";
-							}
-						trace(str+"\n");
-						s=s.substr(0,s.length-2)													// Remove last comma
-						if (data)		data.ents=s;												// Add to object
-						if (callback) 	callback(s);												// Return entities to callback	
-																						
-						}
-				});
-		} catch(e) { trace("*****************\nWIT error: "+e.error+"\n***********"); }				// Show error
-	}
-
-	DoActions(o)																				// RESPOND TO ACTIONS
-	{
-		trace(o)
-	}
-
-}  // PARSE CLOSURE
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
 // VOICE
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -83,7 +30,8 @@ class Voice {
 			this.tts.onend=()=> { 																		// ON TALKING END
 				this.talking=0;  																		// Stop talking animation
 				if (this.recognition)	this.recognition.abort();										// Flush recognition cache
-				app.sc.SetBone(app.students[app.curStudent],"mouth",0,0,0); 							// Neutral mouth 
+				if (app.curStudent >= 0)																// A valid student
+					app.sc.SetBone(app.students[app.curStudent],"mouth",0,0,0); 						// Neutral mouth 
 				};	
 
 			} catch(e) { trace("TTS error",e) };														// On error

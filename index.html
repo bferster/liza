@@ -111,7 +111,6 @@ class App  {
 		this.arc.Load(this.gid);																	// Load from Google doc
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
-		this.parser=new Parser();																	// Alloc AI parser		
 		this.poses=[];																				// Holds poses
 		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
@@ -123,6 +122,7 @@ class App  {
 		this.Draw();																				// Start 
 		this.startTime=new Date().getTime();														// Session start time
 		this.inPlayback=false;																		// In playback mode?
+		app.pickingStudent="";																		// Flag for picking student
 		if (!this.voice.hasRecognition) 															// This platform doesn't have voice recognition
 			$("#talkSpan").html("<input id='talkInput' type='text' class='lz-is' style='vertical-align:4px' placeholder='Talk by typing here'>");	// Put in text input field
 		$("#settingsBut").on("click", ()=> { app.sc.PoseEditor();  });								// On settings button click	
@@ -197,6 +197,15 @@ class App  {
 		this.sc.Render();																			// Render scene and animate
 	}
 
+	SitDown(student)																			// SIT STUDENT(s) DOWN
+	{
+		if (student)																				// Just one student	
+			app.sc.StartAnimation(student,this.seqs["sit"]);										// Make them sit
+		else 
+			for (var i=0;i<this.students.length;++i)												// All the students
+				app.sc.StartAnimation(this.students[i].id,this.seqs["sit"]);						// Make them sit
+	}
+
 	ShowHelp() 																					// SHOW HELP
 	{
 		if ($("#helpDiv").length) {																// If already up, bring it down
@@ -216,25 +225,34 @@ class App  {
 
 	OnPhrase(text, playingBack) 																// ON PHRASE UTTERED
 	{
-		trace(text)
 		var hasAction=false;
 		if (app.voice.talking == 1)  return;														// Not while student is talking																
-		app.parser.Parse(text, null, (o)=> {														// Parse text
+		app.arc.Parse(text, null, (o)=> {															// Parse text
 			app.AddToRecord({ o:'S', w:text, e: o});												// Add to recording if not playing back
-			if (o.match(/student:liza/i)) 			app.curStudent=3;								// Set current student
-			else if (o.match(/student:freddy/i)) 	app.curStudent=0;
-			else if (o.match(/student:robert/i)) 	app.curStudent=2;
-			else if (o.match(/student:sara/i)) 		app.curStudent=1;
+			if (o.match(/who:liza/i)) 			app.curStudent=3;									// Set current student
+			else if (o.match(/who:freddy/i)) 	app.curStudent=0;
+			else if (o.match(/who:robert/i)) 	app.curStudent=2;
+			else if (o.match(/who:sara/i)) 		app.curStudent=1;
+			else if (o.match(/who:class/i)) 	app.curStudent=-1;
+			if (app.pickingStudent) {																// If students have their hands up
+				if (app.curStudent < 0) app.curStudent=3;											// Default to Liza if still talking to class
+				app.SitDown();																		// Hands down
+				app.voice.Talk(app.pickingStudent);													// Have current one give the reponse		
+				app.pickingStudent="";																// Clear flag
+				Prompt("");																			// Clear prompt
+				}
 			if (o.match(/action:/i)) 																// If an action mentioned
 				hasAction=app.DoAction((o+" ").match(/action:(.+?) /i)[1])							// Try to do action
 			if (!hasAction)																			// If no action
-				app.ParseDialog(text);																// Try to parse text directly
-				Prompt("Best fit with ARC: "+app.arc.FindClosestARC(text,o));						// Match closest ARC to text
+				app.ParseDialog(text);													        			// Try to parse text directly
+			app.arc.FindClosestARC(text,o);															// Match closest ARC to text
+			app.arc.DeliverResponse(app.arc.curArc);												// Deliver resonse
 			});																		
 		}
 		
 		DoAction(act)																			// PERFORM ACTION
 		{
+			if (app.curStudent < 0)	return;
 			var mod=app.students[app.curStudent].id;												// Get model id
 			if (act.match(/sleep/i))	 					 		app.sc.StartAnimation(mod,app.seqs["sleep"]);								
 			else if (act.match(/sit/i))	 							app.sc.StartAnimation(mod,app.seqs["sit"]);							
@@ -259,21 +277,13 @@ class App  {
 
 	ParseDialog(text) 																				// PARSE DIALOG
 	{
-		if (text.match(/what/i)) {
-			if (text.match(/2.*\+.2*/i))			app.voice.Talk("2 + 2 = 4");
-			else if (text.match(/4.*\+.* 4/i))		app.voice.Talk("4 + 4 = 8");
-			else if (text.match(/time is it/i))		app.voice.Talk("It is now time for all men to come to the aid of their country.");
-			}
-		else if (text.match(/replay/i) && text.match(/class/i))	app.record.pop(),app.Playback();
+		if (text.match(/replay/i) && text.match(/class/i))	app.record.pop(),app.Playback();
 		else if (text.match(/who/i) && text.match(/knows/i)) {
 			var i=Math.floor(Math.random()*app.students.length);	
 			app.curStudent=i;
 			app.voice.Talk("I do, I do, it's "+app.students[i].id+", please choose me!");
 			app.sc.StartAnimation(app.students[i].id,app.seqs["wave"]);
 			}
-		else if (text.match(/sure/i))				app.voice.Talk("Yes I am sure.")
-		else if (text.match(/final/i))				app.voice.Talk("Yes, this is my final answer.")
-		else 										Prompt("Huh? - "+text);
 	}
 
 	AddToRecord(data)																				// ADD ACTION TO RECORD
@@ -329,8 +339,10 @@ class ARC  {
 
 	constructor()   																				// CONSTRUCTOR
 	{
-		this.tree=[];
-	}
+		this.tree=[];																					// Holds ARC tree
+		this.curArc="";																					// Current ARC "picked"
+		this.threshold=.4;																				// ARC picking threshold		
+		}
 
 	Load(id) 																						// LOAD DOC FROM GOOGLE DRIVE
 	{
@@ -348,6 +360,7 @@ class ARC  {
 				if (v[1] == "A") 			  o=_this.tree[v[0]]={ text:v[2], res:[], con:[] };			// A new ARC
 				else if (v[1].match(/R\+/i))  o.res.push({ text:v[2], type:1 } );						// Right response
 				else if (v[1].match(/R\-/i))  o.res.push({ text:v[2], type:-1 } );						// Wrong 
+				else if (v[1].match(/R\?/i))  o.res.push({ text:v[2], type:0 } );						// Wrong 
 				else if (v[1].match(/C\+/i))  o.con.push({ text:v[2], type:1, next: v[3] } );			// Right consequence
 				else if (v[1].match(/C\-/i))  o.con.push({ text:v[2], type:-1, next: v[3] } );			// Wrong
 				else if (v[1].match(/C\?/i))  o.con.push({ text:v[2], type:0, next: v[3] } );			// None
@@ -364,8 +377,8 @@ class ARC  {
 			};		
 		}
 
-		Extract()																					// EXTRACT KEYWORDS AND ENTITIES FROM ARC
-		{
+	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM ARC
+	{
 			var i,j,o,v,val;
 			var _this=this;																				// Save context
 			for (var arc in this.tree) {																// For each ARC in tree
@@ -379,7 +392,7 @@ class ARC  {
 						o.text=o.text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ~'s
 						}
 					}
-				app.parser.Parse(o.text,o);																// Parse first text portion
+				app.arc.Parse(o.text,o);																// Parse first text portion
 				
 				if (o.con.length) {																		// If consquences
 					for (i=0;i<o.con.length;++i) {														// For each consequence
@@ -392,7 +405,7 @@ class ARC  {
 								o.con[i].text=o.text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ~'s
 								}
 							}
-						app.parser.Parse(o.con[i].text, o.con[i]);										// Parse consequence text portion
+						app.arc.Parse(o.con[i].text, o.con[i]);											// Parse consequence text portion
 						}
 					}
 				}
@@ -400,7 +413,7 @@ class ARC  {
 
 		FindClosestARC(text, entities)																// FIND ARC CLOSEST TO TEXT + ENTITIES
 		{
-			var o,i,n;
+			var o,i,n,str="";
 			var kscore,escore,best="";
 			entities=(""+entities).split(", ");															// Put entities into array
 			for (var arc in this.tree) {																// For each ARC in tree
@@ -422,13 +435,70 @@ class ARC  {
 			n=0;																						// Start low
 			for (var arc in this.tree) 	{																// For each ARC in tree
 				if (this.tree[arc].score >= n) { n=this.tree[arc].score;	best=arc };					// Set if highest
-				trace(arc,this.tree[arc].score)
+				str+=arc+" - "+Math.round(this.tree[arc].score*100) + "%\n";
 				}
-			if (n < .5) return "NONE ("+Math.round(n*100) + "%)";
-			return best+" ("+Math.round(n*100) + "%)";
+			this.curArc=(n > this.threshold) ? best : "";												// Set ARC if above threshold
+			str+="\n["+best+"] = "+this.tree[best].ents; trace(str); 															
+			return this.curArc;																			// Return best fit
 		}
 
-	} // ARC class closure
+	DeliverResponse(arc)																			// DELIVER RESPONSE
+	{
+		var i,j,n
+		if (!arc)	return;																				// Quit if no ARC
+		var r=Math.floor(Math.random()*this.tree[arc].res.length+1);									// Pick a response			
+	
+		if (app.curStudent == -1) {																		// If whole class responding
+			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
+			var j=Math.floor(Math.random()*app.students.length);										// Random start	
+			for (i=0;i<n;++i)																			// For each responder	
+				app.sc.StartAnimation(app.students[++j%app.students.length].id,app.seqs["wave"]);		// Make them wave
+			r=Math.floor(Math.random()*this.tree[arc].res.length);										// Pick one			
+			if (n) {																					// If someone responded
+				Prompt("Choose a student to respond...","on"); 											// Ask to choose a student
+				app.pickingStudent=this.tree[arc].res[r].text;											// Send this message
+				}
+			}
+		else{
+			if (r) app.voice.Talk(this.tree[arc].res[r-1].text);										// If something to say
+			}
+		}
+		
+	Parse(text, data, callback)																		// PARSE TEXT STRING
+	{
+		try {
+			if (!window.location.search.match(/noai/i))													// Unless turned off
+				$.ajax({ url: 'https://api.wit.ai/message',												// Send to WIT
+					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },				// Text and api id
+					dataType: "jsonp", method: "GET",													// JSONP
+					success: (r)=> {																	// When parsed
+						trace(r._text);
+						var i,c,v,s="",str="";
+						if (r.error) {																	// If an error
+							trace("*****************\nWit error: "+r.error+"\n***********");			// Show error
+							return;																		// Quit
+							}	
+						for (var entity in r.entities) {												// For each entity parsed
+							str+=entity.toUpperCase()+": ";												// Print entity name
+							for (i=0;i<r.entities[entity].length;++i) {									// For each entity instance
+								v=r.entities[entity][i].value;											// Add value
+								c=Math.floor(r.entities[entity][i].confidence*100);						// Confidence
+								s+=entity+":"+v+", ";													// Add entities
+								str+=v+" ";																// Print value and confidence
+								}
+							str+="\n";
+							}
+						trace(str+"\n");
+						s=s.substr(0,s.length-2)														// Remove last comma
+						if (data)		data.ents=s;													// Add to object
+						if (callback) 	callback(s);													// Return entities to callback	
+																						
+						}
+				});
+		} catch(e) { trace("*****************\nWIT error: "+e.error+"\n***********"); }				// Show error
+	}
+
+} // ARC class closure
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN 
@@ -579,7 +649,10 @@ $(document).ready(function() {								           	// ON PAGE LOADED
 	{
 		var str="";
 		$("#promptSpan").html(msg);												// Add message
-		$("#promptSpan").fadeIn(500).delay(time ? time : 3000).fadeOut(500)		// Animate in and out		
+		if (time == "on") 														// If on	
+			$("#promptSpan").fadeIn(200);										// Fade in
+		else																	// Popping up	
+			$("#promptSpan").fadeIn(500).delay(time ? time : 3000).fadeOut(500);	// Animate in and out		
 	}
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
