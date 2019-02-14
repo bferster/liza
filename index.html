@@ -172,14 +172,11 @@ class App  {
 			if (url.match(/gid=/i)) 	this.gid=url.split("&")[0].substr(4);						// If params have a 'gid=' tag, use it
 			else						this.gid=url;												// Just plain
 			}
-
-		this.bb=new Blackboard();																	// Make bakcboard		
+		this.bb=new Blackboard();																	// Make blackboard		
 		this.arc=new ARC();																			// Make new ARC tree		
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
-	
-		this.arc.Load(this.gid);																	// Load from Google doc
-		this.LoadProject();																			// Load project file
+		this.LoadProject(this.gid);																	// Load project file
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
 
@@ -201,8 +198,10 @@ class App  {
 			});															
 	}
 
-	LoadProject()																				// LOAD PROJECT DATA
+	LoadProject(id)																				// LOAD PROJECT DATA
 	{
+		this.arc.Load(id);																			// Load from Google doc
+
 		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
 		this.desks.push({ id:"desk1", src:"assets/desk.dae", x:-120, y:-100, z:0, s:20, r:0, tex:tex} );	
 		this.desks.push({ id:"desk2", src:"assets/desk.dae", x:0, y:-100, z:0, s:20, r:0, tex:tex} );		
@@ -263,11 +262,12 @@ class App  {
 			$("#helpDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#helpDiv").remove(); } }); // Slide down
 			return;																				// Quit																					
 			}
-		var str="<div id='helpDiv' class='lz-dialog'style='height:calc(100vh - 106px);display:none;'>";
+		var h=window.innerHeight;
+		var str="<div id='helpDiv' class='lz-dialog'style='height:"+(h-106)+"px;overflow:hidden;display:none;'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
 		str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vTXAsMJ-YlQaNtT49RtKvEnT5v5Xzz-TKPyVlo2px-23vDt-4lZFB7JujSKyDXs38hiSMISQoulYXB5/pub?embedded=true' ";
-		str+="style='border: 1px solid #999;width:100%;height:calc(100vh - 154px)'></iframe></div>";
+		str+="style='border: 1px solid #999;width:100%;height:"+(h-154)+"px'></iframe></div>";
 		$("body").append(str);																	// Add to body
 		$("#helpDiv").show("slide",{ direction:"down" });										// Slide up
 		if (!isMobile)	$("#helpDiv").draggable();												// Make it draggable on desktop
