@@ -8,6 +8,7 @@ class Voice {
 	{
 		var _this=this;
 		this.hasRecognition=false;																		// Assume no STT
+		this.listening=false;																			// Flag if listening
 
 		try {																							// Try
 			this.femaleVoice=1;																			// Female voice
@@ -42,7 +43,7 @@ class Voice {
 			this.recognition.lang="en-US";																// US English
 			this.dictionary=['liza' , 'eliza' , 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave', 'sure'];	// Dictionary of words
 			this.AddGrammarList("lizaWords");															// Add to grammar list
-			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png")};				// On end, restore button
+			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png"); this.listening=false; };	// On end, restore button
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 
 
@@ -57,7 +58,8 @@ class Voice {
 
 	Listen()																						// TURN ON SPEECH RECOGNITIOM
 	{
-		try { this.recognition.start(); } catch(e) { trace("Voice error",e) };							// Start recognition
+		if (this.listening)	return;																		// Quit if already started
+		try { this.recognition.start(); this.listening=true; } catch(e) { trace("Voice error",e) };		// Start recognition
 		$("#talkBut").prop("src","img/intalkbut.png");													// Talking but
 	}
 
