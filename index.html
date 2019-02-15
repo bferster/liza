@@ -130,8 +130,12 @@ var isMobile=false;																					// Flag for mobile devices
 			window.attachEvent("message",html5MessageHandler);										// Add handler
 		
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
-			if ((e.which == 84) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+T)
-				app.Playback();																		// Playback actions
+			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
+				var a = [[8, 3], [2, 4], [3, 6]]
+				var b = [[1, 2, 3], [4, 6, 8]]
+				print("[A]= ",a); 	print("[B]= ",b);   print("[M]= ",MatrixMultiply(a,b)); 
+				function print (title,m) { var str=title; m.forEach(r => str+=`${r.join(' ')}\n     `);	trace(str); };
+				}
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
 				app.voice.Talk("");																	// Enable audio
 			else if ((e.which == 71) && e.altKey) {													// Show spreadsheet (Alt+G)
@@ -203,7 +207,6 @@ class App  {
 	LoadProject(id)																				// LOAD PROJECT DATA
 	{
 		this.arc.Load(id);																			// Load from Google doc
-
 		var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";								// Desks cartoon or real				
 		this.desks.push({ id:"desk1", src:"assets/desk.dae", x:-120, y:-100, z:0, s:20, r:0, tex:tex} );	
 		this.desks.push({ id:"desk2", src:"assets/desk.dae", x:0, y:-100, z:0, s:20, r:0, tex:tex} );		
@@ -455,12 +458,12 @@ class ARC  {
 			for (var arc in this.tree) {																// For each ARC in tree
 				o=this.tree[arc];																		// Point at ARC
 				o.keys=[];																				// Create keyword array
-				v=(o.text+" ").match(/~.+?~/g);															// Get array of key words (~key word~)
+				v=(o.text+" ").match(/\(.+?\)/g);														// Get array of key words (keyword)
 				if (v) {																				// If keys flagged
 					for (i=0;i<v.length;++i) {															// For each key
 						val=v[i].substr(1,v[i].length-2);												// Extract text
 						o.keys.push(val);																// Add to keys
-						o.text=o.text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ~'s
+						o.text=o.text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
 						}
 					}
 				app.arc.Parse(o.text,o);																// Parse first text portion
@@ -468,12 +471,12 @@ class ARC  {
 				if (o.con.length) {																		// If consquences
 					for (i=0;i<o.con.length;++i) {														// For each consequence
 						o.con[i].keys=[];																// Create keyword array
-						v=(o.con[i].text+" ").match(/~.+?~/g);											// Get array of key words (~key word~)
+						v=(o.con[i].text+" ").match(/\(.+?\)/g);											// Get array of key words (keyword)
 						if (v) {																		// If keys flagged
 							for (j=0;j<v.length;++j) {													// For each key
 								val=v[j].substr(1,v[j].length-2);										// Extract text
 								o.con[i].keys.push(val);												// Add to keys
-								o.con[i].text=o.text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ~'s
+								o.con[i].text=o.text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
 								}
 							}
 						app.arc.Parse(o.con[i].text, o.con[i]);											// Parse consequence text portion
@@ -517,18 +520,18 @@ class ARC  {
 
 	DeliverResponse(arc)																			// DELIVER RESPONSE
 	{
-		var i,j,n
+		var i,j,n,r;
 		if (!arc)	return;																				// Quit if no ARC
-		var r=Math.floor(Math.random()*this.tree[arc].res.length);										// Pick a response			
+		r=Math.floor(Math.random()*this.tree[arc].res.length);											// Pick a response			
 	
 		if (app.curStudent == -1) {																		// If whole class responding
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
 			var j=Math.floor(Math.random()*app.students.length);										// Random start	
 			for (i=0;i<n;++i)																			// For each responder	
 				app.sc.StartAnimation(app.students[++j%app.students.length].id,app.seqs["wave"]);		// Make them wave
-			r=Math.floor(Math.random()*this.tree[arc].res.length);										// Pick one			
 			if (n) {																					// If someone responded
-				Prompt("Choose a student to respond...","on"); 											// Ask to choose a student
+				Prompt("Choose a student to respond...",10); 											// Ask to choose a student
+				if (!this.tree[arc].res[r].text) r=(r+1)%this.tree[arc].res.length;						// Can't respond with nothing
 				app.pickingStudent=this.tree[arc].res[r].text;											// Send this message
 				Sound("ding");																			// Ding
 				}
@@ -739,6 +742,24 @@ class ARC  {
 			}	
 		return str+"</select>";																			// End select				
 	}
+
+	function MatrixMultiply(a, b) 																	// MULTIPLY TWO MATRICES
+	{
+		var i,m,r,c;
+		var aNumRows=a.length, aNumCols=a[0].length;													// A matrix sizes
+      	var bNumRows=b.length, bNumCols=b[0].length;													// B
+      	m=new Array(aNumRows);  																		// Initialize array of rows
+  		for (r=0;r<aNumRows;++r) {																		// For each A row
+    		m[r]=new Array(bNumCols); 																	// Initialize the current row
+			for (c=0;c<bNumCols;++c) {																	// For each B column
+				m[r][c]=0;            																	// Initialize the current cell
+				for (i=0;i<aNumCols;++i) {																// For each A column
+					m[r][c]+=a[r][i]*b[i][c];															// Sum it
+					}
+				}
+			}
+ 	 	return m;																						// Return multiplied matrix
+	}
 	
 
 </script>
@@ -751,6 +772,5 @@ class ARC  {
   gtag('js', new Date());
   gtag('config', 'UA-133670235-1');
 </script>
-
 </body>
 </html>
