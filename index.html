@@ -164,7 +164,9 @@ class App  {
 		this.record=[];																				// Holds record of actions
 		this.startTime=new Date().getTime();														// Session start time
 		this.inPlayback=false;																		// In playback mode?
-		app.pickingStudent="";																		// Flag for picking student
+		this.pickingStudent="";																		// Flag for picking student
+		this.curStep=0;																				// Current step in focus
+		this.curStudent=0;																			// Currently active student
 
 		this.gid="1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU";									// Default ARC tree spreadshet
 		var url=window.location.search.substring(1);						   						// Get query string
@@ -267,7 +269,7 @@ class App  {
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
 		str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vTXAsMJ-YlQaNtT49RtKvEnT5v5Xzz-TKPyVlo2px-23vDt-4lZFB7JujSKyDXs38hiSMISQoulYXB5/pub?embedded=true' ";
-		str+="style='border: 1px solid #999;width:100%;height:"+(h-154)+"px'></iframe></div>";
+		str+="style='border: 1px solid #999;width:100%;height:"+(h-154)+"px' scrolling='yes'></iframe></div>";
 		$("body").append(str);																	// Add to body
 		$("#helpDiv").show("slide",{ direction:"down" });										// Slide up
 		if (!isMobile)	$("#helpDiv").draggable();												// Make it draggable on desktop
@@ -285,6 +287,12 @@ class App  {
 			else if (o.match(/who:robert/i)) 	app.curStudent=2;
 			else if (o.match(/who:sara/i)) 		app.curStudent=1;
 			else if (o.match(/who:class/i)) 	app.curStudent=-1;
+	
+			if (o.match(/step:/i)) {																// If setting step		
+				app.curStep=o.match(/step:(\d+)/i)[1]-0;											// Set current ARC focus step
+				Prompt("Focusing on step "+app.curStep,5),											// Prompt
+				Sound("ding");																		// Ding
+				}
 			if (app.pickingStudent) {																// If students have their hands up
 				if (app.curStudent < 0) app.curStudent=3;											// Default to Liza if still talking to class
 				app.DoAction("sit",true);															// Hands down
@@ -295,7 +303,7 @@ class App  {
 			if (o.match(/action:/i)) 																// If an action mentioned
 				hasAction=app.DoAction((o+" ").match(/action:(.+?) /i)[1])							// Try to do action
 			if (!hasAction)																			// If no action
-				app.ParseDialog(text);													        			// Try to parse text directly
+				app.ParseDialog(text);													        	// Try to parse text directly
 			app.arc.FindClosestARC(text,o);															// Match closest ARC to text
 			app.arc.DeliverResponse(app.arc.curArc);												// Deliver resonse
 			});																		
@@ -486,6 +494,8 @@ class ARC  {
 					if (text.match(RegExp(o.keys[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"))))		// Check for key in text
 						kscore++;																		// Add to key score
 				escore=0;																				// Start at 0
+				i=arc.match(/-(\d+)/);																	// Look for step infor
+				if (i && i[1] == app.curStep)	escore+=2;												// Bump-up escore if ARC is in current step
 				for (i=0;i<entities.length;++i) {														// For each entity spoken
 					if (o.ents.match(RegExp(entities[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a match
 						++escore;																		// Add to score
@@ -509,7 +519,7 @@ class ARC  {
 	{
 		var i,j,n
 		if (!arc)	return;																				// Quit if no ARC
-		var r=Math.floor(Math.random()*this.tree[arc].res.length+1);									// Pick a response			
+		var r=Math.floor(Math.random()*this.tree[arc].res.length);										// Pick a response			
 	
 		if (app.curStudent == -1) {																		// If whole class responding
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
@@ -524,9 +534,9 @@ class ARC  {
 				}
 			else Prompt("Nobody reponded to you!",5),Sound("delete"); 									// Show no one responded
 			}
-		else{
-			if (r) app.voice.Talk(this.tree[arc].res[r-1].text);										// If something to say
-	
+		else{																							// A single student responding
+			if (this.tree[arc].res[r].text)	app.voice.Talk(this.tree[arc].res[r].text);					// If something to say
+			else Prompt(app.students[app.curStudent].id+" did not repond to you!",5),Sound("delete"); 	// Show no one responded
 			}
 		}
 		
