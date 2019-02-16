@@ -131,12 +131,15 @@ var isMobile=false;																					// Flag for mobile devices
 		
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				var a = [[0,0,1]]
-				var b = [[.7, .3, 0], [.4, .3, .3], [.2, .8, 0]]
-
-				for (i=0;i<5;++i) {
-				a=MatrixMultiply(a,b)
-				TraceMatrix("[M]= ",a);
+				var a = [[0,.5,.5]]
+				TraceMatrix(a);
+//                             N                 R                W
+				var tm=[ [0.0, 0.4, 0.6], [0.0, .55, .45], [0.0, .49, .51] ];						// Markov transition matrix
+		
+				TraceMatrix();
+				for (i=0;i<15;++i) {
+				a=MatrixMultiply(a,tm)
+				TraceMatrix(a);
 				} 
 				}
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
@@ -225,7 +228,7 @@ class App  {
 			this.students.push({ id:"robert", src:"assets/body.dae", x:0, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
 			}
 		this.students.push({ id:"liza", src:"assets/body.dae", x:120, y:88, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/lizaskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
-		
+	
 		this.poses["startUp"]="armL,-51,4,-44,armR,-51,-4,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-78,-8,0,thighR,-78,10,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-50,0,wristR,8,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["headUp"]="neck,0,0,0";				this.poses["headDown"]="neck,16,0,0";	this.poses["headBack"]="neck,-16,0,0";
@@ -256,7 +259,10 @@ class App  {
 	{
 		var i;
 		for (i=0;i<this.desks.length;++i)  		this.sc.AddModel(this.desks[i]);					// Load each desk		
-		for (i=0;i<this.students.length;++i)  	this.sc.AddModel(this.students[i]);					// Load each student		
+		for (i=0;i<this.students.length;++i) {													 	// For each student	
+			this.sc.AddModel(this.students[i]);														// Load model
+			this.students[i].rMatrix=[];															// Holds response stage matrix
+			}					
 	}
 
 	Draw() 																						// REDRAW
@@ -288,6 +294,7 @@ class App  {
 		if (app.voice.talking == 1)  return;														// Not while student is talking																
 		app.arc.Parse(text, null, (o)=> {															// Parse text
 			app.AddToRecord({ o:'S', w:text, e: o});												// Add to recording if not playing back
+			
 			if (o.match(/who:liza/i)) 			app.curStudent=3;									// Set current student
 			else if (o.match(/who:freddy/i)) 	app.curStudent=0;
 			else if (o.match(/who:robert/i)) 	app.curStudent=2;
@@ -302,7 +309,9 @@ class App  {
 			if (app.pickingStudent) {																// If students have their hands up
 				if (app.curStudent < 0) app.curStudent=3;											// Default to Liza if still talking to class
 				app.DoAction("sit",true);															// Hands down
-				app.voice.Talk(app.pickingStudent);													// Have current one give the reponse		
+				var r=app.arc.MarkovFindResponse(app.pickingStudent,app.curStudent);				// Get and save right response
+				if (r)	app.voice.Talk(app.arc.tree[app.pickingStudent].res[r-1]);					// If something to say
+				else 	Prompt(app.students[app.curStudent].id+" didn't repond to you!",5),Sound("delete"); // Show student didn't respond
 				app.pickingStudent="";																// Clear flag
 				Prompt("");																			// Clear prompt
 				}
@@ -513,25 +522,14 @@ class ARC  {
 				str+=arc+" - "+Math.round(this.tree[arc].score*100) + "%\n";
 				}
 			this.curArc=(n > this.threshold) ? best : "";												// Set ARC if above threshold
-			str+="\n["+best+"] = "+this.tree[best].ents; trace(str); 															
+			str+="\n= ["+best+"] "+this.tree[best].ents; trace(str); 															
 			return this.curArc;																			// Return best fit
 		}
 
 	DeliverResponse(arc)																			// DELIVER RESPONSE
 	{
 		var i,j,n,r,so;
-		var tm=[ [0, .4, .6], [0, .55, .45], [.4, .3, .3] ];												// Transition matrix
 		if (!arc)	return;																				// Quit if no ARC
-	
-		if (this.tree[arc].rso)		so=this.tree[arc].rso;												// If been there already, use last stage matrix as starting matrix
-		else{																							// First respinse is random
-			r=Math.floor(Math.random()*3);																// Get response [0=none, 1=right, 2=wrong]			
-			var v=[[ 1,0,0],[0,1,0],[0,0,1]];															// Starting matrix options
-			so=[v[r]];																					// Choose one at random
-			}
-		this.tree[arc].rso=so=MatrixMultiply(so,tm);													// Get response matrix stage, save as next one to use
-		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
-	
 		if (app.curStudent == -1) {																		// If whole class responding
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
 			var j=Math.floor(Math.random()*app.students.length);										// Random start	
@@ -539,18 +537,34 @@ class ARC  {
 				app.sc.StartAnimation(app.students[++j%app.students.length].id,app.seqs["wave"]);		// Make them wave
 			if (n) {																					// If someone responded
 				Prompt("Choose a student to respond...",10); 											// Ask to choose a student
-				if (!r)	r=Math.floor(Math.random()*2)+1;												// Can't respond with nothing, so pick from right or wrong
-				app.pickingStudent=this.tree[arc].res[r-1];												// Send this message
+				app.pickingStudent=arc;																	// Send this message
 				Sound("ding");																			// Ding
 				}
 			else Prompt("Nobody reponded to you!",5),Sound("delete"); 									// Show no one responded
 			}
 		else{																							// A single student responding
+			r=this.MarkovFindResponse(arc,app.curStudent);												// Get and save right response
 			if (r)	app.voice.Talk(this.tree[arc].res[r-1]);											// If something to say
 			else 	Prompt(app.students[app.curStudent].id+" didn't repond to you!",5),Sound("delete"); // Show student didn't respond
 			}
 		}
 		
+	MarkovFindResponse(arc, sid) 																	// FIND RESPOSE USING MARKOV CHAIN
+	{	
+		var r,so;
+		var tm=[ [0, .4, .6], [0, .50, .50], [0.0, .50, .50] ];											// Markov transition matrix
+		if (app.students[sid].rMatrix[arc])		so=app.students[sid].rMatrix[arc];						// If been there already, use last stage matrix as starting matrix
+		else{																							// First respinse is random
+			r=Math.floor(Math.random()*3);																// Get response [0=none, 1=right, 2=wrong]			
+			var v=[[ 1,0,0],[0,1,0],[0,0,1]];															// Starting matrix options
+			so=[v[r]];																					// Choose one at random
+			}
+		app.students[sid].rMatrix[arc]=so=MatrixMultiply(so,tm);										// Get response matrix stage, save as next one to use
+		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
+		TraceMatrix(so)
+		return r;																						// Return type of response
+	}
+
 	Parse(text, data, callback)																		// PARSE TEXT STRING
 	{
 		if (!text)	return;																				// Quit if no text
@@ -560,7 +574,7 @@ class ARC  {
 					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },				// Text and api id
 					dataType: "jsonp", method: "GET",													// JSONP
 					success: (r)=> {																	// When parsed
-						trace(r._text);
+						trace(">>> "+r._text);
 						var i,c,v,s="",str="";
 						if (r.error) {																	// If an error
 							trace("*****************\nWit error: "+r.error+"\n***********");			// Show error
@@ -751,12 +765,15 @@ class ARC  {
 		return str+"</select>";																			// End select				
 	}
 
-	function TraceMatrix(title, mat) 																// PRINT MATRIX ON CONSOLE
+	function TraceMatrix(mat) 																		// PRINT MATRIX ON CONSOLE
 	{
-		var pad="";
-		var str=title;																					// Print title
-		pad=pad.padEnd(title.length," ");																// Padding for following rows
-		mat.forEach(r => str+=`${r.join(' ')}\n`+pad);													// Add rows	
+		var i,j,str=""
+		if (!mat) return trace("--N--  --R--  --W--")													// Header
+		for (i=0;i<mat.length;++i) {																	// For each row	
+			for (j=0;j<mat[0].length;++j)																// For each col
+				str+=mat[i][j]=mat[i][j].toFixed(3)+"  ";												// Cap decimals
+			str+="\n";																					// New row
+			}
 		trace(str); 																					// Show it
 	}
 
