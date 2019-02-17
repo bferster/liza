@@ -131,16 +131,30 @@ var isMobile=false;																					// Flag for mobile devices
 		
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				var a = [[0,.5,.5]]
-				TraceMatrix(a);
-//                             N                 R                W
-				var tm=[ [0.0, 0.4, 0.6], [0.0, .55, .45], [0.0, .49, .51] ];						// Markov transition matrix
+				var ability=.5;
+				var count=0;
+				for (i=0;i<100;++i) {
+
+				var r=Math.random();																// Get random number
+				if (r*ability < .03) ++count;
+				trace((r*ability).toFixed(2),count)
+				if (r/ability < .2)		so=[[1,0,0]];												// If really low, force a none response
+				else {																				// Calc starting matrix
+					r=Math.max(Math.min(ability+((r-.5)*(1+ability)),1),0); 						// Calc chance of right answer capped 0-1
+//					trace(r > .5, app.sc.aniTimer)
+
+					so=[[0,r,1-r]];																	// Set starting matrix
+					}
+				}
+				trace("Count="+count)
+//                             N                 R                W									// Heading
+				var tm=[ [0.0, .40, .60], [0.0, .55, .45], [0.0, .46, .54] ];						// Markov transition matrix
 		
-				TraceMatrix();
-				for (i=0;i<15;++i) {
-				a=MatrixMultiply(a,tm)
-				TraceMatrix(a);
-				} 
+//				TraceMatrix(so);
+				for (i=0;i<4;++i) {
+					so=MatrixMultiply(so,tm)
+//					TraceMatrix(so);
+					} 
 				}
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
 				app.voice.Talk("");																	// Enable audio
@@ -221,13 +235,13 @@ class App  {
 		this.desks.push({ id:"desk5", src:"assets/desk.dae", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"assets/desk.dae", x:120, y:100, z:0, s:20, r:0, tex:tex} );		
 		if (!window.location.search.match(/one/i)) {
-			this.students.push({ id:"freddy", src:"assets/body.dae", x:-120, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/freddyskin.png" : "assets/skin1.png", sex: "male", fidget:0} );
-//			this.students.push({ id:"joe", src:"assets/body.dae", x:0, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/joeskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
-//			this.students.push({ id:"sally", src:"assets/body.dae", x:120, y:-112, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/sallyskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
-			this.students.push({ id:"sara", src:"assets/body.dae", x:-120, y:88, z:0, s:15, r:-10, tex:this.sc.cartoonScene ? "assets/saraskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
-			this.students.push({ id:"robert", src:"assets/body.dae", x:0, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0 } );
+			this.students.push({ id:"freddy", src:"assets/body.dae", x:-120, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/freddyskin.png" : "assets/skin1.png", sex: "male", fidget:0, ability:.2} );
+//			this.students.push({ id:"joe", src:"assets/body.dae", x:0, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/joeskin.png" : "assets/skin1.png", sex: "male", fidget:0, ability:.5 } );
+//			this.students.push({ id:"sally", src:"assets/body.dae", x:120, y:-112, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/sallyskin.png" : "assets/skin1.png", sex: "female", fidget:0, ability:.5 } );
+			this.students.push({ id:"sara", src:"assets/body.dae", x:-120, y:88, z:0, s:15, r:-10, tex:this.sc.cartoonScene ? "assets/saraskin.png" : "assets/skin1.png", sex: "female", fidget:0, ability:.8 } );
+			this.students.push({ id:"robert", src:"assets/body.dae", x:0, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0, ability:.5 } );
 			}
-		this.students.push({ id:"liza", src:"assets/body.dae", x:120, y:88, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/lizaskin.png" : "assets/skin1.png", sex: "female", fidget:0 } );
+		this.students.push({ id:"liza", src:"assets/body.dae", x:120, y:88, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/lizaskin.png" : "assets/skin1.png", sex: "female", fidget:0, ability:.8 } );
 	
 		this.poses["startUp"]="armL,-51,4,-44,armR,-51,-4,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-78,-8,0,thighR,-78,10,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-50,0,wristR,8,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
@@ -552,16 +566,23 @@ class ARC  {
 	MarkovFindResponse(arc, sid) 																	// FIND RESPOSE USING MARKOV CHAIN
 	{	
 		var r,so;
-		var tm=[ [0, .4, .6], [0, .50, .50], [0.0, .50, .50] ];											// Markov transition matrix
-		if (app.students[sid].rMatrix[arc])		so=app.students[sid].rMatrix[arc];						// If been there already, use last stage matrix as starting matrix
-		else{																							// First respinse is random
-			r=Math.floor(Math.random()*3);																// Get response [0=none, 1=right, 2=wrong]			
-			var v=[[ 1,0,0],[0,1,0],[0,0,1]];															// Starting matrix options
-			so=[v[r]];																					// Choose one at random
+		var ability=app.students[sid].ability;															// Get student ability
+		var tm=[ [0.0, .40, .60], [0.0, .55, .45], [0.0, .46, .54] ];									// Markov transition matrix
+		if (app.students[sid].rMatrix[arc])	{															// If been there already,
+			so=app.students[sid].rMatrix[arc];						 									// Use last stage matrix as starting matrix
+			so=MatrixMultiply(so,tm);																	// Get response matrix stage
 			}
-		app.students[sid].rMatrix[arc]=so=MatrixMultiply(so,tm);										// Get response matrix stage, save as next one to use
+		else{																							// First response is random, based on ability/affect
+			var r=Math.random();																		// Get random number
+			if (r*ability < .03)	so=[[1,0,0]];														// Force a none response ~20% proportional to ability
+			else{																						// Calc starting matrix
+				r=Math.max(Math.min(ability+((r-.5)*(1+ability)),1),0); 								// Calc chance of right answer capped 0-1
+				so=[[0,r,1-r]];																			// Set starting matrix
+				}
+			}
+		app.students[sid].rMatrix[arc]=so;																// Save for later responses
+		trace("Ability:"+ability+" Right:"+so[0][1].toFixed(2)+" None:"+so[0][0]);						// Show results
 		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
-		TraceMatrix(so)
 		return r;																						// Return type of response
 	}
 
@@ -767,8 +788,7 @@ class ARC  {
 
 	function TraceMatrix(mat) 																		// PRINT MATRIX ON CONSOLE
 	{
-		var i,j,str=""
-		if (!mat) return trace("--N--  --R--  --W--")													// Header
+		var i,j,str="--N--  --R--  --W--\n"
 		for (i=0;i<mat.length;++i) {																	// For each row	
 			for (j=0;j<mat[0].length;++j)																// For each col
 				str+=mat[i][j]=mat[i][j].toFixed(3)+"  ";												// Cap decimals
