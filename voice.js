@@ -30,7 +30,6 @@ class Voice {
 
 			this.tts.onend=()=> { 																		// ON TALKING END
 				this.talking=0;  																		// Stop talking animation
-				if (this.recognition)	this.recognition.abort();										// Flush recognition cache
 				if (app.curStudent >= 0)																// A valid student
 					app.sc.SetBone(app.students[app.curStudent],"mouth",0,0,0); 						// Neutral mouth 
 				};	
