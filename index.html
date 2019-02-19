@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
-	<title>liza</title>
+	<title>Classroom</title>
 	<meta name="viewport" content="width=device-width", initial-scale=1.0, user-scalable=no>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
@@ -80,9 +80,10 @@
 
 		<img id="helpBut" src="img/helpicon.gif" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
+		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">The University of Virginia @ 2019</div>
 	</div>
 	<div id='blackboardDiv' class='lz-blackboard'>
-		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer;margin-bottom:12px;;margin-top:-12px" title="Draw"><br>
+		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer;margin-bottom:12px;margin-top:-12px" title="Draw"><br>
 		<img id="BB-EraseBut" src="img/eraser-icon.png" style="cursor:pointer;margin-bottom:12px" title="Erase"><br>
 		<img id="BB-TextBut" src="img/text-icon.png" style="cursor:pointer;margin-bottom:12px" title="Text"><br>
 		<img id="BB-ImageBut" src="img/image-icon.png" style="cursor:pointer;margin-bottom:60px" title="Pics"><br>
@@ -662,7 +663,7 @@ class ARC  {
 	{
 		$("#alertBoxDiv").remove();																	// Remove any old ones
 		$("body").append("<div id='alertBoxDiv'></div>");														
-		var str="<p><img src='img/scalelogo.png' width='32' style='vertical-align:-10px'/>&nbsp;&nbsp;";								
+		var str="<p><img src='lizalogo.png' width='32' style='vertical-align:-10px'/>&nbsp;&nbsp;";								
 		str+="<span id='gtBoxTi'style='font-size:18px'><b>"+title+"</b></span><p>";
 		str+="<div style='font-size:12px;margin:14px'>"+content;
 		str+="<p><input class='lz-is' style='width:75%' type='text' id='gtBoxTt' value='"+def+"'></p>";
@@ -689,7 +690,7 @@ class ARC  {
 		Sound("ding");																					// Ding sound
 		$("#confirmBoxDiv").remove();																	// Remove 
 		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");														
-		var str="<img src='img/scalelogo.png' width='32' style='vertical-align:-10px'/>&nbsp;&nbsp;";								
+		var str="<img src='img/lizalogo.png' width='32' style='vertical-align:-10px'/>&nbsp;&nbsp;";								
 		str+="<span style='font-size:18px; color:#666'><b>"+title+"</b></span><br>";
 		str+="<p>"+content+"<p>";
 		str+="<div style='float:right'><div id='confirmOK' class='lz-bs'>OK</div>";
