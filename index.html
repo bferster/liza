@@ -308,6 +308,7 @@ class App  {
 			else if (o.match(/who:class/i)) 	app.curStudent=-1;
 	
 			if (text.match(/set goal to/i)) {														// If setting goal		
+				app.lastGoal=app.curGoal;															// Save last goal
 				app.curGoal=text.replace(/set goal to/i,"").trim().toUpperCase();					// Remove goal tag
 				Prompt("Now ocusing on the goal "+app.curGoal,5),									// Prompt
 				Sound("ding");																		// Ding
@@ -519,10 +520,12 @@ class ARC  {
 					if (text.match(RegExp(o.keys[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"))))		// Check for key in text
 						kscore++;																		// Add to key score
 				escore=0;																				// Start at 0
-				if (app.curGoal && arc.match(RegExp(app.curGoal)))	escore+=2;							// If in current goal, bump-up escore 
+				if (app.curGoal && arc.match(RegExp(app.curGoal)))	escore+=.25;						// If in current goal, bump-up escore 
 				for (i=0;i<entities.length;++i) {														// For each entity spoken
-					if (o.ents.match(RegExp(entities[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a match
-						++escore;																		// Add to score
+					if (o.ents.match(RegExp(entities[i].split(':')[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/i))))  // If a basic enities match
+						escore+=.5;																		// Add to score
+					if (o.ents.match(RegExp(entities[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a entity AND value match
+						escore+=.5;																		// Add to score
 					}
 				n=(""+o.ents).split(", ").length;														// Number of entities in ARC	
 				if (n)				escore=escore/(n);													// Normalize 0-1
@@ -534,8 +537,11 @@ class ARC  {
 				if (this.tree[arc].score >= n) { n=this.tree[arc].score;	best=arc };					// Set if highest
 				str+=arc+" - "+Math.round(this.tree[arc].score*100) + "%\n";
 				}
+		
 			this.curArc=(n > this.threshold) ? best : "";												// Set ARC if above threshold
 			str+="\n= ["+best+"] "+this.tree[best].ents; trace(str); 															
+			if (this.curArc)					app.curGoal=best;										// Set current goal if past threshold	
+			if (app.curGoal != app.lastGoal) 	app.lastGoal=app.curGoal;								// Save last goal
 			return this.curArc;																			// Return best fit
 		}
 
@@ -581,7 +587,7 @@ class ARC  {
 				}
 			}
 		app.students[sid].rMatrix[arc]=so;																// Save for later responses
-		trace("Ability:"+ability+" Right:"+so[0][1].toFixed(2)+" None:"+so[0][0]);						// Show results
+		trace("Entities:"+app.arc.tree[arc].score+" Right:"+so[0][1].toFixed(2)+" None:"+so[0][0]);		// Show results
 		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
 		return r;																						// Return type of response
 	}
