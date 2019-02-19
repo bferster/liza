@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  	<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
+	<title>CTScan Timeline</title>
+
+	<style type="text/css">
+		 
+		 body { 			font-family: Verdana,Geneva,sans-serif; font-size:13px; box-sizing: border-box;
+							padding: 0px; margin: 0px; 
+							}
+		.ct-mainPanel {		background-color:#eee; border-radius: 6px; margin-top: 16px; padding: 12px; max-width: 1200px;
+							margin-left: auto; margin-right: auto; opacity: 0;
+							}
+		.ct-chartPanel {	background-color:#fff; margin-top: 16px; max-width:1200px; margin-left: auto; margin-right: auto; opacity: 0; 
+							font-size: 12px; padding-bottom:0px
+							}
+		.ct-chart {			display: inline-block; width:24.5%
+							}
+		.ct-dataPanel {		background-color:#fff; max-width:1200px; margin-left: auto; margin-right: auto; opacity: 0; 
+							max-height: 2000px;  overflow-y:auto;
+							}
+		.ct-timePanel {		border-radius: 6px; background-color:#fff;  overflow-x:auto; margin-left:120px;
+							}
+		.ct-is 	{			border-radius:4px; padding-left:8px; border: 1px solid #999; margin-bottom: 3px;
+							}
+
+		.ct-but {			cursor: pointer; color:#fff; 
+							text-align: center; border-radius: 6px; display: inline-block; user-select: none;
+							font-size: 12px; background-color: #27ae60; padding: 2px 8px 2px 8px; vertical-align:3px;
+							}
+		.ct-dialogTitle {	font-size: 20px; font-weight: bold; color: #000; margin-bottom: 8px; user-select: none;
+							}
+		.ct-actionBut {		cursor: pointer; color:#fff; 
+							text-align: center; border-radius: 6px; display: inline-block; user-select: none;
+							font-size: 12px; background-color: #27ae60; padding: 2px 8px 2px 8px; vertical-align:-3px;
+							}
+		.ct-popup {			display: none; position: absolute; padding: 3px 8px 3px 8px; border-radius: 6px;
+							font-size: 11px; border: 1px solid #999; background-color: #eee;
+							}
+		
+		.unselectable { 	-moz-user-select: none;     -khtml-user-select: none;
+		   			 		-webkit-user-select: none;  -ms-user-select: none;   user-select: none;
+		   				}
+		.ui-dialog-buttonpane.ui-widget-content.ui-helper-clearfix { border:none }
+		.ui-dialog { border-radius:6px; background-color:#eee }
+		.ui-button { border-radius:30px;outline:none }
+		.ui-dialog-titlebar { display:none }
+		 table {			border-spacing: 0px; vertical-align:top}
+		 input {		    vertical-align: -2px; }
+
+</style>
+</head>
+<body>
+	<div id="mainPanel" class="ct-mainPanel">
+	<div style="text-align:center">
+		<div style="float:right;line-height:13px;user-select:none;">
+			<img id="scaleUp"   style="cursor:zoom-in;padding-bottom:2px;" src="img/upbut.gif"><br>
+			<span id="scaleAmt">6</span><br>
+			<img id="scaleDown" style="cursor:zoom-out" src="img/downbut.gif"><br>
+		</div>
+		<div class="unselectable">
+			<img src="img/ctlogo32.png"><br>
+			<b>Classroom Teaching Scan Timeline</b></div><br>
+		</div>	
+		<div style="text-align:right;font-size:12px;width:150px;float:left;margin-top:8px;padding-right:10px;line-height:20px;font-weight:bold;user-select:none;">
+			<span style="color:#e74c3c;line-height:45px">Practice</span><br>
+			<span style="color:#a49a2a">Student Actions</span><br>
+			<span style="color:#8888ff">Talking to</span><br><br>
+			<span style="color:#e67e22" id="evt-0">OTR</span><br>
+			<span style="color:#e67e22" id="evt-1">Feedback</span><br>
+			<span style="color:#e67e22" id="evt-2">Questions</span><br>
+			<span style="color:#e67e22" id="evt-3">Custom</span><br><br><br>
+			<span style="color:#3db1ff;line-height:30px">Vocab or Topic</span><br><br><br>
+			<span style="color:#27ae60" id="med-0">Diagram/Graphic/Map</span><br>
+			<span style="color:#27ae60" id="med-1">Object/Manipulative</span><br>
+			<span style="color:#27ae60" id="med-2">Graphic Organizer</span><br>
+			<span style="color:#27ae60" id="med-3">Picture</span><br>
+			<span style="color:#27ae60" id="med-4">Movie</span><br>
+			<span style="color:#27ae60" id="med-5">Text</span><br>
+			<span style="color:#999;font-size:10px;line-height:40px">100%</span><br>
+			<span style="color:#666">Engagement</span><br>
+			<span style="color:#999;font-size:10px;line-height:45px">0%</span><br>
+			</div>
+		<div id="timePanel" class="ct-timePanel">
+		<svg id="svg" width="100%" height="99%"></svg>
+		</div>
+		<span style="float:right;color:#666;margin-top:5px;">Help&nbsp;<a style="float:right" href="https://docs.google.com/document/d/19l87L5sZfLohU6rhQKLMERTNHhQr-jLiE4xQJeYN_3g/edit?usp=sharing" target="_blank">
+			<img src="img/helpicon.gif" style="vertical-align:bottom" title="Show help"></a></span><br>
+	</div>
+	<div id="chartPanel" class="ct-chartPanel">
+		<div class="ct-chart" id="chart1Chart"></div>
+		<div class="ct-chart" id="chart2Chart"></div>
+		<div class="ct-chart" id="chart3Chart"></div>
+		<div class="ct-chart" id="chart4Chart"></div>
+	</div>
+	<div id="dataPanel" class="ct-dataPanel"></div>
+	<div id="popup" class="ct-popup"></div>
+
+<script>
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// MAIN 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+var curJson=null;															// Holds session results
+var sessionNum=28;															// Session index
+var obsEvents=null;															// Points at events
+var maxTime=0;																// Size of timeline
+var svgNS="http://www.w3.org/2000/svg";										// Name space
+var menuFile="menus.txt";													// Memu filename
+var scaleSpan=256;															// Scaling
+var dataMedia=[];															// Holds media buttons											
+var dataLabVals=[];															// Holds OTR button values											
+var dataLabCats=[];															// Holds OTR button categories											
+var dataActs=[];															// Holds media buttons											
+var dataAcad=[];															// Holds academic diciplines
+var menus=[];																// Holds menus
+var butCts=[];																// Button counts
+
+$(document).ready(function() {								           	// ON PAGE LOADED
+
+	var url=window.location.search.substring(1);							// Get query string
+	if (url) {																// If something	
+		if (url.split("&")[0]) menuFile=url.split("&")[0];					// Get menu file
+		if (!menuFile.match(/\.txt/))	menuFile+=".txt";					// Add ext if not there
+		sessionNum=url.split("&")[1];										// Get session id
+		}
+	document.title+=" ("+sessionNum+")";									// Add id to title		
+	
+	$("#scaleDown").on("click", function(e) {								// SCALE DOWN
+		if (scaleSpan < 16)													// At max
+			return;															// Quit
+		$("#scaleAmt").text($("#scaleAmt").text()-1);						// Show scale
+		scaleSpan/=2;														// Show less
+		Sound("click");														// Click sound
+		Draw();																// Redraw
+		});
+
+	$("#scaleUp").on("click", function(e) {									// SCALE UP
+		if (scaleSpan > 1024)												// At max
+			return;															// Quit
+		$("#scaleAmt").text($("#scaleAmt").text()-0+1);						// Show scale
+		scaleSpan*=2;														// Show more
+		Sound("click");														// Click sound
+		Draw();																// Redraw
+		});
+	
+	$.ajax({ type: "GET", url: "assets/"+menuFile, success: function(text) { // Get menus text tile
+		var i,j,o,cp,cc,subs;
+		text=text.replace(/\n\r/g,"\n");									// LFCR -> LF
+		text=text.replace(/\r\n/g,"\n");									// CRLF -> LF
+		text=text.replace(/\r/g,"");										// Remove CR
+		var lines=text.split("\n");											// Spit by line
+		for (i=0;i<lines.length;++i) {										// For each line
+			o=lines[i];														// Point at line
+			if (!o)	continue;												// Skip blanks
+			if (o.match(/MEDIA=/i)) 										// Media button
+				dataMedia=o.substr(6).split(",");							// Get options
+			else if (o.match(/BUTVAL=/i)) 									// OTR button value
+				dataLabVals=o.substr(7).split(",");							// Get options
+			else if (o.match(/BUTLAB=/i)) 									// OTR button label
+				dataLabs=o.substr(7).split(",");							// Get options
+			else if (o.match(/BUTCAT=/i)) 									// OTR button category
+				dataLabCats=o.substr(7).split(",");							// Get options
+			else if (o.match(/STUACT=/i)) 									// Student actions
+				dataActs=o.substr(7).split(",");							// Get options
+			else if (o.match(/ACAD=/i)) 									// Disciplines
+				dataAcad=o.substr(5).split(",");							// Get options
+			else if (o.match(/:/)) {										// At new category
+				cc=menus.length;											// Get index
+				menus.push({});												// Add cat obj
+				menus[cc].cname=o.substr(0,o.length-1);						// Add cat name
+				menus[cc].prac=[];											// Add array for practices									
+				}
+			else if (o.match(/\*/)) {										// At new * category
+				cp=menus[cc].prac.length;									// Get prac index
+				menus[cc].prac.push({});									// Add practice obj
+				menus[cc].prac[cp].pname=o.split(" *")[0];					// Add prac name
+				menus[cc].prac[cp].subs=[];									// Add array for sub-practices									
+				subs=o.split("&")[1].split(",");							// Get subs, if any
+				for (j=0;j<subs.length;++j)									// For each sub
+					if (subs[j].length)										// If something there
+						menus[cc].prac[cp].subs.push(subs[j]);				// Add to practice
+				}
+			}
+		for (i=0;i<dataMedia.length;++i)									// For each media
+			$("#med-"+i).html(dataMedia[i]);								// Set label
+
+		var v=[dataLabCats[0]];
+		for (i=1;i<dataLabCats.length;++i)									// For each event category
+			if (dataLabCats[i] != v[v.length-1]) 							// Get a unique one
+				v.push(dataLabCats[i])										// Add to array
+		dataLabCats=v;														// Copy array
+		for (i=0;i<dataLabCats.length;++i)									// For each event category
+			$("#evt-"+i).html(dataLabCats[i]);								// Set label
+	
+		curJson={}
+		curJson.events=[{"time":0,"d1":"Practice","d2":"Vocabulary Instruction","d3":"Analogy","d4":67,"d5":186},{"time":6,"d1":"Event","d2":"OTR","d3":"Deep Q OTR","d4":1,"d5":""},{"time":8,"d1":"Event","d2":"FB","d3":"Academic Specific FB","d4":1,"d5":""},{"time":9,"d1":"Event","d2":"Student Q","d3":"Student Ask Q","d4":1,"d5":""},{"time":12,"d1":"Event","d2":"FB","d3":"Behavior Specific FB","d4":1,"d5":""},{"time":13,"d1":"Event","d2":"Custom","d3":"Custom 2","d4":1,"d5":""},{"time":16,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Analogy","d4":"Clear Language","d5":3},{"time":27,"d1":"Visual Aid","d2":"Diagram/Graph","d3":"","d4":"","d5":207},{"time":29,"d1":"Visual Aid","d2":"Movie","d3":"","d4":"","d5":279},{"time":31,"d1":"Student status","d2":"Percent engaged","d3":70,"d4":"","d5":""},{"time":35,"d1":"Teacher status","d2":"Which Teacher","d3":"General","d4":"","d5":107},{"time":38,"d1":"Teacher status","d2":"Grouping","d3":"Whole group","d4":"","d5":107},{"time":41,"d1":"Teacher status","d2":"Model","d3":"1-teach/1-observe","d4":"","d5":106},{"time":45,"d1":"Student actions","d2":"Listening","d3":"","d4":"","d5":94},{"time":54,"d1":"Note","d2":"a note","d3":"","d4":"","d5":""},{"time":61,"d1":"Student status","d2":"Percent engaged","d3":70,"d4":"","d5":""},{"time":62,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Analogy","d4":"Cues Instruction","d5":3},{"time":87,"d1":"Event","d2":"OTR","d3":"Deep Q OTR","d4":2,"d5":""},{"time":89,"d1":"Event","d2":"Student Q","d3":"Num Student Ask Q","d4":1,"d5":""},{"time":92,"d1":"Student status","d2":"Percent engaged","d3":20,"d4":"","d5":""},{"time":116,"d1":"Vocab Word","d2":"airplane","d3":"","d4":"","d5":56},{"time":122,"d1":"Student status","d2":"Percent engaged","d3":20,"d4":"","d5":""},{"time":130,"d1":"Vocab Word","d2":"train","d3":"","d4":"","d5":163},{"time":134,"d1":"Visual Aid","d2":"Graphic Organizer","d3":"","d4":"","d5":302},{"time":139,"d1":"Student actions","d2":"Asking Qs","d3":"","d4":"","d5":108},{"time":142,"d1":"Teacher status","d2":"Which Teacher","d3":"Special Ed","d4":"","d5":95},{"time":145,"d1":"Teacher status","d2":"Grouping","d3":"Individual","d4":"","d5":94},{"time":147,"d1":"Teacher status","d2":"Model","d3":"NONE","d4":"","d5":97},{"time":152,"d1":"Student status","d2":"Percent engaged","d3":30,"d4":"","d5":""},{"time":166,"d1":"Vocab Word","d2":"car","d3":"","d4":"","d5":132},{"time":181,"d1":"Student status","d2":"Percent engaged","d3":40,"d4":"","d5":""},{"time":186,"d1":"Practice","d2":"Vocabulary Instruction","d3":"Application - prompt student to apply","d4":100,"d5":215},{"time":203,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Application - prompt student to apply","d4":"Clear Language","d5":4},{"time":207,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Application - prompt student to apply","d4":"Cues Instruction","d5":4},{"time":208,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Application - prompt student to apply","d4":"Strong Relevance","d5":4},{"time":209,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Application - prompt student to apply","d4":"Provides Feedback","d5":4},{"time":211,"d1":"Student status","d2":"Percent engaged","d3":10,"d4":"","d5":""},{"time":217,"d1":"Vocab Word","d2":"truck","d3":"","d4":"","d5":131},{"time":224,"d1":"Event","d2":"OTR","d3":"Deep Q OTR","d4":3,"d5":""},{"time":225,"d1":"Event","d2":"OTR","d3":"Choral Response","d4":1,"d5":""},{"time":226,"d1":"Event","d2":"FB","d3":"Academic Specific FB","d4":2,"d5":""},{"time":226,"d1":"Event","d2":"FB","d3":"Generic FB Statement","d4":1,"d5":""},{"time":228,"d1":"Event","d2":"FB","d3":"Precorrect Statement","d4":1,"d5":""},{"time":229,"d1":"Event","d2":"Student Q","d3":"Student Ask Q","d4":2,"d5":""},{"time":230,"d1":"Visual Aid","d2":"Object/Manipulative","d3":"","d4":"","d5":77},{"time":235,"d1":"Visual Aid","d2":"Picture","d3":"","d4":"","d5":197},{"time":237,"d1":"Teacher status","d2":"Which Teacher","d3":"General","d4":"","d5":76},{"time":239,"d1":"Teacher status","d2":"Grouping","d3":"Whole group","d4":"","d5":76},{"time":241,"d1":"Student status","d2":"Percent engaged","d3":20,"d4":"","d5":""},{"time":244,"d1":"Teacher status","d2":"Model","d3":"Stations","d4":"","d5":73},{"time":247,"d1":"Student actions","d2":"Group work (desk)","d3":"","d4":"","d5":73},{"time":263,"d1":"Event","d2":"FB","d3":"Academic Specific FB","d4":3,"d5":""},{"time":264,"d1":"Event","d2":"FB","d3":"Behavior Specific FB","d4":2,"d5":""},{"time":268,"d1":"Event","d2":"Custom","d3":"Custom 1","d4":1,"d5":""},{"time":272,"d1":"Student status","d2":"Percent engaged","d3":10,"d4":"","d5":""},{"time":274,"d1":"Event","d2":"Custom","d3":"Custom 2","d4":1,"d5":""},{"time":289,"d1":"Vocab Word","d2":"motorcycle","d3":"","d4":"","d5":200},{"time":302,"d1":"Student status","d2":"Percent engaged","d3":0,"d4":"","d5":""},{"time":305,"d1":"Visual Aid","d2":"Diagram/Graph","d3":"","d4":"","d5":344},{"time":313,"d1":"Teacher status","d2":"Which Teacher","d3":"Special Ed","d4":"","d5":126},{"time":315,"d1":"Teacher status","d2":"Grouping","d3":"Individual","d4":"","d5":58},{"time":317,"d1":"Teacher status","d2":"Model","d3":"Alternative","d4":"","d5":59},{"time":320,"d1":"Student actions","d2":"Present/share learning","d3":"","d4":"","d5":61},{"time":333,"d1":"Student status","d2":"Percent engaged","d3":0,"d4":"","d5":""},{"time":346,"d1":"Vocab Word","d2":"boat","d3":"","d4":"","d5":276},{"time":352,"d1":"Event","d2":"OTR","d3":"Deep Q OTR","d4":4,"d5":""},{"time":353,"d1":"Event","d2":"OTR","d3":"Rote Q OTR","d4":1,"d5":""},{"time":355,"d1":"Event","d2":"OTR","d3":"Social Behavioral OTR","d4":1,"d5":""},{"time":357,"d1":"Event","d2":"FB","d3":"Precorrect Statement","d4":2,"d5":""},{"time":358,"d1":"Event","d2":"FB","d3":"Generic FB Statement","d4":2,"d5":""},{"time":362,"d1":"Student status","d2":"Percent engaged","d3":40,"d4":"","d5":""},{"time":366,"d1":"Visual Aid","d2":"Object/Manipulative","d3":"","d4":"","d5":68},{"time":368,"d1":"Visual Aid","d2":"Text","d3":"","d4":"","d5":130},{"time":373,"d1":"Teacher status","d2":"Grouping","d3":"Whole group","d4":"","d5":69},{"time":376,"d1":"Teacher status","d2":"Model","d3":"1-teach/1-assist","d4":"","d5":69},{"time":381,"d1":"Student actions","d2":"No clear direction","d3":"","d4":"","d5":68},{"time":393,"d1":"Student status","d2":"Percent engaged","d3":100,"d4":"","d5":""},{"time":401,"d1":"Practice","d2":"Phonics Instruction","d3":"Alphabet activities","d4":0,"d5":130},{"time":408,"d1":"Teacher actions","d2":"Phonics Instruction","d3":"Alphabet activities","d4":"","d5":0},{"time":422,"d1":"Student status","d2":"Percent engaged","d3":90,"d4":"","d5":""},{"time":424,"d1":"Event","d2":"OTR","d3":"Deep Q OTR","d4":5,"d5":""},{"time":427,"d1":"Event","d2":"Custom","d3":"Custom 1","d4":2,"d5":""},{"time":428,"d1":"Event","d2":"Student Q","d3":"Num Student Ask Q","d4":2,"d5":""},{"time":429,"d1":"Event","d2":"FB","d3":"Precorrect Statement","d4":3,"d5":""},{"time":431,"d1":"Visual Aid","d2":"Diagram/Graph","d3":"","d4":"","d5":152},{"time":435,"d1":"Visual Aid","d2":"Movie","d3":"","d4":"","d5":146},{"time":439,"d1":"Teacher status","d2":"Which Teacher","d3":"General","d4":"","d5":61},{"time":442,"d1":"Teacher status","d2":"Grouping","d3":"Small group","d4":"","d5":60},{"time":445,"d1":"Teacher status","d2":"Model","d3":"Parallel","d4":"","d5":59},{"time":449,"d1":"Student actions","d2":"Present/share learning","d3":"","d4":"","d5":59},{"time":454,"d1":"Student status","d2":"Percent engaged","d3":50,"d4":"","d5":""},{"time":482,"d1":"Student status","d2":"Percent engaged","d3":30,"d4":"","d5":""},{"time":487,"d1":"Vocab Word","d2":"cycle","d3":"","d4":"","d5":137},{"time":492,"d1":"Event","d2":"OTR","d3":"Deep Q OTR","d4":6,"d5":""},{"time":493,"d1":"Event","d2":"FB","d3":"Behavior Specific FB","d4":3,"d5":""},{"time":495,"d1":"Event","d2":"Student Q","d3":"Num Student Ask Q","d4":3,"d5":""},{"time":496,"d1":"Event","d2":"Student Q","d3":"Student Ask Q","d4":3,"d5":""},{"time":500,"d1":"Teacher status","d2":"Which Teacher","d3":"Special Ed","d4":"","d5":86},{"time":502,"d1":"Teacher status","d2":"Grouping","d3":"Whole group","d4":"","d5":86},{"time":504,"d1":"Teacher status","d2":"Model","d3":"Alternative","d4":"","d5":87},{"time":508,"d1":"Student actions","d2":"Academic convo w/ peers","d3":"","d4":"","d5":87},{"time":512,"d1":"Student status","d2":"Percent engaged","d3":0,"d4":"","d5":""},{"time":531,"d1":"Practice","d2":"Vocabulary Instruction","d3":"Definition - formal","d4":100,"d5":118},{"time":536,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Definition - formal","d4":"Clear Language","d5":3},{"time":542,"d1":"Student status","d2":"Percent engaged","d3":0,"d4":"","d5":""},{"time":553,"d1":"Vocab Word","d2":"moped","d3":"","d4":"","d5":96},{"time":566,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Definition - formal","d4":"Explicitly Explains Parts of Def","d5":3},{"time":567,"d1":"Event","d2":"OTR","d3":"Deep Q OTR","d4":7,"d5":""},{"time":569,"d1":"Event","d2":"Custom","d3":"Custom 3","d4":1,"d5":""},{"time":571,"d1":"Student status","d2":"Percent engaged","d3":10,"d4":"","d5":""},{"time":573,"d1":"Event","d2":"Custom","d3":"Custom 4","d4":1,"d5":""},{"time":576,"d1":"Visual Aid","d2":"Picture","d3":"","d4":"","d5":73},{"time":578,"d1":"Visual Aid","d2":"Graphic Organizer","d3":"","d4":"","d5":51},{"time":580,"d1":"Visual Aid","d2":"Text","d3":"","d4":"","d5":69},{"time":586,"d1":"Teacher status","d2":"Which Teacher","d3":"General","d4":"","d5":63},{"time":588,"d1":"Teacher status","d2":"Grouping","d3":"Individual","d4":"","d5":61},{"time":591,"d1":"Teacher status","d2":"Model","d3":"Parallel","d4":"","d5":58},{"time":595,"d1":"Student actions","d2":"Taking notes","d3":"","d4":"","d5":39},{"time":603,"d1":"Student status","d2":"Percent engaged","d3":20,"d4":"","d5":""},{"time":611,"d1":"Teacher actions","d2":"Vocabulary Instruction","d3":"Definition - formal","d4":"Cues Instruction","d5":3},{"time":626,"d1":"Event","d2":"FB","d3":"Academic Specific FB","d4":4,"d5":""},{"time":627,"d1":"Event","d2":"FB","d3":"Generic FB Statement","d4":3,"d5":""},{"time":631,"d1":"Student status","d2":"Percent engaged","d3":10,"d4":"","d5":""},{"time":634,"d1":"Student actions","d2":"Answering Qs","d3":"","d4":"","d5":15}]
+		curJson.events=JSON.stringify(curJson.events);
+		Start();														// Start timeline
+		google.charts.load('current', {'packages':['corechart']});		// Load chart library
+		google.charts.setOnLoadCallback(DrawChart1);					// Draw chart 1
+		google.charts.setOnLoadCallback(DrawChart2);					// Draw chart 2
+		google.charts.setOnLoadCallback(DrawChart3);					// Draw chart 3
+		google.charts.setOnLoadCallback(DrawChart4);					// Draw chart 4
+
+	}});																	// On menus loaded
+	
+
+});																			// On ready
+
+	function Start()
+	{
+		var i;
+		obsEvents=$.parseJSON(curJson.events);								// Objectify events
+		for (i=0;i<dataLabVals.length;++i)									// For each event button
+			butCts[dataLabVals[i]]=0;										// Null each one
+		
+		for (i=0;i<obsEvents.length;++i) {									// For each event
+			if (obsEvents[i].time-0 > maxTime)								// If a longer time
+				maxTime=obsEvents[i].time-0;								// Use it
+			if (obsEvents[i].d1 == "Event") 								// An event
+				butCts[obsEvents[i].d3]++;									// Add to count
+			}
+	 	if (obsEvents[obsEvents.length-1].d5)								// If last event duration
+			maxTime+=obsEvents[obsEvents.length-1].d5-1;					// Add it
+
+		Draw();
+		ShowData();
+		$("#mainPanel").animate({ opacity:1 },1500);						// Show timeline
+		$("#chartPanel").animate({ opacity:1 },1500);						// Show charts
+		$("#dataPanel").animate({ opacity:1 },1500);						// Show data
+	}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DRAW
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function Draw()														// DRAW TIMELINE
+	{
+		var vpos=0;
+		var x=8,y;
+		var h=550;															
+		var i,j,o,p,xs,ys,start,end,str;
+		var mins=Math.ceil(maxTime/60);										// Number of minutes to show
+		$("#timePanel").height(h);											// Set panel height
+		var w=(mins*scaleSpan)+8;											// Width of timeline
+		$("#svg").empty();													// Remove all segs
+		document.getElementById('svg').setAttribute("width", (w+scaleSpan)+"px");	// Set SVG width	
+		if (w > $("#timePanel").width())									// If no scroller
+			h-=18;															// Reduce height
+		for (i=0;i<5;++i) {													// For each engagement line
+			y=i*16+445;														// Set height
+			DrawLine([x,w],[y,y],"#ccc",.5);								// Draw it
+			}
+		ys=[5, h-23 ];														// Line ys
+		DrawLine([x,w],[5,5],"#ccc",.5);									// Top line
+		DrawLine([x,w],[55,55],"#ccc",.5);									// Actions separator
+		DrawLine([x,w],[95,95],"#ccc",.5);									// OTR
+		DrawLine([x,w],[215,215],"#ccc",.5);								// Vocab
+		DrawLine([x,w],[295,295],"#ccc",.5);								// Media
+
+		for (i=0;i<=mins;++i) {												// For each minute
+			xs=[x,x];														// Xs
+			DrawLine(xs,ys,"#ccc",.5);										// Draw minute tic
+			DrawText(x,h-6,"#666",12,i,"middle");							// Label it
+			x+=scaleSpan;													// Next pos
+			}
+		xs=[];	ys=[];														// Engagement line arrays
+		o=obsEvents;														// Point at events
+		if (!o)																// If no events loaded yet
+			return;															// Quit
+		for (i=0;i<o.length;++i) {											// For each event
+			start=GetPixFromTime(o[i].time);								// Convert start to pixels
+			end=GetPixFromTime((o[i].time-0)+(o[i].d5-0));					// End
+			x=start+(end-start)/2;											// Center
+			if (o[i].d2 == "Percent engaged") {								// Engagement	
+				xs.push(GetPixFromTime(o[i].time));							// X pos
+				ys.push((100-o[i].d3)/100*60+447);							// Y pos
+				}
+	
+			else if (o[i].d1 == "Vocab Word") {								// Vocab	
+				y=(vpos*19)+219;											// Position 									
+				DrawBox(start,y,end,y+15,"#3db1ff","",0,8);					// Draw bar
+				DrawText(x,y+11,"#fff",12,o[i].d2,"middle");				// Draw word
+				vpos=(vpos+1)%4;											// Next pos
+				}
+			else if (o[i].d1 == "Note") {                                   // Note 
+                y=426;                                                      // Position                                     
+                DrawBox(start-4,y,start+11,y+15,"#999","",0,8);            	// Draw dot
+                p=DrawText(start,y+11,"#fff",12,"n","left");            	// Draw n
+                p.setAttribute("id","note-"+i);                             // Id
+                $("#note-"+i).on("click", function(e) {                     // On click
+                    var id=e.target.id.substr(5)-0;                         // Get id
+                    ShowPopup(e.clientX+8,e.clientY+16,obsEvents[id].d2);   // Show note
+                    });
+                }
+			else if (o[i].d1 == "Practice") {								// Practice	
+				DrawBox(start,5,end,509,"","#e74c3c",1,0);					// Draw box
+				j=100;														// Assume full width
+				if (end-start < 16)			j=0;							// Shrink if smaller box
+				else if (end-start < 64)	j=5;
+				else if (end-start < 128)	j=10;
+				else if (end-start < 192)	j=20;
+				DrawText(x,22,"#e74c3c",12,ShortenString(o[i].d2,j),"middle").setAttribute("font-weight","bold");
+				str=o[i].d3+" ("+Math.min(o[i].d4,100)+"%)";				// Add % sub-practices completed
+				p=DrawText(x,40,"#e74c3c",12,ShortenString(str,j),"middle")
+				p.setAttribute("font-weight","normal");						// Normal
+				p.setAttribute("id","pra-"+i);								// Id
+				p.setAttribute("cursor","pointer");							// Pointer cursor
+				$("#pra-"+i).on("click", function(e) { 						// On click
+					var acts="";
+					var i,j,str="";
+					var curCat=0,curPrac=0;
+					var id=e.target.id.substr(4)-0;							// Get id
+					for (i=id+1;i<o.length;++i) {							// Look for subs
+						if( o[i].d1 == "Practice")							// If into another practice
+							break;											// Quit
+						if (o[i].d1 == "Teacher actions")					// Found a sub
+							acts+="|"+o[i].d4;								// Add to list		
+						}
+					for (j=0;j<menus.length;++j)							// For each category
+						if (menus[j].cname == o[id].d2)						// A match
+							curCat=j;								 		// Save index
+					for (j=0;j<menus[curCat].prac.length;++j)				// For each practice
+						if (menus[curCat].prac[j].pname == o[id].d3)		// A match
+							curPrac=j;								 		// Save index
+					for (j=0;j<menus[curCat].prac[curPrac].subs.length;++j){ // For each practice
+						str+="<br><span style='color:";						// Add span
+						if (acts.indexOf("|"+menus[curCat].prac[curPrac].subs[j]) != -1) // A match
+							str+="#27ae60";									// Make it green
+						else												// Not chosen
+							str+="#999";									// Make it grey
+						str+="'>"+menus[curCat].prac[curPrac].subs[j]+"</span>"; // Add and end span
+						}
+					ShowPopup(e.clientX+8,e.clientY+16,str.substr(4));		// Show popup
+					});
+	
+				}
+			else if (o[i].d1 == "Student actions") {						// Student actions	
+				DrawBox(start,58,end,74,"#c8bc34","#fff",1.5,3);				// Draw bar
+				DrawText(x,69,"#fff",12,o[i].d2,"middle");					// Draw action
+				}
+			else if ((o[i].d1 == "Teacher status") && (o[i].d2 == "Grouping")) { // Teacher talking to
+				DrawBox(start,76,end,92,"#8888ff","#fff",1.5,3);			// Draw bar
+				DrawText(x,87,"#fff",12,o[i].d3,"middle");					// Draw action
+				}
+			else if (o[i].d1 == "Event") {									// Events	
+				for (j=0;j<dataLabCats.length;++j)							// For each media type
+					if (o[i].d2 == dataLabCats[j]) {						// Matches
+						y=120+(j*20);										// Set pos
+						break;												// Quit
+						}
+				p=DrawBox(start,y,start+8,y+8,"#e67e22","",0,8);			// Draw circle
+				p.setAttribute("id","dot-"+i);								// Id
+				p.setAttribute("cursor","pointer");							// Pointer cursor
+				$("#dot-"+i).on("click", function(e) { 						// On click
+					var id=e.target.id.substr(4);							// Get id
+					ShowPopup(e.clientX+8,e.clientY+16,o[id].d3);			// Show popup
+					});
+				}
+			else if (o[i].d1 == "Visual Aid") {								// Visual Aid	
+				for (j=0;j<dataMedia.length;++j)							// For each media type
+					if (o[i].d2 == dataMedia[j]) {							// Matches
+						y=310+(j*20);										// Set pos
+						DrawBox(start,y,end,y+5,"#27ae60","",0,5);			// Draw bar
+						break;												// Quit
+						}
+				}
+			}
+		DrawLine(xs,ys,"#ccc",5).setAttribute("stroke-dasharray","5,5");	// Draw engagement line
+	}
+
+	function ShowData()													// SHOW DATA
+	{
+		var i,o;
+		var str="<div style='display:inline-block;margin-right:32px;vertical-align:top'><table>"
+		str+="<tr><td><b>Setting</b></td><td><b>Value</b><td></tr>";
+		str+="<tr><td colspan='2'><hr></td></tr>";
+		str+="<tr><td><b>Session Id</b></td><td>"+curJson.id+"</td></tr>";
+		str+="<tr><td><b>Observer</b></td><td>"+curJson.obs+"</td></tr>";
+		str+="<tr><td><b>Observer email&nbsp;&nbsp;</b></td><td>"+curJson.email+"</td></tr>";
+		str+="<tr><td><b>Teacher Id</b></td><td>"+curJson.teacherId+"</td></tr>";
+		str+="<tr><td><b>Grade</b></td><td>"+curJson.grade+"</td></tr>";
+		str+="<tr><td><b>Subject</b></td><td>"+curJson.subject+"</td></tr>";
+		str+="<tr><td><b>Date</b></td><td>"+curJson.date+"</td></tr>";
+		str+="<tr><td><b>Block</b></td><td>"+curJson.block+"</td></tr>";
+		str+="<tr><td><b>Setting</b></td><td>"+curJson.setting+"</td></tr>";
+		str+="<tr><td><b>Video</b></td><td>"+curJson.video+"</td></tr>";
+		str+="<tr><td><b>Reminder</b></td><td>"+curJson.remind+"</td></tr>";
+		str+="<tr><td><b>Research</b></td><td>"+curJson.research+"</td></tr>";
+		str+="<tr><td><b>Template</b></td><td>"+curJson.template+"</td></tr>";
+			
+		str+="</table></div>";
+		str+="<div style='display:inline-block;margin-right:32px;vertical-align:top'><table>"
+		str+="<tr><td><b>Event</b></td><td><b>(#)</b></td><td><b>#/M</b></td></tr>";
+		str+="<tr><td colspan='5'><hr></td></tr>";
+		for (i=0;i<dataLabVals.length;++i) {								// For each event button
+			str+="<tr><td><b>"+dataLabVals[i]+"&nbsp;&nbsp;</b></td>";		// Label
+			str+="<td>("+butCts[dataLabVals[i]]+")&nbsp;&nbsp</td>";		// Count
+			str+="<td  style='text-align:right'>"+(butCts[dataLabVals[i]]/maxTime*60).toFixed(1)+"</td></tr>";	// Counts per minute
+			}
+		
+		str+="</table></div>";
+		str+="<div style='display:inline-block;vertical-align:top'><table>"
+		str+="<tr><td><b>Vocabulary Practices</b></td><td><b>Time&nbsp;&nbsp;</b></td><td><b>Markers used&nbsp;&nbsp;</td><td></b><b>Total</b></td></tr>";
+		str+="<tr><td colspan='4'><hr></td></tr>";
+		var all=0,c=0;quality=0;
+		for (i=0;i<obsEvents.length;++i) {									// For each event
+			o=obsEvents[i];													// Point at event
+			if ((o.d1 == "Practice") && ((o.d2 == "Vocabulary Instruction") || (o.d2 == "Explicit Mathematics Vocabulary Instruction"))) { // If a vocab practice
+				str+="<tr><td><b>"+o.d3+"&nbsp;&nbsp;</b></td>";			// Label
+				str+="<td>"+Timecode(o.d5);									// Time
+				str+="</td><td  style='text-align:center'>"+o.d4+"%";		// Pct marker
+				str+="</td><td  style='text-align:right'>"+Math.round(o.d5/maxTime*100)+"%</td></tr>";// Pct of total
+				quality+=((o.d4/100)+1)*(o.d5/maxTime);						// Calc QVI
+				if (o.d4 == 100)	all+=(o.d5-0)							// If all used, add to all count
+				++c;
+				}
+			}
+		str+="<tr><td colspan='4'><hr></td></tr>";
+		str+="<tr><td><b>Total vocabulary practices used</b></td>";			// # vocabs
+		str+="<td>"+c+"&nbsp;&nbsp</td></tr>";								// #
+		str+="<tr><td><b>Total time when all markers were used&nbsp;&nbsp;</b></td>";	// All 100%ers
+		str+="<td>"+Timecode(all)+"&nbsp;&nbsp</td></tr>";					// time
+		str+="<tr><td><b>Quality Vocabulary Index</b></td>";				// QVI
+		str+="<td>"+quality.toFixed(2)+"&nbsp;&nbsp</td></tr>";				// #
+		$("#dataPanel").append(str);										// Add to panel	
+	}									
+
+	function Timecode(time)												// FORMAT SECONDS TO TIMECODE
+	{
+		var secs=time%60;													// Get secs
+		if (secs == 0)		secs="00";										// Double 0
+		else if (secs < 10) secs="0"+secs;									// Add leading 0
+		var mins=Math.floor(time/60);										// Get mins
+		if (mins == 0)		mins="00";										// Double 0
+		else if (mins < 10) mins="0"+mins;									// Add leading 0
+		return mins+":"+secs;												// Return timecode
+	}		
+
+	function GetPixFromTime(time)											// GET TIMELINE POSITION FROM TIME
+	{
+		return (time-0)*scaleSpan/60+8;											// Get pixels
+	}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SVG
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function DrawLine(x, y, col, wid) 									// DRAW SVG LINE
+	{
+		var i;
+		var o=document.createElementNS(svgNS,"path");						// Create element
+		var str="M"+x[0]+" "+y[0];											// Start
+		for (i=1;i<x.length;++i) {											// For each coord
+			str+="L";														// Line to
+			str+=x[i]+",";													// Pos x
+			str+=y[i]+" ";													// Pos y
+			}
+		o.setAttribute("d",str);											// Add coords to line
+		o.setAttribute("stroke-width",wid+"px");							// Stroke width 
+		o.style.fill="none";												// No fill	
+		o.style.stroke=col;  												// Stroke color
+		svg.appendChild(o);													// Add element to DOM
+		return o;															// Return pointer to element
+}
+
+	function DrawText(x, y, col, size, text, align) 					// DRAW SVG TEXT
+	{
+		var o=document.createElementNS(svgNS,"text");						// Create element
+		o.setAttribute("x",x);												// X
+		o.setAttribute("y",y);												// Y
+		o.setAttribute("fill",col);											// Col
+		o.setAttribute("font-size",size);									// Size
+		o.setAttribute("font-family","sans-serif");							// Font
+		if (align)															// If aligning
+			o.setAttribute("text-anchor",align);							// Align
+		svg.appendChild(o);													// Add element to DOM
+		$(o).css("user-select","none");										// No select
+		$(o).text(text);													// Text
+		return o;															// Return pointer to element
+		}
+
+	function DrawBox(x1, y1, x2, y2, col, ecol, ewid, rad) 				// DRAW SVG BOX
+	{
+		var o=document.createElementNS(svgNS,"rect");						// Create element
+		o.setAttribute("height",Math.abs(y2-y1));							// Height
+		o.setAttribute("width",Math.abs(x2-x1));							// Width
+		o.setAttribute("x",x1);												// X
+		o.setAttribute("y",y1);												// Y
+		if (rad) {															// If rounded
+			o.setAttribute("rx",rad);										// Set X radius
+			o.setAttribute("ry",rad);										// Y
+			}
+		if (ewid) {															// If an edge
+			o.style.stroke=ecol;  											// Stroke color
+			o.setAttribute("stroke-width",ewid+"px");						// Stroke width 
+			}
+		else																// No edge
+			o.style.stroke="none";											// No stroke	
+		if (col) 															// If a fill color
+			o.style.fill=col;  												// Fill color
+		else																// No color
+			o.style.fill="none";											// No fill	
+		svg.appendChild(o);													// Add element to DOM
+		return o;															// Return pointer to element
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CHARTS
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    function DrawChart1() 												// DRAW CHART 1
+	{
+		var i,d=[];
+		var w=$("#chart1Chart").width()+50;
+		var data=new google.visualization.DataTable();						// Make new table
+		data.addColumn('string', 'Label');									// Add label column
+ 		data.addColumn('number', 'Time');									// Add time
+		for (i=0;i<obsEvents.length;++i) 									// For each event
+			if (obsEvents[i].d1 == "Practice")								// If a practice
+				d.push([ obsEvents[i].d3, obsEvents[i].d5-0]);				// Add slice								
+		d=RemoveRedundant(d);												// Remove redundant entries  
+		data.addRows(d);													// Add data
+		var options={width: w, is3D: true,									// Set options
+		 			 title: "Teacher Time",									// Title
+					 titleTextStyle: { "fontSize": 12, color:"#666" }, 		// Title format
+					 chartArea:{left:"0%",top:"10%", width:"75%",height:"75%"}	//  Sizing
+		  			};
+		new google.visualization.PieChart(document.getElementById('chart1Chart')).draw(data,options);
+      }
+
+  function DrawChart2() 												// DRAW CHART 2
+	{
+		var i,d=[];
+		var w=$("#chart1Chart").width()+50;
+		var data=new google.visualization.DataTable();						// Make new table
+		data.addColumn('string', 'Label');									// Add label column
+ 		data.addColumn('number', 'Time');									// Add time
+		for (i=0;i<obsEvents.length;++i) 									// For each event
+			if (obsEvents[i].d1 == "Student actions")						// If a student action
+				d.push([ obsEvents[i].d2, obsEvents[i].d5-0 ]);				// Add slice								
+		d=RemoveRedundant(d);												// Remove redundant entries  
+		data.addRows(d);													// Add data
+  		var options={width: w, is3D: true, 									// Set options
+		 			 title: "Student Time",									// Title
+					 titleTextStyle: { "fontSize": 12, color:"#666" }, 		// Title format
+					 chartArea:{left:"0%",top:"10%", width:"75%",height:"75%"}	//  Sizing
+		  			};
+		new google.visualization.PieChart(document.getElementById('chart2Chart')).draw(data,options);
+      }
+
+	function DrawChart3() 												// DRAW CHART 3
+	{
+		var i,d=[];
+		var w=$("#chart1Chart").width()+50;
+		var data=new google.visualization.DataTable();						// Make new table
+		data.addColumn('string', 'Label');									// Add label column
+ 		data.addColumn('number', 'Time');									// Add time
+		for (i=0;i<obsEvents.length;++i) 									// For each event
+			if (obsEvents[i].d1 == "Vocab Word")							// If a vocab
+				d.push([ obsEvents[i].d2, obsEvents[i].d5-0 ]);				// Add slice								
+		d=RemoveRedundant(d);												// Remove redundant entries  
+		data.addRows(d);													// Add data
+	  	var options={width: w, is3D: true, 									// Set options
+		 			 title: "Vocabulary/Topic Terms ",						// Title
+					 titleTextStyle: { "fontSize": 12, color:"#666" }, 		// Title format
+					 chartArea:{left:"0%",top:"10%", width:"75%",height:"75%"}	//  Sizing
+		  			};
+		new google.visualization.PieChart(document.getElementById('chart3Chart')).draw(data,options);
+      }
+
+	function DrawChart4() 												// DRAW CHART 4
+	{
+		var i,d=[];
+		var w=$("#chart1Chart").width()+50;
+		var data=new google.visualization.DataTable();						// Make new table
+		data.addColumn('string', 'Label');									// Add label column
+ 		data.addColumn('number', 'Time');									// Add time
+		for (i=0;i<obsEvents.length;++i) 									// For each event
+			if (obsEvents[i].d2 == "Model")									// If a model
+				d.push([ obsEvents[i].d3, obsEvents[i].d5-0 ]);				// Add slice								
+		d=RemoveRedundant(d);												// Remove redundant entries  
+		data.addRows(d);													// Add data
+  		var options={width: w, is3D: true, 									// Set options
+		 			 title: "Co-teaching Model ",							// Title
+					 titleTextStyle: { "fontSize": 12, color:"#666" }, 		// Title format
+					 chartArea:{left:"0%",top:"10%", width:"75%",height:"75%"}	//  Sizing
+	  			};
+		new google.visualization.PieChart(document.getElementById('chart4Chart')).draw(data,options);
+	}
+
+	function RemoveRedundant(data)										// REMOVE REDUNDANT ENTRIES
+	{
+		var i,j;
+		for (i=0;i<data.length;++i) {										// For each slice										
+			for (j=i+1;j<data.length;++j) {									// For each slice til end
+				if (data[i][0] == data[j][0]) {								// A match
+					data[i][1]+=data[j][1];									// Add time to current
+					data.splice(j,1);										// Remove it
+					--j;													// So as not to skip next one
+					}
+				}	
+			}
+		return data;														// Return unique set of slices
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HELPERS
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function ShowPopup(x, y, msg)										// SHOW A POPUP
+	{
+		if (!msg)															// Nothing to show
+			return;															// Quit
+		$("#popup").css({left:x,top:y});									// Position
+		$("#popup").html(msg);												// Add text										
+		$("#popup").show();													// Show it
+		$("#popup").delay(4000).fadeOut(400);								// Close after 4 seconds
+		}
+
+	function Query(query, callback) 
+	{
+		var dat={ q:query.replace(/'/g,"~") };
+		var url="//classroomteachingscan.com/ctscan/query.php";				// Target
+		$.ajax({ url:url,dataType:'text',type:"GET",crossDomain:true,data:dat,  // Get data
+			success:function(d) { callback(d) },							// Run callback				
+			error:function(xhr,status,error) { trace(error) },				// Show error
+			});		
+	}
+		
+	function ShortenString(str, len)									// SHORTEN A STRING TO LENGTH
+	{
+		if (!len)															// No length
+			return "";														// Return null
+		if (str && str.length > len)										// Too long
+			str=str.substr(0,(len-3)/2)+"..."+str.slice((len-3)/-2);		// Shorten	
+		return str;															// Return string
+	}
+
+	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
+	{
+		if (p4 != undefined)
+			console.log(msg,p1,p2,p3,p4);
+		else if (p3 != undefined)
+			console.log(msg,p1,p2,p3);
+		else if (p2 != undefined)
+			console.log(msg,p1,p2);
+		else if (p1 != undefined)
+			console.log(msg,p1);
+		else
+			console.log(msg);
+	}
+
+	function Sound(sound, mute)												// PLAY SOUND
+	{
+		var snd=new Audio();													// Init audio object
+		if (!snd.canPlayType("audio/mpeg") || (snd.canPlayType("audio/mpeg") == "maybe")) 
+			snd=new Audio("img/"+sound+".ogg");									// Use ogg
+		else	
+			snd=new Audio("img/"+sound+".mp3");									// Use mp3
+		if (!mute)	{															// If not initing or muting	
+			snd.volume=50/100;													// Set volume
+			snd.play();															// Play it
+			}
+		}
+
+/////////////////////// GOOGLE ANALYTICS //////////////////////////////////////////
+
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-104678642-1', 'auto');
+		ga('send', 'pageview');
+
+</script>
+</body>
+</html>
