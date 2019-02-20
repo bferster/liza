@@ -38,7 +38,11 @@
 		.lz-blackboard {	position: absolute; left:16px; top: calc(100vh - 336px); width: 550px; height: 256px;  display:none;
 							background-color: #999; border: 1px solid #999;	padding:12px; border-radius: 8px; 
 							}
-		.lz-canvas {		position: absolute; left:50px; top: 12px; width: 512px; height:256px; border-radius: 4px; 
+		.lz-textS {			background-color:#eeeeee; border-radius:8px; padding:8px; width:fit-content; max-width: 66%; margin-bottom:8px;	
+							}
+		.lz-textR {			background-color:#a7e5fd; border-radius:8px; padding:8px; width:fit-content; max-width: 66%; float:right
+							}
+		.lz-canvas {		position: absolute; left:50px; top: 12px; width: 512px; height:256px; border-radius: 4px;
 							}
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
@@ -131,7 +135,9 @@ var isMobile=false;																					// Flag for mobile devices
 		
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				var ability=.5;
+				app.rec.Reviewer();	
+
+				/*				var ability=.5;
 				var count=0;
 
 				var r=Math.random();																// Get random number
@@ -148,7 +154,8 @@ var isMobile=false;																					// Flag for mobile devices
 					so=MatrixMultiply(so,tm)
 					TraceMatrix(so);
 					} 
-				}
+				*/
+			}
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
 				app.voice.Talk("");																	// Enable audio
 			else if ((e.which == 71) && e.altKey) {													// Show spreadsheet (Alt+G)
@@ -391,8 +398,33 @@ class Record  {
 		this.record.push(event);																		// Add to array																	
 	}
 
-	ShowAsTexts()															
+	Reviewer()																						// REVIEW RECORD AS TEXTS													
 	{
+		var i,w,o;
+		$("#reviewDiv").remove();
+		var str="<div id='reviewDiv' class='lz-dialog' style='width:298px;overflow:hidden;display:none;padding:8px'>";
+		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
+		str+="Session review</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'><br><br>";	
+		str+="<div style='height:50vh;width:280px;background-color:#fff;padding:8px;border-radius:4px;overflow-y:auto'>"; 
+		for (i=0;i<this.record.length;++i) {															// For each event
+			o=this.record[i];																			// Point at event
+			if (o.o == 'S') {																			// Instructor
+				str+="<div class='lz-textS' ";															// Start div
+				str+="title='Entities are "+o.ent;														// Tooltip
+				if (o.arc)	str+="\n"+Math.floor(o.score*100)+"% match with "+o.arc+"\nEntities are "+app.arc.tree[o.arc].ents+"";	// Arc and entities
+				str+="'>"+o.text+"</div>";
+			}
+			else if (o.o == 'R') {																		// Student
+				w=(o.who == null) ? ""  : app.students[o.who].id; 										// Student name
+				str+="<div style='text-align:right;width:100%;margin:-16px 0 24px 0'>";					// Enclosing div
+				str+="<span style='float:right;color:#ccc'><i>"+w+"</i>&nbsp;</span><br>";				// Who's talking
+				str+="<span class='lz-textR' title='"+o.res+"'>"+(o.text ? o.text : "NO RESPONSE")+"</span><br></div><br>";	// Response
+				}
+			}
+		$("body").append(str+"</div>");																	// Add to body
+		$("#reviewDiv").show("slide",{ direction:"down" });												// Slide up
+		$("#reviewDiv").draggable();																	// Make it draggable on desktop
+		$("#reviewDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );			// Don't move orbiter
 	}
 
 	Playback()																						// PLAYBACK ACTION IN RECORD
