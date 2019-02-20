@@ -83,6 +83,7 @@
 		<span id='promptSpan' class='lz-prompt'></span>
 
 		<img id="helpBut" src="img/helpicon.gif" style="cursor:pointer;margin-right:4px;float:right">
+		<img id="reviewBut" src="img/revbut.gif" title="Review session" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
 		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">The University of Virginia @ 2019</div>
 	</div>
@@ -208,6 +209,7 @@ class App  {
 		if (!this.voice.hasRecognition) 															// This platform doesn't have voice recognition
 			$("#talkSpan").html("<input id='talkInput' type='text' class='lz-is' style='vertical-align:4px' placeholder='Talk by typing here'>");	// Put in text input field
 		$("#settingsBut").on("click", ()=> { app.sc.PoseEditor();  });								// On settings button click	
+		$("#reviewBut").on("click", ()=> { app.rec.Reviewer();  });									// On review button click	
 		$("#talkBut").on("click", ()=> { app.voice.Listen(); });									// On talk button click, start listening
 		$("#helpBut").on("click", ()=> { app.ShowHelp(); });										// On help button click, show help
 		$("#writeBut").on("click", ()=> { 															// On BB button clck
@@ -290,7 +292,7 @@ class App  {
 			return;																				// Quit																					
 			}
 		var h=window.innerHeight;
-		var str="<div id='helpDiv' class='lz-dialog'style='height:"+(h-106)+"px;overflow:hidden;display:none;'>";
+		var str="<div id='helpDiv' class='lz-dialog'style='height:"+(h-106)+"px;overflow:hidden;display:none;;left:calc(100vw - 646px)'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
 		str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vTXAsMJ-YlQaNtT49RtKvEnT5v5Xzz-TKPyVlo2px-23vDt-4lZFB7JujSKyDXs38hiSMISQoulYXB5/pub?embedded=true' ";
@@ -401,8 +403,11 @@ class Record  {
 	Reviewer()																						// REVIEW RECORD AS TEXTS													
 	{
 		var i,w,o;
-		$("#reviewDiv").remove();
-		var str="<div id='reviewDiv' class='lz-dialog' style='width:298px;overflow:hidden;display:none;padding:8px'>";
+		if ($("#reviewDiv").length) {																// If already up, bring it down
+			$("#reviewDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#reviewDiv").remove(); } }); // Slide down
+			return;																				// Quit																					
+			}
+		var str="<div id='reviewDiv' class='lz-dialog' style='width:298px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 330px);top:calc(50vh - 134px)'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="Session review</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'><br><br>";	
 		str+="<div style='height:50vh;width:280px;background-color:#fff;padding:8px;border-radius:4px;overflow-y:auto'>"; 
@@ -418,7 +423,7 @@ class Record  {
 				w=(o.who == null) ? ""  : app.students[o.who].id; 										// Student name
 				str+="<div style='text-align:right;width:100%;margin:-16px 0 24px 0'>";					// Enclosing div
 				str+="<span style='float:right;color:#ccc'><i>"+w+"</i>&nbsp;</span><br>";				// Who's talking
-				str+="<span class='lz-textR' title='"+o.res+"'>"+(o.text ? o.text : "NO RESPONSE")+"</span><br></div><br>";	// Response
+				str+="<span class='lz-textR' title='"+o.res+"'>"+(o.text ? o.text : "Nobody responded")+"</span><br></div><br>";	// Response
 				}
 			}
 		$("body").append(str+"</div>");																	// Add to body
