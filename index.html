@@ -111,7 +111,7 @@ var isMobile=false;																					// Flag for mobile devices
 		isMobile=navigator.userAgent.match(/(ipad|iphone|ipod|android)/i) ? true : false;			// Set mobile flag
 		var url=window.location.search.substring(1);						   						// Get query string
 		app=new App(url);                                                    						// Alloc app
-		if ((window.location.host != "localhost") && (url != "preview")) {							// Not in debug or preview
+		if (window.location.host != "localhost") {													// Not in debug
 			$("#splashDiv").fadeIn();																// Fade in splash page
 			$("#startBut").click( ()=> {															// On start button clicked
 				$("#splashDiv").fadeOut();															// Fade out splash
@@ -178,9 +178,7 @@ class App  {
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
-		this.record=[];																				// Holds record of actions
 		this.startTime=new Date().getTime();														// Session start time
-		this.inPlayback=false;																		// In playback mode?
 		this.pickingStudent="";																		// Flag for picking student
 		this.curGoal="";																			// Current goal in focus
 		this.curStudent=0;																			// Currently active student
@@ -195,6 +193,7 @@ class App  {
 		this.arc=new ARC();																			// Make new ARC tree		
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
+		this.rec=new Record();																		// Make new recorder		
 		this.LoadProject(this.gid);																	// Load project file
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
@@ -207,7 +206,7 @@ class App  {
 		$("#writeBut").on("click", ()=> { 															// On BB button clck
 			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
-			this.AddToRecord({ o:'B', m:m }); 														// Add to record
+			app.rec.Add({ o:'B', m:m }); 													// Add to record
 			}); 
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
@@ -295,13 +294,11 @@ class App  {
 		$("#helpDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 		}
 
-	OnPhrase(text, playingBack) 																// ON PHRASE UTTERED
+	OnPhrase(text) 																			// ON PHRASE UTTERED
 	{
-		var hasAction=false;
-		if (app.voice.talking == 1)  return;														// Not while student is talking																
+		if (text && text.match(/replay|playback/i) && text.match(/class/i)) { app.rec.Playback(); return; }		// Playback
 		app.arc.Parse(text, null, (o)=> {															// Parse text
-			app.AddToRecord({ o:'S', w:text, e: o});												// Add to recording if not playing back
-			
+			var score=0;
 			if (o.match(/who:liza/i)) 			app.curStudent=3;									// Set current student
 			else if (o.match(/who:freddy/i)) 	app.curStudent=0;
 			else if (o.match(/who:robert/i)) 	app.curStudent=2;
@@ -311,25 +308,29 @@ class App  {
 			if (text.match(/set goal to/i)) {														// If setting goal		
 				app.lastGoal=app.curGoal;															// Save last goal
 				app.curGoal=text.replace(/set goal to/i,"").trim().toUpperCase();					// Remove goal tag
-				Prompt("Now ocusing on the goal "+app.curGoal,5),									// Prompt
+				Prompt("Now focusing on the goal "+app.curGoal,5),									// Prompt
 				Sound("ding");																		// Ding
 				return;
 				}
+	
+			app.arc.FindClosestARC(text,o);															// Match closest ARC to text
+			if (app.arc.curArc)		score=app.arc.tree[app.arc.curArc].score;						// Get match score			
+			app.rec.Add({ o:'S', t:app.voice.talkStartTime, text:text, ent:o, arc:app.arc.curArc, score:score });	// Add to record at time of STT listening
+			
 			if (app.pickingStudent) {																// If students have their hands up
+				var txt;
 				if (app.curStudent < 0) app.curStudent=3;											// Default to Liza if still talking to class
 				app.DoAction("sit",true);															// Hands down
 				var r=app.arc.MarkovFindResponse(app.pickingStudent,app.curStudent);				// Get and save right response
-				if (r)	app.voice.Talk(app.arc.tree[app.pickingStudent].res[r-1]);					// If something to say
-				else 	Prompt(app.students[app.curStudent].id+" didn't repond to you!",5),Sound("delete"); // Show student didn't respond
+				if (r)	txt=app.arc.tree[app.pickingStudent].res[r-1],app.voice.Talk(txt);			// If something to say
+				else 	txt=app.students[app.curStudent].id+" didn't repond to you!",Prompt(txt,5),Sound("delete"); // Show student didn't respond
+				app.rec.Add({ o:'R', text:txt, who:app.curStudent, res:r });						// Add to record
 				app.pickingStudent="";																// Clear flag
 				Prompt("");																			// Clear prompt
 				}
-			if (o.match(/action:/i)) 																// If an action mentioned
-				hasAction=app.DoAction((o+" ").match(/action:(.+?) /i)[1])							// Try to do action
-			if (!hasAction)																			// If no action
-				app.ParseDialog(text);													        	// Try to parse text directly
-			app.arc.FindClosestARC(text,o);															// Match closest ARC to text
-			app.arc.DeliverResponse(app.arc.curArc);												// Deliver resonse
+	
+			app.arc.DeliverResponse(app.arc.curArc);												// Deliver response
+			if (o.match(/action:/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);			// If an action mentioned, try to do it
 			});																		
 		}
 		
@@ -365,56 +366,6 @@ class App  {
 				}					
 			}
 
-	ParseDialog(text) 																				// PARSE DIALOG
-	{
-		if (text.match(/replay/i) && text.match(/class/i))	app.record.pop(),app.Playback();
-		else if (text.match(/who/i) && text.match(/knows/i)) {
-			var i=Math.floor(Math.random()*app.students.length);	
-			app.curStudent=i;
-			app.voice.Talk("I do, I do, it's "+app.students[i].id+", please choose me!");
-			app.sc.StartAnimation(app.students[i].id,app.seqs["wave"]);
-			}
-	}
-
-	AddToRecord(data)																				// ADD ACTION TO RECORD
-	{
-		if (this.inPlayback) {																			// Playing back
-			if (data.o == 'S')	app.voice.Talk(data.w,true);											// Speak as instructor
-			return;																						// Don't add
-			}
-		data.t=new Date().getTime();																	// Capture time
-		app.record.push(data);																			// Add to array																	
-	}
-
-	Playback()																						// PLAYBACK ACTION IN RECORD
-	{
-		var i,o,now,s=0;
-		var sTimer=setInterval(actions,2);																// Set time
-		this.inPlayback=true;																			// In playback mode
-		this.sc.SetCamera(0,150,500,-.291457,0,0);														// Reset camera
-		for (i=0;i<this.students.length;++i)															// For each student
-			this.sc.SetPose(this.students[i].id,"startUp",20);											// Return to startup pose
-		app.bb.Playback({ o:'B', s:0, m:0 });															// Close bb editor, set to left side
-		app.bb.Playback({ o:'C', s:0 }); app.bb.Playback({ o:'C', s:1 });								// Clear bbs																		
-		var off=new Date().getTime()-this.startTime;													// Get offset from 1st event
-		function actions() {																			// PERFORM ACTIONS IN RECORD
-			if (s >= app.record.length)	{																// If done
-				clearInterval(sTimer);																	// Kill timer
-				app.inPlayback=false;																	// In normal mode
-				return;
-				}
-			now=new Date().getTime()-off;																// Get now
-			for (i=s;i<app.record.length;++i) {															// For each action
-				o=app.record[i];																		// Point at segment
-				if (now < o.t) 		break;																// If before time of action quit
-				if (now >= o.t)		++s;																// Done this one
-				if (o.o == 'S')		app.OnPhrase(o.w,true);												// Speaking if S
-//				if (o.o == 'O')		app.sc.SetCamera(o.x,o.y,o.z,o.xr,o.yr,o.zr);						// Move camera if O
-				else				app.bb.Playback(o);													// Draw segment	if B, M, D, E, U, T, X, P, or C		
-				}
-			}	
-	}
-
 } // App class closure
 
 
@@ -422,7 +373,60 @@ class App  {
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RECORD
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class Record  {																					
+
+	constructor()   																				// CONSTRUCTOR
+	{
+		this.record=[];																					// Holds record of actions
+		this.inPlayback=false;																			// In playback mode
+	}
+
+	Add(event)																						// ADD EVENT TO RECORD
+	{
+		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
+		this.record.push(event);																		// Add to array																	
+	}
+
+	ShowAsTexts()															
+	{
+	}
+
+	Playback()																						// PLAYBACK ACTION IN RECORD
+	{
+		var i,o,now,s=0;
+		var _this=this;																					// Save context
+		var sTimer=setInterval(actions,24);																// Set time
+		this.inPlayback=true;																			// In playback mode
+		app.sc.SetCamera(0,150,500,-.291457,0,0);														// Reset camera
+		for (i=0;i<app.students.length;++i)																// For each student
+			app.sc.SetPose(app.students[i].id,"startUp",20);											// Return to startup pose
+		app.bb.Playback({ o:'B', s:0, m:0 });															// Close bb editor, set to left side
+		app.bb.Playback({ o:'C', s:0 }); app.bb.Playback({ o:'C', s:1 });								// Clear bbs																		
+		var off=new Date().getTime()-app.startTime;														// Get offset from 1st event
+		function actions() {																			// PERFORM ACTIONS IN RECORD
+			if (s >= _this.record.length)	{															// If done
+				clearInterval(sTimer);																	// Kill timer
+				_this.inPlayback=false;																	// Turn it off
+				return;
+				}
+			now=new Date().getTime()-off;																// Get now
+			for (i=s;i<_this.record.length;++i) {														// For each action
+				o=_this.record[i];																		// Point at segment
+				if (now < o.t) 				break;														// If before time of action quit
+				if (now >= o.t)				++s;														// Done this one
+				if (o.o == 'S')				app.voice.Talk(o.text,"instructor");						// Speaking if S
+				else if (o.o == 'R')		app.voice.Talk(o.text,o.who);								// Responding if R
+//				else if (o.o == 'O')		app.sc.SetCamera(o.x,o.y,o.z,o.xr,o.yr,o.zr);				// Move camera if O
+				else						app.bb.Playback(o);											// Draw segment	if B, M, D, E, U, T, X, P, or C		
+				}
+			}	
+	}
+
+} // Record class closure
 
 
 
@@ -538,7 +542,6 @@ class ARC  {
 				if (this.tree[arc].score >= n) { n=this.tree[arc].score;	best=arc };					// Set if highest
 				str+=arc+" - "+Math.round(this.tree[arc].score*100) + "%\n";
 				}
-		
 			this.curArc=(n > this.threshold) ? best : "";												// Set ARC if above threshold
 			str+="\n= ["+best+"] "+this.tree[best].ents; trace(str); 															
 			if (this.curArc)					app.curGoal=best;										// Set current goal if past threshold	
@@ -549,6 +552,7 @@ class ARC  {
 	DeliverResponse(arc)																			// DELIVER RESPONSE
 	{
 		var i,j,n,r,so;
+		var text="";
 		if (!arc)	return;																				// Quit if no ARC
 		if (app.curStudent == -1) {																		// If whole class responding
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
@@ -560,12 +564,18 @@ class ARC  {
 				app.pickingStudent=arc;																	// Send this message
 				Sound("ding");																			// Ding
 				}
-			else Prompt("Nobody reponded to you!",5),Sound("delete"); 									// Show no one responded
+			else{																						// Noone reponded
+				text="Nobody reponded to you!";															// Message
+				app.rec.Add({ o:'R', who:null, text:"", res:0 });										// Add to record
+				Prompt(text,5); 																		// Show prompt				
+				Sound("delete");
+				}
 			}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(arc,app.curStudent);												// Get, compute, and save right response to ARC
-			if (r)	app.voice.Talk(this.tree[arc].res[r-1]);											// If something to say
-			else 	Prompt(app.students[app.curStudent].id+" didn't repond to you!",5),Sound("delete"); // Show student didn't respond
+			if (r)	text=this.tree[arc].res[r-1],app.voice.Talk(text);									// If something to say
+			else 	text=app.students[app.curStudent].id+" didn't repond to you!",Prompt(text,5),Sound("delete"); // Show student didn't respond
+			app.rec.Add({ o:'R', text:text, who:r ? app.curStudent : null, res:r });					// Add to record
 			}
 		}
 		
@@ -625,7 +635,7 @@ class ARC  {
 																						
 						}
 				});
-		} catch(e) { trace("*****************\nWIT error: "+e.error+"\n***********"); }				// Show error
+		} catch(e) { trace("*****************\nWIT error: "+e.error+"\n***********"); }					// Show error
 	}
 
 } // ARC class closure

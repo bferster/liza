@@ -9,6 +9,7 @@ class Voice {
 		var _this=this;
 		this.hasRecognition=false;																		// Assume no STT
 		this.listening=false;																			// Flag if listening
+		this.talkStartTime=0;																			// Time started talking
 
 		try {																							// Try
 			this.femaleVoice=1;																			// Female voice
@@ -57,20 +58,24 @@ class Voice {
 
 	Listen()																						// TURN ON SPEECH RECOGNITIOM
 	{
+		this.talkStartTime=new Date().getTime();														// Record start talk time
 		if (this.listening)	return;																		// Quit if already started
 		try { this.recognition.start(); this.listening=true; } catch(e) { trace("Voice error",e) };		// Start recognition
 		$("#talkBut").prop("src","img/intalkbut.png");													// Talking but
+
 	}
 
-	Talk(text, instructor)																			// SAY SOMETHING
+	Talk(text, who)																					// SAY SOMETHING
 	{
 		try{																							// Try
+			if (who != null && (who != "instructor")) app.curStudent=who,who=app.students[app.curStudent].sex;	// Set curent student & voice based on who param
+			else if (who == null)					  who=app.students[app.curStudent].sex;				// Set voice based on sex
 			var oldPitch=this.tts.pitch;																// Save old pitch
-			if (instructor) this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;				// Lower pitch if instructor
-			else if (app.students[app.curStudent].sex == "male")	this.tts.voice=this.voices[this.maleVoice];		// Set male voice
-			else 													this.tts.voice=this.voices[this.femaleVoice];	// Set female voice
+			if (who == "instructor") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;	// Lower pitch if instructor
+			else if (who == "male")		this.tts.voice=this.voices[this.maleVoice];						// Set male voice
+			else 						this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
 			this.tts.text=text;																			// Set text
-			this.talking=instructor ? 2 : 1;															// Trigger mouth animation
+			if (who != "instructor") 	this.talking=1;													// Trigger mouth animation if a student
 			speechSynthesis.speak(this.tts);															// Speak
 			this.tts.pitch=oldPitch;																	// Restore pitch	
 		}

@@ -68,7 +68,7 @@ class Blackboard  {
 				this.startPosX=e.touches[0].clientX-$(this.curSideId).offset().left;					// Set start point X from touch event
 				this.startPosY=e.touches[0].clientY-$(this.curSideId).offset().top;						// Y		
 				}
-			app.AddToRecord({ x:e.offsetX, y:e.offsetY, o:'M', s:this.curSide }); 						// Add to record
+			app.rec.Add({ x:e.offsetX, y:e.offsetY, o:'M', s:this.curSide }); 					// Add to record
 			this.ctx[this.curSide].beginPath();
 			});
 
@@ -84,13 +84,13 @@ class Blackboard  {
 			this.ctx[this.curSide].lineTo(x,y);															// Set end point
 			this.ctx[this.curSide].stroke();															// Draw line
 			this.startPosX=x;	this.startPosY=y;														// Reset drawing start position to current position
-			app.AddToRecord({ x:x, y:y, o: erase ? 'E' : 'D', s:this.curSide }); 						// Add to record
+			app.rec.Add({ x:x, y:y, o: erase ? 'E' : 'D', s:this.curSide }); 					// Add to record
 			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
 			});
 			
 		$(this.curSideId).on("mouseup touchend", (e)=> { 												// ON MOUSE UP
 			this.paint=false; this.ctx[this.curSide].closePath(); 										// Close
-			app.AddToRecord({ o:'U', s:this.curSide });	 												// Add to record
+			app.rec.Add({ o:'U', s:this.curSide });	 												// Add to record
 			}); 
 	}
 
@@ -118,8 +118,8 @@ class Blackboard  {
 		if (label == "Founding fathers")	imageObj.src="assets/FoundingFathers.jpg";
 		if (label == "US map")				imageObj.src="assets/USMap.png";
 		if (label == "Math lesson")			imageObj.src="assets/BB2.png";
-		if (label == "Liza tips")				imageObj.src="assets/BB1.png";
-		if (!init)	app.AddToRecord({ o: 'P', p: label, s:this.curSide }); 								// Add to record, unless initting
+		if (label == "Liza tips")			imageObj.src="assets/BB1.png";
+		if (!init)	app.rec.Add({ o: 'P', p: label, s:this.curSide }); 									// Add to record, unless initting
 
 		imageObj.onload=function() { 																	// When loaded
 			var side=init ? init-1 : app.bb.curSide;													// Set side
@@ -159,11 +159,11 @@ class Blackboard  {
 				this.ctx[this.curSide].fillRect(this.nextPosX,this.startPosY-this.fontHgt*.75,this.fontHgt,this.fontHgt);		// Clear last char
 				this.ctx[this.curSide].fillStyle="#fff";												// Text color
 				this.chars.pop();
-				app.AddToRecord({ o:'X', x:this.nextPosX, y:this.startPosY, s:this.curSide });			// Add to record
+				app.rec.Add({ o:'X', x:this.nextPosX, y:this.startPosY, s:this.curSide });				// Add to record
 				return;																					// Quit	
 				}
 			if (e.keyCode < 32)	return;																	// No control chars																		
-			app.AddToRecord({ x:Math.round(this.nextPosX), y:Math.round(this.startPosY), c:e.key, o:'T', s:this.curSide });	// Add to record
+			app.rec.Add({ x:Math.round(this.nextPosX), y:Math.round(this.startPosY), c:e.key, o:'T', s:this.curSide });	// Add to record
 			this.ctx[this.curSide].fillText(e.key, this.nextPosX,this.startPosY);						// Draw letter		
 			this.chars.push({ x:this.nextPosX, y:this.startPosY });										// Save char start												
 			this.nextPosX+=this.ctx[this.curSide].measureText(e.key).width;								// New start point to draw next letter					
@@ -176,7 +176,7 @@ class Blackboard  {
 		this.ctx[this.curSide].fillStyle=this.backCol;													// Color
 		this.ctx[this.curSide].fillRect(0,0,this.wid,this.hgt);											// Clear
 		this.texMap[this.curSide].needsUpdate=true;														// Flag the tex map as needing updating
-		app.AddToRecord({ o:'C', s:this.curSide });														// Add to record
+		app.rec.Add({ o:'C', s:this.curSide });															// Add to record
 	}
 
 	SetSide(side)																					// CHANGE SIDE
@@ -209,7 +209,7 @@ class Blackboard  {
 			this.ctx[o.s].fillStyle=this.backCol;														// Erasure color
 			this.ctx[o.s].fillRect(o.x, o.y-this.fontHgt*.75, this.fontHgt, this.fontHgt);				// Clear last char
 			}
-		else if (o.o == "P") { 	this.SetPic(o.p, true);  }												// Pic
+		else if (o.o == "P") { 	this.SetPic(o.p);  }													// Pic
 		else if (o.o == "C") { 																			// Clear
 			this.ctx[o.s].fillStyle=this.backCol;														// Color
 			this.ctx[o.s].fillRect(0,0,this.wid,this.hgt);												// Clear
