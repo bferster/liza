@@ -38,7 +38,8 @@
 		.lz-blackboard {	position: absolute; left:16px; top: calc(100vh - 336px); width: 550px; height: 256px;  display:none;
 							background-color: #999; border: 1px solid #999;	padding:12px; border-radius: 8px; 
 							}
-		.lz-textS {			background-color:#eeeeee; border-radius:8px; padding:8px; width:fit-content; max-width: 66%; margin-bottom:8px;	
+		.lz-textS {			background-color:#eeeeee; border-radius:8px; padding:8px; width:fit-content; max-width: 66%; 
+							margin-bottom:8px; cursor:pointer;
 							}
 		.lz-textR {			background-color:#a7e5fd; border-radius:8px; padding:8px; width:fit-content; max-width: 66%; float:right
 							}
@@ -403,22 +404,22 @@ class Record  {
 	Reviewer()																						// REVIEW RECORD AS TEXTS													
 	{
 		var i,w,o;
-		if ($("#reviewDiv").length) {																// If already up, bring it down
+		if ($("#reviewDiv").length) {																	// If already up, bring it down
 			$("#reviewDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#reviewDiv").remove(); } }); // Slide down
-			return;																				// Quit																					
+			return;																						// Quit																					
 			}
-		var str="<div id='reviewDiv' class='lz-dialog' style='width:298px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 330px);top:calc(50vh - 134px)'>";
+		var str="<div id='reviewDiv' class='lz-dialog' style='width:298px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 330px);top:calc(50vh - 154px)'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="Session review</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'><br><br>";	
 		str+="<div style='height:50vh;width:280px;background-color:#fff;padding:8px;border-radius:4px;overflow-y:auto'>"; 
 		for (i=0;i<this.record.length;++i) {															// For each event
 			o=this.record[i];																			// Point at event
 			if (o.o == 'S') {																			// Instructor
-				str+="<div class='lz-textS' ";															// Start div
-				str+="title='Entities are "+o.ent;														// Tooltip
+				str+="<div class='lz-textS' id='revStep-"+i+"' ";										// Start div
+				str+=" title='Entities are "+o.ent;														// Tooltip
 				if (o.arc)	str+="\n"+Math.floor(o.score*100)+"% match with "+o.arc+"\nEntities are "+app.arc.tree[o.arc].ents+"";	// Arc and entities
 				str+="'>"+o.text+"</div>";
-			}
+				}
 			else if (o.o == 'R') {																		// Student
 				w=(o.who == null) ? ""  : app.students[o.who].id; 										// Student name
 				str+="<div style='text-align:right;width:100%;margin:-16px 0 24px 0'>";					// Enclosing div
@@ -426,10 +427,24 @@ class Record  {
 				str+="<span class='lz-textR' title='"+o.res+"'>"+(o.text ? o.text : "Nobody responded")+"</span><br></div><br>";	// Response
 				}
 			}
-		$("body").append(str+"</div>");																	// Add to body
+		
+		str+="</div><div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 6px 0 0 0'><i>Click box to see backboard at time</div"; 
+		$("body").append(str);																			// Add to body
 		$("#reviewDiv").show("slide",{ direction:"down" });												// Slide up
 		$("#reviewDiv").draggable();																	// Make it draggable on desktop
 		$("#reviewDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );			// Don't move orbiter
+
+		$("[id^=revStep-]").on("click", function(e) {													// On click of instructor event
+			var i,o;
+			var id=e.target.id.substr(8);																// Get id of event
+			app.bb.Playback({ o:'C', s:1 }); app.bb.Playback({ o:'C', s:0 });							// Clear blackboards																		
+			for (i=0;i<app.rec.record.length;++i) {														// For each event
+				o=app.rec.record[i];																	// Point at event
+				if (o.t > app.rec.record[id].t)															// If past clicked event
+					break;																				// Quit drawing													
+				if (o.o != 'B')	app.bb.Playback(o);														// Draw if a draw event, if not open or close
+				}
+			});
 	}
 
 	Playback()																						// PLAYBACK ACTION IN RECORD
