@@ -21,7 +21,7 @@
 		 body { 			font-family:Verdana,Geneva,sans-serif;font-size:13px; box-sizing:border-box; 
 							padding:0;margin:0; position: fixed; width:100%;
 							}
-		.lz-splash { 		color:#999; text-align:center; margin-top:10%;  display:none;
+		.lz-splash { 		color:#999; text-align:center; margin-top:5%;  display:none;
 							}
 		.lz-about { 		position: relative; width:100%; max-width:800px; height:calc(100vh - 28px); margin: 12px auto; border:none; 
 							}
@@ -72,9 +72,23 @@
 	
 	<div id="mainDiv" class="lz-main"></div>
 	<div id="splashDiv" class="lz-splash">
-		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br><br>
+		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br>
 		<br><p style="color:#000;font-size:14px"><em>A tool for engaging people in highly affective script-driven discourse<br>for learning and practicing goal-directed behaviors.</em></p>
-		<br><br><div id='startBut' class='lz-bs' onclick='app.voice.Talk("hello")'>Start</div>
+		<br><div id='startBut' class='lz-bs' onclick='app.voice.Talk("hello")'>Start</div><br><br>
+		<div style='color:#000'><br>
+			<b>This demo ONLY runs in the Chrome Desktop Browser</b><br><br>
+			Right now it reacts to only few things like:<br><br>
+			• Does anyone know what 2 + 2 equals?<br>
+			• Robert, what is 3+3?<br>
+			• How did you come up with that answer?<br>
+			• Does anyone know what time it is?<br>
+			• Everyone go to sleep<br>
+			• Sara, wakeup<br><br>
+			If you refer to the class, some students will raise their hands and you need to choose one.<br> 
+			If you refer to a student by name, they will answer directly.<br> 
+			You need to tap the green microphone button (or tap the spacebar) to start speaking.<br>
+			There is more information in the help (?) button at the bottom of the screen.
+		</div>
 	</div>
 	<div id="controllerDiv" class="lz-controller">
 		<span id="talkSpan">
@@ -408,10 +422,11 @@ class Record  {
 			$("#reviewDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#reviewDiv").remove(); } }); // Slide down
 			return;																						// Quit																					
 			}
-		var str="<div id='reviewDiv' class='lz-dialog' style='width:298px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 330px);top:calc(50vh - 154px)'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
-		str+="Session review</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'><br><br>";	
-		str+="<div style='height:50vh;width:280px;background-color:#fff;padding:8px;border-radius:4px;overflow-y:auto'>"; 
+		var str="<div id='reviewDiv' class='lz-dialog' 	style='background-color:#ccc;";
+		str+="width:298px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 330px);top:calc(50vh - 154px)'>";
+		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px;padding-bottom:30px'>"
+		str+="Session review</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
+		str+="<div style='height:50vh;width:280px;background-color:#fff;padding:8px;border-radius:6px;overflow-y:auto;margin-top:8px'>"; 
 		for (i=0;i<this.record.length;++i) {															// For each event
 			o=this.record[i];																			// Point at event
 			if (o.o == 'S') {																			// Instructor
