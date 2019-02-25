@@ -68,7 +68,7 @@ class Blackboard  {
 				this.startPosX=e.touches[0].clientX-$(this.curSideId).offset().left;					// Set start point X from touch event
 				this.startPosY=e.touches[0].clientY-$(this.curSideId).offset().top;						// Y		
 				}
-			app.rec.Add({ x:e.offsetX, y:e.offsetY, o:'M', s:this.curSide }); 					// Add to record
+			app.rec.Add({ x:e.offsetX, y:e.offsetY, o:'M', s:this.curSide }); 							// Add to record
 			this.ctx[this.curSide].beginPath();
 			});
 
@@ -84,13 +84,13 @@ class Blackboard  {
 			this.ctx[this.curSide].lineTo(x,y);															// Set end point
 			this.ctx[this.curSide].stroke();															// Draw line
 			this.startPosX=x;	this.startPosY=y;														// Reset drawing start position to current position
-			app.rec.Add({ x:x, y:y, o: erase ? 'E' : 'D', s:this.curSide }); 					// Add to record
+			app.rec.Add({ x:x, y:y, o: erase ? 'E' : 'D', s:this.curSide }); 							// Add to record
 			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
 			});
 			
 		$(this.curSideId).on("mouseup touchend", (e)=> { 												// ON MOUSE UP
 			this.paint=false; this.ctx[this.curSide].closePath(); 										// Close
-			app.rec.Add({ o:'U', s:this.curSide });	 												// Add to record
+			app.rec.Add({ o:'U', s:this.curSide });	 													// Add to record
 			}); 
 	}
 
@@ -176,7 +176,7 @@ class Blackboard  {
 		this.ctx[this.curSide].fillStyle=this.backCol;													// Color
 		this.ctx[this.curSide].fillRect(0,0,this.wid,this.hgt);											// Clear
 		this.texMap[this.curSide].needsUpdate=true;														// Flag the tex map as needing updating
-		app.rec.Add({ o:'C', s:this.curSide });															// Add to record
+		app.rec.Add({ o:'X', s:this.curSide });															// Add to record
 	}
 
 	SetSide(side)																					// CHANGE SIDE

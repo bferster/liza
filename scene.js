@@ -31,7 +31,7 @@ class Scene {
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
 		this.AddCamera(0,150,500,.4);																// Add camera
 		this.controls.addEventListener('end',(e)=> {												// On control change
-			app.rec.Add( {o:'O',																	// Add to record
+			app.rec.Add( {o:'C',																	// Add to record
 				xr:this.camera.rotation.x, yr:this.camera.rotation.y, zr:this.camera.rotation.z,	// Rotation
 				x:this.camera.position.x,  y:this.camera.position.y,  z:this.camera.position.z});	// Position
 				});
@@ -390,7 +390,7 @@ class Scene {
 			}
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
-		if (app.voice.talking == 1)																	// If student talking
+		if ((app.voice.talking == 1) && (app.curStudent != -1))										// If student talking
 			app.sc.SetBone(app.students[app.curStudent].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);		// Animate mouth
 		for (i=0;i<app.students.length;++i)															// For each student
 			if (app.students[i].fidget)	{															// If fidgeting
