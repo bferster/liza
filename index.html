@@ -277,7 +277,7 @@ class App  {
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
 		this.seqs["wave"]="handUp,.6,handRight,.5,4";
-		this.seqs["nodYes"]="headBack,.6,headDown,.5,headUp,.5,2";
+		this.seqs["nodYes"]="headBack,.4,headDown,.3,headUp,.3,1";
 		this.seqs["nodNo"]="headLeft,.3,headRight,.3,headCenter,.3,2";
 		this.seqs["headUp"]="headUp,1";			this.seqs["headDown"]="headDown,1";			
 		this.seqs["headLeft"]="headLeft,1";		this.seqs["headRight"]="headRight,1";	this.seqs["headCenter"]="headCenter,1";
@@ -329,6 +329,7 @@ class App  {
 			else if (o.match(/who:Robert/i)) 	app.curStudent=2;
 			else if (o.match(/who:Sara/i)) 		app.curStudent=1;
 			else if (o.match(/who:Class/i)) 	app.curStudent=-1;
+			else if (o.match(/who:all/i)) 		app.curStudent=-2;
 	
 			if (text.match(/set goal to/i)) {														// If setting goal		
 				app.lastGoal=app.curGoal;															// Save last goal
@@ -580,25 +581,33 @@ class ARC  {
 		var xhr=new XMLHttpRequest();																	// Ajax
 		xhr.open("GET",str);																			// Set open url
 		xhr.onload=function() { 																		// When loaded
-			var i,o,v,step=0;
-			var goal="",id;
+			var i,j,o,v,id,step=0;
+			var last="",goal="";
 			_this.tree=[];																				// Clear tree
-			var tsv=xhr.responseText.replace(/\\r/,"");													// Remove CRs
+			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
 			tsv=tsv.split("\n");																		// Split into lines
 			for (i=1;i<tsv.length;++i) {																// For each line
 				v=tsv[i].split("\t");																	// Split into fields
 				if (v[1] == "A") {																		// New action
-					if (v[0] && isNaN(v[0]))	{ goal=v[0].toUpperCase(); step=0; }					// Whole new goal
-					else		step++;																	// New step
-					o=_this.tree[goal+"-"+step]={ con:[], rso:null, aso:null, cso:null }; 				// A new ARC
+					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase(),step=0; 						// Whole new goal
+					else						step++;													// New step
+					o=_this.tree[goal+"-"+step]={ con:[], rso:null, aso:null, cso:null, }; 				// A new ARC
 					o.text=v[3];																		// Add text
 					o.res=["",""];																		// Responses										
 					o.gist=v[2];																		// Get gist
+					o.next=["","",v[5] ? v[5] : ""];													// Add nexts
+					for (j=0;j<3;++j) 																	// For each next of last ARC
+						if (last && !_this.tree[last].next[j])	_this.tree[last].next[j]=goal+"-"+step;	// If last ARC had no nexts in this slot, use this one
+					last=goal+"-"+step;																	// A new last arc
 					}
-				else if (v[1].match(/R\+/i))  o.res[0]=v[3];											// Right response
-				else if (v[1].match(/R\-/i))  o.res[1]=v[3];											// Wrong
-				else if (v[1].match(/ov/i))   app.rev.overview=v[3];									// Overview
-				}
+				else if (v[1].match(/R[+|-]/i)) { 														// Response
+					j=v[1].match(/R-/i) ? 1 : 0;														// 0=right, 1=wrong
+					o.res[j]=v[3];																		// Set response
+					if ((v[5] != "") && isNaN(v[5]))  	o.next[j]=v[5]+"-0";							// A goal, add post fix
+					else if (v[5])						o.next[j]=goal+"-"+v[5];			  			// Use current goal and add step
+					}
+				else if (v[1].match(/ov/i))  app.rev.overview=v[3];										// Overview
+					}
 			_this.Extract();																			// Extract keywords and entities
 			};									
 		xhr.send();																						// Do it
@@ -689,7 +698,7 @@ class ARC  {
 		var i,j,n,r,so;
 		var text="";
 		if (!arc)	return;																				// Quit if no ARC
-		if (app.curStudent == -1) {																		// If whole class responding
+		if (app.curStudent == -1) {																		// If whole class responding and looking for answer
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
 			var j=Math.floor(Math.random()*app.students.length);										// Random start	
 			for (i=0;i<n;++i)																			// For each responder	
@@ -705,6 +714,11 @@ class ARC  {
 				Prompt(text,5); 																		// Show prompt				
 				Sound("delete");
 				}
+			}
+		if (app.curStudent == -2) {																		// If whole class responding with nods
+			for (i=0;i<app.students.length;++i)															// For eac hstudent
+				if (this.MarkovFindResponse(arc,i) == 1)												// If right
+					app.sc.StartAnimation(app.students[i].id,app.seqs["nodYes"]);						// Nod yes
 			}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(arc,app.curStudent);												// Get, compute, and save right response to ARC

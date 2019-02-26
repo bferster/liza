@@ -390,7 +390,7 @@ class Scene {
 			}
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
-		if ((app.voice.talking == 1) && (app.curStudent != -1))										// If student talking
+		if ((app.voice.talking == 1) && (app.curStudent >= 0))										// If student talking
 			app.sc.SetBone(app.students[app.curStudent].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);		// Animate mouth
 		for (i=0;i<app.students.length;++i)															// For each student
 			if (app.students[i].fidget)	{															// If fidgeting
