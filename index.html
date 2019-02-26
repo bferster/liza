@@ -205,7 +205,8 @@ class App  {
 		this.pickingStudent="";																		// Flag for picking student
 		this.curGoal="";																			// Current goal in focus
 		this.curStudent=0;																			// Currently active student
-
+		this.gettingEntities=0;																		// Flag when waiting for entities from AI
+		
 		this.gid="1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU";									// Default ARC tree spreadshet
 		var url=window.location.search.substring(1);						   						// Get query string
 		if (url) {																					// If params
@@ -277,7 +278,7 @@ class App  {
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
 		this.seqs["wave"]="handUp,.6,handRight,.5,4";
-		this.seqs["nodYes"]="headBack,.4,headDown,.3,headUp,.3,1";
+		this.seqs["nodYes"]="headBack,.4,headDown,.3,headUp,.3,2";
 		this.seqs["nodNo"]="headLeft,.3,headRight,.3,headCenter,.3,2";
 		this.seqs["headUp"]="headUp,1";			this.seqs["headDown"]="headDown,1";			
 		this.seqs["headLeft"]="headLeft,1";		this.seqs["headRight"]="headRight,1";	this.seqs["headCenter"]="headCenter,1";
@@ -470,24 +471,34 @@ class Review  {
 			return;																						// Quit																					
 			}
 		var str="<div id='reviewDiv' class='lz-dialog' 	style='background-color:#ccc;";
-		str+="width:298px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 330px);top:calc(50vh - 154px)'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px;padding-bottom:30px'>"
-		str+="Lesson plan</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
-		str+="<div id='revBodyDiv'style='height:50vh;width:280px;background-color:#fff;padding:8px;border-radius:6px;overflow-y:auto;margin-top:8px'></div>"; 
+		str+="width:324px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 358px);top:calc(50vh - 178px)'>";
+		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px;padding-bottom:30px'";
+		str+="id='lpTitle'></span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
+		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:8px'></div>"; 
 		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0'>";
-		str+=MakeSelect("revMode",false,["Overview","Hints","Full plan","Review"])+"</div>"; 
-
+		str+=MakeSelect("revMode",false,["Overview","Hints","Full plan","Review"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
+		str+=MakeSelect("revStu",false,["Student"])+"</div>"; 
+			
 		$("body").append(str);																			// Add to body
+		for (i=0;i<app.students.length;++i)																// For each student
+			$("#revStu").append("<option>"+app.students[i].id+"</option>");								// Add to pulldown
 		refreshBody(this.mode);																			// Fill content
-
 		$("#reviewDiv").show("slide",{ direction:"down" });												// Slide up
 		$("#reviewDiv").draggable();																	// Make it draggable on desktop
-		$("#reviewDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );			// Don't move orbiter
+		$("#reviewDiv").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 
-		$("#revMode").on("change", function(e) {														// On change mode
+		$("#revMode").on("change", function() {															// On change mode
 			app.rev.mode=this.value;																	// Change mode
 			refreshBody(this.value);																	// Refresh body content
 			});
+		
+		$("#revStu").on("change", function() {															// On answer student
+			if (!this.selectedIndex)	return;															// Quit on title option
+			var text="Yes, "+this.value;																// Get value
+			app.voice.Talk(text,"instructor");															// Talk
+			app.OnPhrase(text);																			// Parse
+			this.selectedIndex=0;																		// Reset
+		});
 
 		$("[id^=revStep-]").on("click", function(e) {													// On click of instructor event
 			var id=e.target.id.substr(8);																// Get id of event
@@ -501,10 +512,10 @@ class Review  {
 			});
 
 		function refreshBody(mode) {																// REFRESH BODY CONTENT
-			app.rev.overview
-			var str="<div style='text-align:center'><b>Overview</b></div><hr>"+app.rev.overview+"<br>";	// Overview
+			var str="";	
 			if (mode == "Review")	{																	// Session review
-				str+="<hr><b>Session review</b><hr>";													// Title
+				str="";																					// Title
+				$("#lpTitle").html("Lesson plan review");												// Set title
 				for (i=0;i<app.rec.record.length;++i) {													// For each event
 					o=app.rec.record[i];																// Point at event
 //		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 6px 0 0 0'><i>Click box to see backboard at time></i></div>"; 
@@ -515,7 +526,7 @@ class Review  {
 						str+="'>"+o.text+"</div>";
 						}
 					else if (o.o == 'R') {																// Student
-						w=(o.who == null) ? ""  : app.students[o.who].id; 								// Student name
+						w=((o.who == null) || (who < 0)) ? ""  : app.students[o.who].id; 				// Student name
 						str+="<div style='text-align:right;width:100%;margin:-16px 0 24px 0'>";			// Enclosing div
 						str+="<span style='float:right;color:#ccc'><i>"+w+"</i>&nbsp;</span><br>";		// Who's talking
 						str+="<span class='lz-textR' title='"+o.res+"'>"+(o.text ? o.text : "Nobody responded")+"</span><br></div><br>";	// Response
@@ -523,39 +534,42 @@ class Review  {
 					}
 				}
 			else if (mode == "Hints")	{																// Gists
-				str+="<hr><div style='text-align:center'><b>Step hints</b></div><hr><ul>";				// Title
+				$("#lpTitle").html("Lesson plan hints");												// Set title
 				for (var arc in app.arc.tree) {															// For each ARC
 					o=app.arc.tree[arc];																// Point at ARC
 					if (o.gist)		str+="<li style='padding-bottom:4px'>"+o.gist+"</li>";				// Add gist
 					}
 				}
 			else if (mode == "Full plan")	{															// Full plan
-				str+="<hr><div style='text-align:center'><b>Full lesson plan</b></div><hr><ul>";		// Title
-				for (i=0;i<app.students.length;++i) {													// Add student names
-					str+="<li id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";			 
-					str+="Yes, "+app.students[i].id+"</li>";											// Add text 
-					}
+				$("#lpTitle").html("Full lesson plan");													// Set title
 				for (var arc in app.arc.tree) {															// For each ARC
 					o=app.arc.tree[arc];																// Point at ARC
 					if (o.text)	{																		// If defined
-						str+="<li id='revTalk-"+arc+"' style='padding-bottom:8px;cursor:pointer'>";		// Add 
-						str+=o.text+"</li>";															// Add text 
+						w=o.next[2] ? app.arc.tree[o.next[2].toUpperCase()].text : "";					// Next ARC's text
+						str+="<div title='"+w+"' id='revTalk-"+arc+"' style='padding-bottom:8px;cursor:pointer'>";		
+						str+="<b>"+o.text+"</b></div>";
+						w=o.next[0] ? app.arc.tree[o.next[0].toUpperCase()].text : "";					// Next ARC's text
+						if (o.res[0]) str+="<div title='"+w+"'><span style='color:#009900;margin-left:16px'><b>&check; &nbsp;</b></span>"+o.res[0]+"</div>";
+						w=o.next[1] ? app.arc.tree[o.next[1].toUpperCase()].text : "";					// Next ARC's text
+						if (o.res[1]) str+="<div title='"+w+"'><span style='color:#990000;margin-left:16px'><b>&cross; &nbsp;</b></span>"+o.res[1]+"</div>";
+						str+="<br>";
 						}
 					}
 				}
-	
+			else if (mode == "Overview") {																// Overview
+				$("#lpTitle").html("Lesson plan overview");												// Set title
+				str=app.rev.overview;																	// Show it
+				}
 			$("#revBodyDiv").html(str);																	// Add to div
 			$("[id^=revTalk-]").off("click");															// Remove existing handlers
 			$("[id^=revTalk-]").on("click", function(e) {												// On click of ARC step
-				var id=e.target.id.substr(8);															// Get arc
+				if (app.voice.talking || app.gettingEntities)  return;									// Not while busy
+				var id=e.currentTarget.id.substr(8);													// Get arc
 				o=app.arc.tree[id];																		// Point at ARC
-				if (isNaN(id))	o=o.text;																// If an ARC, deliver text from ARC
-				else			o="Yes,  "+app.students[id].id;											// If number, respond to student
-				app.voice.Talk(o,"instructor");															// Talk
-				app.OnPhrase(o);	
+				app.voice.Talk(o.text,"instructor");													// Talk
+				app.OnPhrase(o.text);	
 				});
 			}
-	
 		}
 
 } // Review class closure
@@ -580,6 +594,7 @@ class ARC  {
 		var str="https://docs.google.com/spreadsheets/d/"+id+"/export?format=tsv";						// Access tto
 		var xhr=new XMLHttpRequest();																	// Ajax
 		xhr.open("GET",str);																			// Set open url
+		xhr.send();																						// Do it
 		xhr.onload=function() { 																		// When loaded
 			var i,j,o,v,id,step=0;
 			var last="",goal="";
@@ -588,7 +603,7 @@ class ARC  {
 			tsv=tsv.split("\n");																		// Split into lines
 			for (i=1;i<tsv.length;++i) {																// For each line
 				v=tsv[i].split("\t");																	// Split into fields
-				if (v[1] == "A") {																		// New action
+				if (v[1].match(/A|I/i)) {																// New ARC or instruction
 					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase(),step=0; 						// Whole new goal
 					else						step++;													// New step
 					o=_this.tree[goal+"-"+step]={ con:[], rso:null, aso:null, cso:null, }; 				// A new ARC
@@ -610,15 +625,15 @@ class ARC  {
 					}
 			_this.Extract();																			// Extract keywords and entities
 			};									
-		xhr.send();																						// Do it
-		
+
 		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
 			if ((xhr.readyState === 4) && (xhr.status !== 200)) {  										// Ready, but no load
 				Sound("delete");																		// Delete sound
 				PopUp("<p style='color:#990000'><b>Couldn't load Google Doc!</b></p>Make sure that <i>anyone</i><br>can view it in Google",5000); // Popup warning
 				}
 			};		
-		}
+		
+			}
 
 	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM ARC
 	{
@@ -708,33 +723,34 @@ class ARC  {
 				app.pickingStudent=arc;																	// Send this message
 				Sound("ding");																			// Ding
 				}
-			else{																						// Noone reponded
+			else{																						// No one reponded
 				text="Nobody reponded to you!";															// Message
 				app.rec.Add({ o:'R', who:null, text:"", res:0 });										// Add to record
 				Prompt(text,5); 																		// Show prompt				
 				Sound("delete");
 				}
 			}
-		if (app.curStudent == -2) {																		// If whole class responding with nods
-			for (i=0;i<app.students.length;++i)															// For eac hstudent
+		else if (app.curStudent == -2) {																// If whole class responding with nods
+			for (i=0;i<app.students.length;++i)															// For eachs tudent
 				if (this.MarkovFindResponse(arc,i) == 1)												// If right
 					app.sc.StartAnimation(app.students[i].id,app.seqs["nodYes"]);						// Nod yes
-			}
+				app.curStudent=-1;																		// Stop nodding
+				}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(arc,app.curStudent);												// Get, compute, and save right response to ARC
-			if (r)	text=this.tree[arc].res[r-1],app.voice.Talk(text);									// If something to say
-			else 	text=app.students[app.curStudent].id+" didn't repond to you!",Prompt(text,5),Sound("delete"); // Show student didn't respond
+			if (r)	text=this.tree[arc].res[r-1],app.voice.Talk(text),Prompt(r ==1 ? "Right answer" : "Wrong answer",5);	// If something to say
+			else 	text=app.students[app.curStudent].id+" didn't repond to you!",Prompt(text,5),Sound("delete"); 			// Show student didn't respond
 			app.rec.Add({ o:'R', text:text, who:r ? app.curStudent : null, res:r });					// Add to record
 			}
 		}
 		
 	MarkovFindResponse(arc, sid) 																	// FIND RESPOSE USING MARKOV CHAIN
 	{	
-		var so;
-		var ability=app.students[sid].ability;															// Get student ability
+		var so,ability=.5;
+		if (sid >= 0) ability=app.students[sid].ability;												// Get student ability
 		var r=(Math.random()-.5)*.1;																	// Get jitter factor
 		var tm=[ [0.0, .40, .60], [0.0, .55-r, .45+r], [0.0, .46, .54] ];								// Markov transition matrix
-		if (app.students[sid].rMatrix[arc])	{															// If been there already,
+		if ((sid >= 0) && app.students[sid].rMatrix[arc])	{											// If been there already, for an individual student
 			so=app.students[sid].rMatrix[arc];						 									// Use last stage matrix as starting matrix
 			so=MatrixMultiply(so,tm);																	// Get response matrix stage
 			}
@@ -746,7 +762,7 @@ class ARC  {
 				so=[[0,r,1-r]];																			// Set starting matrix
 				}
 			}
-		app.students[sid].rMatrix[arc]=so;																// Save for later responses
+		if (sid >= 0) app.students[sid].rMatrix[arc]=so;												// Save for later responses
 		trace("Score:"+app.arc.tree[arc].score.toFixed(2)+" Entities:"+app.arc.tree[arc].escore.toFixed(2)+" Match:"+app.arc.tree[arc].matched.toFixed(2)+" Keywords:"+app.arc.tree[arc].kscore.toFixed(2));	// Show results
 		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
 		return r;																						// Return type of response
@@ -755,16 +771,18 @@ class ARC  {
 	Parse(text, data, callback)																		// PARSE TEXT STRING
 	{
 		if (!text)	return;																				// Quit if no text
+		app.gettingEntities=1;																			// Waiting for entities from AI
 		try {
 			if (!window.location.search.match(/noai/i))													// Unless turned off
 				$.ajax({ url: 'https://api.wit.ai/message',												// Send to WIT
 					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },				// Text and api id
 					dataType: "jsonp", method: "GET",													// JSONP
 					success: (r)=> {																	// When parsed
+						app.gettingEntities=0;															// Not waiting
 						trace(">>> "+r._text);
 						var i,c,v,s="",str="";
 						if (r.error) {																	// If an error
-							trace("*****************\nWit error: "+r.error+"\n***********");			// Show error
+							trace("************\nWit error: "+r.error+"\n***********");					// Show error
 							return;																		// Quit
 							}	
 						for (var entity in r.entities) {												// For each entity parsed
@@ -784,7 +802,7 @@ class ARC  {
 																						
 						}
 				});
-		} catch(e) { trace("*****************\nWIT error: "+e.error+"\n***********"); }					// Show error
+		} catch(e) { app.gettingEntities=0;	trace("***********\nWIT error: "+e.error+"\n*********"); }	// Show error
 	}
 
 } // ARC class closure
