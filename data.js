@@ -281,36 +281,35 @@ class Review  {
 			this.selectedIndex=0;																		// Reset
 		});
 
-		$("[id^=revStep-]").on("click", function(e) {													// On click of instructor event
-			var id=e.target.id.substr(8);																// Get id of event
-			app.bb.Playback({ o:'C', s:1 }); app.bb.Playback({ o:'C', s:0 });							// Clear blackboards																		
-			for (i=0;i<app.rec.record.length;++i) {														// For each event
-				o=app.rec.record[i];																	// Point at event
-				if (o.t > app.rec.record[id].t)															// If past clicked event
-					break;																				// Quit drawing													
-				if (o.o != 'B')	app.bb.Playback(o);														// Draw if a draw event, if not open or close
-				}
-			});
-
 		function refreshBody(mode) {																// REFRESH BODY CONTENT
 			var str="";	
 			if (mode == "Review")	{																	// Session review
+				var j,last=0,e;
 				str="";																					// Title
 				$("#lpTitle").html("Lesson plan review");												// Set title
 				for (i=0;i<app.rec.record.length;++i) {													// For each event
 					o=app.rec.record[i];																// Point at event
-//		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 6px 0 0 0'><i>Click box to see backboard at time></i></div>"; 
 					if (o.o == 'S') {																	// Instructor
-						str+="<div class='lz-textS' id='revStep-"+i+"' ";								// Start div
-						str+=" title='Entities are "+o.ent;												// Tooltip
-						if (o.arc)	str+="\n"+Math.floor(o.score*100)+"% match with "+o.arc+"\nEntities are "+app.arc.tree[o.arc].ents+"";	// Arc and entities
-						str+="'>"+o.text+"</div>";
+						str+="<div style='width:75%'><b>"+o.text+"</b>";								// Message	
+						for (j=0;j<app.rec.record.length;++j) {											// For each record event
+							e=app.rec.record[j];														// Point at record
+							if ((e.t >= last) && (e.t < o.t) && ((e.o == "M") || (e.o == "T") || (e.o == "P"))) {	// Some drawing in this period
+								str+="&nbsp;&nbsp;<img id='revStep-"+i+"' title='Show blackboard' src='img/bbbut.png' style='cursor:pointer'>";
+								break;																	// Just need one
+								}
+							}
+						str+="</div>";																	// End instructor div
+						last=o.t;																		// Save last time
 						}
 					else if (o.o == 'R') {																// Student
-						w=((o.who == null) || (who < 0)) ? ""  : app.students[o.who].id; 				// Student name
-						str+="<div style='text-align:right;width:100%;margin:-16px 0 24px 0'>";			// Enclosing div
-						str+="<span style='float:right;color:#ccc'><i>"+w+"</i>&nbsp;</span><br>";		// Who's talking
-						str+="<span class='lz-textR' title='"+o.res+"'>"+(o.text ? o.text : "Nobody responded")+"</span><br></div><br>";	// Response
+						w=((o.who == null) || (o.who < 0)) ? ""  : app.students[o.who].id; 				// Student name
+						str+="<div style='text-align:right;width:100%'>";								// Enclosing div
+						str+="<span style='color:#999'><i>"+w+"</i>&nbsp;</span><br>";					// Who's talking
+						str+="<div style='display:inline-block;width:75%;";								// Text div
+						if (o.res == 1) 		str+="color:#009900";									// Red if wrong
+						else if (o.res == 2) 	str+="color:#990000";									// Green if right
+						str+="'>";
+						str+=(o.text ? o.text : "<i>Nobody responded</i>")+"</div><br></div></div><br>"; // Response
 						}
 					}
 				}
@@ -350,6 +349,24 @@ class Review  {
 				app.voice.Talk(o.text,"instructor");													// Talk
 				app.OnPhrase(o.text);	
 				});
+				
+			$("[id^=revStep-]").off("click");															// Remove existing handlers
+			$("[id^=revStep-]").on("click", function(e) {												// On click of instructor event
+				var i;
+				var id=e.target.id.substr(8);															// Get id of event
+				app.bb.Playback({ o:'C', s:1 }); app.bb.Playback({ o:'C', s:0 });						// Clear blackboards																		
+				for (i=0;i<app.rec.record.length;++i) {													// For each event
+					o=app.rec.record[i];																// Point at event
+					if (o.t > app.rec.record[id].t)														// If past clicked event
+						break;																			// Quit drawing													
+					if (o.o == 'P') {																	// If a picture
+						app.bb.Playback({ o:"PW", p:o.p, s:o.s, resume:i+1, end:app.rec.record[id].t}); // Wait for it to be loaded before continuing
+						break;																			// Quit for now, resume in callback
+						}
+					else if (o.o != 'B')	app.bb.Playback(o);											// Draw if a draw event, if not open or close
+					}
+				});
+
 			}
 		}
 

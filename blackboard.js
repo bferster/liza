@@ -19,7 +19,6 @@ class Blackboard  {
 		this.backCol="#333";																			// Background color
 		this.curSideId="#blackboardCan-0";																// Currently active blackboard side
 		this.InitCanvas(); 																				// Init left and right canvas
-		this.SetSide(this.curSide);																		// Set proper side
 		$("#BBClearBut").on("click", ()=> { app.bb.Clear(); });											// On clear button click
 		$("[id^=BB-]").on("click", function() { app.bb.ButtonRoute(this.id)	});							// On BB Drawing menu button click
 		$("#BBSideBut").on("click", ()=> { app.bb.SetSide(1-app.bb.curSide); });						// On side click, toggle
@@ -35,7 +34,8 @@ class Blackboard  {
 		this.ctx[1].fillStyle=this.backCol;																// Right
 		this.ctx[0].fillRect(0,0,this.wid,this.hgt);													// Left clear
 		this.ctx[1].fillRect(0,0,this.wid,this.hgt);													// Right
-		this.SetPic("Math lesson",1);	this.SetPic("Liza tips",2);										// Put up initial slides
+		this.SetSide(1);	this.SetPic("Liza tips",true);												// Set right side, set pic and record
+		this.SetSide(0);	this.SetPic("Math lesson",true);											// Left 
 	}
 
 	ButtonRoute(but)																				// ROUTE BASED ON BUTTON PICK
@@ -47,10 +47,10 @@ class Blackboard  {
 		$("#BBImagePicker").remove();																	// Remove old picker
 		$(this.curSideId).off("mousedown");		$(this.curSideId).off("mouseup");						// Unbind events	
 		$(this.curSideId).off("mousemove");		$(this.curSideId).off("keyup");			
-		if (but == "BB-DrawBut")		this.Draw(false);												// Drawing
-		else if (but == "BB-EraseBut")	this.Draw(true);												// Erasing
-		else if (but == "BB-ImageBut")	this.ChoosePic();												// Image
-		else if (but == "BB-TextBut")	this.Text();													// Text
+		if (but == "BB-DrawBut")				this.Draw(false);										// Drawing
+		else if (but == "BB-EraseBut")			this.Draw(true);										// Erasing
+		else if (but == "BB-ImageBut")			this.ChoosePic();										// Image
+		else if (but == "BB-TextBut")			this.Text();											// Text
 		$(this.curSideId).css("cursor","auto");															// Normal curson
 		}
 
@@ -97,7 +97,7 @@ class Blackboard  {
 	ChoosePic()																						// CHOOSE PIC TO SHOW																			
 	{
 		var trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
-		trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"' onclick='app.bb.SetPic($(this).text())' ";
+		trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"' onclick='app.bb.SetPic($(this).text(),true)' ";
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		$("#BB-ImageBut").css("box-shadow","0 0 16px 4px #009900");										// Highlight button
 		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
@@ -110,21 +110,21 @@ class Blackboard  {
 		$("body").append(str+"</div");																	// Add popup	
 	}
 
-	SetPic(label, init)																					// SHOW PIC																			
+	SetPic(label, record, callback)																	// SHOW PIC																			
 	{
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
-		var imageObj=new Image();
+		var imageObj=new Image();																		// Create image
+		imageObj.side=this.curSide;																		// Tag side
 		if (label == "Founding fathers")	imageObj.src="assets/FoundingFathers.jpg";
 		if (label == "US map")				imageObj.src="assets/USMap.png";
 		if (label == "Math lesson")			imageObj.src="assets/BB2.png";
 		if (label == "Liza tips")			imageObj.src="assets/BB1.png";
-		if (!init)	app.rec.Add({ o: 'P', p: label, s:this.curSide }); 									// Add to record, unless initting
-
+		if (record)							app.rec.Add({ o: 'P', p: label, s:this.curSide }); 			// Add to record, unless initting
 		imageObj.onload=function() { 																	// When loaded
-			var side=init ? init-1 : app.bb.curSide;													// Set side
-			app.bb.ctx[side].drawImage(this,0,0,512,256);												// Add image 				
-			app.bb.texMap[side].needsUpdate=true;														// Flag the tex map as needing updating
+			app.bb.ctx[this.side].drawImage(this,0,0,512,256);											// Add image 				
+			app.bb.texMap[this.side].needsUpdate=true;													// Flag the tex map as needing updating
+			if (callback)	callback();																	// Callback if active
 			}
 	}
 
@@ -209,7 +209,25 @@ class Blackboard  {
 			this.ctx[o.s].fillStyle=this.backCol;														// Erasure color
 			this.ctx[o.s].fillRect(o.x, o.y-this.fontHgt*.75, this.fontHgt, this.fontHgt);				// Clear last char
 			}
-		else if (o.o == "P") { 	this.SetPic(o.p);  }													// Pic
+		else if (o.o == "P")  { this.SetPic(o.p); }														// Pic
+		else if (o.o == "PW") {																			// Use callback for load records AFTER pic is loaded
+			var r;
+			this.SetPic(o.p,null, function() {															// Load pic, callback when loaded
+				for (var i=o.resume;i<app.rec.record.length;++i) {										// For each event
+					r=app.rec.record[i];																// Point at event
+					if (r.o == 'P') {																	// If a picture
+						app.bb.Playback({ o:"PW", p:r.p, s:r.s, resume:i+1, end:o.end}); 				// Wait for it to be loaded before continuing
+						break;																			// Quit for now, resume in callback
+						}
+					if (r.t > o.end)																	// If past clicked event
+						break;																			// Quit drawing													
+					else if (r.o != 'B')	app.bb.Playback(r);											// Draw if a draw event, if not open or close
+					}
+				}); 
+			}
+			
+			
+			
 		else if (o.o == "C") { 																			// Clear
 			this.ctx[o.s].fillStyle=this.backCol;														// Color
 			this.ctx[o.s].fillRect(0,0,this.wid,this.hgt);												// Clear
