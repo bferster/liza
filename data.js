@@ -244,7 +244,7 @@ class Review  {
 		this.mode="Overview";																			// Start off in overview
 	}
 
-	Reviewer()																						// REVIEW LESSON PLAN SCRIPT												
+	Reviewer()																						// REVIEW LESSON MAP SCRIPT												
 	{
 		var i,w,o;
 		if ($("#reviewDiv").length) {																	// If already up, bring it down
@@ -255,9 +255,9 @@ class Review  {
 		str+="width:324px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 358px);top:calc(50vh - 178px)'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px;padding-bottom:30px'";
 		str+="id='lpTitle'></span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
-		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:8px'></div>"; 
+		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div>"; 
 		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0'>";
-		str+=MakeSelect("revMode",false,["Overview","Hints","Full plan","Review"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
+		str+=MakeSelect("revMode",false,["Overview","Hints","Full map","Review"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
 		str+=MakeSelect("revStu",false,["Student"])+"</div>"; 
 			
 		$("body").append(str);																			// Add to body
@@ -286,7 +286,7 @@ class Review  {
 			if (mode == "Review")	{																	// Session review
 				var j,last=0,e;
 				str="";																					// Title
-				$("#lpTitle").html("Lesson plan review");												// Set title
+				$("#lpTitle").html("Lesson map review");												// Set title
 				for (i=0;i<app.rec.record.length;++i) {													// For each event
 					o=app.rec.record[i];																// Point at event
 					if (o.o == 'S') {																	// Instructor
@@ -314,14 +314,14 @@ class Review  {
 					}
 				}
 			else if (mode == "Hints")	{																// Gists
-				$("#lpTitle").html("Lesson plan hints");												// Set title
+				$("#lpTitle").html("Lesson map hints");												// Set title
 				for (var arc in app.arc.tree) {															// For each ARC
 					o=app.arc.tree[arc];																// Point at ARC
 					if (o.gist)		str+="<li style='padding-bottom:4px'>"+o.gist+"</li>";				// Add gist
 					}
 				}
-			else if (mode == "Full plan")	{															// Full plan
-				$("#lpTitle").html("Full lesson plan");													// Set title
+			else if (mode == "Full map")	{															// Full map
+				$("#lpTitle").html("Full lesson map");													// Set title
 				for (var arc in app.arc.tree) {															// For each ARC
 					o=app.arc.tree[arc];																// Point at ARC
 					if (o.text)	{																		// If defined
@@ -337,7 +337,7 @@ class Review  {
 					}
 				}
 			else if (mode == "Overview") {																// Overview
-				$("#lpTitle").html("Lesson plan overview");												// Set title
+				$("#lpTitle").html("Lesson map overview");												// Set title
 				str=app.rev.overview;																	// Show it
 				}
 			$("#revBodyDiv").html(str);																	// Add to div
