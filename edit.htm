@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
+	<title>&nbsp; Lesson Map Editor</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script src="https://apis.google.com/js/api.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link   rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+ 	<style>
+		 body { 			font-family: Verdana,Geneva,sans-serif; font-size:14px; padding:0; margin:0; 
+		 					box-sizing: border-box; background-color: #f8f8f8;	
+							}
+		.wm-main { 			width:100%;  overflow:auto;  display:none; min-width:1450px;
+							}
+		.wm-map {	 		float:left; overflow:hidden; padding:24px; width: calc(100vw - 1100px); min-width:360px; 
+							}
+		.wm-confirm {		position: absolute;  width: 350px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
+							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
+							}
+		.wm-splash { 		width:100%; color:#999; text-align:center; margin-top:10%; display:none;
+							}
+		.wm-header { 		background-color: #bbb; width:100%; color:#fff;	padding: 8px 0px;
+							}
+		.wm-logo { 			height:30px; vertical-align: top; margin:0px 16px; cursor:pointer;
+							}
+		.wm-courseTitle { 	font-size: 24px; font-weight: bold; margin-right:32px; cursor:pointer;
+							}
+		.wm-pageTitle {		color:#333;	font-size: 24px; text-align:center; font-weight: bold; padding-top:16px; padding-bottom:8px;
+							}
+		.wm-popup {			position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top: calc(50% - 50px);
+							border-radius: 8px; background-color: #fff; border: 1px solid #009900; box-shadow: 4px 2px 12px 2px #aaa; 
+							text-align:center; display: none;
+							}
+		.wm-is {			border-radius:10px; padding-left:8px; padding-right:8px; padding-top:1px;
+							border:1px solid #999; font-size:12px; height:20px; width:300px;
+							}
+		.wm-bs {			border-radius: 16px; padding-left: 8px; padding-right: 8px; display: inline-block; height: 17px; padding-top: 1px;
+							font-size: 12px; background-color: #27ae5f; cursor: pointer; text-align: center; color:#fff; user-select: none;
+							}
+		.wm-tree {      	user-select: none; width: 100%; margin-left:40px;
+							padding: 0px 0; font-size: 14px; text-align: left; 
+							}
+
+		.wm-tree ul { 		list-style: none outside none; padding: 0 }
+		.wm-tree li a { 	line-height: 20px; cursor: pointer; }
+		.wm-tree > ul > li > a { color:#000; display: block;  font-weight: normal; position: relative; text-decoration: none; }
+		.wm-tree li.parent > a { padding: 0 0 0 16px;  }
+		.wm-tree li.parent > a:before { background-image: url("img/treebuts.gif"); content: ""; display: block;
+										height: 11px; left: 0; position: absolute; top: 4px; width: 11px;  background-position: 0px;
+										}
+		.wm-tree ul li.active > a:before { background-position: 22px; }
+		.wm-tree ul li ul 	{ border-left: 1px solid #ccc;  display: none; margin: 0 0 0 5px; padding: 0 0 0 10px; }
+		.wm-tree ul li ul li { position: relative; }
+
+	</style>
+
+</head>
+<body>
+
+	<div id='mainDiv' class='wm-main'>
+		<div id='headerDiv' class='wm-header'>
+			<span id='courseTitle' class='wm-courseTitle'>Demo session</span>
+			<span id='menuMsg' style='display:none;margin-left:32px'></span>
+			<div id='showgdoc' title='Load new map' style='float:right;margin-right:16px;cursor:pointer;margin-top:6px'></div>
+			</div>
+		<div id='mapDiv' class='wm-map'></div>
+	</div>
+	<div id='splashDiv' class='wm-splash'>
+		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br>
+		<br><p style="color:#000;font-size:14px"><em>A tool for engaging people in highly affective script-driven discourse<br>for learning and practicing goal-directed behaviors.</em></p>
+	</div>
+		
+<script>
+
+	if ((location.protocol != 'https:') && (window.location.host != "localhost")) location.href = 'https:' + window.location.href.substring(window.location.protocol.length); // FORCE HTTPS!
+
+	var app=null;																	
+	
+	$(document).ready(function() {								           				// ON PAGE LOADED
+		var url=window.location.search.substring(1);						   			// Get query string
+		app=new App();																	// Alloc app
+		app.Draw();
+		if (window.location.host != "localhost") {										// Not in debug
+			$("#splashDiv").fadeIn();													// Fade in splash page
+			$("#mainDiv").fadeIn(2000);													// Fade in main
+			}
+		else	$("#mainDiv").fadeIn(0);												// Load fast
+		});
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// APP
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class App  {																
+
+	constructor(id)   															// CONSTRUCTOR
+	{
+		app=this;
+		this.arcs=[ { name:"Session name", id:1, status:0, body:"", children:[], kids:[]}];							
+		this.tree=null;																// Holds arcs tree
+		this.undos=[];																// Holds undos
+		this.curUndo=0;																// Undo counter
+	}
+
+	Draw()																		// DRAW
+	{
+		var str="<b>Learning map:</b><i> (Click to edit)</i><br>";					// Tree label
+		str+="<div id='treeDiv' class='wm-tree'></div>";							// Add div to hold tree
+		str+="<div id='addStepBut' class='wm-bs'>Add new step</div>&nbsp;&nbsp;";	// Add button
+		$("#mapDiv").html(str);														// Draw map part
+		app.tree=new Tree();														// Show arc tree				
+
+		$("#saveCourseBut").on("click", ()=> {  									// ON SAVE COURSE
+			var i,d=[];
+//			var v=app.doc.MakeTabFile().split("\n");								// Split into rows
+			for (var i=0;i<v.length;++i)											// For each row
+				d.push(v[i].split("\t"));											// Add array of fields
+//			SaveSpreadsheet(app.doc.courseId,d);									// Save to GDrive
+	});
+
+		$("#addStepBut").on("click", ()=> {  										// ON ADD ARC PANE
+			app.AddNewArc(app.tree.curId); 										// Add arc
+			var id=app.arcs[app.arcs.length-1].id;									// New id
+			app.tree.Init(id);														// Remake tree
+			Sound("ding"); 															// Ding
+			});
+
+	}
+
+	AddNewArc(parent, id, name)																					// ADD NEW ARC
+	{
+		if (parent < 0)	return;																						// Quit on invalid parent
+		if (!id)	id=this.UniqueArcId(parent);																	// If not spec'd add unique id based on parent
+		if (!name)	name="Rename this";																				// And name
+		this.arcs.push({ name:name, id:id, status:0, body:"", parent:parent, kids:[], children:[]});				// Add arc
+		
+		parent=this.FindArcById(parent);																			// Point at parent arc
+		if (parent) {																								// If has a parent
+			parent.children.push(id);																				// Add id to children	
+			parent.kids.push(this.arcs.length-1);																	// Add index to kids	
+			}
+		}
+
+	UnlinkArd(id)																								// UNLINK ARC
+	{
+		var i=this.FindArcIndexById(id);																			// Get index
+		if (i <= 0)	return;																							// Root or invalid index
+		var o=this.FindArcById(this.arcs[i].parent);																// Get pointer parent
+		if (!o)			return;																						// Invalid parent
+		for (i=0;i<o.children.length;++i) 																			// For each child
+			if (o.children[i] == id)  {																				// Matches this id
+				o.kids.splice(i,1);																					// Remove from from kids
+				o.children.splice(i,1);																				// Remove from from children
+				break;
+				}
+	}
+
+	UniqueArcId(id) 																							// MAKE UNIQUE ARC ID BASED ON PARENT
+	{	
+		var nid,add=1;																								// Add number																				
+		nid=id+""+add;																								// Add number to parent
+		while (this.FindArcById(nid))																				// While not unique
+			nid=id+""+(++add);																						// Add to count until it is																					
+		return nid;																									// Return unique id												
+	}
+	
+	FindArcById(id, objArray) {																					// FIND PTR TO OBJECT FROM ID
+		var i;
+		var o=objArray ? objArray : this.arcs;																		// Point at array of object array
+		var n=o.length;																								// Set length
+		for (i=0;i<n;++i) {																							// For each obj
+			if (id == o[i].id) 																						// A match
+				return o[i];																						// Return ptr to obj
+			}
+		return null;																								// Not found
+		}
+
+	FindArcIndexById(id, objArray ) {																			// FIND INDEX OF OBJECT FROM ID
+		var i;
+		var o=objArray ? objArray : this.arcs;																		// Point at array of object array
+		var n=o.length;																								// Set length
+		for (i=0;i<n;++i) {																							// For each arc
+			if (id == o[i].id) 																						// A match
+				return i;																							// Return ptr to arc
+			}
+		return -1;																									// Not found
+		}
+
+	DescendedFrom(id, testId) 																					// FIND IF IS A DESCENDENT
+	{		
+		var par=this.FindArcById(testId);																			// Point at parent
+		while (par) {																								// While still a parent
+			if (par.parent == id)	return true;																	// It's in the chain
+			par=this.FindArcById(par.parent);																		// Go up a level
+			}
+		return false;																								// Not in the chain
+	}
+
+	FindArcLevelById(id) {																						// FIND LEVEL FROM ID
+		var level=0;
+		var o=this.FindArcById(id);																					// Point 
+		if (!o)	return 0;																							// A floater
+		while (o.parent) {																							// While not root
+			o=this.FindArcById(o.parent);																			// Set id to parent and go up hierarchy
+			if (!o)	return 0;																						// At root level
+			++level;																								// Increase level
+			}
+		return level;																								// Return level
+	}
+
+	AddChildList()																								// ADD LIST OF CHILDREN
+	{	
+		var i,par,n=this.arcs.length;
+		for (i=0;i<n;++i) {																							// For each element
+			this.arcs[i].children=[];																				// Alloc arrays
+			this.arcs[i].kids=[];																
+			}
+		for (i=0;i<n;++i) {																							// For each element
+			if (this.arcs[i].parent === "")	delete(this.arcs[i].parent);											// Blank = undefined
+			par=this.FindArcIndexById(this.arcs[i].parent);															// Get index of parent
+			if (par < 0)	continue;																				// Skip if invalid parent
+			this.arcs[i].level=this.FindArcLevelById(this.arcs[i].id);												// Set level
+			if (par != undefined) {																					// If not root
+				this.arcs[par].children.push(this.arcs[i].id);														// Add id of child 
+				this.arcs[par].kids.push(i);																		// Add index of child 
+				}			
+			}
+	}
+
+	ChangeOrder(arcId, parent, mode)																			// CHANGE arc'S ORDER VIA PARENT OR PLACE IN CHILDREN
+	{
+		var i=this.FindArcIndexById(arcId);																			// Get index of arc to move	
+		if (i < 0)	return;																							// Quit if invalid
+		var j=this.FindArcIndexById(parent);																		// Get index of arc to move to	
+		if (j < 0)	return;																							// Quit if invalid
+	
+		if ((this.arcs[j].parent == this.arcs[i].parent) && (mode == "shift"))	{									// Pointing to same parent
+			var ii,fromKid,fromChild;
+			var o=this.FindArcById(this.arcs[j].parent);															// Point at parent arc
+			for (ii=0;ii<o.children.length;++ii) 																	// For reach child
+				if (o.children[ii] == arcId)  {																		// Save from point
+					fromKid=o.kids[ii];																				// Save from kids value
+					fromChild=o.children[ii];																		// Save from child value
+					o.kids.splice(ii,1);																			// Remove from from kids
+					o.children.splice(ii,1);																		// Remove from from children
+					break;
+					}
+			for (ii=0;ii<o.children.length;++ii) 																	// For reach child
+				if (o.children[ii] == parent)  {																	// Save from point
+					o.kids.splice(ii,0,fromKid);																	// Add from kids
+					o.children.splice(ii,0,fromChild);																// Add from children
+					break;
+					}
+		}
+	else{	
+		if (!this.DescendedFrom(this.arcs[i].id,this.arcs[j].id))													// If this log is not a descendant
+			this.arcs[i].parent=parent;																				// Set new parent
+		this.AddChildList();																						// Remake childen/kids arrays
+		}
+	}
+
+	Do()																		// DO
+	{
+//		this.undos[this.curUndo]=app.doc.MakeTabFile();								// Save undo
+		this.curUndo++;																// Inc undo count
+	}
+	
+	UnDo()																		// UNDO
+	{
+		if (this.curUndo < 1)														// Nothing to undo
+			return;																	// Quit
+//		app.doc.InitFromTSV(this.undos[this.curUndo-1]);							// Init show from undo
+		app.Draw();																	// Redraw
+		this.curUndo--;																// Dec undo count
+		Sound("ding");																// Ding
+	}
+
+}																					// CLASS CLOSURE
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TREE  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	class Tree {
+
+		constructor()  																	// CONSTRUCTOR
+		{
+			this.Init();																	// Init tree
+		}
+
+		Init(id) 																			// INIT TREE
+		{
+			var i,o;
+			var _this=this;																	// Save context		
+			this.curId=0;																	// Start at root
+			var o=app.arcs[0];																// Point at root												
+			if (!o)	return;																	// If invalid, quit
+			var str="<ul><li class='parent active'><a id='tr-"+o.id+"'>"+o.name+"</a></li>"; // Add root tree node
+			$("#treeDiv").html(str+"</ul>");												// Add to tree div
+			this.AddChildren($("#tr-"+o.id),0);												// Add children to tree
+		
+			$("#tr-"+o.id).parent().children('ul').slideToggle('fast');            			// Open course
+			$("[id^=tr-]").draggable( {	revert:true, delay:500 });							// Make lines draggable to change spotin tree
+			$("[id^=tr-]").droppable( {														// Make lines droppable 
+				drop: function(e,ui) {														// On drop
+					var mode=e.shiftKey ? "move" : "shift";									// Move or shift
+					app.Do();																// Save for undo
+					app.ChangeOrder(ui.draggable[0].id.substr(3),e.target.id.substr(3),mode); // Rearrange
+					_this.Init(ui.draggable[0].id.substr(3));								// Re-init tree	
+					Sound("ding");															// Ding
+					}
+			});
+
+			if (id != undefined) this.Open(id);	
+
+			$('.wm-tree li > a').on("click", function(e) {									// ON CLICK OF NODE TEXT
+				_this.handleTreeClick($(this),e);  											// Handle
+				Sound("click"); 															// Click
+				});      
+		}
+
+		Open(id)																		// OPEN TREE AT ID
+		{
+			var i;
+			var row=$("#tr-"+id);															// Row
+			var par=row.parent();															// Point at previous line
+			$('.wm-tree li a').each( function() {                          					// For each line
+				$(this).css({"color":"#000","font-weight":"normal"});      					// Normal
+				}); 
+			row.css({"color":"#009900","font-weight":"bold"});          					// Bold and green   
+			for (i=0;i<20;++i) {															// Iterate upwards
+				if ($(par).attr("class") == "wm-tree")	break;								// Quit at top of tree
+				if ($(par).attr("class") == "parent") {										// Has children
+					par.addClass('active');                         						// Active class on 
+					par.children('ul').slideToggle('fast');            						// Slide into place
+					}
+				par=par.parent();															// Up a level
+				}
+		}
+
+	handleTreeClick(row, e)																// HANDLE TREE CLICK
+	{
+		if (e.offsetX < 12) {                                         				  		// In icon
+			row.parent().toggleClass('active');                         					// Toggle active class on or off
+			row.parent().children('ul').slideToggle('fast');            					// Slide into place
+			}
+		else{																				// In text
+			$('.wm-tree li a').each( function() {                          					// For each line
+				$(this).css({"color":"#000","font-weight":"normal"});      					// Normal
+				}); 
+			row.css({"color":"#009900","font-weight":"bold"});          					// Bold and green   
+			this.curRow=row;																// Save row
+			this.curId=e.target.id.substr(3);											// Save pane id
+			trace(this.curId);											// Show pane
+			}
+		}
+
+	AddChildren(row, id) 																// ADD CHILDREN TO TREE RECURSIVELY
+	{
+		var i,o,oo;
+		if (id < 0)	return;																	// Invalid index
+		var o=app.arcs[id];																	// Point at parent												
+		if (!o)	return;																		// If invalid, quit
+		if (!o.children)	return;															// Quit if no children
+		var str="<ul style='display:none'>";												// Wrapper
+		for (i=0;i<o.children.length;++i) {													// For each child
+			str+="<li";																		// Start row
+			oo=app.arcs[o.kids[i]];															// Point at child arc via index
+			if (oo.children.length)	str+=" class='parent'"									// Add parent if it has children
+			str+="><a id='tr-"+oo.id+"'>"+oo.name;											// Add index and name
+			str+"</a></li>";																// Add label
+			}
+		row.after(str+"</ul>");																// Add to tree
+		for (i=0;i<o.children.length;++i) {													// For each child
+			row=$("#tr-"+o.children[i])
+			this.AddChildren(row,o.kids[i]);												// Recurse
+			}
+		}
+}																						// Class closure
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GOOGLE DRIVE
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var gdClientId="453812393680-8tb3isinl1bap0vqamv45cc5d9c7ohai.apps.googleusercontent.com";		// Google client id
+var gdScope="https://www.googleapis.com/auth/drive";											// Scope of access
+var gdKey="AIzaSyD0jrIlONfTgL-qkfnMTNdjizsNbLBBjTk";											// Google API key
+
+function SaveSpreadsheet(id, data)															// CLEAR AND SAVE DATA TO GDRIVE
+{
+		gapi.load('client:auth2', function() {
+			gapi.client.init({																	// Init
+			apiKey: gdKey, clientId: gdClientId, scope:gdScope,									// Params
+           	discoveryDocs:["https://sheets.googleapis.com/$discovery/rest?version=v4"],			// API discovery
+        	}).then(function () {																// When initted, listen for sign-in state changes.
+	        	gapi.auth2.getAuthInstance().isSignedIn.listen(doIt);							// Try						
+        		doIt(gapi.auth2.getAuthInstance().isSignedIn.get());							// Try
+	
+				function doIt(isSignedIn) {														// Do action
+					if (!isSignedIn) 															// If not signed in yet														
+						gapi.auth2.getAuthInstance().signIn();									// Sign in
+					else{																		// Clear and save
+						var params= { spreadsheetId:id, range: "A1:ZZZ100000" };				// Where to save it
+						var body= { majorDimension: "ROWS", values: data };						// Data to save
+						var request=gapi.client.sheets.spreadsheets.values.clear(params);		// Clear first
+						request.then(function(r) { 												// When cleared
+							params.valueInputOption="RAW";										// Send raw data
+							var request=gapi.client.sheets.spreadsheets.values.update(params,body);	// Send new data
+							request.then(function(r) {											// Good save
+								Sound("ding");													// Ding
+								PopUp("Course copied<br>to Google Drive!");						// Show popup
+								}, 
+								function(e) { trace(e.result.error.message); })					// Error reporting for send
+							}, 
+						function(e) { trace(e.result.error.message); });						// Error reporting for clear
+						}
+				}			
+			});
+		});
+}
+
+function GetSpreadsheet(allFiles, callback)													// RUN GDRIVE PICKER
+{
+	var oauthToken,pickerApiLoaded=false;
+	gapi.load('auth', { callback: function() {													// LOAD AUTH
+		window.gapi.auth.authorize({															// Authorize
+				apiKey: gdKey, client_id: gdClientId, scope:gdScope,immediate: false },			// Params
+				function(authResult) {															// On auth return
+					if (authResult && !authResult.error) {										// If OK
+						oauthToken=authResult.access_token;										// Set token
+						createPicker();															// Create picker
+						}
+				});																				// End auth.authorize()
+			}																					// End callback()
+		});																						// End auth()
+		
+	gapi.load('picker', {'callback': function() {												// LOAD PICKER							
+			pickerApiLoaded=true;																// Set flag
+			createPicker();																		// Create picker
+			}
+		});
+	
+	function createPicker() {																	// CREATE GDRIVE PICKER
+		if (pickerApiLoaded && oauthToken) {													// If loaded and authed
+			var view=new google.picker.DocsView(google.picker.ViewId.SPREADSHEETS).				// Make view
+			setOwnedByMe(allFiles).setIncludeFolders(true);										// Params
+			var picker=new google.picker.PickerBuilder().										// Make picker
+				addView(view).setOAuthToken(oauthToken).										// Params
+				setDeveloperKey(gdKey).setCallback(pickerCallback).build();						// Do it
+			picker.setVisible(true);															// Show picker
+			}
+		}
+
+	function pickerCallback(data) {																// FILE CHOSEN CALLBACK
+		if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {				// If picked
+			var doc=data[google.picker.Response.DOCUMENTS][0];									// Get doc
+			callback(doc.id,doc.name);															// Return name and id
+			}
+		}
+}																								// End closure
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HELPERS
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function ShortenString(str, len)													// SHORTEN A STRING TO LENGTH
+	{
+		if (str && str.length > len)														// Too long
+			str=str.substr(0,(len-3)/2)+"..."+str.slice((len-3)/-2);						// Shorten	
+		return str;																			// Return string
+	}
+
+	function ConfirmBox(title, content, callback, callback2)							// CONFIRMATION BOX
+	{
+		Sound("ding");																		// Ding sound
+		$("#confirmBoxDiv").remove();														// Remove 
+		$("body").append("<div class='wm-confirm' id='confirmBoxDiv'></div>");														
+		var str="<img src='img/scalelogo.png' width='32' style='vertical-align:-10px'/>&nbsp;&nbsp;";								
+		str+="<span style='font-size:18px; color:#666'><b>"+title+"</b></span><br>";
+		str+="<p>"+content+"<p>";
+		str+="<div style='float:right'><div id='confirmOK' class='wm-bs'>OK</div>";
+		str+="<div id='confirmCancel' class='wm-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
+		$("#confirmBoxDiv").html(str);	
+	
+		$("#confirmOK").on("click", function() {											// ON OK BUT
+				$("#confirmBoxDiv").remove();												// Remove 
+				if (callback)	callback();													// If callback defined, run it
+				});
+
+		$("#confirmCancel").on("click", function() {										// ON CANCEL BUT
+				$("#confirmBoxDiv").remove();												// Remove 
+				if (callback2)	callback2();												// If callback defined, run it
+				Sound("delete");															// Delete sound
+				});
+	}
+
+	function MakeSelect(id, multi, items, sel, extra, values)				// CREATE HTML SELECT
+	{
+		var	str="<select class='wm-is' style='width:200px' id='"+id+"'";		// Header
+		if (multi)																// Multi select
+			str+="multiple='multiple' size='"+multi+"'";						// Add flag
+		if (extra)																// If extra param
+			str+=extra;															// Add them
+		str+=">";																// End header
+		for (i=0;i<items.length;++i) {											// For each option
+			str+="<option";														// Add tag
+			if (values && values[i]) {											// If has a value
+				str+=" value='"+values[i]+"'";									// Add it
+				if (sel == values[i])	str+=" selected='selected'"				// If value selected, add tag
+				}
+			else if (sel == items[i])	str+=" selected='selected'"				// If name selected, add tag
+			str+=">"+items[i]+"</option>";										// End option
+			}	
+		return str+"</select>";													// End select				
+	}
+
+	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
+	{
+		if (p4 != undefined)
+			console.log(msg,p1,p2,p3,p4);
+		else if (p3 != undefined)
+			console.log(msg,p1,p2,p3);
+		else if (p2 != undefined)
+			console.log(msg,p1,p2);
+		else if (p1 != undefined)
+			console.log(msg,p1);
+		else
+			console.log(msg);
+	}
+
+	function Sound(sound, mute)												// PLAY SOUND
+	{
+		var snd=new Audio();													// Init audio object
+		if (sound.match(/\.mp3/i))		snd=new Audio(sound)					// If an MP3 file
+		else							snd=new Audio("img/"+sound+".mp3");		// Use built in mp3
+		if (!mute)	{															// If not initing or muting	
+			snd.volume=50/100;													// Set volume
+			snd.play();															// Play it
+			}
+		}
+	
+	function PopUp(msg, time, div)											// TIMED POPUP
+	{
+		var str="";
+		$("#popupDiv").remove();												// Kill old one, if any
+		str+="<div id='popupDiv' class='wm-popup'>"; 							// Add div
+		if (time == -1) {														// If has close but
+			time=100000;														// Increase time
+			str+="<img id='pu-close' src='img/closedot.gif' style='float:right;cursor:pointer'>";	// Add close button
+			}
+		str+=msg+"</div>"; 														// Add div
+		$(div ? "#"+div : "body").append(str);									// Add popup to div or body
+		$("#pu-close").click(function() { $("#popupDiv").remove(); });			// Remove on click of close but
+		$("#popupDiv").fadeIn(500).delay(time ? time : 2000).fadeOut(500)		// Animate in and out		
+	}
+
+</script>
+</body>
+</html>
