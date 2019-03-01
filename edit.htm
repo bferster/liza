@@ -77,7 +77,8 @@
 
 	if ((location.protocol != 'https:') && (window.location.host != "localhost")) location.href = 'https:' + window.location.href.substring(window.location.protocol.length); // FORCE HTTPS!
 
-	var app=null;																	
+	var app=null;
+	var result="";																	
 	
 	$(document).ready(function() {								           				// ON PAGE LOADED
 		var url=window.location.search.substring(1);						   			// Get query string
@@ -113,17 +114,17 @@ class App  {
 		str+=" contenteditable='true'></div><br>";		
 		str+="<div id='convertBut' class='wm-bs'>Convert to map</div></div>";		// Add button
 		str+="&nbsp;&nbsp;<div id='copyBut' class='wm-bs'>Copy to clipboard</div></div>";		// Ccopy button
-	$("#mapDiv").html(str);														// Draw map part
+		$("#mapDiv").html(str);														// Draw map part
 	
 		$("#convertBut").on("click", ()=> {  									// ON CONVERT
-			var r,i,s,ids=[];
-			var goal,step,str="";									
+			var r,i,s,ss,ids=[];
+			var goal,step;									
 			recurse($("#textDiv")[0].getElementsByTagName('ol')[0]);				// Iterate through ol's
 			for (i=0;i<ids.length;++i) {
 				r=RegExp(ids[i].a.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
-				str=str.replace(r,ids[i].b);										// Put real ids in		
+				result=result.replace(r,ids[i].b);										// Put real ids in		
 				}
-				trace(str)
+			trace(result)
 			
 			function recurse(obj) {													// Recurse thru ol's
 				if (!obj)	return;
@@ -134,16 +135,32 @@ class App  {
 						step=0;														// Start counting afresh
 						}
 					else{															// Normal line
-						step++;														// Inc step
-						if (obj.innerText.charAt(0) == "-") 	 str+="\tR-\t\t"+obj.innerText.substr(1);
-						else if (obj.innerText.charAt(0) == "+") str+="\tR+\t\t"+obj.innerText.substr(1);
-						else if (obj.innerText.charAt(0) == "?") str+="\tR?\t\t"+obj.innerText.substr(1);
-						else {
-							s=obj.innerText.match(/\[.*\]/i);
-							if (s) ids.push({ a:s[0], b:goal+"-"+step })
-							str+=goal+"-"+step+"\tA\t\t"+obj.innerText;
+						s=obj.innerText.match(/\[.*\]/i);							// An id tag
+						if (s) r=RegExp(s[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
+						if (obj.innerText.charAt(0) == "-") {						// Wrong response
+							ss=obj.innerText.substr(1);								// Get text
+							if (s)	ss=ss.replace(r,"");							// Remove id tag
+							result+="\tR-\t\t"+ss+"\t\t"+(s ? s[0] : "");			// Show
 							}
-						str+="\t\tnext\n"
+						else if (obj.innerText.charAt(0) == "+") {					// Right
+							ss=obj.innerText.substr(1);								// Get text
+							if (s)	ss=ss.replace(r,"");							// Remove id tag
+							result+="\tR+\t\t"+ss+"\t\t"+(s ? s[0] : "");			// Show
+							}
+						else if (obj.innerText.charAt(0) == "?") {					// Incomplete
+							ss=obj.innerText.substr(1);								// Get text
+							if (s)	ss=ss.replace(r,"");							// Remove id tag
+							result+="\tR?\t\t"+ss+"\t\t"+(s ? s[0] : "");			// Show
+							}
+						else{
+							if (s) ids.push({ a:s[0], b:goal+"-"+step })			// Instructor
+							ss=obj.innerText;										// Get text
+							if (s)	ss=ss.replace(r,"");							// Remove id tag
+							if (step)	result+=step+"\tA\t\t"+ss;					// Just number
+							else		result+=goal+"-"+step+"\tA\t\t"+ss;			// Show
+							step++;													// Inc step
+							}
+						result+="\n"
 						}
 					}
 				
@@ -154,9 +171,27 @@ class App  {
 			});
 
 			$("#copyBut").on("click", ()=> {  									// ON COPY
+				trace(123,result)
+				var textArea = document.createElement("textarea");
+				textArea.style.position = 'fixed';
+				textArea.style.top=textArea.style.left = 0;
+				textArea.style.width=textArea.style.height = '2em';
+				textArea.style.padding = 0;
+				textArea.style.border=textArea.style.outline=textArea.style.boxShadow = 'none';
+				textArea.style.background = 'transparent';
+				textArea.value = result;
+				document.body.appendChild(textArea);
+				textArea.select();
+				try {
+					if (document.execCommand('copy'))
+						Sound("ding");
+					else
+						Sound("delete");
+				} catch (err) {	Sound("delete"); }
+				document.body.removeChild(textArea);
 				});
 
-	}
+			}
 
 
 
