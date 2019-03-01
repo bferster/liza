@@ -15,7 +15,7 @@
 							}
 		.wm-main { 			width:100%;  overflow:auto;  display:none; min-width:1450px;
 							}
-		.wm-map {	 		float:left; overflow:hidden; padding:24px; width: calc(100vw - 1100px); min-width:360px; 
+		.wm-map {	 		margin:16px;
 							}
 		.wm-confirm {		position: absolute;  width: 350px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
@@ -108,9 +108,63 @@ class App  {
 
 	Draw()																		// DRAW
 	{
+		var str="<b>Learning map text:</b><i> (paste from Word)</i><br>";			// Label
+		str+="<div id='textDiv' style='width:600px;height:600px;background-color:#fff;padding:12px;overflow:auto'";
+		str+=" contenteditable='true'></div><br>";		
+		str+="<div id='convertBut' class='wm-bs'>Convert to map</div></div>";		// Add button
+		str+="&nbsp;&nbsp;<div id='copyBut' class='wm-bs'>Copy to clipboard</div></div>";		// Ccopy button
+	$("#mapDiv").html(str);														// Draw map part
+	
+		$("#convertBut").on("click", ()=> {  									// ON CONVERT
+			var r,i,s,ids=[];
+			var goal,step,str="";									
+			recurse($("#textDiv")[0].getElementsByTagName('ol')[0]);				// Iterate through ol's
+			for (i=0;i<ids.length;++i) {
+				r=RegExp(ids[i].a.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
+				str=str.replace(r,ids[i].b);										// Put real ids in		
+				}
+				trace(str)
+			
+			function recurse(obj) {													// Recurse thru ol's
+				if (!obj)	return;
+				if (obj.nodeName == "LI") {											// If a line
+					if (obj.innerText.charAt(0) == "!") {							// If a  goal
+						goal=obj.innerText.substr(1).trim().toUpperCase();			// Extract as current goal
+						goal=goal.replace(/ /g,"_");								// No spaces
+						step=0;														// Start counting afresh
+						}
+					else{															// Normal line
+						step++;														// Inc step
+						if (obj.innerText.charAt(0) == "-") 	 str+="\tR-\t\t"+obj.innerText.substr(1);
+						else if (obj.innerText.charAt(0) == "+") str+="\tR+\t\t"+obj.innerText.substr(1);
+						else if (obj.innerText.charAt(0) == "?") str+="\tR?\t\t"+obj.innerText.substr(1);
+						else {
+							s=obj.innerText.match(/\[.*\]/i);
+							if (s) ids.push({ a:s[0], b:goal+"-"+step })
+							str+=goal+"-"+step+"\tA\t\t"+obj.innerText;
+							}
+						str+="\t\tnext\n"
+						}
+					}
+				
+				
+				for (var i=0;i<obj.childNodes.length;++i) 							// For each child
+					recurse(obj.childNodes[i]); 									// Recurse
+				}
+			});
+
+			$("#copyBut").on("click", ()=> {  									// ON COPY
+				});
+
+	}
+
+
+
+	Draw2()																		// DRAW
+	{
 		var str="<b>Learning map:</b><i> (Click to edit)</i><br>";					// Tree label
 		str+="<div id='treeDiv' class='wm-tree'></div>";							// Add div to hold tree
-		str+="<div id='addStepBut' class='wm-bs'>Add new step</div>&nbsp;&nbsp;";	// Add button
+		str+="<div id='addStepBut' class='wm-bs'>Add new step</div>";				// Add button
 		$("#mapDiv").html(str);														// Draw map part
 		app.tree=new Tree();														// Show arc tree				
 
@@ -130,6 +184,8 @@ class App  {
 			});
 
 	}
+
+
 
 	AddNewArc(parent, id, name)																					// ADD NEW ARC
 	{
