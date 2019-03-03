@@ -117,16 +117,17 @@ class App  {
 		$("#mapDiv").html(str);														// Draw map part
 	
 		$("#convertBut").on("click", ()=> {  									// ON CONVERT
-			var r,i,s,ss,ids=[];
+			var r,i;
 			var goal,step;									
 			recurse($("#textDiv")[0].getElementsByTagName('ol')[0]);				// Iterate through ol's
-			for (i=0;i<ids.length;++i) {
-				r=RegExp(ids[i].a.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
-				result=result.replace(r,ids[i].b);										// Put real ids in		
-				}
+//			for (i=0;i<ids.length;++i) {
+//				r=RegExp(ids[i].a.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
+//				result=result.replace(r,ids[i].b);										// Put real ids in		
+//				}
 			trace(result)
 			
 			function recurse(obj) {													// Recurse thru ol's
+				var typ,s,ss
 				if (!obj)	return;
 				if (obj.nodeName == "LI") {											// If a line
 					if (obj.innerText.charAt(0) == "!") {							// If a  goal
@@ -135,29 +136,22 @@ class App  {
 						step=0;														// Start counting afresh
 						}
 					else{															// Normal line
-						s=obj.innerText.match(/\[.*\]/i);							// An id tag
-						if (s) r=RegExp(s[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
-						if (obj.innerText.charAt(0) == "-") {						// Wrong response
-							ss=obj.innerText.substr(1);								// Get text
-							if (s)	ss=ss.replace(r,"");							// Remove id tag
-							result+="\tR-\t\t"+ss+"\t\t"+(s ? s[0] : "");			// Show
-							}
-						else if (obj.innerText.charAt(0) == "+") {					// Right
-							ss=obj.innerText.substr(1);								// Get text
-							if (s)	ss=ss.replace(r,"");							// Remove id tag
-							result+="\tR+\t\t"+ss+"\t\t"+(s ? s[0] : "");			// Show
-							}
-						else if (obj.innerText.charAt(0) == "?") {					// Incomplete
-							ss=obj.innerText.substr(1);								// Get text
-							if (s)	ss=ss.replace(r,"");							// Remove id tag
-							result+="\tR?\t\t"+ss+"\t\t"+(s ? s[0] : "");			// Show
+						ss=obj.innerText;											// Get text
+						if (ss.match(/^[+-0?]+/)) {									// A response
+							typ="R"+ss.match(/^[+-0?]+/)[0];						// Set type
+							ss=ss.substr(typ.length-1);								// Remove from response
+							s=obj.innerText.match(/\[.*\]/i);						// An id tag
+							if (s) r=RegExp(s[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
+							if (s) 	ss=ss.replace(r,"");							// Remove id from response
+							result+="\t"+typ+"\t\t"+ss.trim()+"\t\t"+(s ? s[0] : ""); // Show
 							}
 						else{
-							if (s) ids.push({ a:s[0], b:goal+"-"+step })			// Instructor
-							ss=obj.innerText;										// Get text
-							if (s)	ss=ss.replace(r,"");							// Remove id tag
-							if (step)	result+=step+"\tA\t\t"+ss;					// Just number
-							else		result+=goal+"-"+step+"\tA\t\t"+ss;			// Show
+							typ=ss.match(/(^.+):/);									// Get type of action
+							if (typ)	ss=ss.replace(typ[0],""),typ=typ[1];		// Remove tag
+							else		typ="Q";									// Defaulr to question
+							ss=ss.trim();											// Trim it
+							if (step)	result+=step+"\t"+typ+"\t\t"+ss;			// Just number
+							else		result+=goal+"-"+step+"\t"+typ+"\t\t"+ss;	// Show
 							step++;													// Inc step
 							}
 						result+="\n"
