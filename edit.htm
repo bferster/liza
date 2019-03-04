@@ -127,7 +127,7 @@ class App  {
 			trace(result)
 			
 			function recurse(obj) {													// Recurse thru ol's
-				var typ,s,ss
+				var typ,s,ss;
 				if (!obj)	return;
 				if (obj.nodeName == "LI") {											// If a line
 					if (obj.innerText.charAt(0) == "!") {							// If a  goal
@@ -140,10 +140,10 @@ class App  {
 						if (ss.match(/^[+-0?]+/)) {									// A response
 							typ="R"+ss.match(/^[+-0?]+/)[0];						// Set type
 							ss=ss.substr(typ.length-1);								// Remove from response
-							s=obj.innerText.match(/\[.*\]/i);						// An id tag
+							s=obj.innerText.match(/\[(.*\]/i);						// An id tag
 							if (s) r=RegExp(s[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
 							if (s) 	ss=ss.replace(r,"");							// Remove id from response
-							result+="\t"+typ+"\t\t"+ss.trim()+"\t\t"+(s ? s[0] : ""); // Show
+							result+="\t"+typ+"\t\t"+ss.trim()+"\t\t"+(s ? s[1] : ""); // Show
 							}
 						else{
 							typ=ss.match(/(^.+):/);									// Get type of action

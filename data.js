@@ -22,7 +22,7 @@ class ARC  {
 		xhr.send();																						// Do it
 		xhr.onload=function() { 																		// When loaded
 			var i,j,o,v,id,step=0;
-			var last="",goal="";
+			var last="",goal="",next;
 			_this.tree=[];																				// Clear tree
 			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
 			tsv=tsv.split("\n");																		// Split into lines
@@ -33,18 +33,20 @@ class ARC  {
 					else						step++;													// New step
 					o=_this.tree[goal+"-"+step]={ con:[], rso:null, aso:null, cso:null, }; 				// A new ARC
 					o.text=v[3];																		// Add text
-					o.res=["",""];																		// Responses										
+					o.res=[];																			// Responses										
 					o.gist=v[2];																		// Get gist
-					o.next=["","",v[5] ? v[5] : ""];													// Add nexts
-					for (j=0;j<3;++j) 																	// For each next of last ARC
-						if (last && !_this.tree[last].next[j])	_this.tree[last].next[j]=goal+"-"+step;	// If last ARC had no nexts in this slot, use this one
-					last=goal+"-"+step;																	// A new last arc
+					o.next="";																			// Assume no next
+					if (last)	_this.tree[last].next=goal+"-"+step;									// Add next
+					last=goal+"-"+step;																	// A new last
 					}
-				else if (v[1].match(/R[+|-]/i)) { 														// Response
-					j=v[1].match(/R-/i) ? 1 : 0;														// 0=right, 1=wrong
-					o.res[j]=v[3];																		// Set response
-					if ((v[5] != "") && isNaN(v[5]))  	o.next[j]=v[5]+"-0";							// A goal, add post fix
-					else if (v[5])						o.next[j]=goal+"-"+v[5];			  			// Use current goal and add step
+				else if (v[1].match(/^R/i)) { 															// Response
+					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
+					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
+					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
+					if ((v[5] != "") && isNaN(v[5]))  	next=v[5]+"-0";									// A goal, add post fix
+					else if (v[5])						next=goal+"-"+v[5];			  					// Just a number, use current goal and add step
+					else 								next="";										// No next				
+					o.res.push({ rc: v[1].substr(1).trim(), text:v[3].trim(), next:next });				// Add response to ARC
 					}
 				else if (v[1].match(/ov/i))  app.rev.overview=v[3];										// Overview
 					}
@@ -135,7 +137,7 @@ class ARC  {
 
 	DeliverResponse(arc)																			// DELIVER RESPONSE
 	{
-		var i,j,n,r,so;
+		var i,j,n,r,o;
 		var text="";
 		if (!arc)	return;																				// Quit if no ARC
 		if (app.curStudent == -1) {																		// If whole class responding and looking for answer
@@ -150,7 +152,7 @@ class ARC  {
 				}
 			else{																						// No one reponded
 				text="Nobody reponded to you!";															// Message
-				app.rec.Add({ o:'R', who:null, text:"", res:0 });										// Add to record
+				app.rec.Add({ o:'R', who:null, text:"", r:0 });											// Add to record
 				Prompt(text,5); 																		// Show prompt				
 				Sound("delete");
 				}
@@ -163,13 +165,26 @@ class ARC  {
 				}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(arc,app.curStudent);												// Get, compute, and save right response to ARC
-			if (r)	text=this.tree[arc].res[r-1],app.voice.Talk(text),Prompt(r ==1 ? "Right answer" : "Wrong answer",5);	// If something to say
-			else 	text=app.students[app.curStudent].id+" didn't repond to you!",Prompt(text,5),Sound("delete"); 			// Show student didn't respond
-			app.rec.Add({ o:'R', text:text, who:r ? app.curStudent : null, res:r });					// Add to record
+			o=this.tree[arc];																			// Point at ARC
+			if (r == NONE) 	{																			// No response
+				Prompt(app.students[app.curStudent].id+" didn't repond to you!",5);						// Show prompt
+				Sound("delete");																		// Delete sound
+				}
+			else if (r == RIGHT) 		Prompt("Right answer");											// Show prompt
+			else if (r == WRONG) 		Prompt("Wrong answer");
+			else if (r == INCOMPLETE) 	Prompt("Incomplete answer");
+			for (var i=0;i<o.res.length;++i) {															// For each response	
+				if (o.res[i].rc[0] == r) {																// If this matches
+					text=o.res[i].text;																	// Use it
+					app.voice.Talk(text);																// Speak response
+					break;																				// Quit looking
+					}
+				}
+			app.rec.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
 			}
 		}
 		
-	MarkovFindResponse(arc, sid) 																	// FIND RESPOSE USING MARKOV CHAIN
+	MarkovFindResponse(arc, sid) 																	// FIND RESPONSE USING MARKOV CHAIN
 	{	
 		var so,ability=.5;
 		if (sid >= 0) ability=app.students[sid].ability;												// Get student ability
@@ -306,15 +321,17 @@ class Review  {
 						str+="<div style='text-align:right;width:100%'>";								// Enclosing div
 						str+="<span style='color:#999'><i>"+w+"</i>&nbsp;</span><br>";					// Who's talking
 						str+="<div style='display:inline-block;width:75%;";								// Text div
-						if (o.res == 1) 		str+="color:#009900";									// Red if wrong
-						else if (o.res == 2) 	str+="color:#990000";									// Green if right
+						if (o.r == RIGHT) 				str+="color:#009900";							// Green
+						else if (o.r == WRONG) 			str+="color:#990000";							// Red
+						else if (o.r == INCOMPLETE)		str+="color:#ffa500";							// Orange
+						else if (o.r == NONE)			str+="color:#000000";							// Black
 						str+="'>";
 						str+=(o.text ? o.text : "<i>Nobody responded</i>")+"</div><br></div></div><br>"; // Response
 						}
 					}
 				}
 			else if (mode == "Hints")	{																// Gists
-				$("#lpTitle").html("Lesson map hints");												// Set title
+				$("#lpTitle").html("Lesson map hints");													// Set title
 				for (var arc in app.arc.tree) {															// For each ARC
 					o=app.arc.tree[arc];																// Point at ARC
 					if (o.gist)		str+="<li style='padding-bottom:4px'>"+o.gist+"</li>";				// Add gist
@@ -325,13 +342,21 @@ class Review  {
 				for (var arc in app.arc.tree) {															// For each ARC
 					o=app.arc.tree[arc];																// Point at ARC
 					if (o.text)	{																		// If defined
-						w=o.next[2] ? app.arc.tree[o.next[2].toUpperCase()].text : "";					// Next ARC's text
+						w=o.next ? app.arc.tree[o.next.toUpperCase()].text : "";						// Next ARC's text
 						str+="<div title='"+w+"' id='revTalk-"+arc+"' style='padding-bottom:8px;cursor:pointer'>";		
 						str+="<b>"+o.text+"</b></div>";
-						w=o.next[0] ? app.arc.tree[o.next[0].toUpperCase()].text : "";					// Next ARC's text
-						if (o.res[0]) str+="<div title='"+w+"'><span style='color:#009900;margin-left:16px'><b>&check; &nbsp;</b></span>"+o.res[0]+"</div>";
-						w=o.next[1] ? app.arc.tree[o.next[1].toUpperCase()].text : "";					// Next ARC's text
-						if (o.res[1]) str+="<div title='"+w+"'><span style='color:#990000;margin-left:16px'><b>&cross; &nbsp;</b></span>"+o.res[1]+"</div>";
+						for (var i=0;i<o.res.length;++i) {												// For each response
+							w=o.res[i].next ? app.arc.tree[o.res[i].next.toUpperCase()].text : "";		// Next ARC's text
+							str+="<div title='"+w+"'>";													// Start of line
+							for (var j=0;j<o.res[i].rc.length;++j) {									// For each response in chain
+								str+="<span style='margin-left:16px;color:"								// Start check span
+								if (o.res[i].rc[j] == RIGHT) 			str+="#009900'><b>&check;";		// Right
+								else if (o.res[i].rc[j] == WRONG) 		str+="#990000'><b>&cross;"; 	// Wrong
+								else if (o.res[i].rc[j] == INCOMPLETE)	str+="#ffa500'><b>?"; 			// Incomplete
+								else if (o.res[i].rc[j] == NONE)		str+="#999999'><b>0"; 			// None
+								}
+							str+=" &nbsp;</b></span>"+o.res[i].text+"</div>";							// Finish response
+							}
 						str+="<br>";
 						}
 					}
@@ -384,12 +409,14 @@ class Record  {
 	{
 		this.record=[];																					// Holds record of actions
 		this.inPlayback=false;																			// In playback mode
+		this.resChain=[];																				// Holds last response chain
 	}
 
 	Add(event)																						// ADD EVENT TO RECORD
 	{
 		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
 		this.record.push(event);																		// Add to array																	
+		if (event.o == "R")  this.resChain.unshift(event.r);											// If response, add to top of response chain
 	}
 
 	Playback()																						// PLAYBACK ACTION IN RECORD

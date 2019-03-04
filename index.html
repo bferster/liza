@@ -121,6 +121,7 @@
 
 var app=null;																						// Holds app
 var isMobile=false;																					// Flag for mobile devices
+var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 
 	$(window).resize(function() {                                         						// ON WINDOW RESIZE
 		app.sc.Resize();																			// Resize 3D system
@@ -342,13 +343,9 @@ class App  {
 				}
 				
 			if (app.pickingStudent) {																// If students have their hands up
-				var txt;
 				if (app.curStudent < 0) app.curStudent=3;											// Default to Liza if still talking to class
 				app.DoAction("sit",true);															// Hands down
-				var r=app.arc.MarkovFindResponse(app.pickingStudent,app.curStudent);				// Get and save right response
-				if (r)	txt=app.arc.tree[app.pickingStudent].res[r-1],app.voice.Talk(txt);			// If something to say
-				else 	txt=app.students[app.curStudent].id+" didn't repond to you!",Prompt(txt,5),Sound("delete"); // Show student didn't respond
-				app.rec.Add({ o:'R', text:txt, who:app.curStudent, res:r });						// Add to record
+				app.arc.DeliverResponse(app.pickingStudent);										// Deliver response
 				app.pickingStudent="";																// Clear flag
 				Prompt("");																			// Clear prompt
 				return;	
