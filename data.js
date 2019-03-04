@@ -137,7 +137,7 @@ class ARC  {
 
 	DeliverResponse(arc)																			// DELIVER RESPONSE
 	{
-		var i,j,n,r,o;
+		var i,j,n,r,rc,o;
 		var text="";
 		if (!arc)	return;																				// Quit if no ARC
 		if (app.curStudent == -1) {																		// If whole class responding and looking for answer
@@ -158,10 +158,16 @@ class ARC  {
 				}
 			}
 		else if (app.curStudent == -2) {																// If whole class responding with nods
-			for (i=0;i<app.students.length;++i)															// For eachs tudent
+			n=0;
+			for (i=0;i<app.students.length;++i)															// For each student
 				if (this.MarkovFindResponse(arc,i) == 1)												// If right
-					app.sc.StartAnimation(app.students[i].id,app.seqs["nodYes"]);						// Nod yes
+					app.sc.StartAnimation(app.students[i].id,app.seqs["nodYes"]),n++;					// Nod yes
 				app.curStudent=-1;																		// Stop nodding
+				n/=app.students.length;
+				if (n < .33)		n=2;																// Most agree
+				else if (n < .66)	n=3;																// Mixed
+				else				n=1;																// Most disagreee
+				app.rec.Add({ o:'R', who:null, text:"% agreed", r:0 });										// Add to record
 				}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(arc,app.curStudent);												// Get, compute, and save right response to ARC
@@ -173,14 +179,15 @@ class ARC  {
 			else if (r == RIGHT) 		Prompt("Right answer");											// Show prompt
 			else if (r == WRONG) 		Prompt("Wrong answer");
 			else if (r == INCOMPLETE) 	Prompt("Incomplete answer");
+			app.rec.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
 			for (var i=0;i<o.res.length;++i) {															// For each response	
-				if (o.res[i].rc[0] == r) {																// If this matches
-					text=o.res[i].text;																	// Use it
-					app.voice.Talk(text);																// Speak response
-					break;																				// Quit looking
+				for (var j=o.res[i].rc.length;j>=0;j--)													// Go thru matches, big to small
+					if (o.res[i].rc == app.rec.resChain.substr(0,j)) {									// If a match
+						text=o.res[i].text;																// Use it
+						app.voice.Talk(text);															// Speak response
+						return;																			// Quit looking
 					}
 				}
-			app.rec.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
 			}
 		}
 		
@@ -347,15 +354,16 @@ class Review  {
 						str+="<b>"+o.text+"</b></div>";
 						for (var i=0;i<o.res.length;++i) {												// For each response
 							w=o.res[i].next ? app.arc.tree[o.res[i].next.toUpperCase()].text : "";		// Next ARC's text
-							str+="<div title='"+w+"'>";													// Start of line
+							str+="<div title='"+w+"' style='margin-left:16px'>";						// Start of line
 							for (var j=0;j<o.res[i].rc.length;++j) {									// For each response in chain
-								str+="<span style='margin-left:16px;color:"								// Start check span
+								str+="<span style='color:"												// Start checks/crosses
 								if (o.res[i].rc[j] == RIGHT) 			str+="#009900'><b>&check;";		// Right
 								else if (o.res[i].rc[j] == WRONG) 		str+="#990000'><b>&cross;"; 	// Wrong
 								else if (o.res[i].rc[j] == INCOMPLETE)	str+="#ffa500'><b>?"; 			// Incomplete
 								else if (o.res[i].rc[j] == NONE)		str+="#999999'><b>0"; 			// None
+								str+="</b></span>";														// Finish checks/crosses
 								}
-							str+=" &nbsp;</b></span>"+o.res[i].text+"</div>";							// Finish response
+							str+=" &nbsp;"+o.res[i].text+"</div>";										// Finish response
 							}
 						str+="<br>";
 						}
@@ -409,14 +417,14 @@ class Record  {
 	{
 		this.record=[];																					// Holds record of actions
 		this.inPlayback=false;																			// In playback mode
-		this.resChain=[];																				// Holds last response chain
+		this.resChain="";																				// Holds last response chain
 	}
 
 	Add(event)																						// ADD EVENT TO RECORD
 	{
 		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
 		this.record.push(event);																		// Add to array																	
-		if (event.o == "R")  this.resChain.unshift(event.r);											// If response, add to top of response chain
+		if (event.o == "R")  this.resChain=event.r+this.resChain;										// If response, add to top of response chain
 	}
 
 	Playback()																						// PLAYBACK ACTION IN RECORD
