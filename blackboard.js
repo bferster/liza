@@ -7,6 +7,8 @@ class Blackboard  {
 	constructor()   																				// CONSTRUCTOR
 	{
 		this.curSide=0;																					// Currently active blackboard side
+		this.curSlide=0;																				// Current PPT slide
+		this.maxSlides=0;																				// Max PPT slide
 		this.ctx=[];																					// Holds both contexts
 		this.paint=false;																				// Painting flag
 		this.startPosX=0;																				// Start pos X
@@ -107,6 +109,7 @@ class Blackboard  {
 		str+="<div"+trsty+">US map</div>"
 		str+="<div"+trsty+">Math lesson</div>"
 		str+="<div"+trsty+">Liza tips</div>"
+		str+="<div"+trsty+">PPT slides</div>"
 		$("body").append(str+"</div");																	// Add popup	
 	}
 
@@ -116,17 +119,29 @@ class Blackboard  {
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		var imageObj=new Image();																		// Create image
 		imageObj.side=this.curSide;																		// Tag side
+		imageObj.label=label;																			// Name of slide
 		if (label == "Founding fathers")	imageObj.src="assets/FoundingFathers.jpg";
 		if (label == "US map")				imageObj.src="assets/USMap.png";
 		if (label == "Math lesson")			imageObj.src="assets/BB2.png";
 		if (label == "Liza tips")			imageObj.src="assets/BB1.png";
+		if (label == "PPT slides")			imageObj.src="assets/slides.jpg";
 		if (record)							app.rec.Add({ o: 'P', p: label, s:this.curSide }); 			// Add to record, unless initting
 		imageObj.onload=function() { 																	// When loaded
-			app.bb.ctx[this.side].drawImage(this,0,0,512,256);											// Add image 				
+			app.bb.maxSlides=Math.floor(imageObj.height/256);											// Get max number of slides
+			if (app.bb.maxSlides > 1)	app.bb.ctx[this.side].drawImage(this,0,app.bb.curSlide*-256); 	// If slides, crop by number
+			else 					  	app.bb.ctx[this.side].drawImage(this,0,0,512,256);				// Add image, scale to fit
 			app.bb.texMap[this.side].needsUpdate=true;													// Flag the tex map as needing updating
 			if (callback)	callback();																	// Callback if active
 			}
 	}
+
+	ShowSlide(dir)																					// SHOW A SLIDE
+	{
+		if (dir < 0)		this.curSlide=Math.max(this.curSlide-1,0);									// Go back
+		else if (dir > 0)	this.curSlide=Math.min(this.curSlide+1,this.maxSlides-1);					// Go forward
+		else				this.curSlide=0;															// Start fresh
+		this.SetPic("PPT slides");																		// Show pic																		
+	}	
 
 	Text()																							// DRAW TEXT
 	{
@@ -178,7 +193,8 @@ class Blackboard  {
 		this.texMap[this.curSide].needsUpdate=true;														// Flag the tex map as needing updating
 		app.rec.Add({ o:'X', s:this.curSide });															// Add to record
 	}
-
+	
+	
 	SetSide(side)																					// CHANGE SIDE
 	{
 		this.curSide=side;																				// Set flag
