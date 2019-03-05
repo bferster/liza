@@ -211,7 +211,7 @@ class App  {
 		
 		this.gid="1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU";									// Default ARC tree spreadshet
 		var url=window.location.search.substring(1);						   						// Get query string
-		if (url) {																					// If params
+		if (url && !url.match(/real/i)) {															// If params
 			if (url.match(/gid=/i)) 	this.gid=url.split("&")[0].substr(4);						// If params have a 'gid=' tag, use it
 			else						this.gid=url;												// Just plain
 			}

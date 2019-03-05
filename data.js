@@ -22,7 +22,7 @@ class ARC  {
 		xhr.send();																						// Do it
 		xhr.onload=function() { 																		// When loaded
 			var i,o,v,step=0;
-			var last="",goal="",next;
+			var goal="",next;
 			_this.tree=[];																				// Clear tree
 			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
 			tsv=tsv.split("\n");																		// Split into lines
@@ -38,11 +38,9 @@ class ARC  {
 					o.metaStruct=v[1].substr(0,1);														// Instructional meta structure
 					o.rc=v[1].substr(1).trim();															// Add 
 					o.text=v[3].trim();																	// Add text
-					o.res=[];																			// Responses										
+					o.res=[];																			// Responses array										
 					o.gist=v[2];																		// Get gist
-					o.next="";																			// Assume no next
-					if (last)	_this.tree[last].next=goal+"-"+step;									// Add next
-					last=goal+"-"+step;																	// A new last
+					o.next=v[5] ? v[5] : "";															// Add next if set
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
@@ -185,13 +183,16 @@ class ARC  {
 			else if (r == WRONG) 		Prompt("Wrong answer");
 			else if (r == INCOMPLETE) 	Prompt("Incomplete answer");
 			app.rec.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
+			rc=app.rec.resChain;																		// Get response chain
 			for (var i=0;i<o.res.length;++i) {															// For each response	
-				for (var j=o.res[i].rc.length;j>=0;j--)													// Go thru matches, big to small
-					if (o.res[i].rc == app.rec.resChain.substr(0,j)) {									// If a match
+				for (var j=o.res[i].rc.length;j>=0;j--)	{												// Go thru matches, big to small
+					if (o.res[i].rc[0] == "0")	rc="0"+app.rec.resChain.substr(1);						// Ignore current response
+					if (o.res[i].rc == rc.substr(0,j)) {												// If a match
 						text=o.res[i].text;																// Use it
 						app.rec.record[app.rec.record.length-1].text=text;								// Place back in record
 						app.voice.Talk(text);															// Speak response
 						return;																			// Quit looking
+						}
 					}
 				}
 			}
@@ -353,13 +354,17 @@ class Review  {
 			else if (mode == "Full map")	{															// Full map
 				$("#lpTitle").html("Full lesson map");													// Set title
 				for (var arc in app.arc.tree) {															// For each ARC
+					w="Next step";																		// Assume next one
 					o=app.arc.tree[arc];																// Point at ARC
 					if (o.text)	{																		// If defined
-						w=o.next ? app.arc.tree[o.next.toUpperCase()].text : "";						// Next ARC's text
+						if (o.next) {																	// If a next step explicitly defined
+							var oo=app.arc.tree[o.next.toUpperCase()+"-0"];								// Point at next arc
+							w=oo.metaStruct+": "+oo.text;												// Add tooltip
+							}
 						str+="<div title='"+w+"' id='revTalk-"+arc+"' style='padding-bottom:8px;cursor:pointer'>";		
-						str+="<b>"+o.text+"</b></div>";
+						str+="<b>"+o.metaStruct+": "+o.text+"</b></div>";
 						for (var i=0;i<o.res.length;++i) {												// For each response
-							w=o.res[i].next ? app.arc.tree[o.res[i].next.toUpperCase()].text : "";		// Next ARC's text
+							w=o.res[i].next ? app.arc.tree[o.res[i].next.toUpperCase()].metaStruct+": "+app.arc.tree[o.res[i].next.toUpperCase()].text : "Next step";	// Next step's text
 							str+="<div title='"+w+"' style='margin-left:16px'>";						// Start of line
 							for (var j=0;j<o.res[i].rc.length;++j) {									// For each response in chain
 								str+="<span style='color:"												// Start checks/crosses
