@@ -21,18 +21,23 @@ class ARC  {
 		xhr.open("GET",str);																			// Set open url
 		xhr.send();																						// Do it
 		xhr.onload=function() { 																		// When loaded
-			var i,j,o,v,id,step=0;
+			var i,o,v,step=0;
 			var last="",goal="",next;
 			_this.tree=[];																				// Clear tree
 			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
 			tsv=tsv.split("\n");																		// Split into lines
 			for (i=1;i<tsv.length;++i) {																// For each line
 				v=tsv[i].split("\t");																	// Split into fields
-				if (v[1].match(/A|I/i)) {																// New ARC or instruction
-					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase(),step=0; 						// Whole new goal
+				if (v[1].match(/^Q|W|A|I|S|C|P/i)) {													// New ARC
+					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
 					else						step++;													// New step
-					o=_this.tree[goal+"-"+step]={ con:[], rso:null, aso:null, cso:null, }; 				// A new ARC
-					o.text=v[3];																		// Add text
+					o=_this.tree[goal+"-"+step]={ con:[], rso:null, aso:null, cso:null, }; 				// A new ARC object
+					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
+					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
+					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
+					o.metaStruct=v[1].substr(0,1);														// Instructional meta structure
+					o.rc=v[1].substr(1).trim();															// Add 
+					o.text=v[3].trim();																	// Add text
 					o.res=[];																			// Responses										
 					o.gist=v[2];																		// Get gist
 					o.next="";																			// Assume no next
@@ -163,11 +168,11 @@ class ARC  {
 				if (this.MarkovFindResponse(arc,i) == 1)												// If right
 					app.sc.StartAnimation(app.students[i].id,app.seqs["nodYes"]),n++;					// Nod yes
 				app.curStudent=-1;																		// Stop nodding
-				n/=app.students.length;
-				if (n < .33)		n=2;																// Most agree
-				else if (n < .66)	n=3;																// Mixed
-				else				n=1;																// Most disagreee
-				app.rec.Add({ o:'R', who:null, text:"% agreed", r:0 });										// Add to record
+				n=Math.floor(n/app.students.length*100);
+				if (n < 33)			r=2;																// Most agree
+				else if (n < 66)	r=3;																// Mixed
+				else				r=1;																// Most disagree
+				app.rec.Add({ o:'R', who:null, text:n+"% agreed", r:r });								// Add to record
 				}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(arc,app.curStudent);												// Get, compute, and save right response to ARC
@@ -184,6 +189,7 @@ class ARC  {
 				for (var j=o.res[i].rc.length;j>=0;j--)													// Go thru matches, big to small
 					if (o.res[i].rc == app.rec.resChain.substr(0,j)) {									// If a match
 						text=o.res[i].text;																// Use it
+						app.rec.record[app.rec.record.length-1].text=text;								// Place back in record
 						app.voice.Talk(text);															// Speak response
 						return;																			// Quit looking
 					}
@@ -424,7 +430,7 @@ class Record  {
 	{
 		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
 		this.record.push(event);																		// Add to array																	
-		if (event.o == "R")  this.resChain=event.r+this.resChain;										// If response, add to top of response chain
+		if ((event.o == "R") && (event.r != NONE))  this.resChain=event.r+this.resChain;				// If an actual response, add to top of response chain
 	}
 
 	Playback()																						// PLAYBACK ACTION IN RECORD

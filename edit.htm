@@ -140,7 +140,7 @@ class App  {
 						if (ss.match(/^[+-0?]+/)) {									// A response
 							typ="R"+ss.match(/^[+-0?]+/)[0];						// Set type
 							ss=ss.substr(typ.length-1);								// Remove from response
-							s=obj.innerText.match(/\[(.*\]/i);						// An id tag
+							s=obj.innerText.match(/\[(.*)\]/i);						// An id tag
 							if (s) r=RegExp(s[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
 							if (s) 	ss=ss.replace(r,"");							// Remove id from response
 							result+="\t"+typ+"\t\t"+ss.trim()+"\t\t"+(s ? s[1] : ""); // Show
