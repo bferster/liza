@@ -1,16 +1,17 @@
 // ARC / REVIEW // RECORD
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ARC
+// STEP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ARC  {																					
 
 	constructor()   																				// CONSTRUCTOR
 	{
-		this.tree=[];																					// Holds ARC tree
-		this.curArc="";																					// Current ARC "picked"
-		this.threshold=.4;																				// ARC picking threshold		
+		this.tree=[];																					// Holds tree
+		this.curStep=0;																					// Current step
+		this.lastStep=0;																				// Last  step 
+		this.threshold=.4;																				// Picking threshold		
 		}
 
 	Load(id) 																						// LOAD DOC FROM GOOGLE DRIVE
@@ -21,17 +22,17 @@ class ARC  {
 		xhr.open("GET",str);																			// Set open url
 		xhr.send();																						// Do it
 		xhr.onload=function() { 																		// When loaded
-			var i,o,v,step=0;
+			var i,j,k,o,v,step=0;
 			var goal="",next;
 			_this.tree=[];																				// Clear tree
 			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
 			tsv=tsv.split("\n");																		// Split into lines
 			for (i=1;i<tsv.length;++i) {																// For each line
 				v=tsv[i].split("\t");																	// Split into fields
-				if (v[1].match(/^Q|W|A|I|S|C|P/i)) {													// New ARC
+				if (v[1].match(/^Q|W|A|I|S|C|P/i)) {													// New step
 					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
 					else						step++;													// New step
-					o=_this.tree[goal+"-"+step]={ con:[], rso:null, aso:null, cso:null, }; 				// A new ARC object
+					o={ con:[], rso:null, aso:null, cso:null }; 										// A new step object
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
@@ -40,20 +41,53 @@ class ARC  {
 					o.text=v[3].trim();																	// Add text
 					o.res=[];																			// Responses array										
 					o.gist=v[2];																		// Get gist
+					o.goal=goal;																		// Set goal
+					o.step=step;																		// Set step
 					o.next=v[5] ? v[5] : "";															// Add next if set
+					_this.tree.push(o);																	// Add strep to tree
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
-					if ((v[5] != "") && isNaN(v[5]))  	next=v[5]+"-0";									// A goal, add post fix
-					else if (v[5])						next=goal+"-"+v[5];			  					// Just a number, use current goal and add step
-					else 								next="";										// No next				
-					o.res.push({ rc: v[1].substr(1).trim(), text:v[3].trim(), next:next });				// Add response to ARC
+						o.res.push({ rc: v[1].substr(1).trim(), text:v[3].trim(), next:v[5] ? v[5] : "" });		// Add responses
 					}
 				else if (v[1].match(/ov/i))  app.rev.overview=v[3];										// Overview
+				}
+	
+			for (i=0;i<_this.tree.length;++i) {															// For each step in tree
+				if (_this.tree[i].next)	{																// If a next spec'd
+					v=_this.tree[i].next.split("-");													// Get goal and step 
+					if (!isNaN(v[0]))	goal=_this.tree[i].goal,step=v[0];								// Just a number 
+					else				goal=v[0].toUpperCase(),step=v[1] ? v[1] : 0;					// A goal and maybe a number													
+					for (j=0;j<_this.tree.length;++j) { 												// For each step in tree
+						if ((_this.tree[j].goal == goal) && (_this.tree[j].step == step)) {				// A match
+							_this.tree[i].next=j;														// Point at next
+							break;																		// Quit looking
+							}
+						}
 					}
-			_this.Extract();																			// Extract keywords and entities
+				else																					// No next spec'd
+					_this.tree[i].next=Math.min(i+1,_this.tree.length-1);								// Point at next in line
+				
+				for (j=0;j<_this.tree[i].res.length;++j) {												// For each response in step
+					if (_this.tree[i].res[j].next)	{													// If a next spec'd
+						v=_this.tree[i].res[j].next.split("-");											// Get goal and step 
+						if (!isNaN(v[0]))	goal=_this.tree[i].goal,step=v[0];							// Just a number 
+						else				goal=v[0].toUpperCase(),step=v[1] ? v[1] : 0;				// A goal and maybe a number													
+						for (k=0;k<_this.tree.length;++k) { 											// For each step in tree
+							if ((_this.tree[k].goal == goal) && (_this.tree[k].step == step)) {			// A match
+								_this.tree[i].res[j].next=k;											// Point at next
+								break;																	// Quit looking
+								}
+							}
+						}
+					else																				// No next spec'd
+						_this.tree[i].res[j].next=Math.min(i+1,_this.tree.length-1);					// Point at next in line
+					}
+				}
+
+				_this.Extract();																		// Extract keywords and entities
 			};									
 
 		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
@@ -65,84 +99,84 @@ class ARC  {
 		
 			}
 
-	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM ARC
+	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM STEP
 	{
-			var i,j,o,v,val;
-			var _this=this;																				// Save context
-			for (var arc in this.tree) {																// For each ARC in tree
-				o=this.tree[arc];																		// Point at ARC
+			var i,j,k,o,v,val;
+			for (i=0;i<this.tree.length;++i) {															// For each step in tree
+				o=this.tree[i];																			// Point at step
 				o.keys=[];																				// Create keyword array
 				v=(o.text+" ").match(/\(.+?\)/g);														// Get array of key words (keyword)
 				if (v) {																				// If keys flagged
-					for (i=0;i<v.length;++i) {															// For each key
-						val=v[i].substr(1,v[i].length-2);												// Extract text
+					for (j=0;j<v.length;++j) {															// For each key
+						val=v[j].substr(1,v[j].length-2);												// Extract text
 						o.keys.push(val);																// Add to keys
-						o.text=o.text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
+						o.text=o.text.replace(RegExp(v[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
 						}
 					}
 				app.arc.Parse(o.text,o);																// Parse first text portion
 				
 				if (o.con.length) {																		// If consquences
-					for (i=0;i<o.con.length;++i) {														// For each consequence
-						o.con[i].keys=[];																// Create keyword array
+					for (j=0;j<o.con.length;++j) {														// For each consequence
+						o.con[j].keys=[];																// Create keyword array
 						v=(o.con[i].text+" ").match(/\(.+?\)/g);										// Get array of key words (keyword)
 						if (v) {																		// If keys flagged
-							for (j=0;j<v.length;++j) {													// For each key
-								val=v[j].substr(1,v[j].length-2);										// Extract text
-								o.con[i].keys.push(val);												// Add to keys
-								o.con[i].text=o.text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
+							for (k=0;k<v.length;++k) {													// For each key
+								val=v[k].substr(1,v[k].length-2);										// Extract text
+								o.con[k].keys.push(val);												// Add to keys
+								o.con[k].text=o.text.replace(RegExp(v[k].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
 								}
 							}
-						app.arc.Parse(o.con[i].text, o.con[i]);											// Parse consequence text portion
+						app.arc.Parse(o.con[j].text, o.con[j]);											// Parse consequence text portion
 						}
 					}
 				}
 		}
 
-		FindClosestARC(text, entities)																// FIND ARC CLOSEST TO TEXT + ENTITIES
+		FindClosestStep(text, entities)																// FIND STEP CLOSEST TO TEXT + ENTITIES
 		{
-			var o,i,n,str="\n";
-			var kscore,escore,best="";
+			var o,i,j,n,str="\n";
+			var kscore,escore,best=-1;
 			entities=(""+entities).split(", ");															// Put entities into array
-			for (var arc in this.tree) {																// For each ARC in tree
+			for (i=0;i<this.tree.length;++i) {															// For each step in tree
 				kscore=0;																				// Start at 0
-				o=this.tree[arc];																		// Point at ARC
-				for (i=0;i<o.keys.length;++i)															// For each key
-					if (text.match(RegExp(o.keys[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"))))		// Check for key in text
+				o=this.tree[i];																			// Point at step
+				for (j=0;j<o.keys.length;++j)															// For each key
+					if (text.match(RegExp(o.keys[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"))))		// Check for key in text
 						kscore++;																		// Add to key score
 				escore=0;																				// Start at 0
-				for (i=0;i<entities.length;++i) {														// For each entity spoken
-					if (o.ents.match(RegExp(entities[i].split(':')[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/i))))  // If a basic enities match
+				for (j=0;j<entities.length;++j) {														// For each entity spoken
+					if (o.ents.match(RegExp(entities[j].split(':')[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/i))))  // If a basic enities match
 						escore+=.5;																		// Add to score
-					if (o.ents.match(RegExp(entities[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a entity AND value match
+					if (o.ents.match(RegExp(entities[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a entity AND value match
 						escore+=.5;																		// Add to score
 					}
 				n=(""+o.ents).split(", ").length;														// Number of entities in ARC	
-				this.tree[arc].kscore=kscore;															// Save kscore
-				this.tree[arc].matched=escore/Math.max(n,entities.length);								// Adjust by amount matched
+				this.tree[i].kscore=kscore;																// Save kscore
+				this.tree[i].matched=escore/Math.max(n,entities.length);								// Adjust by amount matched
 				if (entities.length)	escore=escore/entities.length;									// Normalize 0-1
-				this.tree[arc].score=this.tree[arc].matched;											// Save score 
-				this.tree[arc].escore=escore;															// Save escore
-				if (o.keys.length)	this.tree[arc].score=(this.tree[arc].matched+(kscore/o.keys.length))/2;	// Average of both
-//				if (app.curGoal && arc.match(RegExp(app.curGoal)))	this.tree[arc].score+=.25;			// If in current goal, bump-up score 
+				this.tree[i].score=this.tree[i].matched;												// Save score 
+				this.tree[i].escore=escore;																// Save escore
+				if (o.keys.length)	this.tree[i].score=(this.tree[i].matched+(kscore/o.keys.length))/2;	// Average of both
+//				if (app.curGoal && arc.match(RegExp(app.curGoal)))	this.tree[i].score+=.25;			// If in current goal, bump-up score 
 				}
 			n=0;																						// Start low
-			for (var arc in this.tree) 	{																// For each ARC in tree
-				if (this.tree[arc].score >= n) { n=this.tree[arc].score;	best=arc };					// Set if highest
-				str+="   "+arc+" - "+Math.round(this.tree[arc].score*100) + "%\n";
+			for (i=0;i<this.tree.length;++i) {															// For each step in tree
+				if (this.tree[i].score >= n) { n=this.tree[i].score;	best=i };						// Set if highest
+				str+="   "+this.tree[i].goal+"-"+this.tree[i].step+" - "+Math.round(this.tree[i].score*100) + "%\n";
 				}
-			this.curArc=(n > this.threshold) ? best : "";												// Set ARC if above threshold
-			str+="\n<< "+best+"\n   "+this.tree[best].ents; trace(str); 															
-			if (this.curArc)					app.curGoal=best;										// Set current goal if past threshold	
-			if (app.curGoal != app.lastGoal) 	app.lastGoal=app.curGoal;								// Save last goal
+			this.curArc=(n > this.threshold) ? best : -1;												// Set ARC if above threshold
+			if (this.curArc != -1) {																	// If past threshold
+				this.lastStep=this.curStep;																// Then is now
+				str+="\n<< "+this.tree[best].goal+"-"+this.tree[best].step+" = "+this.tree[best].ents; trace(str); 															
+				}
 			return this.curArc;																			// Return best fit
 		}
 
-	DeliverResponse(arc)																			// DELIVER RESPONSE
+	DeliverResponse(step)																			// DELIVER RESPONSE
 	{
 		var i,j,n,r,rc,o;
 		var text="";
-		if (!arc)	return;																				// Quit if no ARC
+		if (step == -1)	return;																			// Quit if no step
 		if (app.curStudent == -1) {																		// If whole class responding and looking for answer
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
 			var j=Math.floor(Math.random()*app.students.length);										// Random start	
@@ -150,7 +184,7 @@ class ARC  {
 				app.sc.StartAnimation(app.students[++j%app.students.length].id,app.seqs["wave"]);		// Make them wave
 			if (n) {																					// If someone responded
 				Prompt("Choose a student to respond...",10); 											// Ask to choose a student
-				app.pickingStudent=arc;																	// Send this message
+				app.pickingStudent=step;																// Send this message
 				Sound("ding");																			// Ding
 				}
 			else{																						// No one reponded
@@ -163,7 +197,7 @@ class ARC  {
 		else if (app.curStudent == -2) {																// If whole class responding with nods
 			n=0;
 			for (i=0;i<app.students.length;++i)															// For each student
-				if (this.MarkovFindResponse(arc,i) == 1)												// If right
+				if (this.MarkovFindResponse(step,i) == 1)												// If right
 					app.sc.StartAnimation(app.students[i].id,app.seqs["nodYes"]),n++;					// Nod yes
 				app.curStudent=-1;																		// Stop nodding
 				n=Math.floor(n/app.students.length*100);
@@ -173,8 +207,8 @@ class ARC  {
 				app.rec.Add({ o:'R', who:null, text:n+"% agreed", r:r });								// Add to record
 				}
 		else{																							// A single student responding
-			r=this.MarkovFindResponse(arc,app.curStudent);												// Get, compute, and save right response to ARC
-			o=this.tree[arc];																			// Point at ARC
+			r=this.MarkovFindResponse(step,app.curStudent);												// Get, compute, and save right response to ARC
+			o=this.tree[step];																			// Point at ARC
 			if (r == NONE) 	{																			// No response
 				Prompt(app.students[app.curStudent].id+" didn't repond to you!",5);						// Show prompt
 				Sound("delete");																		// Delete sound
@@ -198,26 +232,26 @@ class ARC  {
 			}
 		}
 		
-	MarkovFindResponse(arc, sid) 																	// FIND RESPONSE USING MARKOV CHAIN
+	MarkovFindResponse(step, sid) 																	// FIND RESPONSE USING MARKOV CHAIN
 	{	
 		var so,ability=.5;
 		if (sid >= 0) ability=app.students[sid].ability;												// Get student ability
 		var r=(Math.random()-.5)*.1;																	// Get jitter factor
 		var tm=[ [0.0, .40, .60], [0.0, .55-r, .45+r], [0.0, .46, .54] ];								// Markov transition matrix
-		if ((sid >= 0) && app.students[sid].rMatrix[arc])	{											// If been there already, for an individual student
-			so=app.students[sid].rMatrix[arc];						 									// Use last stage matrix as starting matrix
+		if ((sid >= 0) && app.students[sid].rMatrix[step])	{											// If been there already, for an individual student
+			so=app.students[sid].rMatrix[step];						 									// Use last stage matrix as starting matrix
 			so=MatrixMultiply(so,tm);																	// Get response matrix stage
 			}
 		else{																							// First response is random, based on ability/affect
 			r=Math.random();																			// Get random number
-			if (r*ability < .03)	so=[[1,0,0]];														// Force a none response ~20% proportional to ability
+			if (r*ability < .02)	so=[[1,0,0]];														// Force a none response ~10% proportional to ability
 			else{																						// Calc starting matrix
 				r=Math.max(Math.min(ability+((r-.5)*(1+ability)),1),0); 								// Calc chance of right answer capped 0-1
 				so=[[0,r,1-r]];																			// Set starting matrix
 				}
 			}
-		if (sid >= 0) app.students[sid].rMatrix[arc]=so;												// Save for later responses
-		trace("   Score:"+app.arc.tree[arc].score.toFixed(2)+" Entities:"+app.arc.tree[arc].escore.toFixed(2)+" Match:"+app.arc.tree[arc].matched.toFixed(2)+" Keywords:"+app.arc.tree[arc].kscore.toFixed(2));	// Show results
+		if (sid >= 0) app.students[sid].rMatrix[step]=so;												// Save for later responses
+		trace("   Score:"+app.arc.tree[step].score.toFixed(2)+" Entities:"+app.arc.tree[step].escore.toFixed(2)+" Match:"+app.arc.tree[step].matched.toFixed(2)+" Keywords:"+app.arc.tree[step].kscore.toFixed(2));	// Show results
 		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
 		return r;																						// Return type of response
 	}
@@ -313,7 +347,7 @@ class Review  {
 		function refreshBody(mode) {																// REFRESH BODY CONTENT
 			var str="";	
 			if (mode == "Review")	{																	// Session review
-				var j,last=0,e;
+				var i,j,k,last=0,e;
 				str="";																					// Title
 				$("#lpTitle").html("Lesson map review");												// Set title
 				for (i=0;i<app.rec.record.length;++i) {													// For each event
@@ -346,35 +380,32 @@ class Review  {
 				}
 			else if (mode == "Hints")	{																// Gists
 				$("#lpTitle").html("Lesson map hints");													// Set title
-				for (var arc in app.arc.tree) {															// For each ARC
-					o=app.arc.tree[arc];																// Point at ARC
+				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
+					o=app.arc.tree[i];																	// Point at step
 					if (o.gist)		str+="<li style='padding-bottom:4px'>"+o.gist+"</li>";				// Add gist
 					}
 				}
 			else if (mode == "Full map")	{															// Full map
 				$("#lpTitle").html("Full lesson map");													// Set title
-				for (var arc in app.arc.tree) {															// For each ARC
-					w="Next step";																		// Assume next one
-					o=app.arc.tree[arc];																// Point at ARC
+				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
+					o=app.arc.tree[i];																	// Point at step
 					if (o.text)	{																		// If defined
-						if (o.next) {																	// If a next step explicitly defined
-							var oo=app.arc.tree[o.next.toUpperCase()+"-0"];								// Point at next arc
-							w=oo.metaStruct+": "+oo.text;												// Add tooltip
-							}
-						str+="<div title='"+w+"' id='revTalk-"+arc+"' style='padding-bottom:8px;cursor:pointer'>";		
+						var oo=app.arc.tree[o.next];													// Point at next step
+						w=oo.metaStruct+": "+oo.text;													// Add tooltip
+						str+="<div title='"+w+"' id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";		
 						str+="<b>"+o.metaStruct+": "+o.text+"</b></div>";
-						for (var i=0;i<o.res.length;++i) {												// For each response
-							w=o.res[i].next ? app.arc.tree[o.res[i].next.toUpperCase()].metaStruct+": "+app.arc.tree[o.res[i].next.toUpperCase()].text : "Next step";	// Next step's text
+						for (var j=0;j<o.res.length;++j) {												// For each response
+							w=app.arc.tree[o.res[j].next].metaStruct+": "+app.arc.tree[o.res[j].next].text;	// Next step's text
 							str+="<div title='"+w+"' style='margin-left:16px'>";						// Start of line
-							for (var j=0;j<o.res[i].rc.length;++j) {									// For each response in chain
+							for (var k=0;k<o.res[j].rc.length;++k) {									// For each response in chain
 								str+="<span style='color:"												// Start checks/crosses
-								if (o.res[i].rc[j] == RIGHT) 			str+="#009900'><b>&check;";		// Right
-								else if (o.res[i].rc[j] == WRONG) 		str+="#990000'><b>&cross;"; 	// Wrong
-								else if (o.res[i].rc[j] == INCOMPLETE)	str+="#ffa500'><b>?"; 			// Incomplete
-								else if (o.res[i].rc[j] == NONE)		str+="#999999'><b>0"; 			// None
+								if (o.res[j].rc[k] == RIGHT) 			str+="#009900'><b>&check;";		// Right
+								else if (o.res[j].rc[k] == WRONG) 		str+="#990000'><b>&cross;"; 	// Wrong
+								else if (o.res[j].rc[k] == INCOMPLETE)	str+="#ffa500'><b>?"; 			// Incomplete
+								else if (o.res[j].rc[k] == NONE)		str+="#999999'><b>0"; 			// None
 								str+="</b></span>";														// Finish checks/crosses
 								}
-							str+=" &nbsp;"+o.res[i].text+"</div>";										// Finish response
+							str+=" &nbsp;"+o.res[j].text+"</div>";										// Finish response
 							}
 						str+="<br>";
 						}
@@ -388,7 +419,7 @@ class Review  {
 			$("[id^=revTalk-]").off("click");															// Remove existing handlers
 			$("[id^=revTalk-]").on("click", function(e) {												// On click of ARC step
 				if (app.voice.talking || app.gettingEntities)  return;									// Not while busy
-				var id=e.currentTarget.id.substr(8);													// Get arc
+				var id=e.currentTarget.id.substr(8);													// Get step
 				o=app.arc.tree[id];																		// Point at ARC
 				app.voice.Talk(o.text,"instructor");													// Talk
 				app.OnPhrase(o.text);	
