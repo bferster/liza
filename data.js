@@ -29,7 +29,9 @@ class ARC  {
 			tsv=tsv.split("\n");																		// Split into lines
 			for (i=1;i<tsv.length;++i) {																// For each line
 				v=tsv[i].split("\t");																	// Split into fields
-				if (v[1].match(/^Q|W|A|I|S|C|P/i)) {													// New step
+				if (v[1].match(/ov/i))  		app.rev.overview=v[3];									// Overview
+				else if (v[1].match(/pic/i)) 	app.bb.AddPic(v[2],v[3]);								// Add image or slide deck
+				else if (v[1].match(/^Q|W|A|I|S|C|P/i)) {												// New step
 					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
 					else						step++;													// New step
 					o={ con:[], rso:null, aso:null, cso:null }; 										// A new step object
@@ -52,7 +54,6 @@ class ARC  {
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
 						o.res.push({ rc: v[1].substr(1).trim(), text:v[3].trim(), next:v[5] ? v[5] : "" });		// Add responses
 					}
-				else if (v[1].match(/ov/i))  app.rev.overview=v[3];										// Overview
 				}
 	
 			for (i=0;i<_this.tree.length;++i) {															// For each step in tree
@@ -150,14 +151,14 @@ class ARC  {
 					if (o.ents.match(RegExp(entities[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a entity AND value match
 						escore+=.5;																		// Add to score
 					}
-				n=(""+o.ents).split(", ").length;														// Number of entities in ARC	
+				n=(""+o.ents).split(", ").length;														// Number of entities in step	
 				this.tree[i].kscore=kscore;																// Save kscore
 				this.tree[i].matched=escore/Math.max(n,entities.length);								// Adjust by amount matched
 				if (entities.length)	escore=escore/entities.length;									// Normalize 0-1
 				this.tree[i].score=this.tree[i].matched;												// Save score 
 				this.tree[i].escore=escore;																// Save escore
 				if (o.keys.length)	this.tree[i].score=(this.tree[i].matched+(kscore/o.keys.length))/2;	// Average of both
-//				if (app.curGoal && arc.match(RegExp(app.curGoal)))	this.tree[i].score+=.25;			// If in current goal, bump-up score 
+				if (o.goal == this.tree[this.lastStep].goal)	this.tree[i].score+=.1;					// If in current goal, bump-up score 
 				}
 			n=0;																						// Start low
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree

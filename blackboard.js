@@ -16,15 +16,20 @@ class Blackboard  {
 		this.fontHgt=25;																				// Height of text
 		this.hgt=276;																					// Height
 		this.wid=552;																					// Width
+		this.pics=[];																					// List of pictures
 		this.chars=[];																					// Chars typed for backspacing
 		this.texMap=[{},{}];																			// Points to material maps
 		this.backCol="#333";																			// Background color
 		this.curSideId="#blackboardCan-0";																// Currently active blackboard side
+		this.AddPic("Math lesson","assets/BB2.png");
+		this.AddPic("Liza tips","assets/BB1.png");
+		this.AddPic("US map","assets/USMap.png");
 		this.InitCanvas(); 																				// Init left and right canvas
 		$("#BBClearBut").on("click", ()=> { app.bb.Clear(); });											// On clear button click
 		$("[id^=BB-]").on("click", function() { app.bb.ButtonRoute(this.id)	});							// On BB Drawing menu button click
 		$("#BBSideBut").on("click", ()=> { app.bb.SetSide(1-app.bb.curSide); });						// On side click, toggle
-	}
+
+		}
 
 	InitCanvas()																					// SET UP CANVASES
 	{
@@ -105,12 +110,22 @@ class Blackboard  {
 		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
 		str+="max-height:232px;position:absolute;left:82px;top:calc(100vh - 308px);overflow-y:auto'>";
 		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
-		str+="<div"+trsty+">Founding fathers</div>"
-		str+="<div"+trsty+">US map</div>"
-		str+="<div"+trsty+">Math lesson</div>"
-		str+="<div"+trsty+">Liza tips</div>"
-		str+="<div"+trsty+">PPT slides</div>"
+		for (var i=0;i<this.pics.length;++i) 	str+="<div"+trsty+">"+this.pics[i].lab+"</div>"
 		$("body").append(str+"</div");																	// Add popup	
+	}
+
+	AddPic(lab, url)																				// ADD PIC																			
+	{
+		if (!url || !lab)	return;
+		if (url.match(/drive\.google/i)) {																// A google drive image
+			var id=url.match(/\?id=(.+)/i);																// Extract id
+			if (!id)																					// Nothing there
+				id=url.match(/\/d\/(.*?)\//);															// Try this way
+			if (id)																						// An id found
+				url="//drive.google.com/uc?export=download&id="+id[1];									// Construct 'direct' link
+			}
+		if (url.match(/\/\//))	url="proxy.php?url="+url;											// Add proxy if cross domain																	
+		this.pics.push( { lab:lab, src: url });															// Add to array
 	}
 
 	SetPic(label, record, callback)																	// SHOW PIC																			
@@ -118,18 +133,16 @@ class Blackboard  {
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		var imageObj=new Image();																		// Create image
+		for (var i=0;i<this.pics.length;++i)															// For each pic
+			if (label == this.pics[i].lab)																// A match
+				imageObj.src=this.pics[i].src;															// Set source to start load
 		imageObj.side=this.curSide;																		// Tag side
-		imageObj.label=label;																			// Name of slide
-		if (label == "Founding fathers")	imageObj.src="assets/FoundingFathers.jpg";
-		if (label == "US map")				imageObj.src="assets/USMap.png";
-		if (label == "Math lesson")			imageObj.src="assets/BB2.png";
-		if (label == "Liza tips")			imageObj.src="assets/BB1.png";
-		if (label == "PPT slides")			imageObj.src="assets/slides.jpg";
+		imageObj.label=label;																			// Set label
 		if (record)							app.rec.Add({ o: 'P', p: label, s:this.curSide }); 			// Add to record, unless initting
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.maxSlides=Math.floor(imageObj.height/256);											// Get max number of slides
-			if (app.bb.maxSlides > 1)	app.bb.ctx[this.side].drawImage(this,0,app.bb.curSlide*-256); 	// If slides, crop by number
-			else 					  	app.bb.ctx[this.side].drawImage(this,0,0,512,256);				// Add image, scale to fit
+			if (imageObj.label.match(/slide/i))	app.bb.ctx[this.side].drawImage(this,0,app.bb.curSlide*-256); 	// If slides, crop by number
+			else 					  			app.bb.ctx[this.side].drawImage(this,0,0,512,256);				// Add image, scale to fit
 			app.bb.texMap[this.side].needsUpdate=true;													// Flag the tex map as needing updating
 			if (callback)	callback();																	// Callback if active
 			}
