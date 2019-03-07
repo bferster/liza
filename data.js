@@ -158,19 +158,20 @@ class ARC  {
 				this.tree[i].score=this.tree[i].matched;												// Save score 
 				this.tree[i].escore=escore;																// Save escore
 				if (o.keys.length)	this.tree[i].score=(this.tree[i].matched+(kscore/o.keys.length))/2;	// Average of both
-				if (o.goal == this.tree[this.lastStep].goal)	this.tree[i].score+=.1;					// If in current goal, bump-up score 
+				if (o.goal == this.tree[this.lastStep].goal)	this.tree[i].score+=.05;				// If in current goal, bump-up score 
+				if ((i == this.lastStep+1))	this.tree[i].score+=.05;				// If next in script, bump it up
 				}
 			n=0;																						// Start low
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
 				if (this.tree[i].score >= n) { n=this.tree[i].score;	best=i };						// Set if highest
 				str+="   "+this.tree[i].goal+"-"+this.tree[i].step+" - "+Math.round(this.tree[i].score*100) + "%\n";
 				}
-			this.curArc=(n > this.threshold) ? best : -1;												// Set ARC if above threshold
-			if (this.curArc != -1) {																	// If past threshold
+			if (n > this.threshold)	{																	// If above threshold
+				this.curStep=best;																		// Set as current step										
 				this.lastStep=this.curStep;																// Then is now
-				str+="\n<< "+this.tree[best].goal+"-"+this.tree[best].step+" = "+this.tree[best].ents; trace(str); 															
 				}
-			return this.curArc;																			// Return best fit
+			str+="\n<< "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str); 															
+			return this.curStep;																			// Return best fit
 		}
 
 	DeliverResponse(step)																			// DELIVER RESPONSE
@@ -208,8 +209,8 @@ class ARC  {
 				app.rec.Add({ o:'R', who:null, text:n+"% agreed", r:r });								// Add to record
 				}
 		else{																							// A single student responding
-			r=this.MarkovFindResponse(step,app.curStudent);												// Get, compute, and save right response to ARC
-			o=this.tree[step];																			// Point at ARC
+			r=this.MarkovFindResponse(step,app.curStudent);												// Get, compute, and save right response to step
+			o=this.tree[step];																			// Point at step
 			if (r == NONE) 	{																			// No response
 				Prompt(app.students[app.curStudent].id+" didn't repond to you!",5);						// Show prompt
 				Sound("delete");																		// Delete sound
@@ -418,10 +419,10 @@ class Review  {
 				}
 			$("#revBodyDiv").html(str);																	// Add to div
 			$("[id^=revTalk-]").off("click");															// Remove existing handlers
-			$("[id^=revTalk-]").on("click", function(e) {												// On click of ARC step
+			$("[id^=revTalk-]").on("click", function(e) {												// On click of step
 				if (app.voice.talking || app.gettingEntities)  return;									// Not while busy
 				var id=e.currentTarget.id.substr(8);													// Get step
-				o=app.arc.tree[id];																		// Point at ARC
+				o=app.arc.tree[id];																		// Point at step
 				app.voice.Talk(o.text,"instructor");													// Talk
 				app.OnPhrase(o.text);	
 				});
