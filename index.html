@@ -53,6 +53,10 @@
 							border-radius: 8px; background-color: #eee; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							font-size: 14px; text-align:center; display: none;
 							}
+		.lz-bubble {		position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top:80px; width:200px;
+							border-radius: 80px; background-color: #d7ebff; border: 1px solid #999; 
+							font-size: 16px; text-align:center; display: none;
+							}
 		.lz-prompt {		color:#fff; width:100%;	vertical-align: 3px; margin-left:16px; font-size:16px;
 							}
 		.lz-is {			border-radius:16px; padding:0 8px; width:200px; height: 24px;
@@ -119,6 +123,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN 
 /////////////////////////////////////////////////////////////////////////////////////////////////
+
+if ((location.protocol != 'https:') && (window.location.host != "localhost")) location.href = 'https:' + window.location.href.substring(window.location.protocol.length); // FORCE HTTPS!
 
 var app=null;																						// Holds app
 var isMobile=false;																					// Flag for mobile devices
@@ -334,12 +340,13 @@ class App  {
 		if (text && text.match(/replay|playback/i) && text.match(/class/i)) { app.rec.Playback(); return; }		// Playback
 		app.arc.Parse(text, null, (o)=> {															// Parse text
 			var score=0;
-			if (o.match(/who:Liza/i)) 			app.curStudent=3;									// Set current student
+			if (o.match(/who:agree/i)) 			app.curStudent=-2;									// Looking for nods
+			else if (o.match(/who:all/i)) 		app.curStudent=-1;									// Whole class
+			else if (o.match(/who:Class/i)) 	app.curStudent=-1;									// Whole class
+			else if (o.match(/who:Liza/i)) 		app.curStudent=3;									// Set current student
 			else if (o.match(/who:Freddy/i)) 	app.curStudent=0;
 			else if (o.match(/who:Robert/i)) 	app.curStudent=2;
 			else if (o.match(/who:Sara/i)) 		app.curStudent=1;
-			else if (o.match(/who:Class/i)) 	app.curStudent=-1;
-			else if (o.match(/who:all/i)) 		app.curStudent=-2;
 	
 			if (text.match(/set goal to/i)) {														// If setting goal		
 				app.lastGoal=app.curGoal;															// Save last goal
@@ -360,8 +367,8 @@ class App  {
 			app.arc.FindClosestStep(text,o);														// Match closest ARC to text
 			if (app.arc.curStep)			score=app.arc.tree[app.arc.curStep].score;				// Get match score			
 			app.rec.Add({ o:'S', t:app.voice.talkStartTime, text:text, ent:o, arc:app.arc.curStep, score:score });	// Add to record at time of STT listening
-			if (o.match(/action:/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);			// If an action mentioned, try to do it
-			else						app.arc.DeliverResponse(app.arc.curStep);					// Deliver response
+			if (o.match(/action:/i)) 		app.DoAction((o+" ").match(/action:(.+?) /i)[1]);		// If an action mentioned, try to do it
+			else							app.arc.DeliverResponse(app.arc.curStep);				// Deliver response
 			});																		
 		}
 		
@@ -481,6 +488,18 @@ class App  {
 				});
 	}
 
+	function LoadingIcon(mode, size, container)														// SHOW/HIDE LOADING ICON		
+	{
+		container=container ? "#"+containern: "body";													// If no container spec'd, use body
+		if (!mode) {																					// If hiding
+			$("#sf-loadingIcon").remove();																// Remove it
+			return;																						// Quit
+			}
+		var str="<img src='img/loading.gif' width='"+size+"' ";											// Img
+		str+="id='sf-loadingIcon' style='position:absolute;top:calc(50% - "+size/2+"px);left:calc(50% - "+size/2+"px);z-index:5000'>";	
+		$(container).append(str);																		// Add icon to container
+	}
+
 	function PopUp(msg, time, div)																	// TIMED POPUP
 	{
 		var str="";
@@ -493,7 +512,19 @@ class App  {
 		str+=msg+"</div>"; 																				// Add div
 		$(div ? "#"+div : "body").append(str);															// Add popup to div or body
 		$("#pu-close").click(function() { $("#popupDiv").remove(); });									// Remove on click of close but
-		$("#popupDiv").fadeIn(500).delay(time ? time : 3000).fadeOut(500)								// Animate in and out		
+		$("#popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);							// Animate in and out		
+	}
+
+	function Bubble(msg, time, x, y)																// TIMED THOUGHT BUBBLE
+	{
+		$("#bubbleDiv").remove();																		// Kill old one, if any
+		var str="<div id='bubbleDiv' class='lz-bubble' style='";
+		if (x)	str+="left:"+x+"px;";
+		if (y)	str+="top:"+y+"px";
+		str+="'>"+msg+"</div>"; 
+		trace(str)
+		$("body").append(str);																			// Add popup to body
+		$("#bubbleDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);						// Animate in and out		
 	}
 
 	function Prompt(msg, secs)																		// TIMED PROMPT

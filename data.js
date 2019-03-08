@@ -87,7 +87,6 @@ class ARC  {
 						_this.tree[i].res[j].next=Math.min(i+1,_this.tree.length-1);					// Point at next in line
 					}
 				}
-
 				_this.Extract();																		// Extract keywords and entities
 			};									
 
@@ -176,12 +175,19 @@ class ARC  {
 
 	DeliverResponse(step)																			// DELIVER RESPONSE
 	{
-		var i,j,n,r,rc,o;
+		var i,j,n=0,r,rc,o;
 		var text="";
 		if (step == -1)	return;																			// Quit if no step
-		if (app.curStudent == -1) {																		// If whole class responding and looking for answer
+		if (app.arc.tree[step].metaStruct == "C") {
+			Bubble("Choral response",5);																// Show response
+			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
+			app.rec.Add({ o:'R', who:null, text:"Choral:"+text, r:1 });									// Add to record
+			app.voice.Talk(text);																		// Speak response
+			return;	
+			}
+		else if (app.curStudent == -1) {																	// If whole class responding and looking for answer
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
-			var j=Math.floor(Math.random()*app.students.length);										// Random start	
+			var j=Math.floor(Math.random()*app.students.length);										// Random start				
 			for (i=0;i<n;++i)																			// For each responder	
 				app.sc.StartAnimation(app.students[++j%app.students.length].id,app.seqs["wave"]);		// Make them wave
 			if (n) {																					// If someone responded
@@ -190,14 +196,13 @@ class ARC  {
 				Sound("ding");																			// Ding
 				}
 			else{																						// No one reponded
-				text="Nobody reponded to you!";															// Message
+				text="Nobody responded!";																// Message
 				app.rec.Add({ o:'R', who:null, text:"", r:0 });											// Add to record
-				Prompt(text,5); 																		// Show prompt				
+				Bubble(text,5);																			// Show response
 				Sound("delete");
 				}
 			}
 		else if (app.curStudent == -2) {																// If whole class responding with nods
-			n=0;
 			for (i=0;i<app.students.length;++i)															// For each student
 				if (this.MarkovFindResponse(step,i) == 1)												// If right
 					app.sc.StartAnimation(app.students[i].id,app.seqs["nodYes"]),n++;					// Nod yes
@@ -206,8 +211,9 @@ class ARC  {
 				if (n < 33)			r=2;																// Most agree
 				else if (n < 66)	r=3;																// Mixed
 				else				r=1;																// Most disagree
+				Prompt(n+"% agreed",5);																	// Show agreement
 				app.rec.Add({ o:'R', who:null, text:n+"% agreed", r:r });								// Add to record
-				}
+			}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(step,app.curStudent);												// Get, compute, and save right response to step
 			o=this.tree[step];																			// Point at step
@@ -224,7 +230,7 @@ class ARC  {
 				for (var j=o.res[i].rc.length;j>=0;j--)	{												// Go thru matches, big to small
 					if (o.res[i].rc[0] == "0")	rc="0"+app.rec.resChain.substr(1);						// Ignore current response
 					if (o.res[i].rc == rc.substr(0,j)) {												// If a match
-						text=o.res[i].text;																// Use it
+						text=randomResponse(step,i);													// Return random response if multiple matches of immediate answer
 						app.rec.record[app.rec.record.length-1].text=text;								// Place back in record
 						app.voice.Talk(text);															// Speak response
 						return;																			// Quit looking
@@ -232,6 +238,18 @@ class ARC  {
 					}
 				}
 			}
+		
+		function randomResponse(step, res) {															// GET RANDOM RESPONSE FROM MULTIPLE MATCHES OF RC
+			var i,v=[];																					
+			var rs=app.arc.tree[step].res;																// Point at responses	
+			for (i=0;i<rs.length;++i)																	// For each response
+				if (rs[i].rc == rs[res].rc)																// If a match
+					v.push(i);																			// Add to matched list
+			var r=Math.floor(Math.random()*v.length);
+			var text=rs[v[r]].text;																		// Get response 
+			return text;																				// Return response text
+			}	
+	
 		}
 		
 	MarkovFindResponse(step, sid) 																	// FIND RESPONSE USING MARKOV CHAIN
