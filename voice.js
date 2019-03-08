@@ -8,6 +8,7 @@ class Voice {
 	{
 		var _this=this;
 		this.hasRecognition=false;																		// Assume no STT
+		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		this.listening=false;																			// Flag if listening
 		this.talkStartTime=0;																			// Time started talking
 
@@ -67,6 +68,16 @@ class Voice {
 
 	Talk(text, who)																					// SAY SOMETHING
 	{
+		if (this.thoughtBubbles) {																		// Show thought bubbles instead of TTS
+				if (who == "instructor")	return;														// No need if instructor
+			var w=window.innerWidth;																	// Screen width
+			var x=w*.5;																					// Default to middle
+			var xs=[w*.33,w*.25,w*.5,w*.73];															// Positions
+			if (who != null) app.curStudent=who;														// Set specific student				
+			if (app.curStudent >= 0) x=xs[app.curStudent];												// If only one, position accordingly
+			Bubble(text,5,x-100);																		// Show bubble
+			return;
+			}
 		try{																							// Try
 			if (who != null && (who != "instructor")) app.curStudent=who,who=app.students[app.curStudent].sex;	// Set curent student & voice based on who param
 			else if ((who == null) && (app.curStudent >= 0))  who=app.students[app.curStudent].sex;			// Set voice based on sex

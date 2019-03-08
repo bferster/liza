@@ -179,13 +179,13 @@ class ARC  {
 		var text="";
 		if (step == -1)	return;																			// Quit if no step
 		if (app.arc.tree[step].metaStruct == "C") {
-			Bubble("Choral response",5);																// Show response
-			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
-			app.rec.Add({ o:'R', who:null, text:"Choral:"+text, r:1 });									// Add to record
+			text="Choral:"+randomResponse(step,0);														// Return random response if multiple matches of immediate answer
+			if (!app.voice.thoughtBubbles) 	Bubble("Choral response",5);								// Show response
+			app.rec.Add({ o:'R', who:null, text:text, r:1 });											// Add to record
 			app.voice.Talk(text);																		// Speak response
 			return;	
 			}
-		else if (app.curStudent == -1) {																	// If whole class responding and looking for answer
+		else if (app.curStudent == -1) {																// If whole class responding and looking for answer
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
 			var j=Math.floor(Math.random()*app.students.length);										// Random start				
 			for (i=0;i<n;++i)																			// For each responder	

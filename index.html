@@ -54,7 +54,7 @@
 							font-size: 14px; text-align:center; display: none;
 							}
 		.lz-bubble {		position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top:80px; width:200px;
-							border-radius: 80px; background-color: #d7ebff; border: 1px solid #999; 
+							border-radius: 100px; background-color: #d7ebff; border: 1px solid #999; 
 							font-size: 16px; text-align:center; display: none;
 							}
 		.lz-prompt {		color:#fff; width:100%;	vertical-align: 3px; margin-left:16px; font-size:16px;
@@ -106,6 +106,7 @@
 		<img id="reviewBut" src="img/scriptbut.gif" title="Lesson map" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="slideBut" src="img/image-icon.png" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="muteBut" src="img/unmutebut.png" title="Sounds" style="cursor:pointer;margin-right:16px;float:right">
 		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">The University of Virginia @ 2019</div>
 	</div>
 	<div id='blackboardDiv' class='lz-blackboard'>
@@ -215,7 +216,7 @@ class App  {
 		this.curGoal="";																			// Current goal in focus
 		this.curStudent=0;																			// Currently active student
 		this.gettingEntities=0;																		// Flag when waiting for entities from AI
-		
+	
 		this.gid="1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU";									// Default ARC tree spreadshet
 		var url=window.location.search.substring(1);						   						// Get query string
 		if (url && !url.match(/real/i)) {															// If params
@@ -241,13 +242,17 @@ class App  {
 		$("#writeBut").on("click", ()=> { 															// On BB button clck
 			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
-			app.rec.Add({ o:'B', m:m }); 													// Add to record
+			app.rec.Add({ o:'B', m:m }); 															// Add to record
 			}); 
 		$("#slideBut").on("click", (e)=> { 															// On BB button clck
 			if (e.shiftKey)	app.bb.ShowSlide(-1);													// Last slide
 			else			app.bb.ShowSlide(1);													// Next slide
 			}); 
-
+		$("#muteBut").on("click", ()=> { 															// On mute button clck
+			if (app.voice.thoughtBubbles) 	$("#muteBut").prop("src","img/unmutebut.png");			// If was muted, show unmute icon
+			else 							$("#muteBut").prop("src","img/mutebut.png");			// Mute icon
+			app.voice.thoughtBubbles=!app.voice.thoughtBubbles;										// Toggle flag
+			}); 
 	
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
@@ -340,7 +345,7 @@ class App  {
 		if (text && text.match(/replay|playback/i) && text.match(/class/i)) { app.rec.Playback(); return; }		// Playback
 		app.arc.Parse(text, null, (o)=> {															// Parse text
 			var score=0;
-			if (o.match(/who:agree/i)) 			app.curStudent=-2;									// Looking for nods
+			if (o.match(/response:agree/i) && o.match(/who:all/i)) app.curStudent=-2;				// Looking for nods from whole class
 			else if (o.match(/who:all/i)) 		app.curStudent=-1;									// Whole class
 			else if (o.match(/who:Class/i)) 	app.curStudent=-1;									// Whole class
 			else if (o.match(/who:Liza/i)) 		app.curStudent=3;									// Set current student
@@ -522,7 +527,6 @@ class App  {
 		if (x)	str+="left:"+x+"px;";
 		if (y)	str+="top:"+y+"px";
 		str+="'>"+msg+"</div>"; 
-		trace(str)
 		$("body").append(str);																			// Add popup to body
 		$("#bubbleDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);						// Animate in and out		
 	}
