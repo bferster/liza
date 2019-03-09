@@ -70,11 +70,9 @@ class Voice {
 	{
 		if (this.thoughtBubbles) {																		// Show thought bubbles instead of TTS
 				if (who == "instructor")	return;														// No need if instructor
-			var w=window.innerWidth;																	// Screen width
-			var x=w*.5;																					// Default to middle
-			var xs=[w*.33,w*.25,w*.5,w*.73];															// Positions
+			var x=window.innerWidth/2;																	// Screen width
 			if (who != null) app.curStudent=who;														// Set specific student				
-			if (app.curStudent >= 0) x=xs[app.curStudent];												// If only one, position accordingly
+			if (app.curStudent >= 0) 	x=app.sc.GetScreenPos(app.sc.models[app.students[app.curStudent].id].model).x;	// If only one, position based on 3D -> 2D projection
 			Bubble(text,5,x-100);																		// Show bubble
 			return;
 			}

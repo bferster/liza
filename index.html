@@ -160,7 +160,7 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 		
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				app.rec.Reviewer();	
+				app.sc.GetScreenPos(app.sc.models["Liza"].model);
 
 				/*				var ability=.5;
 				var count=0;

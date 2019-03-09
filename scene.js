@@ -439,5 +439,15 @@ class Scene {
 			}
 	}
 
+	GetScreenPos(obj)																			// GET SCREEN POS OF 3D OBJECT
+	{	
+		var w=window.innerWidth/2, h=window.innerHeight/2;
+		var pos=new THREE.Vector3();
+		pos=pos.setFromMatrixPosition(obj.matrixWorld);		
+		pos.project(this.camera);																	// Project pos
+		pos.x=(pos.x*w)+w;																			// In screen coords X
+		pos.y=-(pos.y*h)+h;																			// Y
+		return pos;																					// Return pos
+	}
 
 }  // SCENE CLOSURE
