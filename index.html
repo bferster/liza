@@ -59,7 +59,7 @@
 							}
 		.lz-prompt {		color:#fff; width:100%;	vertical-align: 3px; margin-left:16px; font-size:16px;
 							}
-		.lz-is {			border-radius:16px; padding:0 8px; width:200px; height: 24px;
+		.lz-is {			border-radius:16px; padding:0 8px; width:250px; height: 24px;
 							border:1px solid #999; font-size: 13px;
 							}
 		.lz-bs {			cursor: pointer; color:#fff; 
@@ -96,9 +96,8 @@
 		</div>
 	</div>
 	<div id="controllerDiv" class="lz-controller">
-		<span id="talkSpan">
-			<img id="talkBut" src="img/talkbut.png" title="Click to talk" style="cursor:pointer">
-		</span>
+		<img id="talkBut" src="img/talkbut.png" title="Click to talk" style="cursor:pointer">
+		<input id="talkInput" type='text' class="lz-is" style="vertical-align:8px;display:none" placeholder="Talk by typing here">
 		<img id="writeBut" src="img/editbut.gif" title="Draw on blackboard" style="cursor:pointer;margin-left:24px">
 		<span id='promptSpan' class='lz-prompt'></span>
 
@@ -234,7 +233,7 @@ class App  {
 		this.Draw();																				// Start 
 
 		if (!this.voice.hasRecognition) 															// This platform doesn't have voice recognition
-			$("#talkSpan").html("<input id='talkInput' type='text' class='lz-is' style='vertical-align:4px' placeholder='Talk by typing here'>");	// Put in text input field
+			$("#talkBut").hide(),$("#talkInput").show();											// Show input	
 		$("#settingsBut").on("click", ()=> { app.sc.PoseEditor();  });								// On settings button click	
 		$("#reviewBut").on("click", ()=> { app.rev.Reviewer();  });									// On review button click	
 		$("#talkBut").on("click", ()=> { app.voice.Listen(); });									// On talk button click, start listening
@@ -252,7 +251,11 @@ class App  {
 			if (app.voice.thoughtBubbles) 	$("#muteBut").prop("src","img/unmutebut.png");			// If was muted, show unmute icon
 			else 							$("#muteBut").prop("src","img/mutebut.png");			// Mute icon
 			app.voice.thoughtBubbles=!app.voice.thoughtBubbles;										// Toggle flag
-			}); 
+			if (app.voice.thoughtBubbles) 															// Type input
+				$("#talkBut").hide(),$("#talkInput").show();										// Show input field
+			else if (app.voice.hasRecognition) 														// This platform has voice recognition
+				$("#talkBut").show(),$("#talkInput").hide();										// Show mic button
+				}); 
 	
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
