@@ -17,6 +17,7 @@
 	<script src="scene.js"></script>
 	<script src="blackboard.js"></script>
 	<script src="voice.js"></script>
+	<script src="time.js"></script>
 	
 	<style>
 		 body { 			font-family:Verdana,Geneva,sans-serif;font-size:13px; box-sizing:border-box; 
@@ -56,6 +57,30 @@
 		.lz-bubble {		position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top:80px; width:200px;
 							border-radius: 100px; background-color: #d7ebff; border: 1px solid #999; 
 							font-size: 16px; text-align:center; display: none;
+							}
+							.lz-timebar { 	position:absolute;color:#999;
+							}
+		.lz-timeslider {	background:#ccc; height:6px; border:none; display:inline-block;
+							}
+		.lz-timeslider.ui-slider .ui-slider-handle {
+							height:30px; width:8px; margin-top:-8px;
+							background:#009900; border:none; cursor:pointer;
+							}
+		.lz-slidertime { 	position:absolute; width:100px; text-align:center;
+							}
+		.lz-ticks { 		position:absolute; width:2px; height:8px; background-color:#ccc;
+							}
+		.lz-timeplayer { 	position:absolute; color:#999; margin-left:18px; margin-right:18px; width:123px;
+							}
+		.lz-playerslider{ 	background:#ccc; height:4px; width:80px; border:none; display:inline-block;
+							margin-left:6px;
+							}
+		.lz-playerspeed { 	position:absolute; width:40px; text-align:center; font-size:9px; color:#999;
+							}
+		.lz-playerslider.ui-slider .ui-slider-handle {
+							height:0px; width:0px; margin-top:7px; cursor:pointer;
+							border-left: 5px solid transparent; border-right: 5px solid transparent;
+							border-bottom: 8px solid #999;
 							}
 		.lz-prompt {		color:#fff; width:100%;	vertical-align: 3px; margin-left:16px; font-size:16px;
 							}
@@ -228,6 +253,7 @@ class App  {
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.rev=new Review();																		// Make new reviewer		
+		this.tim=new Timeline();																	// Make timeline	
 		this.LoadProject(this.gid);																	// Load project file
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
