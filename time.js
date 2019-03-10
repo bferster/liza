@@ -7,7 +7,56 @@ class Timeline {
 	constructor()																				// CONSTRUCTOR
 	{
 		this.curTime=0;
+		this.curStart=0;
+		this.startPlay;
 		this.playerSpeed=50;
+		this.maxTime=5*60;
+		this.events=[];
+		this.events.push({ text:"What&apos;s 2 + 2?", o:"S", t:10, m:"Q" })
+		this.events.push({ who:3, text:"I dont know", o:"R", t:10, r:2 })
+		this.events.push({ text:"Do you agree?", o:"S", t:30, m:"A" })
+		this.events.push({ who:0, text:"No I don't", o:"R", t:30, r:1 })
+	}
+
+	Draw(playing)																				// DRAW
+	{
+		var i,o;
+		if (this.curTime == 0)	$("#stuTextDiv").html(""),$("#insTextDiv").html("");				// Clear at start
+		for (i=0;i<this.events.length;++i) {														// For each event
+			o=this.events[i];																		// Point at it
+			if (o.who && (o.who >= 0))	app.curStudent=o.who;										// Set current student
+			if (this.curTime >= o.t) {																// If in this one
+				if (this.curStep != i) {															// Not same step showing
+					if (o.o == "R")  {																// Student
+						$("#stuTextDiv").html(o.text);												// Show response
+						if (playing && !o.played)	app.voice.Talk(o.text),o.played=1;				// Speak it
+						}							
+					else{																			// Instructor
+						$("#insTextDiv").html("<b>"+o.text+"</b>");	}								// Show
+						if (playing && !o.played)	app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
+						}
+				this.curStep=i;																		// Then is now
+				}							
+			}
+	}
+	
+	AddEvents()																					// ADD EVENTS TO TIMELINE
+	{
+		var i,o,x,col,str;
+		var w=$("#timeSlider").width();																// Width of slider
+		for (i=0;i<this.events.length;++i) {														// For each event
+			o=this.events[i];																		// Point at it
+			x=(w*o.t/this.maxTime)+30;																// Position
+			if (o.r == RIGHT)				col="#4ab16a";											// Color if right
+			else if (o.r == WRONG)			col="#a77171";											// Wrong
+			else if (o.r == INCOMPLETE)		col="#e88632";											// Incomplete
+			else							col="#fff";												// Instructor
+			str="<div class='lz-timeEvent' style='left:"+x+"px;background-color:"+col;				// Start event
+			if (o.o == "S")		str+=";top:15px;color:#333' title='";								// Instructor
+			else				str+=";top:40px' title='"+app.students[o.who].id+": ";				// Student
+			str+=o.text+"'>"+(o.m ? o.m : "")+"</div>";												// End event
+			$("#timeBar").append(str);		
+			}
 	}
 
 	Init()																						// INIT TIMELINE
@@ -16,28 +65,36 @@ class Timeline {
 		$("#timeBar").remove();																		// Remove old one
 		var _this=this;																				// Save context
 		str="<div id='timeBar' class='lz-timebar'>";												// Add timebar div
-		str+="<div id='timecontrol'>"																// Block timebar unit
-		str+="<div id='timeSlider' class='lz-timeslider'></div>";									// Add slider div
-		str="<div id='timePlayer' class='lz-timeplayer'>";										// Add timeplayer div
-		str+="<img id='playerButton' src='img/playbut.png' style='width:18;cursor:pointer;vertical-align:middle'>";		// Player button
-		str+="<div id='playerSlider' class='lz-playerslider'></div>";								// Add slider div
-		str+="<div id='playerSpeed' class='lz-playerspeed'></div>";								// Speed display
+		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-80px'></div>";									
+		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-60px'></div>";								
+		
+		str+="<div id='timeSlider' class='lz-timeslider'></div>";									// Add time slider div
+		str+="<div id='sliderTime' class='lz-slidertime'></div>";									// Time display
+		str+="<img id='closeTimeline' src='img/closedot.gif' style='float:right;cursor:pointer;margin-top:-22px;margin-right:-20px' ";	// Close button
+		str+="onclick='$(\"#timeBar\").remove()'>";													// On click, close
+		str+="<div id='speedDiv' class='lz-speedControl'>";											// Speed control
+		str+="<img id='playerButton' src='img/playbut.png' style='width:18;cursor:pointer;vertical-align:-7px'>";	// Player button
+		str+="<div id='playerSlider' class='lz-playerslider'></div>";								// Speed slider div
+		str+="<div id='playerSpeed' class='lz-playerspeed'>Speed</div></div>";						// Speed slider text
 		$("body").append(str+"</div>");																// Add timebar				
-	
+		this.AddEvents();																			//Add ecents to timeline															
+
+		$("#timeBar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );			// Don't move orbiter
+
 		$("#playerSlider").slider({																	// Init slider
 			value:50,																				// Set speed
 			create: function(event,ui) {															// On create
 				var x=$($(this).children('.ui-slider-handle')).offset().left-$(this).offset().left;	// Get pos       			
-				 ShowSpeed(x,_this.defaultSpeed);													// Show time			
+				ShowSpeed(x,_this.defaultSpeed);													// Show time			
 				},
 			slide: function(event,ui) {																// On slide
 				var x=$($(this).children('.ui-slider-handle')).offset().left-$(this).offset().left;	// Get pos       			
-				 ShowSpeed(x,ui.value);																// Show time			
-				 },
+				ShowSpeed(x,ui.value);																// Show time			
+				},
 			stop: function(event,ui) {																// On slide stop
 				var x=$($(this).children('.ui-slider-handle')).offset().left-$(this).offset().left;	// Get pos       			
-				 ShowSpeed(x,ui.value);																// Show time			
-				 }
+				ShowSpeed(x,ui.value);																// Show time			
+				}
 			});
 
 		function ShowSpeed(x, speed) {																// SHOW TIME AT HANDLE
@@ -46,7 +103,7 @@ class Timeline {
 			 }
 		
 		$("#playerButton").click( function() {														// ON PLAY CLICK
-				_this.pop.Sound("click",_this.muteSound);											// Click sound							
+				Sound("click");																		// Click sound							
 				if ($(this).prop("src").match("play")) 												// If not playing
 					_this.Play(_this.curTime);														// Play	
 				else																				// If in pause
@@ -54,60 +111,65 @@ class Timeline {
 				});
 	
 		$("#timeSlider").slider({																	// INIT SLIDER
-		   create: function(event,ui) {																// On create
-				var x=$(this).offset().left+2;														// Start
-				this.ShowTime(x,0);																	// Show start time			
-				},
+		    max: _this.maxTime,																		// Max time in seconds
+			create: function(event,ui) {															// On create
+				var x=$(this).offset().left-8;														// Start
+				_this.ShowTime(x,0);																// Show start time			
+				_this.Draw();																		// Draw state at time	
+			},
 		   slide: function(event,ui) {																// On slide
 			   var x=$($(this).children('.ui-slider-handle')).offset().left;						// Get pos       			
-				this.ShowTime(x,ui.value);															// Show time			
-				app.rev.Draw(ui.value);																// Redraw project
-			   },
+			   _this.ShowTime(x,ui.value);															// Show time			
+			   _this.Draw();																		// Draw state at time	
+			},
 		   stop: function(event,ui) {																// On slide stop
 			   var x=$($(this).children('.ui-slider-handle')).offset().left;						// Get pos       			
-				this.ShowTime(x,ui.value);															// Show time			
-				app.rev.Draw(ui.value);																// Redraw project
-			   }
+				_this.ShowTime(x,ui.value);															// Show time			
+				_this.Draw();																		// Draw state at time	
+			}
 		   });
 	}
 
 	ShowTime(x, time) 																			// SHOW TIME AT HANDLE
 	{	  
 		this.curTime=time;																			// Set now
-		var min=Math.floor(time/1000/60);															// Mins
-		var secs=Math.floor(time/1000)%60;															// Secs
+		var min=Math.floor(time/60);																// Mins
+		var sec=Math.floor(time)%60;																// Secs
+		if (sec < 10)	sec="0"+sec;																// Add leading 0
 		$("#sliderTime").html(min+":"+sec);															// Show value
- 		$("#sliderTime").css({top:"22px",left:x+"px"})												// Position text
- 		}
+		$("#sliderTime").css("left",x-30+"px")														// Position text
+	}
 
 	Goto(time)																					// SET TIME
 	{
 		if (time == undefined) 		time=this.curTime;												// Set to current time if undefined							
 		$("#timeSlider").slider("option","value",time);												// Trigger slider
-		var x=$($("#timeSlider").children('.ui-slider-handle')).offset().left;						// Get pos       			
+		var x=$($("#timeSlider").children('.ui-slider-handle')).offset().left;						// Get pos       		
 		this.ShowTime(x,time);																		// Show time
+		this.Draw(true);																			// Draw state at time	
 	}
 
-	Play(start, end) 																			// PLAY/STOP TIMELINE ANIMATION
+	Play(start) 																			// PLAY/STOP TIMELINE ANIMATION
 	{
 		var _this=this;																				// Save context for callback
 		clearInterval(this.interval);																// Clear timer
+		for (var i=0;i<this.events.length;++i) this.events[i].played=0;								// For each event, reset played flag
 		$("#playerButton").prop("src","img/playbut.png");											// Show play button
 		if (start != undefined) {																	// If playing
 			$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
-			this.startPlay=new Date().getTime();													// Set start
-			var off=(this.curTime-this.curStart)/this.curDur;			 							// Get offset from start
+			this.startPlay=new Date().getTime()/1000;												// Set start in seconds
+			var off=(this.curTime-this.curStart)/this.maxTime;			 							// Get offset from start
 			this.interval=setInterval(function() {													// Start timer
 				var speed=_this.playerSpeed*100/Math.max($("#playerSlider").slider("option","value"),5);
-				var pct=(new Date().getTime()-_this.startPlay)/speed; 								// Get percentage
+				var pct=(new Date().getTime()/1000-_this.startPlay)/speed; 							// Get percentage
 				pct+=off;																			// Add starting offset
-				if ((end != undefined) && (_this.curTime > end)) 	pct=99;							// Past end point, force quit
-				if (pct > 1)																		// If done
-					_this.Play();																	// Stop playing
-				if (pct != 99)																		// If a regular stop
-					_this.Goto((pct*_this.curDur)+_this.curStart);									// Go there
+				if (_this.curTime > _this.maxTime) pct=99;											// Past end point, force quit
+				if (pct >= 1)																		// If done
+					_this.Play(),_this.curStart=0,_this.curTime=0;									// Stop playing
+				else																				// If playing
+					_this.Goto((pct*_this.maxTime)+_this.curStart);									// Go there
 				}
-			,42);																					// ~24fps
+			,10);																					// ~5fps
 			}
 	}
 
@@ -130,6 +192,8 @@ class Review  {
 	Reviewer()																						// REVIEW LESSON MAP SCRIPT												
 	{
 		var i,w,o;
+		var _this=this;																					// Save context
+		$("#timeBar").remove();																			// Remove timeline, if up
 		if ($("#reviewDiv").length) {																	// If already up, bring it down
 			$("#reviewDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#reviewDiv").remove(); } }); // Slide down
 			return;																						// Quit																					
@@ -140,7 +204,7 @@ class Review  {
 		str+="id='lpTitle'></span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
 		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div>"; 
 		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0'>";
-		str+=MakeSelect("revMode",false,["Overview","Hints","Full map","Review"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
+		str+=MakeSelect("revMode",false,["Overview","Hints","Full map","Review", "Timeline"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
 		str+=MakeSelect("revStu",false,["Student"])+"</div>"; 
 			
 		$("body").append(str);																			// Add to body
@@ -166,7 +230,14 @@ class Review  {
 
 		function refreshBody(mode) {																// REFRESH BODY CONTENT
 			var str="";	
-			if (mode == "Review")	{																	// Session review
+			if (mode == "Timeline")	{																	// Timeline
+				$("#reviewDiv").hide("slide",{ direction:"down", complete: ()=> { 						// Slide down
+					$("#reviewDiv").remove(); 															// Kill this dialog
+					app.tim.Init();																		// Show timeline
+					_this.mode="Overview";																// Start next time in overview
+				}}); 
+				}
+			else if (mode == "Review") {																// Session review
 				var i,j,k,last=0,e;
 				str="";																					// Title
 				$("#lpTitle").html("Lesson map review");												// Set title

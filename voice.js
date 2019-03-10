@@ -69,11 +69,12 @@ class Voice {
 	Talk(text, who)																					// SAY SOMETHING
 	{
 		if (this.thoughtBubbles) {																		// Show thought bubbles instead of TTS
-				if (who == "instructor")	return;														// No need if instructor
+			if (who == "instructor")	return;															// No need if instructor
 			var x=window.innerWidth/2;																	// Screen width
 			if (who != null) app.curStudent=who;														// Set specific student				
-			if (app.curStudent >= 0) 	x=app.sc.GetScreenPos(app.sc.models[app.students[app.curStudent].id].model).x;	// If only one, position based on 3D -> 2D projection
-			Bubble(text,5,x-100);																		// Show bubble
+			if (app.curStudent >= 0) 																	// If only one student
+				x=app.sc.GetScreenPos(app.sc.models[app.students[app.curStudent].id].model).x;			// Put over them, based on 3D -> 2D projection
+			Bubble(text,5,x-100,80);																	// Show bubble
 			return;
 			}
 		try{																							// Try
