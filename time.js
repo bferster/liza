@@ -12,10 +12,6 @@ class Timeline {
 		this.playerSpeed=50;
 		this.maxTime=5*60;
 		this.events=[];
-		this.events.push({ text:"What&apos;s 2 + 2?", o:"S", t:10, m:"Q" })
-		this.events.push({ who:3, text:"I dont know", o:"R", t:10, r:2 })
-		this.events.push({ text:"Do you agree?", o:"S", t:30, m:"A" })
-		this.events.push({ who:0, text:"Yes I do", o:"R", t:30, r:1 })
 	}
 
 	Draw(playing)																				// DRAW
@@ -45,10 +41,35 @@ class Timeline {
 			}
 	}
 	
-	AddEvents()																					// ADD EVENTS TO TIMELINE
+	AddEvents(preview)																			// ADD EVENTS TO TIMELINE
 	{
-		var i,o,x,col,str;
+		var i=0,n=0,o,x,r,col,str;
+		var last=0
 		var w=$("#timeSlider").width();																// Width of slider
+		this.events=[];																				// Clear events
+		if (preview) {																				// If previewing
+			while (n++ < 200) {																		// No more than 200
+				app.curStudent=(app.curStudent+1)%app.students.length;								// Cycle through students
+				o=app.arc.tree[i];																	// Point at step
+				if (!o)	continue;																	// Skip if bad																		
+				if (o.score == undefined)	o.score=0;												// Must exist to use markov function
+				if (o.escore == undefined)	o.escore=0;												
+				if (o.kscore == undefined)	o.kscore=0;												
+				if (o.matched == undefined)	o.matched=0;											
+				this.maxTime=n*30-15;																// Set max time
+				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct });			// Add action
+				r=app.arc.MarkovFindResponse(i,app.curStudent) 										// Find proper response
+				if (r && r <= o.res.length) {														// If a response
+					this.events.push({ o:"R", t:this.maxTime, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add response
+					if (o.res[r-1].next == "*")	i=last+1;											// If going back to next step
+					else						last=i,i=o.res[r-1].next;							// Go to designated step
+					}
+				else last=i,i=o.next;
+				if (o.next == "END")	break;														// Quit on last one
+				}
+			}
+
+
 		for (i=0;i<this.events.length;++i) {														// For each event
 			o=this.events[i];																		// Point at it
 			x=(w*o.t/this.maxTime)+30;																// Position
@@ -64,14 +85,14 @@ class Timeline {
 			}
 	}
 
-	Init()																						// INIT TIMELINE
+	Init(preview)																				// INIT TIMELINE
 	{
 		$("#timeBar").remove();																		// Remove old one
 		var _this=this;																				// Save context
 		var str="<div id='timeBar' class='lz-timebar'>";											// Add timebar div
 		str+="<div class='lz-timeback'></div>";														// Backing div
-		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-52px;font-size:14px'></div>";									
-		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-30px;font-size:14px'></div>";								
+		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-48px;font-size:14px'></div>";									
+		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-27px;font-size:14px'></div>";								
 		
 		str+="<div id='timeSlider' class='lz-timeslider'></div>";									// Add time slider div
 		str+="<div id='sliderTime' class='lz-slidertime'></div>";									// Time display
@@ -82,8 +103,8 @@ class Timeline {
 		str+="<div id='playerSlider' class='lz-playerslider'></div>";								// Speed slider div
 		str+="<div id='playerSpeed' class='lz-playerspeed'>Speed</div></div>";						// Speed slider text
 		$("body").append(str+"</div>");																// Add timebar				
+		this.AddEvents(preview);																		// Add events to timeline															
 		this.DrawTicks();																			// Draw tick lines
-		this.AddEvents();																			// Add events to timeline															
 
 		$("#timeBar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );			// Don't move orbiter
 
@@ -221,7 +242,7 @@ class Review  {
 		str+="id='lpTitle'></span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
 		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div>"; 
 		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0'>";
-		str+=MakeSelect("revMode",false,["Overview","Hints","Full map","Review", "Timeline"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
+		str+=MakeSelect("revMode",false,["Overview","Hints","Full map","Preview", "Review"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
 		str+=MakeSelect("revStu",false,["Student"])+"</div>"; 
 			
 		$("body").append(str);																			// Add to body
@@ -247,10 +268,10 @@ class Review  {
 
 		function refreshBody(mode) {																// REFRESH BODY CONTENT
 			var str="";	
-			if (mode == "Timeline")	{																	// Timeline
+			if (mode == "Preview")	{																	// Timeline
 				$("#reviewDiv").hide("slide",{ direction:"down", complete: ()=> { 						// Slide down
 					$("#reviewDiv").remove(); 															// Kill this dialog
-					app.tim.Init();																		// Show timeline
+					app.tim.Init(true);																	// Show timeline
 					_this.mode="Overview";																// Start next time in overview
 				}}); 
 				}
@@ -299,11 +320,12 @@ class Review  {
 					o=app.arc.tree[i];																	// Point at step
 					if (o.text)	{																		// If defined
 						var oo=app.arc.tree[o.next];													// Point at next step
-						w=oo.metaStruct+": "+oo.text;													// Add tooltip
+						w=oo ? oo.metaStruct+": "+oo.text : "";											// Add tooltip if a valid next
 						str+="<div title='"+w+"' id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";		
 						str+="<b>"+o.metaStruct+": "+o.text+"</b></div>";
 						for (var j=0;j<o.res.length;++j) {												// For each response
-							w=app.arc.tree[o.res[j].next].metaStruct+": "+app.arc.tree[o.res[j].next].text;	// Next step's text
+							oo=app.arc.tree[o.res[j].next];												// Point at next
+							w=oo ? oo.metaStruct+": "+oo.text : "";										// Add tooltip if a valid next
 							str+="<div title='"+w+"' style='margin-left:16px'>";						// Start of line
 							for (var k=0;k<o.res[j].rc.length;++k) {									// For each response in chain
 								str+="<span style='color:"												// Start checks/crosses

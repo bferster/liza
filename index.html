@@ -194,7 +194,7 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				app.tim.Init();
+				app.tim.Init(true);
 
 				/*				var ability=.5;
 				var count=0;

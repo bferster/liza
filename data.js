@@ -70,7 +70,7 @@ class ARC  {
 					}
 				else																					// No next spec'd
 					_this.tree[i].next=Math.min(i+1,_this.tree.length-1);								// Point at next in line
-				
+					
 				for (j=0;j<_this.tree[i].res.length;++j) {												// For each response in step
 					if (_this.tree[i].res[j].next)	{													// If a next spec'd
 						v=_this.tree[i].res[j].next.split("-");											// Get goal and step 
@@ -87,7 +87,7 @@ class ARC  {
 						_this.tree[i].res[j].next=Math.min(i+1,_this.tree.length-1);					// Point at next in line
 					}
 				}
-				_this.Extract();																		// Extract keywords and entities
+			_this.Extract();																			// Extract keywords and entities
 			};									
 
 		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE

@@ -90,7 +90,7 @@ class Voice {
 			this.tts.pitch=oldPitch;																	// Restore pitch	
 		}
 		catch(e) { trace("Speech error",e) };															// Catch
-}
+	}
 
 	AddGrammarList(heading, dictionary)																// ADD WORDS TO GRAMMAR LIST
 	{
