@@ -15,12 +15,12 @@ class Timeline {
 		this.events.push({ text:"What&apos;s 2 + 2?", o:"S", t:10, m:"Q" })
 		this.events.push({ who:3, text:"I dont know", o:"R", t:10, r:2 })
 		this.events.push({ text:"Do you agree?", o:"S", t:30, m:"A" })
-		this.events.push({ who:0, text:"No I don't", o:"R", t:30, r:1 })
+		this.events.push({ who:0, text:"Yes I do", o:"R", t:30, r:1 })
 	}
 
 	Draw(playing)																				// DRAW
 	{
-		var i,o;
+		var i,o,col;
 		if (this.curTime == 0)	$("#stuTextDiv").html(""),$("#insTextDiv").html("");				// Clear at start
 		for (i=0;i<this.events.length;++i) {														// For each event
 			o=this.events[i];																		// Point at it
@@ -28,12 +28,17 @@ class Timeline {
 			if (this.curTime >= o.t) {																// If in this one
 				if (this.curStep != i) {															// Not same step showing
 					if (o.o == "R")  {																// Student
-						$("#stuTextDiv").html(o.text);												// Show response
-						if (playing && !o.played)	app.voice.Talk(o.text),o.played=1;				// Speak it
+						if (o.r == RIGHT)				col="#009900";								// Color if right
+						else if (o.r == WRONG)			col="#990000";								// Wrong
+						else if (o.r == INCOMPLETE)		col="#e88632";								// Incomplete
+						$("#stuTextDiv").css("color",col);											// Set color
+						if (o.who >= 0)  $("#stuTextDiv").html(app.students[o.who].id+": "+o.text),app.curStudent=o.who;	// Add name if a single student
+						else			 $("#stuTextDiv").html(o.text);								// Just response
+						if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text),o.played=1;	// Speak it
 						}							
 					else{																			// Instructor
 						$("#insTextDiv").html("<b>"+o.text+"</b>");	}								// Show
-						if (playing && !o.played)	app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
+						if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
 						}
 				this.curStep=i;																		// Then is now
 				}							
@@ -52,8 +57,8 @@ class Timeline {
 			else if (o.r == INCOMPLETE)		col="#e88632";											// Incomplete
 			else							col="#fff";												// Instructor
 			str="<div class='lz-timeEvent' style='left:"+x+"px;background-color:"+col;				// Start event
-			if (o.o == "S")		str+=";top:15px;color:#333' title='";								// Instructor
-			else				str+=";top:40px' title='"+app.students[o.who].id+": ";				// Student
+			if (o.o == "S")		str+=";top:31px;color:#333' title='";								// Instructor
+			else				str+=";top:56px' title='"+app.students[o.who].id+": ";				// Student
 			str+=o.text+"'>"+(o.m ? o.m : "")+"</div>";												// End event
 			$("#timeBar").append(str);		
 			}
@@ -61,23 +66,24 @@ class Timeline {
 
 	Init()																						// INIT TIMELINE
 	{
-		var str=""
 		$("#timeBar").remove();																		// Remove old one
 		var _this=this;																				// Save context
-		str="<div id='timeBar' class='lz-timebar'>";												// Add timebar div
-		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-80px'></div>";									
-		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-60px'></div>";								
+		var str="<div id='timeBar' class='lz-timebar'>";											// Add timebar div
+		str+="<div class='lz-timeback'></div>";														// Backing div
+		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-52px;font-size:14px'></div>";									
+		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-30px;font-size:14px'></div>";								
 		
 		str+="<div id='timeSlider' class='lz-timeslider'></div>";									// Add time slider div
 		str+="<div id='sliderTime' class='lz-slidertime'></div>";									// Time display
-		str+="<img id='closeTimeline' src='img/closedot.gif' style='float:right;cursor:pointer;margin-top:-22px;margin-right:-20px' ";	// Close button
-		str+="onclick='$(\"#timeBar\").remove()'>";													// On click, close
+		str+="<div id='closeTimeline' style='float:right;cursor:pointer;margin-top:2px;color:#fff;margin-right:8px' ";	// Close button
+		str+="onclick='$(\"#timeBar\").remove()'>x</div>";									// On click, close
 		str+="<div id='speedDiv' class='lz-speedControl'>";											// Speed control
 		str+="<img id='playerButton' src='img/playbut.png' style='width:18;cursor:pointer;vertical-align:-7px'>";	// Player button
 		str+="<div id='playerSlider' class='lz-playerslider'></div>";								// Speed slider div
 		str+="<div id='playerSpeed' class='lz-playerspeed'>Speed</div></div>";						// Speed slider text
 		$("body").append(str+"</div>");																// Add timebar				
-		this.AddEvents();																			//Add ecents to timeline															
+		this.DrawTicks();																			// Draw tick lines
+		this.AddEvents();																			// Add events to timeline															
 
 		$("#timeBar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );			// Don't move orbiter
 
@@ -104,10 +110,7 @@ class Timeline {
 		
 		$("#playerButton").click( function() {														// ON PLAY CLICK
 				Sound("click");																		// Click sound							
-				if ($(this).prop("src").match("play")) 												// If not playing
-					_this.Play(_this.curTime);														// Play	
-				else																				// If in pause
-					_this.Play();																	// Pause	
+				_this.Play();																		// Play	
 				});
 	
 		$("#timeSlider").slider({																	// INIT SLIDER
@@ -137,8 +140,20 @@ class Timeline {
 		var sec=Math.floor(time)%60;																// Secs
 		if (sec < 10)	sec="0"+sec;																// Add leading 0
 		$("#sliderTime").html(min+":"+sec);															// Show value
-		$("#sliderTime").css("left",x-30+"px")														// Position text
+		$("#sliderTime").css("left",x-23+"px")														// Position text
 	}
+
+	DrawTicks()																					// DRAW TICK LINES
+	{
+		var i,str="";
+		var n=Math.floor(this.maxTime/60);															// Number of ticks
+		var inc=$("#timeSlider").width()/n;															// Increment size										
+		for (i=1;i<n;++i) {																			// For each tick
+			str+="<div class='lz-ticks' style='left:"+(i*inc+34)+"px'></div>";						// Add tick div
+			str+="<div class='lz-tickLab' style='left:"+(i*inc+25)+"px'>"+i+"</div>";				// Add label
+			}
+		$("#timeBar").append(str);																	// Add to timebar							
+		}
 
 	Goto(time)																					// SET TIME
 	{
@@ -149,13 +164,15 @@ class Timeline {
 		this.Draw(true);																			// Draw state at time	
 	}
 
-	Play(start) 																			// PLAY/STOP TIMELINE ANIMATION
+	Play() 																						// PLAY/STOP TIMELINE ANIMATION
 	{
 		var _this=this;																				// Save context for callback
-		clearInterval(this.interval);																// Clear timer
-		for (var i=0;i<this.events.length;++i) this.events[i].played=0;								// For each event, reset played flag
-		$("#playerButton").prop("src","img/playbut.png");											// Show play button
-		if (start != undefined) {																	// If playing
+   		clearInterval(this.interval);																// Clear timer
+		if ($("#playerButton").prop("src").match(/pausebut/)) 										// If playing, stop
+			$("#playerButton").prop("src","img/playbut.png");										// Show play button
+		else{																						// If not playing, start
+			for (var i=0;i<this.events.length;++i) 													// For each event
+				this.events[i].played=(this.events[i].t < this.curTime) ? 1 : 0;					// Reset played flag if after current time
 			$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
 			this.startPlay=new Date().getTime()/1000;												// Set start in seconds
 			var off=(this.curTime-this.curStart)/this.maxTime;			 							// Get offset from start

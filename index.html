@@ -58,24 +58,27 @@
 							border-radius: 100px; background-color: #d7ebff; border: 1px solid #999; 
 							font-size: 16px; text-align:center; display: none;
 							}
-		.lz-timebar { 		position:absolute;color:#999; width:calc(100% - 72px); height:18px; left:0px; top:calc(100vh - 120px);
-							background-color: #fff; border: 12px solid #aaa; padding:24px;
+		.lz-timebar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 128px);
+							background-color:#aaa; border-radius: 12px 12px 0 0; height:90px;
 							}
-		.lz-timeslider {	background:#ccc; height:3px; border:none; display:inline-block; width: calc(100% - 140px); margin-top:8px; margin-left:8px;
+		.lz-timeback { 		position:absolute;width:calc(100% - 32px); height:68px; left:0; top:0; background-color:#fff; border-radius:8px; margin:16px 16px 0 16px;
+							}
+		.lz-timeslider {	background:#ccc; height:3px; border:none; display:inline-block; width: calc(100% - 206px); margin-top:8px; margin-left:8px; top:40px; left:32px;
 							}
 		.lz-timeslider.ui-slider .ui-slider-handle { 
-							height:30px; width:6px; margin-top:-8px; background:#009900; border:none; cursor:pointer;
+							height:30px; width:8px; margin-top:-8px; background:#009900; border:none; cursor:pointer;
 							}
-		.lz-slidertime { 	position:absolute; width:50px; text-align:center; color:#999; font-size:10px; top:52px;
+		.lz-slidertime { 	position:absolute; width:50px; text-align:center; color:#999; font-size:10px; top:69px;
 							}
-		.lz-timeEvent { 	position:absolute; width:8px; height:8px; border-radius:8px;
+		.lz-timeEvent { 	position:absolute; width:8px; height:8px; border-radius:8px; color:#ccc;
 							}
-
-		.lz-ticks { 		position:absolute; width:2px; height:8px; background-color:#ccc;
+		.lz-ticks { 		position:absolute; width:2px; height:40px; background-color:#ccc; top:34px;
+							}
+		.lz-tickLab { 		position:absolute; width:20px; top:20px; font-size:10px; text-align:center;
 							}
 		.lz-timeplayer { 	position:absolute; color:#999; margin-left:18px; margin-right:18px; width:123px;
 							}
-		.lz-speedControl { 	position:absolute; left: calc(100% - 120px); top:24px;
+		.lz-speedControl { 	position:absolute; left: calc(100% - 140px); top:39px;
 							}
 		.lz-playerspeed { 	position:absolute; width:40px;  text-align:center; font-size:9px; color:#999;
 							}
@@ -292,7 +295,11 @@ class App  {
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$("body").on("keydown", (e)=> {																// On key hit
-			if ((e.target == document.body) && (e.keyCode == 32) && this.voice.hasRecognition)		// Spacebar in body
+			if ($("#timeBar")[0]) {																	// If in timeline view
+				if (e.keyCode == 32) 	app.tim.Play();												// Spacebar toggles play													
+				if (e.keyCode == 36) 	app.tim.Goto(0);											// Home button plays afresh
+				}																									
+			else if ((e.target == document.body) && (e.keyCode == 32) && this.voice.hasRecognition)	// Spacebar in body
 				 app.voice.Listen();																// Start listening	
 			});															
 	}
