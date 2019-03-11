@@ -58,6 +58,7 @@ class Timeline {
 				if (o.matched == undefined)	o.matched=0;											
 				this.maxTime=n*30-15;																// Set max time
 				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct });			// Add action
+				if (o.metaStruct == "C")	app.curStudent=-2;										// Choral response
 				r=app.arc.MarkovFindResponse(i,app.curStudent) 										// Find proper response
 				if (r && r <= o.res.length) {														// If a response
 					this.events.push({ o:"R", t:this.maxTime, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add response
@@ -69,7 +70,6 @@ class Timeline {
 				}
 			}
 
-
 		for (i=0;i<this.events.length;++i) {														// For each event
 			o=this.events[i];																		// Point at it
 			x=(w*o.t/this.maxTime)+30;																// Position
@@ -77,10 +77,14 @@ class Timeline {
 			else if (o.r == WRONG)			col="#a77171";											// Wrong
 			else if (o.r == INCOMPLETE)		col="#e88632";											// Incomplete
 			else							col="#fff";												// Instructor
-			str="<div class='lz-timeEvent' style='left:"+x+"px;background-color:"+col;				// Start event
-			if (o.o == "S")		str+=";top:31px;color:#333' title='";								// Instructor
-			else				str+=";top:56px' title='"+app.students[o.who].id+": ";				// Student
-			str+=o.text+"'>"+(o.m ? o.m : "")+"</div>";												// End event
+			str="<div class='lz-timeEvent";
+			if (o.o == "S")		
+				str+="I' style='left:"+(x-6)+"px;top:26px' title='";								
+			else{
+				str+="S' style='left:"+x+"px;background-color:"+col+";top:56px;' title='"
+				if (o.who >= 0) str+-app.students[o.who].id+": ";									// Add student name if individual
+				}
+			str+=o.text.trim()+"'>"+(o.m ? o.m : "")+"</div>";										// End event
 			$("#timeBar").append(str);		
 			}
 	}
@@ -96,8 +100,8 @@ class Timeline {
 		
 		str+="<div id='timeSlider' class='lz-timeslider'></div>";									// Add time slider div
 		str+="<div id='sliderTime' class='lz-slidertime'></div>";									// Time display
-		str+="<div id='closeTimeline' style='float:right;cursor:pointer;margin-top:2px;color:#fff;margin-right:8px' ";	// Close button
-		str+="onclick='$(\"#timeBar\").remove()'>x</div>";									// On click, close
+		str+="<img id='closeTimeline' src='img/closedot.gif' style='cursor:pointer;position:absolute;left:calc(100% - 33px);top:17px;' ";	// Close button
+		str+="onclick='$(\"#timeBar\").remove()'>";									// On click, close
 		str+="<div id='speedDiv' class='lz-speedControl'>";											// Speed control
 		str+="<img id='playerButton' src='img/playbut.png' style='width:18;cursor:pointer;vertical-align:-7px'>";	// Player button
 		str+="<div id='playerSlider' class='lz-playerslider'></div>";								// Speed slider div
