@@ -197,7 +197,7 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				app.tim.Init(true);
+				app.tim.Init();
 
 				/*				var ability=.5;
 				var count=0;
@@ -260,7 +260,6 @@ class App  {
 			else						this.gid=url;												// Just plain
 			}
 		this.arc=new ARC();																			// Make new ARC tree		
-		this.rec=new Record();																		// Make new recorder		
 		this.bb=new Blackboard();																	// Make blackboard		
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
@@ -279,7 +278,7 @@ class App  {
 		$("#writeBut").on("click", ()=> { 															// On BB button clck
 			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
-			app.rec.Add({ o:'B', m:m }); 															// Add to record
+			app.arc.Add({ o:'B', m:m }); 															// Add to record
 			}); 
 		$("#slideBut").on("click", (e)=> { 															// On BB button clck
 			if (e.shiftKey)	app.bb.ShowSlide(-1);													// Last slide
@@ -387,7 +386,6 @@ class App  {
 
 	OnPhrase(text) 																			// ON PHRASE UTTERED
 	{
-		if (text && text.match(/replay|playback/i) && text.match(/class/i)) { app.rec.Playback(); return; }		// Playback
 		app.arc.Parse(text, null, (o)=> {															// Parse text
 			var score=0;
 			if (o.match(/response:agree/i) && o.match(/who:all/i)) app.curStudent=-2;				// Looking for nods from whole class
@@ -416,7 +414,7 @@ class App  {
 				}
 			app.arc.FindClosestStep(text,o);														// Match closest step to text
 			if (app.arc.curStep)			score=app.arc.tree[app.arc.curStep].score;				// Get match score			
-			app.rec.Add({ o:'S', t:app.voice.talkStartTime, text:text, meta:app.arc.tree[app.arc.curStep].metaStruct, step:app.arc.curStep, score:score });	// Add to record at time of STT listening
+			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, meta:app.arc.tree[app.arc.curStep].metaStruct, step:app.arc.curStep, score:score });	// Add to record at time of STT listening
 			if (o.match(/action:/i)) 		app.DoAction((o+" ").match(/action:(.+?) /i)[1]);		// If an action mentioned, try to do it
 			else							app.arc.DeliverResponse(app.arc.curStep);				// Deliver response
 			});																		

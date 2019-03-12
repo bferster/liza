@@ -9,8 +9,7 @@ class Timeline {
 		this.curTime=0;
 		this.curStart=0;
 		this.startPlay;
-		this.playerSpeed=50;
-		this.maxTime=5*60;
+		this.maxTime=5*60000;
 		this.events=[];
 	}
 
@@ -20,34 +19,33 @@ class Timeline {
 		if (this.curTime == 0)	$("#stuTextDiv").html(""),$("#insTextDiv").html("");				// Clear at start
 		for (i=0;i<this.events.length;++i) {														// For each event
 			o=this.events[i];																		// Point at it
-			if (o.who && (o.who >= 0))	app.curStudent=o.who;										// Set current student
-			if (this.curTime >= o.t) {																// If in this one
-				if (this.curStep != i) {															// Not same step showing
-					if (o.o == "R")  {																// Student
-						if (o.r == RIGHT)				col="#009900";								// Color if right
-						else if (o.r == WRONG)			col="#990000";								// Wrong
-						else if (o.r == INCOMPLETE)		col="#e88632";								// Incomplete
-						$("#stuTextDiv").css("color",col);											// Set color
-						if (o.who >= 0)  $("#stuTextDiv").html(app.students[o.who].id+": "+o.text),app.curStudent=o.who;	// Add name if a single student
-						else			 $("#stuTextDiv").html(o.text);								// Just response
-						if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text),o.played=1;	// Speak it
-						}							
-					else{																			// Instructor
-						$("#insTextDiv").html("<b>"+o.text+"</b>");	}								// Show
-						if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
-						}
-				this.curStep=i;																		// Then is now
-				}							
+			if (this.curTime < o.t) 	break;														// If before this one
+				if ((this.curTime >= o.t) && (this.curTime < o.e)) {								// If in this one
+				if (o.o == "R")  {																	// Student
+					app.curStudent=o.who;															// Set current student
+					if (o.r == RIGHT)				col="#009900";									// Color if right
+					else if (o.r == WRONG)			col="#990000";									// Wrong
+					else if (o.r == INCOMPLETE)		col="#e88632";									// Incomplete
+					$("#stuTextDiv").css("color",col);												// Set color
+					if ((o.who != null) && (o.who >= 0))  	$("#stuTextDiv").html(app.students[o.who].id+": "+o.text);		// Add name if a single student
+					else									$("#stuTextDiv").html(o.text);									// Just response
+					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text),o.played=1;	// Speak it
+					}							
+				else{																				// Instructor
+					$("#stuTextDiv").html("");														// Clear student response
+					$("#insTextDiv").html("<b>"+o.text+"</b>");	}									// Show
+					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
+					}
 			}
-	}
+		app.rev.ShowBlackboard(this.curTime+app.startTime);											// Draw blackboard
+		}
 	
 	AddEvents(preview)																			// ADD EVENTS TO TIMELINE
 	{
 		var i=0,n=0,o,x,r,col,str;
 		var last=0
-		var w=$("#timeSlider").width();																// Width of slider
 		this.events=[];																				// Clear events
-		if (preview) {																				// If previewing
+		if (preview) {																				// If previewing session
 			while (n++ < 200) {																		// No more than 200
 				app.curStudent=(app.curStudent+1)%app.students.length;								// Cycle through students
 				o=app.arc.tree[i];																	// Point at step
@@ -56,12 +54,12 @@ class Timeline {
 				if (o.escore == undefined)	o.escore=0;												
 				if (o.kscore == undefined)	o.kscore=0;												
 				if (o.matched == undefined)	o.matched=0;											
-				this.maxTime=n*30-15;																// Set max time
+				this.maxTime=n*20000-10000;															// Set max time
 				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct });			// Add action
 				if (o.metaStruct == "C")	app.curStudent=-2;										// Choral response
 				r=app.arc.MarkovFindResponse(i,app.curStudent) 										// Find proper response
 				if (r && r <= o.res.length) {														// If a response
-					this.events.push({ o:"R", t:this.maxTime, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add response
+					this.events.push({ o:"R", t:this.maxTime+10000, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add response
 					if (o.res[r-1].next == "*")	i=last+1;											// If going back to next step
 					else						last=i,i=o.res[r-1].next;							// Go to designated step
 					}
@@ -69,9 +67,26 @@ class Timeline {
 				if (o.next == "END")	break;														// Quit on last one
 				}
 			}
-
+		else{																						// If reviewing session
+			this.maxTime=0;																			// Reset time
+			for (i=0;i<app.arc.record.length;++i) {													// For each event
+				o=app.arc.record[i];																// Point at event
+				x=o.t-app.startTime;																// Set time in mseconds
+				if (o.o == 'S') {																	// Instructor
+					this.events.push({ o:"S", t:x, text:o.text, m:o.meta });						// Add action
+					last=x;																			// Save time of action
+				}
+				else if (o.o == 'R') 																// Student
+					this.events.push({ o:"R", t:last, text:o.text, who:o.who, r:o.r });				// Add action
+//				if ((o.o == 'S') ||  (o.o == 'R'))													// If an action or response
+					this.maxTime=Math.max(x,this.maxTime);											// Set to max time
+				}
+			}
+		var w=$("#timeSlider").width();																// Width of slider
 		for (i=0;i<this.events.length;++i) {														// For each event
 			o=this.events[i];																		// Point at it
+			if (i < this.events.length-2)	o.e=this.events[i+1].t;									// End is start of next
+			else							o.e=o.t+1000000;										// Pad last
 			x=(w*o.t/this.maxTime)+30;																// Position
 			if (o.r == RIGHT)				col="#4ab16a";											// Color if right
 			else if (o.r == WRONG)			col="#a77171";											// Wrong
@@ -81,8 +96,9 @@ class Timeline {
 			if (o.o == "S")		
 				str+="I' style='left:"+(x-6)+"px;top:26px' title='";								
 			else{
+				x=i ? w*this.events[i-1].t/this.maxTime : 0 +30;									// Position under action
 				str+="S' style='left:"+x+"px;background-color:"+col+";top:56px;' title='"
-				if (o.who >= 0) str+-app.students[o.who].id+": ";									// Add student name if individual
+				if ((o.who != null) && (o.who >= 0)) 	str+-app.students[o.who].id+": ";			// Add student name if individual
 				}
 			str+=o.text.trim()+"'>"+(o.m ? o.m : "")+"</div>";										// End event
 			$("#timeBar").append(str);		
@@ -93,6 +109,8 @@ class Timeline {
 	{
 		$("#timeBar").remove();																		// Remove old one
 		var _this=this;																				// Save context
+		this.curTime=0;																				// Start at 0
+		app.rev.ShowBlackboard(0);																	// Draw starting blackboard
 		var str="<div id='timeBar' class='lz-timebar'>";											// Add timebar div
 		str+="<div class='lz-timeback'></div>";														// Backing div
 		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-48px;font-size:14px'></div>";									
@@ -107,8 +125,9 @@ class Timeline {
 		str+="<div id='playerSlider' class='lz-playerslider'></div>";								// Speed slider div
 		str+="<div id='playerSpeed' class='lz-playerspeed'>Speed</div></div>";						// Speed slider text
 		$("body").append(str+"</div>");																// Add timebar				
-		this.AddEvents(preview);																		// Add events to timeline															
+		this.AddEvents(preview);																	// Add events to timeline															
 		this.DrawTicks();																			// Draw tick lines
+		this.Draw();																				// Draw opening screens
 
 		$("#timeBar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );			// Don't move orbiter
 
@@ -161,8 +180,8 @@ class Timeline {
 	ShowTime(x, time) 																			// SHOW TIME AT HANDLE
 	{	  
 		this.curTime=time;																			// Set now
-		var min=Math.floor(time/60);																// Mins
-		var sec=Math.floor(time)%60;																// Secs
+		var min=Math.floor(time/60000);																// Mins
+		var sec=Math.floor(time/1000)%60;															// Secs
 		if (sec < 10)	sec="0"+sec;																// Add leading 0
 		$("#sliderTime").html(min+":"+sec);															// Show value
 		$("#sliderTime").css("left",x-23+"px")														// Position text
@@ -171,7 +190,7 @@ class Timeline {
 	DrawTicks()																					// DRAW TICK LINES
 	{
 		var i,str="";
-		var n=Math.floor(this.maxTime/60);															// Number of ticks
+		var n=Math.floor(this.maxTime/60000);														// Number of ticks
 		var inc=$("#timeSlider").width()/n;															// Increment size										
 		for (i=1;i<n;++i) {																			// For each tick
 			str+="<div class='lz-ticks' style='left:"+(i*inc+34)+"px'></div>";						// Add tick div
@@ -199,18 +218,19 @@ class Timeline {
 			for (var i=0;i<this.events.length;++i) 													// For each event
 				this.events[i].played=(this.events[i].t < this.curTime) ? 1 : 0;					// Reset played flag if after current time
 			$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
-			this.startPlay=new Date().getTime()/1000;												// Set start in seconds
+			this.startPlay=new Date().getTime();													// Set start in sseconds
 			var off=(this.curTime-this.curStart)/this.maxTime;			 							// Get offset from start
 			this.interval=setInterval(function() {													// Start timer
-				var speed=_this.playerSpeed*100/Math.max($("#playerSlider").slider("option","value"),5);
-				var pct=(new Date().getTime()/1000-_this.startPlay)/speed; 							// Get percentage
+				var speed=Math.max($("#playerSlider").slider("option","value")/50,.25);				// -.25 to +2 
+				var now=new Date().getTime();														// Get time
+				var pct=(now-_this.startPlay)/_this.maxTime*speed; 									// Get percentage
 				pct+=off;																			// Add starting offset
 				if (_this.curTime > _this.maxTime) pct=99;											// Past end point, force quit
 				if (pct >= 1)																		// If done
 					_this.Play(),_this.curStart=0,_this.curTime=0;									// Stop playing
 				else																				// If playing
 					_this.Goto((pct*_this.maxTime)+_this.curStart);									// Go there
-				}
+			}
 			,10);																					// ~5fps
 			}
 	}
@@ -272,46 +292,14 @@ class Review  {
 
 		function refreshBody(mode) {																// REFRESH BODY CONTENT
 			var str="";	
-			if (mode == "Preview")	{																	// Timeline
+			if ((mode == "Preview") || (mode == "Review"))	{											// Timeline 
 				$("#reviewDiv").hide("slide",{ direction:"down", complete: ()=> { 						// Slide down
 					$("#reviewDiv").remove(); 															// Kill this dialog
-					app.tim.Init(true);																	// Show timeline
+					app.tim.Init(mode == "Preview");													// Show timeline
 					_this.mode="Overview";																// Start next time in overview
 				}}); 
 				}
-			else if (mode == "Review") {																// Session review
-				var i,j,k,last=0,e;
-				str="";																					// Title
-				$("#lpTitle").html("Lesson map review");												// Set title
-				for (i=0;i<app.rec.record.length;++i) {													// For each event
-					o=app.rec.record[i];																// Point at event
-					if (o.o == 'S') {																	// Instructor
-						str+="<div style='width:75%'><b>"+o.text+"</b>";								// Message	
-						for (j=0;j<app.rec.record.length;++j) {											// For each record event
-							e=app.rec.record[j];														// Point at record
-							if ((e.t >= last) && (e.t < o.t) && ((e.o == "M") || (e.o == "T") || (e.o == "P"))) {	// Some drawing in this period
-								str+="&nbsp;&nbsp;<img id='revStep-"+i+"' title='Show blackboard' src='img/bbbut.png' style='cursor:pointer'>";
-								break;																	// Just need one
-								}
-							}
-						str+="</div>";																	// End instructor div
-						last=o.t;																		// Save last time
-						}
-					else if (o.o == 'R') {																// Student
-						w=((o.who == null) || (o.who < 0)) ? ""  : app.students[o.who].id; 				// Student name
-						str+="<div style='text-align:right;width:100%'>";								// Enclosing div
-						str+="<span style='color:#999'><i>"+w+"</i>&nbsp;</span><br>";					// Who's talking
-						str+="<div style='display:inline-block;width:75%;";								// Text div
-						if (o.r == RIGHT) 				str+="color:#009900";							// Green
-						else if (o.r == WRONG) 			str+="color:#990000";							// Red
-						else if (o.r == INCOMPLETE)		str+="color:#ffa500";							// Orange
-						else if (o.r == NONE)			str+="color:#000000";							// Black
-						str+="'>";
-						str+=(o.text ? o.text : "<i>Nobody responded</i>")+"</div><br></div></div><br>"; // Response
-						}
-					}
-				}
-			else if (mode == "Hints")	{																// Gists
+		else if (mode == "Hints")	{																	// Gists
 				$("#lpTitle").html("Lesson map hints");													// Set title
 				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
 					o=app.arc.tree[i];																	// Point at step
@@ -358,26 +346,24 @@ class Review  {
 				app.voice.Talk(o.text,"instructor");													// Talk
 				app.OnPhrase(o.text);	
 				});
-				
-			$("[id^=revStep-]").off("click");															// Remove existing handlers
-			$("[id^=revStep-]").on("click", function(e) {												// On click of instructor event
-				var i;
-				var id=e.target.id.substr(8);															// Get id of event
-				app.bb.Playback({ o:'C', s:1 }); app.bb.Playback({ o:'C', s:0 });						// Clear blackboards																		
-				for (i=0;i<app.rec.record.length;++i) {													// For each event
-					o=app.rec.record[i];																// Point at event
-					if (o.t > app.rec.record[id].t)														// If past clicked event
-						break;																			// Quit drawing													
-					if (o.o == 'P') {																	// If a picture
-						app.bb.Playback({ o:"PW", p:o.p, s:o.s, resume:i+1, end:app.rec.record[id].t}); // Wait for it to be loaded before continuing
-						break;																			// Quit for now, resume in callback
-						}
-					else if (o.o != 'B')	app.bb.Playback(o);											// Draw if a draw event, if not open or close
-					}
-				});
-
 			}
 		}
+
+		ShowBlackboard(time, start)																	// SHOW BLACKBOARD AT TIME
+		{
+			var i,o;
+			for (i=0;i<app.arc.record.length;++i) {														// For each event
+				o=app.arc.record[i];																	// Point at event
+				if ((start != undefined) && (o.t < start))	continue;									// Before start, skip								
+				if (o.t > time)								break;										// If past current time, quit drawing	
+//				if (o.o == 'P') {																		// If a picture
+//					app.bb.Playback({ o:"PW", p:o.p, s:o.s, resume:i+1, end:time}); 					// Wait for it to be loaded before continuing
+//					break;																				// Quit for now, resume in callback
+//					}
+				if (o.o != 'B') 	app.bb.Playback(o);													// Draw if a draw event, if not open, close 
+				}
+		}
+
 
 } // Review class closure
 

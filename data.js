@@ -12,6 +12,8 @@ class ARC  {
 		this.curStep=0;																					// Current step
 		this.lastStep=0;																				// Last  step 
 		this.threshold=.4;																				// Picking threshold		
+		this.record=[];																					// Holds record of actions
+		this.resChain="";																				// Holds last response chain
 		}
 
 	Load(id) 																						// LOAD DOC FROM GOOGLE DRIVE
@@ -99,6 +101,14 @@ class ARC  {
 		
 			}
 
+
+	Add(event)																						// ADD EVENT TO RECORD
+	{
+		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
+		this.record.push(event);																		// Add to array																	
+		if ((event.o == "R") && (event.r != NONE))  this.resChain=event.r+this.resChain;				// If an actual response, add to top of response chain
+	}
+
 	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM STEP
 	{
 			var i,j,k,o,v,val;
@@ -181,7 +191,7 @@ class ARC  {
 		if (app.arc.tree[step].metaStruct == "C") {
 			text="Choral:"+randomResponse(step,0);														// Return random response if multiple matches of immediate answer
 			if (!app.voice.thoughtBubbles) 	Bubble("Choral response",5);								// Show response
-			app.rec.Add({ o:'R', who:null, text:text, r:1 });											// Add to record
+			app.arc.Add({ o:'R', who:null, text:text, r:1 });											// Add to record
 			app.voice.Talk(text);																		// Speak response
 			return;	
 			}
@@ -197,7 +207,7 @@ class ARC  {
 				}
 			else{																						// No one reponded
 				text="Nobody responded!";																// Message
-				app.rec.Add({ o:'R', who:null, text:"", r:0 });											// Add to record
+				app.arc.Add({ o:'R', who:null, text:"", r:0 });											// Add to record
 				Bubble(text,5);																			// Show response
 				Sound("delete");
 				}
@@ -212,7 +222,7 @@ class ARC  {
 				else if (n < 66)	r=3;																// Mixed
 				else				r=1;																// Most disagree
 				Prompt(n+"% agreed",5);																	// Show agreement
-				app.rec.Add({ o:'R', who:null, text:n+"% agreed", r:r });								// Add to record
+				app.arc.Add({ o:'R', who:null, text:n+"% agreed", r:r });								// Add to record
 			}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(step,app.curStudent);												// Get, compute, and save right response to step
@@ -224,14 +234,14 @@ class ARC  {
 			else if (r == RIGHT) 		Prompt("Right answer");											// Show prompt
 			else if (r == WRONG) 		Prompt("Wrong answer");
 			else if (r == INCOMPLETE) 	Prompt("Incomplete answer");
-			app.rec.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
-			rc=app.rec.resChain;																		// Get response chain
+			app.arc.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
+			rc=app.arc.resChain;																		// Get response chain
 			for (var i=0;i<o.res.length;++i) {															// For each response	
 				for (var j=o.res[i].rc.length;j>=0;j--)	{												// Go thru matches, big to small
-					if (o.res[i].rc[0] == "0")	rc="0"+app.rec.resChain.substr(1);						// Ignore current response
+					if (o.res[i].rc[0] == "0")	rc="0"+app.arc.resChain.substr(1);						// Ignore current response
 					if (o.res[i].rc == rc.substr(0,j)) {												// If a match
 						text=randomResponse(step,i);													// Return random response if multiple matches of immediate answer
-						app.rec.record[app.rec.record.length-1].text=text;								// Place back in record
+						app.arc.record[app.arc.record.length-1].text=text;								// Place back in record
 						app.voice.Talk(text);															// Speak response
 						return;																			// Quit looking
 						}
@@ -314,56 +324,3 @@ class ARC  {
 } // ARC class closure
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// RECORD
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-class Record  {																					
-
-	constructor()   																				// CONSTRUCTOR
-	{
-		this.record=[];																					// Holds record of actions
-		this.inPlayback=false;																			// In playback mode
-		this.resChain="";																				// Holds last response chain
-	}
-
-	Add(event)																						// ADD EVENT TO RECORD
-	{
-		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
-		this.record.push(event);																		// Add to array																	
-		if ((event.o == "R") && (event.r != NONE))  this.resChain=event.r+this.resChain;				// If an actual response, add to top of response chain
-	}
-
-	Playback()																						// PLAYBACK ACTION IN RECORD
-	{
-		var i,o,now,s=0;
-		var _this=this;																					// Save context
-		var sTimer=setInterval(actions,24);																// Set time
-		this.inPlayback=true;																			// In playback mode
-		app.sc.SetCamera(0,150,500,-.291457,0,0);														// Reset camera
-		for (i=0;i<app.students.length;++i)																// For each student
-			app.sc.SetPose(app.students[i].id,"startUp",20);											// Return to startup pose
-		app.bb.Playback({ o:'B', s:0, m:0 });															// Close bb editor, set to left side
-		app.bb.Playback({ o:'C', s:0 }); app.bb.Playback({ o:'C', s:1 });								// Clear bbs																		
-		var off=new Date().getTime()-app.startTime;														// Get offset from 1st event
-		function actions() {																			// PERFORM ACTIONS IN RECORD
-			if (s >= _this.record.length)	{															// If done
-				clearInterval(sTimer);																	// Kill timer
-				_this.inPlayback=false;																	// Turn it off
-				return;
-				}
-			now=new Date().getTime()-off;																// Get now
-			for (i=s;i<_this.record.length;++i) {														// For each action
-				o=_this.record[i];																		// Point at segment
-				if (now < o.t) 				break;														// If before time of action quit
-				if (now >= o.t)				++s;														// Done this one
-				if (o.o == 'S')				app.voice.Talk(o.text,"instructor");						// Speaking if S
-				else if (o.o == 'R')		app.voice.Talk(o.text,o.who);								// Responding if R
-//				else if (o.o == 'C')		app.sc.SetCamera(o.x,o.y,o.z,o.xr,o.yr,o.zr);				// Move camera if O
-				else						app.bb.Playback(o);											// Draw segment	if B, M, D, E, U, T, X, P, or C		
-				}
-			}	
-	}
-
-} // Record class closure

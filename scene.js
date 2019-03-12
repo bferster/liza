@@ -31,7 +31,7 @@ class Scene {
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
 		this.AddCamera(0,150,500,.4);																// Add camera
 		this.controls.addEventListener('end',(e)=> {												// On control change
-			app.rec.Add( {o:'O',																	// Add to record
+			app.arc.Add( {o:'O',																	// Add to record
 				xr:this.camera.rotation.x, yr:this.camera.rotation.y, zr:this.camera.rotation.z,	// Rotation
 				x:this.camera.position.x,  y:this.camera.position.y,  z:this.camera.position.z});	// Position
 				});

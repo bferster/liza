@@ -75,7 +75,7 @@ class Blackboard  {
 				this.startPosX=e.touches[0].clientX-$(this.curSideId).offset().left;					// Set start point X from touch event
 				this.startPosY=e.touches[0].clientY-$(this.curSideId).offset().top;						// Y		
 				}
-			app.rec.Add({ x:e.offsetX, y:e.offsetY, o:'M', s:this.curSide }); 							// Add to record
+			app.arc.Add({ x:e.offsetX, y:e.offsetY, o:'M', s:this.curSide }); 							// Add to record
 			this.ctx[this.curSide].beginPath();
 			});
 
@@ -91,13 +91,13 @@ class Blackboard  {
 			this.ctx[this.curSide].lineTo(x,y);															// Set end point
 			this.ctx[this.curSide].stroke();															// Draw line
 			this.startPosX=x;	this.startPosY=y;														// Reset drawing start position to current position
-			app.rec.Add({ x:x, y:y, o: erase ? 'E' : 'D', s:this.curSide }); 							// Add to record
+			app.arc.Add({ x:x, y:y, o: erase ? 'E' : 'D', s:this.curSide }); 							// Add to record
 			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
 			});
 			
 		$(this.curSideId).on("mouseup touchend", (e)=> { 												// ON MOUSE UP
 			this.paint=false; this.ctx[this.curSide].closePath(); 										// Close
-			app.rec.Add({ o:'U', s:this.curSide });	 													// Add to record
+			app.arc.Add({ o:'U', s:this.curSide });	 													// Add to record
 			}); 
 	}
 
@@ -138,7 +138,7 @@ class Blackboard  {
 				imageObj.src=this.pics[i].src;															// Set source to start load
 		imageObj.side=this.curSide;																		// Tag side
 		imageObj.label=label;																			// Set label
-		if (record)							app.rec.Add({ o: 'P', p: label, s:this.curSide }); 			// Add to record, unless initting
+		if (record)							app.arc.Add({ o: 'P', p: label, s:this.curSide }); 			// Add to record, unless initting
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.maxSlides=Math.floor(imageObj.height/256);											// Get max number of slides
 			if (imageObj.label.match(/slide/i))	app.bb.ctx[this.side].drawImage(this,0,app.bb.curSlide*-256); 	// If slides, crop by number
@@ -187,11 +187,11 @@ class Blackboard  {
 				this.ctx[this.curSide].fillRect(this.nextPosX,this.startPosY-this.fontHgt*.75,this.fontHgt,this.fontHgt);		// Clear last char
 				this.ctx[this.curSide].fillStyle="#fff";												// Text color
 				this.chars.pop();
-				app.rec.Add({ o:'X', x:this.nextPosX, y:this.startPosY, s:this.curSide });				// Add to record
+				app.arc.Add({ o:'X', x:this.nextPosX, y:this.startPosY, s:this.curSide });				// Add to record
 				return;																					// Quit	
 				}
 			if (e.keyCode < 32)	return;																	// No control chars																		
-			app.rec.Add({ x:Math.round(this.nextPosX), y:Math.round(this.startPosY), c:e.key, o:'T', s:this.curSide });	// Add to record
+			app.arc.Add({ x:Math.round(this.nextPosX), y:Math.round(this.startPosY), c:e.key, o:'T', s:this.curSide });	// Add to record
 			this.ctx[this.curSide].fillText(e.key, this.nextPosX,this.startPosY);						// Draw letter		
 			this.chars.push({ x:this.nextPosX, y:this.startPosY });										// Save char start												
 			this.nextPosX+=this.ctx[this.curSide].measureText(e.key).width;								// New start point to draw next letter					
@@ -204,7 +204,7 @@ class Blackboard  {
 		this.ctx[this.curSide].fillStyle=this.backCol;													// Color
 		this.ctx[this.curSide].fillRect(0,0,this.wid,this.hgt);											// Clear
 		this.texMap[this.curSide].needsUpdate=true;														// Flag the tex map as needing updating
-		app.rec.Add({ o:'X', s:this.curSide });															// Add to record
+		app.arc.Add({ o:'X', s:this.curSide });															// Add to record
 	}
 	
 	
@@ -242,8 +242,8 @@ class Blackboard  {
 		else if (o.o == "PW") {																			// Use callback for load records AFTER pic is loaded
 			var r;
 			this.SetPic(o.p,null, function() {															// Load pic, callback when loaded
-				for (var i=o.resume;i<app.rec.record.length;++i) {										// For each event
-					r=app.rec.record[i];																// Point at event
+				for (var i=o.resume;i<app.arc.record.length;++i) {										// For each event
+					r=app.arc.record[i];																// Point at event
 					if (r.o == 'P') {																	// If a picture
 						app.bb.Playback({ o:"PW", p:r.p, s:r.s, resume:i+1, end:o.end}); 				// Wait for it to be loaded before continuing
 						break;																			// Quit for now, resume in callback
@@ -254,9 +254,6 @@ class Blackboard  {
 					}
 				}); 
 			}
-			
-			
-			
 		else if (o.o == "C") { 																			// Clear
 			this.ctx[o.s].fillStyle=this.backCol;														// Color
 			this.ctx[o.s].fillRect(0,0,this.wid,this.hgt);												// Clear

@@ -78,8 +78,8 @@ class Voice {
 			return;
 			}
 		try{																							// Try
-			if (who != null && (who != "instructor")) app.curStudent=who,who=app.students[app.curStudent].sex;	// Set curent student & voice based on who param
-			else if ((who == null) && (app.curStudent >= 0))  who=app.students[app.curStudent].sex;			// Set voice based on sex
+			if (who == undefined) 			who=who=app.students[app.curStudent].sex;					// Set sex based on current student
+			else if (who != "instructor")	app.curStudent=who,who=app.students[app.curStudent].sex;	// Set current student
 			var oldPitch=this.tts.pitch;																// Save old pitch
 			if (who == "instructor") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;	// Lower pitch if instructor
 			else if (who == "male")		this.tts.voice=this.voices[this.maleVoice];						// Set male voice
