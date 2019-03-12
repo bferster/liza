@@ -96,7 +96,7 @@ class Timeline {
 			if (o.o == "S")		
 				str+="I' style='left:"+(x-6)+"px;top:26px' title='";								
 			else{
-				x=i ? w*this.events[i-1].t/this.maxTime : 0 +30;									// Position under action
+				x=i ? w*this.events[i-1].t/this.maxTime+30 : 30 +30;								// Position under action
 				str+="S' style='left:"+x+"px;background-color:"+col+";top:56px;' title='"
 				if ((o.who != null) && (o.who >= 0)) 	str+-app.students[o.who].id+": ";			// Add student name if individual
 				}
