@@ -124,11 +124,11 @@ class Blackboard  {
 			if (id)																						// An id found
 				url="//drive.google.com/uc?export=download&id="+id[1];									// Construct 'direct' link
 			}
-		if (url.match(/\/\//))	url="proxy.php?url="+url;											// Add proxy if cross domain																	
+		if (url.match(/\/\//))	url="proxy.php?url="+url;												// Add proxy if cross domain																	
 		this.pics.push( { lab:lab, src: url });															// Add to array
 	}
 
-	SetPic(label, record, callback)																	// SHOW PIC																			
+	SetPic(label, record, slideNum)																	// SHOW PIC																			
 	{
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
@@ -138,13 +138,14 @@ class Blackboard  {
 				imageObj.src=this.pics[i].src;															// Set source to start load
 		imageObj.side=this.curSide;																		// Tag side
 		imageObj.label=label;																			// Set label
-		if (record)							app.arc.Add({ o: 'P', p: label, s:this.curSide }); 			// Add to record, unless initting
+		if (record)	app.arc.Add({ o: 'P', p: label, s:this.curSide }); 									// Add to record
+		if (slideNum != undefined) 	app.bb.curSlide=slideNum;											// Set curSlide id palying back slides
+	
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.maxSlides=Math.floor(imageObj.height/256);											// Get max number of slides
 			if (imageObj.label.match(/slide/i))	app.bb.ctx[this.side].drawImage(this,0,app.bb.curSlide*-256); 	// If slides, crop by number
 			else 					  			app.bb.ctx[this.side].drawImage(this,0,0,512,256);				// Add image, scale to fit
 			app.bb.texMap[this.side].needsUpdate=true;													// Flag the tex map as needing updating
-			if (callback)	callback();																	// Callback if active
 			}
 	}
 
@@ -154,6 +155,7 @@ class Blackboard  {
 		else if (dir > 0)	this.curSlide=Math.min(this.curSlide+1,this.maxSlides-1);					// Go forward
 		else				this.curSlide=0;															// Start fresh
 		this.SetPic("PPT slides");																		// Show pic																		
+		app.arc.Add({ o: 'P', p: "PPT slides", s:this.curSide, snum:this.curSlide }); 				// Add to record
 	}	
 
 	Text()																							// DRAW TEXT
@@ -207,7 +209,6 @@ class Blackboard  {
 		app.arc.Add({ o:'X', s:this.curSide });															// Add to record
 	}
 	
-	
 	SetSide(side)																					// CHANGE SIDE
 	{
 		this.curSide=side;																				// Set flag
@@ -238,22 +239,7 @@ class Blackboard  {
 			this.ctx[o.s].fillStyle=this.backCol;														// Erasure color
 			this.ctx[o.s].fillRect(o.x, o.y-this.fontHgt*.75, this.fontHgt, this.fontHgt);				// Clear last char
 			}
-		else if (o.o == "P")  { this.SetPic(o.p); }														// Pic
-		else if (o.o == "PW") {																			// Use callback for load records AFTER pic is loaded
-			var r;
-			this.SetPic(o.p,null, function() {															// Load pic, callback when loaded
-				for (var i=o.resume;i<app.arc.record.length;++i) {										// For each event
-					r=app.arc.record[i];																// Point at event
-					if (r.o == 'P') {																	// If a picture
-						app.bb.Playback({ o:"PW", p:r.p, s:r.s, resume:i+1, end:o.end}); 				// Wait for it to be loaded before continuing
-						break;																			// Quit for now, resume in callback
-						}
-					if (r.t > o.end)																	// If past clicked event
-						break;																			// Quit drawing													
-					else if (r.o != 'B')	app.bb.Playback(r);											// Draw if a draw event, if not open or close
-					}
-				}); 
-			}
+		else if (o.o == "P")  { this.SetPic(o.p,false,o.snum); }										// Pic or slide
 		else if (o.o == "C") { 																			// Clear
 			this.ctx[o.s].fillStyle=this.backCol;														// Color
 			this.ctx[o.s].fillRect(0,0,this.wid,this.hgt);												// Clear

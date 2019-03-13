@@ -72,13 +72,13 @@ class Timeline {
 			for (i=0;i<app.arc.record.length;++i) {													// For each event
 				o=app.arc.record[i];																// Point at event
 				x=o.t-app.startTime;																// Set time in mseconds
-				if (o.o == 'S') {																	// Instructor
+				if (o.o == 'S') {																	// Instructor statement
 					this.events.push({ o:"S", t:x, text:o.text, m:o.meta });						// Add action
-					last=x;																			// Save time of action
+					last=x;																			// Save time of action for responsesthat follow
 				}
-				else if (o.o == 'R') 																// Student
+				else if (o.o == 'R') 																// Student response
 					this.events.push({ o:"R", t:last, text:o.text, who:o.who, r:o.r });				// Add action
-//				if ((o.o == 'S') ||  (o.o == 'R'))													// If an action or response
+//				if ((o.o == 'S') ||  (o.o == 'R'))													// If statement or response
 					this.maxTime=Math.max(x,this.maxTime);											// Set to max time
 				}
 			}
@@ -110,7 +110,7 @@ class Timeline {
 		$("#timeBar").remove();																		// Remove old one
 		var _this=this;																				// Save context
 		this.curTime=0;																				// Start at 0
-		app.rev.ShowBlackboard(0);																	// Draw starting blackboard
+		app.rev.ShowBlackboard(app.startTime+100);													// Draw starting blackboard
 		var str="<div id='timeBar' class='lz-timebar'>";											// Add timebar div
 		str+="<div class='lz-timeback'></div>";														// Backing div
 		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-48px;font-size:14px'></div>";									
@@ -172,7 +172,7 @@ class Timeline {
 		   stop: function(event,ui) {																// On slide stop
 			   var x=$($(this).children('.ui-slider-handle')).offset().left;						// Get pos       			
 				_this.ShowTime(x,ui.value);															// Show time			
-				_this.Draw();																		// Draw state at time	
+//				_this.Draw();																		// Draw state at time	
 			}
 		   });
 	}
@@ -349,18 +349,20 @@ class Review  {
 			}
 		}
 
-		ShowBlackboard(time, start)																	// SHOW BLACKBOARD AT TIME
+		ShowBlackboard(time)																		// SHOW BLACKBOARD AT TIME
 		{
-			var i,o;
+			var i,o,side=0;
+			var starts=[0,0];																			// Draw from this point for
 			for (i=0;i<app.arc.record.length;++i) {														// For each event
-				o=app.arc.record[i];																	// Point at event
-				if ((start != undefined) && (o.t < start))	continue;									// Before start, skip								
+				o=app.arc.record[i];																	// Point at it
+				if ((o.o == "P") || (o.o == "C"))	starts[o.s]=i;										// If a picture or clear, ignore drawing before this point
+				if (o.t > time)						break;												// If past current time, quit looking
+				}
+			for (i=0;i<app.arc.record.length;++i) {														// For each event
+				o=app.arc.record[i];																	// Point at it
+				side=o.s ? 1 : 0;																		// Set side				
 				if (o.t > time)								break;										// If past current time, quit drawing	
-//				if (o.o == 'P') {																		// If a picture
-//					app.bb.Playback({ o:"PW", p:o.p, s:o.s, resume:i+1, end:time}); 					// Wait for it to be loaded before continuing
-//					break;																				// Quit for now, resume in callback
-//					}
-				if (o.o != 'B') 	app.bb.Playback(o);													// Draw if a draw event, if not open, close 
+				if ((o.o != 'B') && (i >= starts[side]))	app.bb.Playback(o);							// Draw if a draw event, if not open or close 
 				}
 		}
 
