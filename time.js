@@ -11,6 +11,7 @@ class Timeline {
 		this.startPlay;
 		this.maxTime=5*60000;
 		this.events=[];
+		this.preview=false;
 	}
 
 	Draw(playing)																				// DRAW
@@ -34,10 +35,13 @@ class Timeline {
 				else if ((o.o == "S") || (o.o == "CON")) {											// Instructor
 					if (o.o != "CON")  $("#stuTextDiv").html("");									// Clear student response if not a consequence
 					$("#insTextDiv").html("<b>"+o.text+"</b>");	}									// Show
-					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
+					if (!o.rrev)																	// If in preview only
+						if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
 					}
-			}
-		app.rev.ShowBlackboard(this.curTime+app.startTime);											// Draw blackboard
+				else if (o.o == "P")	app.bb.Playback({ o:"P", p:"PPT slides", s:0, n:o.n });		// Show slides
+				}
+		
+		if (!this.preview)		app.rev.ShowBlackboard(this.curTime+app.startTime);					// Draw blackboard
 		}
 	
 	AddEvents(preview)																			// ADD EVENTS TO TIMELINE
@@ -46,6 +50,7 @@ class Timeline {
 		var last=0,rate;
 		this.events=[];																				// Clear events
 		if (preview) {																				// If previewing session
+			this.preview=true;																		// In preview
 			this.maxTime=3000;																		// Start at 3 sec
 			while (n++ < 200) {																		// No more than 200
 				rate=app.voice.secsPerChar*1000*app.voice.tts.rate;									// How to time speech rates
@@ -56,10 +61,12 @@ class Timeline {
 				if (o.escore == undefined)	o.escore=0;												
 				if (o.kscore == undefined)	o.kscore=0;												
 				if (o.matched == undefined)	o.matched=0;											
-					this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct });		// Add action
+				if (o.slide != "")  this.events.push({ t:this.maxTime, o:"P", n:o.slide });			// Add slide, if set
+				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct });			// Add action
 				r=app.arc.MarkovFindResponse(i,app.curStudent) 										// Find proper response
 				if (o.metaStruct == "C")	app.curStudent=-2, r=Math.max(1,r);						// Choral response with no NONE responses
 				x=o.text.length*rate+2000;															// Time to speak action with padding
+
 				if (r && r <= o.res.length) {														// If a response
 					this.events.push({ o:"R", t:this.maxTime+x, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add it to record
 					if (o.res[r-1].next == "*")	i=last+1;											// If going back to next step
@@ -78,6 +85,7 @@ class Timeline {
 		else{																						// If reviewing session
 			this.maxTime=0;																			// Reset time
 			for (i=0;i<app.arc.record.length;++i) {													// For each event
+				rate=app.voice.secsPerChar*1000*app.voice.tts.rate;									// How to time speech rates
 				o=app.arc.record[i];																// Point at event
 				x=o.t-app.startTime;																// Set time in mseconds
 				if (o.o == 'S') {																	// Instructor statement
@@ -86,9 +94,10 @@ class Timeline {
 					}
 				else if (o.o == 'R') {																// Student response
 					this.events.push({ o:"R", t:last, text:o.text, who:o.who, r:o.r });				// Add action
-//					this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons });	 		// Add it
+					x=o.text.length*rate+2000;														// Time to speak action with padding
+					this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons, rev:1 });	// Add it, flagging for review
 					}
-				if ((o.o == 'S') ||  (o.o == 'R'))													// If statement or response
+//				if ((o.o == 'S') ||  (o.o == 'R'))													// If statement or response
 					this.maxTime=Math.max(x,this.maxTime);											// Set to max time
 				}
 			}
@@ -362,15 +371,16 @@ class Review  {
 		{
 			var i,o,side=0;
 			var starts=[0,0];																			// Draw from this point for
-			for (i=0;i<app.arc.record.length;++i) {														// For each event
+/*			for (i=0;i<app.arc.record.length;++i) {														// For each event
 				o=app.arc.record[i];																	// Point at it
 				if ((o.o == "P") || (o.o == "C"))	starts[o.s]=i;										// If a picture or clear, ignore drawing before this point
 				if (o.t > time)						break;												// If past current time, quit looking
 				}
-			for (i=0;i<app.arc.record.length;++i) {														// For each event
+*/			for (i=0;i<app.arc.record.length;++i) {														// For each event
 				o=app.arc.record[i];																	// Point at it
 				side=o.s ? 1 : 0;																		// Set side				
 				if (o.t > time)								break;										// If past current time, quit drawing	
+//				trace(i,o.o,o.n)
 				if ((o.o != 'B') && (i >= starts[side]))	app.bb.Playback(o);							// Draw if a draw event, if not open or close 
 				}
 		}

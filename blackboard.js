@@ -128,8 +128,9 @@ class Blackboard  {
 		this.pics.push( { lab:lab, src: url });															// Add to array
 	}
 
-	SetPic(label, record, slideNum)																	// SHOW PIC																			
+	SetPic(label, record, slideNum, side)															// SHOW PIC	OR SLIDE																		
 	{
+		var _this=this;																					// Save context
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		var imageObj=new Image();																		// Create image
@@ -138,25 +139,26 @@ class Blackboard  {
 				imageObj.src=this.pics[i].src;															// Set source to start load
 		imageObj.side=this.curSide;																		// Tag side
 		imageObj.label=label;																			// Set label
-		if (record)	app.arc.Add({ o: 'P', p: label, s:this.curSide }); 									// Add to record
-		if (slideNum != undefined) 	app.bb.curSlide=slideNum;											// Set curSlide id palying back slides
-	
+		imageObj.side=(side == undefined) ? this.curSide : side;										// Set curSide if playing back slides
+		imageObj.snum=(slideNum == undefined) ? 0 :	slideNum;											// Set curSlide id playing back slides
+		if (record)	app.arc.Add({ o:'P', p:label, s:imageObj.side, n:imageObj.snum }); 					// Add to record
+
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.maxSlides=Math.floor(imageObj.height/256);											// Get max number of slides
-			if (imageObj.label.match(/slide/i))	app.bb.ctx[this.side].drawImage(this,0,app.bb.curSlide*-256); 	// If slides, crop by number
-			else 					  			app.bb.ctx[this.side].drawImage(this,0,0,512,256);				// Add image, scale to fit
-			app.bb.texMap[this.side].needsUpdate=true;													// Flag the tex map as needing updating
+			if (imageObj.label.match(/slide/i))	_this.ctx[this.side].drawImage(this,0,this.snum*-256); 	// If slides, crop by number
+			else 					  			_this.ctx[this.side].drawImage(this,0,0,512,256);		// Add image, scale to fit
+			_this.texMap[this.side].needsUpdate=true;													// Flag the tex map as needing updating
 			}
 	}
 
-	ShowSlide(dir)																					// SHOW A SLIDE
+	ShowSlide(dir, num)																				// SHOW A SLIDE
 	{
-		if (dir < 0)		this.curSlide=Math.max(this.curSlide-1,0);									// Go back
-		else if (dir > 0)	this.curSlide=Math.min(this.curSlide+1,this.maxSlides-1);					// Go forward
-		else				this.curSlide=0;															// Start fresh
-		this.SetPic("PPT slides");																		// Show pic																		
-		app.arc.Add({ o: 'P', p: "PPT slides", s:this.curSide, snum:this.curSlide }); 				// Add to record
-	}	
+		if (num != undefined)	this.curSlide=num;														// Use number directly
+		else if (dir < 0)		this.curSlide=Math.max(this.curSlide-1,0);								// Go back
+		else if (dir > 0)		this.curSlide=Math.min(this.curSlide+1,this.maxSlides-1);				// Go forward
+		else					this.curSlide=0;														// Start fresh
+		this.SetPic("PPT slides",true,this.curSlide);													// Show pic																		
+		}	
 
 	Text()																							// DRAW TEXT
 	{
@@ -239,7 +241,7 @@ class Blackboard  {
 			this.ctx[o.s].fillStyle=this.backCol;														// Erasure color
 			this.ctx[o.s].fillRect(o.x, o.y-this.fontHgt*.75, this.fontHgt, this.fontHgt);				// Clear last char
 			}
-		else if (o.o == "P")  { this.SetPic(o.p,false,o.snum); }										// Pic or slide
+		else if (o.o == "P")  { this.SetPic(o.p,false,o.n); }											// Pic or slide
 		else if (o.o == "C") { 																			// Clear
 			this.ctx[o.s].fillStyle=this.backCol;														// Color
 			this.ctx[o.s].fillRect(0,0,this.wid,this.hgt);												// Clear
