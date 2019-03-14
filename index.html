@@ -70,14 +70,13 @@
 							}
 		.lz-slidertime { 	position:absolute; width:50px; text-align:center; color:#999; font-size:10px; top:69px;
 							}
-		.lz-timeEventS { 	position:absolute; width:8px; height:8px; border-radius:8px; color:#ccc;
+		.lz-timeEventS { 	position:absolute; width:8px; height:8px; border-radius:8px; color:#ccc; top:56px;
 							}
-		.lz-timeEventI { 	position:absolute; width:20px; height:19px; border-radius:16px; background-color:#3255c0;
-							text-align:center; color:#fff; padding-top:1px; 
+		.lz-timeEventI { 	position:absolute; width:20px; text-align:center; color:#3255c0; font-weight:bold; font-size:12px; top:31px;
 							}
 		.lz-ticks { 		position:absolute; width:2px; height:40px; background-color:#ccc; top:34px;
 							}
-		.lz-tickLab { 		position:absolute; width:20px; top:20px; font-size:10px; text-align:center;
+		.lz-tickLab { 		position:absolute; width:20px; top:20px; font-size:9px; text-align:center;
 							}
 		.lz-timeplayer { 	position:absolute; color:#999; margin-left:18px; margin-right:18px; width:123px;
 							}
@@ -197,7 +196,7 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				app.tim.Init();
+				app.tim.Init(true);
 
 				/*				var ability=.5;
 				var count=0;
@@ -214,7 +213,7 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 				TraceMatrix(so);
 				for (i=0;i<4;++i) {
 					so=MatrixMultiply(so,tm)
-					TraceMatrix(so);
+					TraceMatrix(so); 
 					} 
 				*/
 			}
@@ -256,10 +255,9 @@ class App  {
 		this.gid="1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU";									// Default ARC tree spreadshet
 		var url=window.location.search.substring(1);						   						// Get query string
 		if (url && !url.match(/real/i)) {															// If params
-			if (url.match(/gid=/i)) 	this.gid=url.split("&")[0].substr(4);						// If params have a 'gid=' tag, use it
-			else if (url="mk")																		// Kennedy's
-				this.gid="1JUEWVr25tktaON17Vi3VREvHpEy54Lz4Ou9NIIBYsRE";							// Default ARC tree spreadshet
-			else						this.gid=url;												// Just plain
+			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
+			else if (url="mk")		this.gid="1JUEWVr25tktaON17Vi3VREvHpEy54Lz4Ou9NIIBYsRE";		// Kennedy's spreadsheet
+			else					this.gid=url;													// Default spreadsheet
 			}
 		this.arc=new ARC();																			// Make new ARC tree		
 		this.bb=new Blackboard();																	// Make blackboard		
@@ -397,7 +395,7 @@ class App  {
 			else if (o.match(/who:Freddy/i)) 	app.curStudent=0;
 			else if (o.match(/who:Robert/i)) 	app.curStudent=2;
 			else if (o.match(/who:Sara/i)) 		app.curStudent=1;
-	
+
 			if (text.match(/set goal to/i)) {														// If setting goal		
 				app.lastGoal=app.curGoal;															// Save last goal
 				app.curGoal=text.replace(/set goal to/i,"").trim().toUpperCase();					// Remove goal tag
@@ -415,10 +413,10 @@ class App  {
 				return;	
 				}
 			app.arc.FindClosestStep(text,o);														// Match closest step to text
-			if (app.arc.curStep)			score=app.arc.tree[app.arc.curStep].score;				// Get match score			
+			if (app.arc.curStep)				score=app.arc.tree[app.arc.curStep].score;			// Get match score			
+			if (o.match(/action:/i)) 			app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an action mentioned, try to do it
+			else if (score > app.arc.threshold)	app.arc.DeliverResponse(app.arc.curStep);			// Deliver response
 			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, meta:app.arc.tree[app.arc.curStep].metaStruct, step:app.arc.curStep, score:score });	// Add to record at time of STT listening
-			if (o.match(/action:/i)) 		app.DoAction((o+" ").match(/action:(.+?) /i)[1]);		// If an action mentioned, try to do it
-			else							app.arc.DeliverResponse(app.arc.curStep);				// Deliver response
 			});																		
 		}
 		

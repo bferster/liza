@@ -11,6 +11,7 @@ class Voice {
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		this.listening=false;																			// Flag if listening
 		this.talkStartTime=0;																			// Time started talking
+		this.secsPerChar=.053;																			// Seconds per char
 
 		try {																							// Try
 			this.femaleVoice=1;																			// Female voice
@@ -78,10 +79,12 @@ class Voice {
 			return;
 			}
 		try{																							// Try
-			if (who == undefined) 			who=who=app.students[app.curStudent].sex;					// Set sex based on current student
+			if ((who == undefined) && (app.curStudent >= 0)) who=app.students[app.curStudent].sex;		// Set sex based on current student
+			else if ((who == undefined) && (app.curStudent < 0)) who="choral";							// It's choral or group
 			else if (who != "instructor")	app.curStudent=who,who=app.students[app.curStudent].sex;	// Set current student
 			var oldPitch=this.tts.pitch;																// Save old pitch
 			if (who == "instructor") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;	// Lower pitch if instructor
+			else if (who == "choral") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=2;	// Higher pitch if choral
 			else if (who == "male")		this.tts.voice=this.voices[this.maleVoice];						// Set male voice
 			else 						this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
 			this.tts.text=text;																			// Set text

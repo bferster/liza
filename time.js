@@ -29,10 +29,10 @@ class Timeline {
 					$("#stuTextDiv").css("color",col);												// Set color
 					if ((o.who != null) && (o.who >= 0))  	$("#stuTextDiv").html(app.students[o.who].id+": "+o.text);		// Add name if a single student
 					else									$("#stuTextDiv").html(o.text);									// Just response
-					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text),o.played=1;	// Speak it
+					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text),o.played=1;				// Speak it
 					}							
-				else{																				// Instructor
-					$("#stuTextDiv").html("");														// Clear student response
+				else if ((o.o == "S") || (o.o == "CON")) {											// Instructor
+					if (o.o != "CON")  $("#stuTextDiv").html("");									// Clear student response if not a consequence
 					$("#insTextDiv").html("<b>"+o.text+"</b>");	}									// Show
 					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
 					}
@@ -43,10 +43,12 @@ class Timeline {
 	AddEvents(preview)																			// ADD EVENTS TO TIMELINE
 	{
 		var i=0,n=0,o,x,r,col,str;
-		var last=0
+		var last=0,rate;
 		this.events=[];																				// Clear events
 		if (preview) {																				// If previewing session
+			this.maxTime=3000;																		// Start at 3 sec
 			while (n++ < 200) {																		// No more than 200
+				rate=app.voice.secsPerChar*1000*app.voice.tts.rate;									// How to time speech rates
 				app.curStudent=(app.curStudent+1)%app.students.length;								// Cycle through students
 				o=app.arc.tree[i];																	// Point at step
 				if (!o)	continue;																	// Skip if bad																		
@@ -54,16 +56,22 @@ class Timeline {
 				if (o.escore == undefined)	o.escore=0;												
 				if (o.kscore == undefined)	o.kscore=0;												
 				if (o.matched == undefined)	o.matched=0;											
-				this.maxTime=n*20000-10000;															// Set max time
-				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct });			// Add action
-				if (o.metaStruct == "C")	app.curStudent=-2;										// Choral response
+					this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct });		// Add action
 				r=app.arc.MarkovFindResponse(i,app.curStudent) 										// Find proper response
+				if (o.metaStruct == "C")	app.curStudent=-2, r=Math.max(1,r);						// Choral response with no NONE responses
+				x=o.text.length*rate+2000;															// Time to speak action with padding
 				if (r && r <= o.res.length) {														// If a response
-					this.events.push({ o:"R", t:this.maxTime+10000, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add response
+					this.events.push({ o:"R", t:this.maxTime+x, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add it to record
 					if (o.res[r-1].next == "*")	i=last+1;											// If going back to next step
 					else						last=i,i=o.res[r-1].next;							// Go to designated step
+					this.maxTime+=o.res[r-1].text.length*rate+2000;									// Add padded speak time to max time
+					if (o.res[r-1].cons) {															// If a consequence
+						this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons });	 	// Add it
+						this.maxTime+=o.res[r-1].cons.length*rate+2000;								// Add padded speak time to max time 
+						}
 					}
 				else last=i,i=o.next;
+				this.maxTime+=x;																	// Add action speak time to max time
 				if (o.next == "END")	break;														// Quit on last one
 				}
 			}
@@ -75,10 +83,12 @@ class Timeline {
 				if (o.o == 'S') {																	// Instructor statement
 					this.events.push({ o:"S", t:x, text:o.text, m:o.meta });						// Add action
 					last=x;																			// Save time of action for responsesthat follow
-				}
-				else if (o.o == 'R') 																// Student response
+					}
+				else if (o.o == 'R') {																// Student response
 					this.events.push({ o:"R", t:last, text:o.text, who:o.who, r:o.r });				// Add action
-//				if ((o.o == 'S') ||  (o.o == 'R'))													// If statement or response
+//					this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons });	 		// Add it
+					}
+				if ((o.o == 'S') ||  (o.o == 'R'))													// If statement or response
 					this.maxTime=Math.max(x,this.maxTime);											// Set to max time
 				}
 			}
@@ -87,22 +97,21 @@ class Timeline {
 			o=this.events[i];																		// Point at it
 			if (i < this.events.length-2)	o.e=this.events[i+1].t;									// End is start of next
 			else							o.e=o.t+1000000;										// Pad last
-			x=(w*o.t/this.maxTime)+30;																// Position
+			x=Math.round(w*o.t/this.maxTime)+30;													// Position
 			if (o.r == RIGHT)				col="#4ab16a";											// Color if right
 			else if (o.r == WRONG)			col="#a77171";											// Wrong
 			else if (o.r == INCOMPLETE)		col="#e88632";											// Incomplete
 			else							col="#fff";												// Instructor
-			str="<div class='lz-timeEvent";
-			if (o.o == "S")		
-				str+="I' style='left:"+(x-6)+"px;top:26px' title='";								
-			else{
+			if (o.o == "S")																			// If an instructor action	
+				str+="<div class='lz-timeEventI' style='left:"+(x-6)+"px' title='"+o.text.trim()+"'>"+(o.m ? o.m : "")+"</div>";								
+			else if (o.o == "R") {																	// If a student response
 				x=i ? w*this.events[i-1].t/this.maxTime+30 : 30 +30;								// Position under action
-				str+="S' style='left:"+x+"px;background-color:"+col+";top:56px;' title='"
+				str+="<div class='lz-timeEventS' style='left:"+x+"px;background-color:"+col+"' title='";
 				if ((o.who != null) && (o.who >= 0)) 	str+-app.students[o.who].id+": ";			// Add student name if individual
+				str+=o.text.trim()+"'>"+(o.m ? o.m : "")+"</div>";				
 				}
-			str+=o.text.trim()+"'>"+(o.m ? o.m : "")+"</div>";										// End event
-			$("#timeBar").append(str);		
 			}
+		$("#timeBar").append(str);																	// Add events to timebar	
 	}
 
 	Init(preview)																				// INIT TIMELINE
@@ -113,8 +122,8 @@ class Timeline {
 		app.rev.ShowBlackboard(app.startTime+100);													// Draw starting blackboard
 		var str="<div id='timeBar' class='lz-timebar'>";											// Add timebar div
 		str+="<div class='lz-timeback'></div>";														// Backing div
-		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-48px;font-size:14px'></div>";									
-		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-27px;font-size:14px'></div>";								
+		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-52px;font-size:14px'></div>";									
+		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-22px;font-size:14px'></div>";								
 		
 		str+="<div id='timeSlider' class='lz-timeslider'></div>";									// Add time slider div
 		str+="<div id='sliderTime' class='lz-slidertime'></div>";									// Time display

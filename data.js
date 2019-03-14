@@ -47,14 +47,15 @@ class ARC  {
 					o.gist=v[2];																		// Get gist
 					o.goal=goal;																		// Set goal
 					o.step=step;																		// Set step
-					o.next=v[5] ? v[5] : "";															// Add next if set
+					o.slide=(v[4] && !isNaN(v[4])) ? v[4]-0 : "";										// Add slide if set
+					o.next=v[6] ? v[6] : "";															// Add next if set
 					_this.tree.push(o);																	// Add strep to tree
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
-						o.res.push({ rc: v[1].substr(1).trim(), text:v[3].trim(), next:v[5] ? v[5] : "" });		// Add responses
+					o.res.push({ rc: v[1].substr(1).trim(), text:v[3].trim(), cons:v[5] ? v[5] : "", next:v[6] ? v[6] : "" });		// Add responses
 					}
 				}
 	
@@ -124,21 +125,6 @@ class ARC  {
 						}
 					}
 				app.arc.Parse(o.text,o);																// Parse first text portion
-				
-				if (o.con.length) {																		// If consquences
-					for (j=0;j<o.con.length;++j) {														// For each consequence
-						o.con[j].keys=[];																// Create keyword array
-						v=(o.con[i].text+" ").match(/\(.+?\)/g);										// Get array of key words (keyword)
-						if (v) {																		// If keys flagged
-							for (k=0;k<v.length;++k) {													// For each key
-								val=v[k].substr(1,v[k].length-2);										// Extract text
-								o.con[k].keys.push(val);												// Add to keys
-								o.con[k].text=o.text.replace(RegExp(v[k].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
-								}
-							}
-						app.arc.Parse(o.con[j].text, o.con[j]);											// Parse consequence text portion
-						}
-					}
 				}
 		}
 
@@ -187,10 +173,11 @@ class ARC  {
 	{
 		var i,j,n=0,r,rc,o;
 		var text="";
-		if (step == -1)	return;																			// Quit if no step
-		if (app.arc.tree[step].metaStruct == "C") {
+		if (step == -1)							return;													// Quit if no step
+		if (!app.arc.tree[step].res.length)		return;													// Quit if no responses
+		if (app.arc.tree[step].metaStruct == "C") {														// Choral
 			text="Choral:"+randomResponse(step,0);														// Return random response if multiple matches of immediate answer
-			if (!app.voice.thoughtBubbles) 	Bubble("Choral response",5);								// Show response
+			if (!app.voice.thoughtBubbles) 	Bubble(text,5);												// Show response
 			app.arc.Add({ o:'R', who:null, text:text, r:1 });											// Add to record
 			app.voice.Talk(text);																		// Speak response
 			return;	
@@ -249,7 +236,7 @@ class ARC  {
 				}
 			}
 		
-		function randomResponse(step, res) {															// GET RANDOM RESPONSE FROM MULTIPLE MATCHES OF RC
+		function randomResponse(step, res) {														// GET RANDOM RESPONSE FROM MULTIPLE MATCHES OF RC
 			var i,v=[];																					
 			var rs=app.arc.tree[step].res;																// Point at responses	
 			for (i=0;i<rs.length;++i)																	// For each response
@@ -315,7 +302,6 @@ class ARC  {
 						s=s.substr(0,s.length-2)														// Remove last comma
 						if (data)		data.ents=s;													// Add to object
 						if (callback) 	callback(s);													// Return entities to callback	
-																						
 						}
 				});
 		} catch(e) { app.gettingEntities=0;	trace("***********\nWIT error: "+e.error+"\n*********"); }	// Show error
