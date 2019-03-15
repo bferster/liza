@@ -6,12 +6,13 @@ class Timeline {
 
 	constructor()																				// CONSTRUCTOR
 	{
-		this.curTime=0;
-		this.curStart=0;
-		this.startPlay;
-		this.maxTime=5*60000;
-		this.events=[];
-		this.preview=false;
+		this.curTime=0;																				// Current relative time in msecs
+		this.curStart=0;																			// Start in msecs
+		this.startPlay;																				// When play started in msecs
+		this.maxTime=0;																				// End of timeline in msecs
+		this.events=[];																				// Holds timeline events
+		this.preview=false;																			// Preview/review mode flag
+		this.lastSlide=-1;																			// Last slide shown
 	}
 
 	Draw(playing)																				// DRAW
@@ -28,53 +29,54 @@ class Timeline {
 					else if (o.r == WRONG)			col="#990000";									// Wrong
 					else if (o.r == INCOMPLETE)		col="#e88632";									// Incomplete
 					$("#stuTextDiv").css("color",col);												// Set color
-					if ((o.who != null) && (o.who >= 0))  	$("#stuTextDiv").html(app.students[o.who].id+": "+o.text);		// Add name if a single student
-					else									$("#stuTextDiv").html(o.text);									// Just response
-					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text),o.played=1;				// Speak it
+					
+					if ((o.who != null) && (o.who >= 0))  	$("#stuTextDiv").html(app.students[o.who].id+": "+o.text);	// Add name if a single student
+					if ((o.who != null) && (o.who < 0))  	$("#stuTextDiv").html("Choral response: "+o.text);			// Add choral response flag
+					else									$("#stuTextDiv").html(o.text);								// Just response
+					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text),o.played=1;			// Speak it
 					}							
 				else if ((o.o == "S") || (o.o == "CON")) {											// Instructor
 					if (o.o != "CON")  $("#stuTextDiv").html("");									// Clear student response if not a consequence
 					$("#insTextDiv").html("<b>"+o.text+"</b>");	}									// Show
-					if (!o.rrev)																	// If in preview only
-						if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
+					if (!isNaN(o.slide)) 															// If a slide is spec'ed
+						if (o.slide != this.lastSlide) {											// If not same one as before
+							this.lastSlide=o.slide;													// Then is now
+							app.bb.Playback({ o:"P", p:"PPT slides", s:0, n:o.slide });				// Show slide
+							}					
+					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
 					}
-				else if (o.o == "P")	app.bb.Playback({ o:"P", p:"PPT slides", s:0, n:o.n });		// Show slides
 				}
-		
-		if (!this.preview)		app.rev.ShowBlackboard(this.curTime+app.startTime);					// Draw blackboard
+		if (!this.preview)		app.rev.ShowBlackboard(this.curTime+app.startTime);					// Draw blackboard if in review only
 		}
 	
 	AddEvents(preview)																			// ADD EVENTS TO TIMELINE
 	{
 		var i=0,n=0,o,x,r,col,str;
-		var last=0,rate;
+		var last=0;
 		this.events=[];																				// Clear events
 		if (preview) {																				// If previewing session
 			this.preview=true;																		// In preview
 			this.maxTime=3000;																		// Start at 3 sec
 			while (n++ < 200) {																		// No more than 200
-				rate=app.voice.secsPerChar*1000*app.voice.tts.rate;									// How to time speech rates
-				app.curStudent=(app.curStudent+1)%app.students.length;								// Cycle through students
 				o=app.arc.tree[i];																	// Point at step
 				if (!o)	continue;																	// Skip if bad																		
+				if (o.metaStruct == "C")	app.curStudent=-2;										// Choral response 
+				else						app.curStudent=(app.curStudent+1)%app.students.length;	// Cycle through students
 				if (o.score == undefined)	o.score=0;												// Must exist to use markov function
 				if (o.escore == undefined)	o.escore=0;												
 				if (o.kscore == undefined)	o.kscore=0;												
 				if (o.matched == undefined)	o.matched=0;											
-				if (o.slide != "")  this.events.push({ t:this.maxTime, o:"P", n:o.slide });			// Add slide, if set
-				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct });			// Add action
-				r=app.arc.MarkovFindResponse(i,app.curStudent) 										// Find proper response
-				if (o.metaStruct == "C")	app.curStudent=-2, r=Math.max(1,r);						// Choral response with no NONE responses
-				x=o.text.length*rate+2000;															// Time to speak action with padding
-
+				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct, slide:o.slide });	// Add action
+				r=Math.max(1,app.arc.MarkovFindResponse(i,app.curStudent)); 						// Find proper response, with no NONE responses
+				x=o.text.length*app.voice.secsPerChar+1000;											// Time to speak action with padding
 				if (r && r <= o.res.length) {														// If a response
 					this.events.push({ o:"R", t:this.maxTime+x, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add it to record
 					if (o.res[r-1].next == "*")	i=last+1;											// If going back to next step
 					else						last=i,i=o.res[r-1].next;							// Go to designated step
-					this.maxTime+=o.res[r-1].text.length*rate+2000;									// Add padded speak time to max time
+					this.maxTime+=o.res[r-1].text.length*app.voice.secsPerChar+2000;				// Add padded speak time to max time
 					if (o.res[r-1].cons) {															// If a consequence
 						this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons });	 	// Add it
-						this.maxTime+=o.res[r-1].cons.length*rate+2000;								// Add padded speak time to max time 
+						this.maxTime+=o.res[r-1].cons.length*app.voice.secsPerChar+2000;			// Add padded speak time to max time 
 						}
 					}
 				else last=i,i=o.next;
@@ -85,26 +87,23 @@ class Timeline {
 		else{																						// If reviewing session
 			this.maxTime=0;																			// Reset time
 			for (i=0;i<app.arc.record.length;++i) {													// For each event
-				rate=app.voice.secsPerChar*1000*app.voice.tts.rate;									// How to time speech rates
 				o=app.arc.record[i];																// Point at event
 				x=o.t-app.startTime;																// Set time in mseconds
-				if (o.o == 'S') {																	// Instructor statement
+				if (o.o == 'S') 																	// Instructor statement
 					this.events.push({ o:"S", t:x, text:o.text, m:o.meta });						// Add action
-					last=x;																			// Save time of action for responsesthat follow
-					}
 				else if (o.o == 'R') {																// Student response
-					this.events.push({ o:"R", t:last, text:o.text, who:o.who, r:o.r });				// Add action
-					x=o.text.length*rate+2000;														// Time to speak action with padding
-					this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons, rev:1 });	// Add it, flagging for review
+					this.events.push({ o:"R", t:x, text:o.text, who:o.who, r:o.r });				// Add action
+//					this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons, rev:1 });	// Add it, flagging for review
 					}
-//				if ((o.o == 'S') ||  (o.o == 'R'))													// If statement or response
+				if ((o.o == 'S') ||  (o.o == 'R'))													// If statement or response
 					this.maxTime=Math.max(x,this.maxTime);											// Set to max time
 				}
 			}
+		this.maxTime+=5000;																			// Pad end
 		var w=$("#timeSlider").width();																// Width of slider
 		for (i=0;i<this.events.length;++i) {														// For each event
 			o=this.events[i];																		// Point at it
-			if (i < this.events.length-2)	o.e=this.events[i+1].t;									// End is start of next
+			if (i < this.events.length-1)	o.e=this.events[i+1].t;									// End is start of next
 			else							o.e=o.t+1000000;										// Pad last
 			x=Math.round(w*o.t/this.maxTime)+30;													// Position
 			if (o.r == RIGHT)				col="#4ab16a";											// Color if right
@@ -132,7 +131,7 @@ class Timeline {
 		var str="<div id='timeBar' class='lz-timebar'>";											// Add timebar div
 		str+="<div class='lz-timeback'></div>";														// Backing div
 		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-52px;font-size:14px'></div>";									
-		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-22px;font-size:14px'></div>";								
+		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-26px;font-size:14px'></div>";								
 		
 		str+="<div id='timeSlider' class='lz-timeslider'></div>";									// Add time slider div
 		str+="<div id='sliderTime' class='lz-slidertime'></div>";									// Time display
@@ -371,16 +370,15 @@ class Review  {
 		{
 			var i,o,side=0;
 			var starts=[0,0];																			// Draw from this point for
-/*			for (i=0;i<app.arc.record.length;++i) {														// For each event
+			for (i=0;i<app.arc.record.length;++i) {														// For each event
 				o=app.arc.record[i];																	// Point at it
-				if ((o.o == "P") || (o.o == "C"))	starts[o.s]=i;										// If a picture or clear, ignore drawing before this point
-				if (o.t > time)						break;												// If past current time, quit looking
+				if ((o.o == "P") || (o.o == "C"))			starts[o.s]=i;								// If a picture or clear, ignore drawing before this point
+				if (o.t > time)								break;										// If past current time, quit looking
 				}
-*/			for (i=0;i<app.arc.record.length;++i) {														// For each event
+			for (i=0;i<app.arc.record.length;++i) {														// For each event
 				o=app.arc.record[i];																	// Point at it
 				side=o.s ? 1 : 0;																		// Set side				
 				if (o.t > time)								break;										// If past current time, quit drawing	
-//				trace(i,o.o,o.n)
 				if ((o.o != 'B') && (i >= starts[side]))	app.bb.Playback(o);							// Draw if a draw event, if not open or close 
 				}
 		}

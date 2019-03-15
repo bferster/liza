@@ -11,23 +11,24 @@ class Voice {
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		this.listening=false;																			// Flag if listening
 		this.talkStartTime=0;																			// Time started talking
-		this.secsPerChar=.053;																			// Seconds per char
+		this.secsPerChar=.12*1000;																		// Mseconds per char
 
 		try {																							// Try
 			this.femaleVoice=1;																			// Female voice
 			this.maleVoice=0;																			// Male voice
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			this.tts.pitch=1.8;																			// Set pitch
-			this.tts.rate=1.3;																			// Set rate 
+			this.tts.pitch=2;																			// Set pitch
+			this.tts.rate=2;																			// Set rate 
 			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
-		
+			this.secsPerChar/=this.tts.rate;															// Adjust for rate
+
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
 				this.voices=[];																			// Clear list
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
 					if (voice.lang == "en-US")		_this.voices.push(voice);							// Just look at English
-					if (voice.name == "Samantha")	_this.femaleVoice=_this.voices.length-1,_this.tts.pitch=1.5,_this.tts.rate=1;	// Use Samantha if available on Mac
-					if (voice.name == "Alex")		_this.maleVoice=_this.voices.length-1,_this.tts.pitch=1.5,_this.tts.rate=1.8;	// Alex 
+					if (voice.name == "Samantha")	_this.femaleVoice=_this.voices.length-1,_this.tts.pitch=1.5;	// Use Samantha if available on Mac
+					if (voice.name == "Alex")		_this.maleVoice=_this.voices.length-1,_this.tts.pitch=1.5;		// And Alex too
 					});
 				};
 
@@ -41,10 +42,8 @@ class Voice {
 		try {																							// Try
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.recognition=new SpeechRecognition();													// Init STT
-			this.recognition.continuous=false;															// Continual recognition
+			this.recognition.continuous=false;															// Continual recognition off
 			this.recognition.lang="en-US";																// US English
-			this.dictionary=['liza' , 'eliza' , 'sit', 'stand', 'sleep', 'talk', 'up', 'down', 'wave', 'sure'];	// Dictionary of words
-			this.AddGrammarList("lizaWords");															// Add to grammar list
 			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png"); this.listening=false; };	// On end, restore button
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 
@@ -84,13 +83,14 @@ class Voice {
 			else if (who != "instructor")	app.curStudent=who,who=app.students[app.curStudent].sex;	// Set current student
 			var oldPitch=this.tts.pitch;																// Save old pitch
 			if (who == "instructor") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;	// Lower pitch if instructor
-			else if (who == "choral") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=2;	// Higher pitch if choral
+			else if (who == "choral") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=3;	// Higher pitch if choral
 			else if (who == "male")		this.tts.voice=this.voices[this.maleVoice];						// Set male voice
 			else 						this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
 			this.tts.text=text;																			// Set text
 			if (who != "instructor") 	this.talking=1;													// Trigger mouth animation if a student
 			speechSynthesis.speak(this.tts);															// Speak
 			this.tts.pitch=oldPitch;																	// Restore pitch	
+		
 		}
 		catch(e) { trace("Speech error",e) };															// Catch
 	}

@@ -47,7 +47,7 @@ class ARC  {
 					o.gist=v[2];																		// Get gist
 					o.goal=goal;																		// Set goal
 					o.step=step;																		// Set step
-					o.slide=(v[4] && !isNaN(v[4])) ? v[4]-0 : "";										// Add slide if set
+					o.slide=(v[4] && !isNaN(v[4])) ? v[4]-1 : "";										// Add slide if set
 					o.next=v[6] ? v[6] : "";															// Add next if set
 					_this.tree.push(o);																	// Add strep to tree
 					}
@@ -153,8 +153,9 @@ class ARC  {
 				this.tree[i].score=this.tree[i].matched;												// Save score 
 				this.tree[i].escore=escore;																// Save escore
 				if (o.keys.length)	this.tree[i].score=(this.tree[i].matched+(kscore/o.keys.length))/2;	// Average of both
-				if (o.goal == this.tree[this.lastStep].goal)	this.tree[i].score+=.05;				// If in current goal, bump-up score 
-				if ((i == this.lastStep+1))	this.tree[i].score+=.05;				// If next in script, bump it up
+				if (o.goal == this.tree[this.lastStep].goal)		this.tree[i].score+=.05;			// If in current goal, bump-up score 
+				if ((i == this.lastStep+1))							this.tree[i].score+=.05;			// If next in script, bump
+				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20;			// If in slide, bump
 				}
 			n=0;																						// Start low
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
@@ -166,7 +167,7 @@ class ARC  {
 				this.lastStep=this.curStep;																// Then is now
 				}
 			str+="\n<< "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str); 															
-			return this.curStep;																			// Return best fit
+			return this.curStep;																		// Return best fit
 		}
 
 	DeliverResponse(step)																			// DELIVER RESPONSE
@@ -254,14 +255,14 @@ class ARC  {
 		var so,ability=.5;
 		if (sid >= 0) ability=app.students[sid].ability;												// Get student ability
 		var r=(Math.random()-.5)*.1;																	// Get jitter factor
-		var tm=[ [0.0, .40, .60], [0.0, .55-r, .45+r], [0.0, .46, .54] ];								// Markov transition matrix
+		var tm=[ [0.0, .40, .60], [0.0, .55-r, .45+r], [0.0, .48, .52] ];								// Markov transition matrix
 		if ((sid >= 0) && app.students[sid].rMatrix[step])	{											// If been there already, for an individual student
 			so=app.students[sid].rMatrix[step];						 									// Use last stage matrix as starting matrix
 			so=MatrixMultiply(so,tm);																	// Get response matrix stage
 			}
 		else{																							// First response is random, based on ability/affect
 			r=Math.random();																			// Get random number
-			if (r*ability < .02)	so=[[1,0,0]];														// Force a none response ~10% proportional to ability
+			if (r*ability < .01)	so=[[1,0,0]];														// Force a none response ~5% proportional to ability
 			else{																						// Calc starting matrix
 				r=Math.max(Math.min(ability+((r-.5)*(1+ability)),1),0); 								// Calc chance of right answer capped 0-1
 				so=[[0,r,1-r]];																			// Set starting matrix

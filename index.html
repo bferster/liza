@@ -413,10 +413,10 @@ class App  {
 				return;	
 				}
 			app.arc.FindClosestStep(text,o);														// Match closest step to text
-			if (app.arc.curStep)				score=app.arc.tree[app.arc.curStep].score;			// Get match score			
+			score=app.arc.tree[app.arc.curStep].score;												// Get match score			
+			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, meta:app.arc.tree[app.arc.curStep].metaStruct, step:app.arc.curStep, score:score });	// Add to record at time of STT listening
 			if (o.match(/action:/i)) 			app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an action mentioned, try to do it
 			else if (score > app.arc.threshold)	app.arc.DeliverResponse(app.arc.curStep);			// Deliver response
-			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, meta:app.arc.tree[app.arc.curStep].metaStruct, step:app.arc.curStep, score:score });	// Add to record at time of STT listening
 			});																		
 		}
 		
