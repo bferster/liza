@@ -19,6 +19,7 @@ class Voice {
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
 			this.tts.pitch=2;																			// Set pitch
 			this.tts.rate=2;																			// Set rate 
+			if (isMobile)	this.tts.rate=1.3;															// Slow down for IOS
 			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
 			this.secsPerChar/=this.tts.rate;															// Adjust for rate
