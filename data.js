@@ -40,7 +40,7 @@ class ARC  {
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
-					o.metaStruct=v[1].substr(0,1);														// Instructional meta structure
+					o.meta=v[1].substr(0,1);															// Instructional meta structure
 					o.rc=v[1].substr(1).trim();															// Add 
 					o.text=v[3].trim();																	// Add text
 					o.res=[];																			// Responses array										
@@ -130,16 +130,15 @@ class ARC  {
 
 		FindClosestStep(text, entities)																// FIND STEP CLOSEST TO TEXT + ENTITIES
 		{
-			var o,i,j,n,str="\n";
-			var kscore,escore,best=-1;
+			var o,i,j,n;
+			var kscore,escore,best=0;
 			entities=(""+entities).split(", ");															// Put entities into array
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
-				kscore=0;																				// Start at 0
+				kscore=escore=0;																		// Start at 0
 				o=this.tree[i];																			// Point at step
 				for (j=0;j<o.keys.length;++j)															// For each key
 					if (text.match(RegExp(o.keys[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"))))		// Check for key in text
 						kscore++;																		// Add to key score
-				escore=0;																				// Start at 0
 				for (j=0;j<entities.length;++j) {														// For each entity spoken
 					if (o.ents.match(RegExp(entities[j].split(':')[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/i))))  // If a basic enities match
 						escore+=.5;																		// Add to score
@@ -158,15 +157,19 @@ class ARC  {
 				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20;			// If in slide, bump
 				}
 			n=0;																						// Start low
+			var v=[],str="<< ";;
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
-				if (this.tree[i].score >= n) { n=this.tree[i].score;	best=i };						// Set if highest
-				str+="   "+this.tree[i].goal+"-"+this.tree[i].step+" - "+Math.round(this.tree[i].score*100) + "%\n";
+				if (this.tree[i].score >= n) { n=this.tree[i].score;	best=i; };						// Set if highest
+				v.push({ n:this.tree[i].goal+"-"+this.tree[i].step, p:Math.round(this.tree[i].score*100), e:this.tree[i].ents }); // Add step
 				}
+			v.sort((a,b)=>{ return b.p-a.p });	for (i=0;i<3;++i) str+=+v[i].p+" : "+v[i].n+", ";		// Top steps
+
+			if (this.tree[best].meta == "I") app.curStudent=Math.max(app.curStudent,1);					// No group responses from instructions
 			if (n > this.threshold)	{																	// If above threshold
-				this.curStep=best;																		// Set as current step										
-				this.lastStep=this.curStep;																// Then is now
+				this.curStep=best;																		// Set as current step 
+				this.lastStep=best;																		// Then is now
 				}
-			str+="\n<< "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str); 															
+			str+="\n    "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str,v); 															
 			return this.curStep;																		// Return best fit
 		}
 
@@ -175,12 +178,13 @@ class ARC  {
 		var i,j,n=0,r,rc,o;
 		var text="";
 		if (step == -1)							return;													// Quit if no step
-		if (!app.arc.tree[step].res.length)		return;													// Quit if no responses
-		if (app.arc.tree[step].metaStruct == "C") {														// Choral
-			text="Choral:"+randomResponse(step,0);														// Return random response if multiple matches of immediate answer
+		if (!app.arc.tree[step].res.length && (app.curStudent >= 0))		return;						// Quit if no responses for individuel students
+		if (app.arc.tree[step].meta == "C") {															// Choral
+			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
 			if (!app.voice.thoughtBubbles) 	Bubble(text,5);												// Show response
 			app.arc.Add({ o:'R', who:null, text:text, r:1 });											// Add to record
 			app.voice.Talk(text);																		// Speak response
+			app.curStudent=0;																			// Reset student
 			return;	
 			}
 		else if (app.curStudent == -1) {																// If whole class responding and looking for answer
@@ -199,6 +203,7 @@ class ARC  {
 				Bubble(text,5);																			// Show response
 				Sound("delete");
 				}
+			app.curStudent=0;																			// Reset student
 			}
 		else if (app.curStudent == -2) {																// If whole class responding with nods
 			for (i=0;i<app.students.length;++i)															// For each student
@@ -211,6 +216,7 @@ class ARC  {
 				else				r=1;																// Most disagree
 				Prompt(n+"% agreed",5);																	// Show agreement
 				app.arc.Add({ o:'R', who:null, text:n+"% agreed", r:r });								// Add to record
+				app.curStudent=0;																		// Reset student
 			}
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(step,app.curStudent);												// Get, compute, and save right response to step
@@ -269,7 +275,7 @@ class ARC  {
 				}
 			}
 		if (sid >= 0) app.students[sid].rMatrix[step]=so;												// Save for later responses
-		trace("   Score:"+app.arc.tree[step].score.toFixed(2)+" Entities:"+app.arc.tree[step].escore.toFixed(2)+" Match:"+app.arc.tree[step].matched.toFixed(2)+" Keywords:"+app.arc.tree[step].kscore.toFixed(2));	// Show results
+//		trace("   Score:"+app.arc.tree[step].score.toFixed(2)+" Entities:"+app.arc.tree[step].escore.toFixed(2)+" Match:"+app.arc.tree[step].matched.toFixed(2)+" Keywords:"+app.arc.tree[step].kscore.toFixed(2));	// Show results
 		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
 		return r;																						// Return type of response
 	}

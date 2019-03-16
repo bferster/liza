@@ -60,13 +60,13 @@ class Timeline {
 			while (n++ < 200) {																		// No more than 200
 				o=app.arc.tree[i];																	// Point at step
 				if (!o)	continue;																	// Skip if bad																		
-				if (o.metaStruct == "C")	app.curStudent=-2;										// Choral response 
+				if (o.meta == "C")	app.curStudent=-2;												// Choral response 
 				else						app.curStudent=(app.curStudent+1)%app.students.length;	// Cycle through students
 				if (o.score == undefined)	o.score=0;												// Must exist to use markov function
 				if (o.escore == undefined)	o.escore=0;												
 				if (o.kscore == undefined)	o.kscore=0;												
 				if (o.matched == undefined)	o.matched=0;											
-				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.metaStruct, slide:o.slide });	// Add action
+				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.meta, slide:o.slide });	// Add action
 				r=Math.max(1,app.arc.MarkovFindResponse(i,app.curStudent)); 						// Find proper response, with no NONE responses
 				x=o.text.length*app.voice.secsPerChar+1000;											// Time to speak action with padding
 				if (r && r <= o.res.length) {														// If a response
@@ -329,12 +329,12 @@ class Review  {
 					o=app.arc.tree[i];																	// Point at step
 					if (o.text)	{																		// If defined
 						var oo=app.arc.tree[o.next];													// Point at next step
-						w=oo ? oo.metaStruct+": "+oo.text : "";											// Add tooltip if a valid next
+						w=oo ? oo.meta+": "+oo.text : "";												// Add tooltip if a valid next
 						str+="<div title='"+w+"' id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";		
-						str+="<b>"+o.metaStruct+": "+o.text+"</b></div>";
+						str+="<b>"+o.meta+": "+o.text+"</b></div>";
 						for (var j=0;j<o.res.length;++j) {												// For each response
 							oo=app.arc.tree[o.res[j].next];												// Point at next
-							w=oo ? oo.metaStruct+": "+oo.text : "";										// Add tooltip if a valid next
+							w=oo ? oo.meta+": "+oo.text : "";											// Add tooltip if a valid next
 							str+="<div title='"+w+"' style='margin-left:16px'>";						// Start of line
 							for (var k=0;k<o.res[j].rc.length;++k) {									// For each response in chain
 								str+="<span style='color:"												// Start checks/crosses
