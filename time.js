@@ -268,7 +268,7 @@ class Review  {
 		this.mode="Overview";																			// Start off in overview
 	}
 
-	Reviewer()																						// REVIEW LESSON MAP SCRIPT												
+	Reviewer(mode)																						// REVIEW LESSON MAP SCRIPT												
 	{
 		var i,w,o;
 		var _this=this;																					// Save context
@@ -289,7 +289,7 @@ class Review  {
 		$("body").append(str);																			// Add to body
 		for (i=0;i<app.students.length;++i)																// For each student
 			$("#revStu").append("<option>"+app.students[i].id+"</option>");								// Add to pulldown
-		refreshBody(this.mode);																			// Fill content
+		refreshBody(mode ? mode : this.mode);															// Fill content use mode if spec's
 		$("#reviewDiv").show("slide",{ direction:"down" });												// Slide up
 		$("#reviewDiv").draggable();																	// Make it draggable on desktop
 		$("#reviewDiv").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } );	// Don't move orbiter
@@ -321,6 +321,7 @@ class Review  {
 				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
 					o=app.arc.tree[i];																	// Point at step
 					if (o.gist)		str+="<li style='padding-bottom:4px'>"+o.gist+"</li>";				// Add gist
+					if (o.next == "END")	break;														// Quit on end
 					}
 				}
 			else if (mode == "Full map")	{															// Full map

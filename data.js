@@ -91,7 +91,8 @@ class ARC  {
 					}
 				}
 			_this.Extract();																			// Extract keywords and entities
-			};									
+			$("#hintBut").prop("title","Next: "+app.arc.tree[0].gist);									// Change tooltip
+		};									
 
 		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
 			if ((xhr.readyState === 4) && (xhr.status !== 200)) {  										// Ready, but no load
@@ -100,7 +101,7 @@ class ARC  {
 				}
 			};		
 		
-			}
+		}
 
 
 	Add(event)																						// ADD EVENT TO RECORD
@@ -170,6 +171,8 @@ class ARC  {
 				this.lastStep=best;																		// Then is now
 				}
 			str+="\n    "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str,v); 															
+			if (app.arc.tree[app.arc.curStep].next)														// If next defined
+				$("#hintBut").prop("title","Next: "+app.arc.tree[app.arc.tree[app.arc.curStep].next].gist);	// Change tooltip
 			return this.curStep;																		// Return best fit
 		}
 
