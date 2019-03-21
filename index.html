@@ -255,7 +255,7 @@ class App  {
 		var url=window.location.search.substring(1);						   						// Get query string
 		if (url && !url.match(/real/i)) {															// If params
 			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
-			else if (url="mk")		this.gid="1JUEWVr25tktaON17Vi3VREvHpEy54Lz4Ou9NIIBYsRE";		// Kennedy's spreadsheet
+			else if (url="ly")		this.gid="10YitC1GN1KptoR-YRXS6HxDNk9ex_NW_m-6wKD8lC-8";		// Kennedy's spreadsheet
 			else					this.gid=url;													// Default spreadsheet
 			}
 		this.arc=new ARC();																			// Make new ARC tree		
@@ -518,8 +518,8 @@ class App  {
 		Sound("ding");																					// Ding sound
 		$("#confirmBoxDiv").remove();																	// Remove 
 		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");														
-		var str="<img src='img/lizalogo.png' width='32' style='vertical-align:-10px'/>&nbsp;&nbsp;";								
-		str+="<span style='font-size:18px; color:#666'><b>"+title+"</b></span><br>";
+		var str="<img src='img/lizalogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
+		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
 		str+="<p>"+content+"<p>";
 		str+="<div style='float:right'><div id='confirmOK' class='lz-bs'>OK</div>";
 		str+="<div id='confirmCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
@@ -532,7 +532,7 @@ class App  {
 
 		$("#confirmCancel").on("click", function() {													// ON CANCEL BUT
 				$("#confirmBoxDiv").remove();															// Remove 
-				if (callback2)	callback();																// If callback defined, run it
+				if (callback2)	callback2();															// If callback defined, run it
 				Sound("delete");																		// Delete sound
 				});
 	}

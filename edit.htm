@@ -13,64 +13,45 @@
 		 body { 			font-family: Verdana,Geneva,sans-serif; font-size:14px; padding:0; margin:0; 
 		 					box-sizing: border-box; background-color: #f8f8f8;	
 							}
-		.wm-main { 			width:100%;  overflow:auto;  display:none; min-width:1450px;
+		.lz-main { 			width:100%;  overflow:auto; min-width:1250px;
 							}
-		.wm-map {	 		margin:16px;
+		.lz-header { 		background-color: #bbb; width:100%; color:#fff;	padding: 8px 0px;
 							}
-		.wm-confirm {		position: absolute;  width: 350px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
+		.lz-popSelect {		position: absolute; top:16px; left:16px; background-color: #f8f8f8; border: 1px solid #aaa;
+							padding:16px; border-radius: 12px;
+							}
+		.lz-map { 			width:calc(100% - 60px);  overflow:auto; padding:16px; background-color:#fff; height:300px;
+							border-radius: 12px; margin-left:16px; margin-top:16px; border: 1px solid #999
+							}
+		.lz-popSelInner { 	width:100%; height:calc(100% - 32px); overflow-y:auto;
+							}
+		.lz-bs {			cursor: pointer; color:#fff; 
+							text-align: center; border-radius: 16px; display: inline-block; user-select: none;
+							font-size: 12px; background-color: #27ae60; padding: 2px 8px 2px 8px; vertical-align:3px;
+							}
+		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							}
-		.wm-splash { 		width:100%; color:#999; text-align:center; margin-top:10%; display:none;
-							}
-		.wm-header { 		background-color: #bbb; width:100%; color:#fff;	padding: 8px 0px;
-							}
-		.wm-logo { 			height:30px; vertical-align: top; margin:0px 16px; cursor:pointer;
-							}
-		.wm-courseTitle { 	font-size: 24px; font-weight: bold; margin-right:32px; cursor:pointer;
-							}
-		.wm-pageTitle {		color:#333;	font-size: 24px; text-align:center; font-weight: bold; padding-top:16px; padding-bottom:8px;
-							}
-		.wm-popup {			position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top: calc(50% - 50px);
-							border-radius: 8px; background-color: #fff; border: 1px solid #009900; box-shadow: 4px 2px 12px 2px #aaa; 
-							text-align:center; display: none;
-							}
-		.wm-is {			border-radius:10px; padding-left:8px; padding-right:8px; padding-top:1px;
-							border:1px solid #999; font-size:12px; height:20px; width:300px;
-							}
-		.wm-bs {			border-radius: 16px; padding-left: 8px; padding-right: 8px; display: inline-block; height: 17px; padding-top: 1px;
-							font-size: 12px; background-color: #27ae5f; cursor: pointer; text-align: center; color:#fff; user-select: none;
-							}
-		.wm-tree {      	user-select: none; width: 100%; margin-left:40px;
-							padding: 0px 0; font-size: 14px; text-align: left; 
+		.lz-is {			border-radius:16px; padding:0 8px; width:calc(100% - 24px); height: 24px;
+							border:1px solid #999; font-size: 13px;
 							}
 
-		.wm-tree ul { 		list-style: none outside none; padding: 0 }
-		.wm-tree li a { 	line-height: 20px; cursor: pointer; }
-		.wm-tree > ul > li > a { color:#000; display: block;  font-weight: normal; position: relative; text-decoration: none; }
-		.wm-tree li.parent > a { padding: 0 0 0 16px;  }
-		.wm-tree li.parent > a:before { background-image: url("img/treebuts.gif"); content: ""; display: block;
-										height: 11px; left: 0; position: absolute; top: 4px; width: 11px;  background-position: 0px;
-										}
-		.wm-tree ul li.active > a:before { background-position: 22px; }
-		.wm-tree ul li ul 	{ border-left: 1px solid #ccc;  display: none; margin: 0 0 0 5px; padding: 0 0 0 10px; }
-		.wm-tree ul li ul li { position: relative; }
+		 table 		{		border-spacing: 0px;  }
+		 tr:hover 	{		background-color: #e7e7f5;}
 
 	</style>
 
 </head>
 <body>
 
-	<div id='mainDiv' class='wm-main'>
-		<div id='headerDiv' class='wm-header'>
-			<span id='courseTitle' class='wm-courseTitle'>Demo session</span>
+	<div id='mainDiv' class='lz-main'>
+		<div id='headerDiv' class='lz-header'>
+			<span id='courseTitle'></span>Demo session</span>
 			<span id='menuMsg' style='display:none;margin-left:32px'></span>
-			<div id='showgdoc' title='Load new map' style='float:right;margin-right:16px;cursor:pointer;margin-top:6px'></div>
 			</div>
-		<div id='mapDiv' class='wm-map'></div>
-	</div>
-	<div id='splashDiv' class='wm-splash'>
-		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br>
-		<br><p style="color:#000;font-size:14px"><em>A tool for engaging people in highly affective script-driven discourse<br>for learning and practicing goal-directed behaviors.</em></p>
+		<div id='mapDiv' class='lz-map'></div>
+		<div id='addStep' class='lz-bs' style='margin-left:16px;margin-top:8px'>Add new step</div>
+		<div id='removeStep' class='lz-bs' style='margin-right:16px;margin-top:8px;float:right'>Remove step</div>
 	</div>
 		
 <script>
@@ -92,6 +73,56 @@
 		});
 
 
+
+
+
+
+
+
+		var o={ x:500, y:300, h:400, w:300, title:"Choose response" };
+		o.opts=["Step one","Step two","Step thgfgfgfgfgfgfgfgfgfgfgjhluguilguigpiugyigoygygyugygyfgfgfgree","Step four","Step five","Step six","Step seven","Step eight"];
+//		PopSelect(o, (s)=> { trace(s) } ); 
+
+
+		function PopSelect(o, callback, addCallback)														// POPUP SELECT
+		{
+			var i,col,s;
+			var trsty="height:20px;cursor:pointer;white-space:nowrap;overflow:visible' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
+			trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"'";
+			$("#popSelectDiv").remove();																		// Remove if open
+			var str="<div id='popSelectDiv' class='lz-popSelect' style='";										// Header
+			str+="left:"+o.x+"px;top:"+o.y+"px;width:"+o.w+"px;height:"+o.h+"px'>";								// Position and size
+			str+="<b>"+o.title+"</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#popSelectDiv\").remove()'><hr>";	// Title and closer
+			str+="<div id='popSelInDiv' class='lz-popSelInner'>";												// Scrollable div
+			for (i=0;i<o.opts.length;++i) {																		// For each option	
+				s=o.opts[i];																					// Get text
+				if (s.charAt(0) == '-')			s=s.substr(1),col="#880000";									// Wrong
+				else if (s.charAt(0) == '+')	s=s.substr(1),col="#006600";									// Right
+				else							col="#000000";													// Other
+				str+="<div id='psopt-"+i+"' style='color:"+col+";"+trsty+">"+s+"</div>";						// Add div
+				}
+			if (addCallback) {
+				str+="<p><input type='text' placeholder='Type to add new item' class='lz-is' id='psadd'></p>";	// Add add button
+				}
+			str+="</div></div>";																				// End divs
+			$("body").append(str);																				// Add to body
+			$("[id^=psopt-]").on("click",(e)=> {  																// On line click
+				callback(e.target.id.substr(6));						 										// Return index via callback
+				$("#popSelectDiv").remove();																	// Kill dialog
+				});
+
+			$("#psadd").on("change",(e)=> {  																	// On add click
+				o.opts.push($("#psadd").val());																	// Add new value
+				addCallback($("#psadd").val());						 											// Return new text via callback
+				PopSelect(o,callback,addCallback)																// Recurse
+			});
+
+	}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // APP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,70 +132,138 @@ class App  {
 	constructor(id)   															// CONSTRUCTOR
 	{
 		app=this;
-		this.arcs=[ { name:"Session name", id:1, status:0, body:"", children:[], kids:[]}];							
-		this.tree=null;																// Holds arcs tree
 		this.undos=[];																// Holds undos
 		this.curUndo=0;																// Undo counter
-	}
+		this.arcs=[];
+		this.as=[];
+		this.cs=[];
+		this.rs=[];
 
-	Draw()																		// DRAW
-	{
-		var str="<b>Learning map text:</b><i> (paste from Word)</i><br>";			// Label
-		str+="<div id='textDiv' style='width:600px;height:600px;background-color:#fff;padding:12px;overflow:auto'";
-		str+=" contenteditable='true'></div><br>";		
-		str+="<div id='convertBut' class='wm-bs'>Convert to map</div></div>";		// Add button
-		str+="&nbsp;&nbsp;<div id='copyBut' class='wm-bs'>Copy to clipboard</div></div>";		// Ccopy button
-		$("#mapDiv").html(str);														// Draw map part
+		this.as.push({ text:"Q:What is 2 + 2", c:"addition" });
+		this.as.push({ text:"Q:What is 3 + 3", c:"addition" });
+		this.as.push({ text:"Q:What is 4 + 4", c:"addition" });
+
+		this.as.push({ text:"A:Do you agree", c:"last" });
+		this.as.push({ text:"P:Are you sure?", c:"last" });
+		this.as.push({ text:"P:Tell me more?", m:"pump", c:"last" });
+		this.as.push({ text:"P:Elaborate", c:"last" });
+		this.as.push({ text:"W:Tell me why", c:"last" });
+		this.as.push({ text:"Q:Know the answer", c:"last" });
+
+		this.rs.push("-I'm not sure");
+		this.rs.push("-I'm have no idea");
+		this.rs.push("+The answer is 4");
+		this.rs.push("-I think the answer is 22");
+		this.rs.push("+The answer is most assuredly 6");
+		this.rs.push("-Would you believe 5?");
+		this.rs.push("+The answer is 8");
+		this.rs.push("-The answer might be 44");
+
+		this.cs.push("Good");
+		this.cs.push("OK, but...");
+		this.cs.push("Anyone else know?");
+		this.cs.push("You're adding the digits, not the numbers together");
+
+		this.arcs.push({ a:0, r:0, c:2, f:0 })
+		this.arcs.push({ a:1, r:4, c:0, f:0 })
 	
-		$("#convertBut").on("click", ()=> {  									// ON CONVERT
-			var r,i;
-			var goal,step;									
-			recurse($("#textDiv")[0].getElementsByTagName('ol')[0]);				// Iterate through ol's
-//			for (i=0;i<ids.length;++i) {
-//				r=RegExp(ids[i].a.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
-//				result=result.replace(r,ids[i].b);										// Put real ids in		
-//				}
-			trace(result)
-			
-			function recurse(obj) {													// Recurse thru ol's
-				var typ,s,ss;
-				if (!obj)	return;
-				if (obj.nodeName == "LI") {											// If a line
-					if (obj.innerText.charAt(0) == "!") {							// If a  goal
-						goal=obj.innerText.substr(1).trim().toUpperCase();			// Extract as current goal
-						goal=goal.replace(/ /g,"_");								// No spaces
-						step=0;														// Start counting afresh
-						}
-					else{															// Normal line
-						ss=obj.innerText;											// Get text
-						if (ss.match(/^[+-0?]+/)) {									// A response
-							typ="R"+ss.match(/^[+-0?]+/)[0];						// Set type
-							ss=ss.substr(typ.length-1);								// Remove from response
-							s=obj.innerText.match(/\[(.*)\]/i);						// An id tag
-							if (s) r=RegExp(s[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"ig");
-							if (s) 	ss=ss.replace(r,"");							// Remove id from response
-							result+="\t"+typ+"\t\t"+ss.trim()+"\t\t"+(s ? s[1] : ""); // Show
-							}
-						else{
-							typ=ss.match(/(^.+):/);									// Get type of action
-							if (typ)	ss=ss.replace(typ[0],""),typ=typ[1];		// Remove tag
-							else		typ="Q";									// Defaulr to question
-							ss=ss.trim();											// Trim it
-							if (step)	result+=step+"\t"+typ+"\t\t"+ss;			// Just number
-							else		result+=goal+"-"+step+"\t"+typ+"\t\t"+ss;	// Show
-							step++;													// Inc step
-							}
-						result+="\n"
-						}
-					}
-				
-				
-				for (var i=0;i<obj.childNodes.length;++i) 							// For each child
-					recurse(obj.childNodes[i]); 									// Recurse
-				}
+		$("#addStep").on("click",(e)=> {  																	// ON ADD STEP
+			var i;
+			for (i=0;i<this.arcs.length;++i)																// For each step
+				if ($("#strad-"+i).prop("checked"))															// If it's checked
+					break;																					// Stop looking
+			this.arcs.splice(i,0,{ a:-1, r:-1, c:-1, n:-1 });												// Add blank step
+			this.Draw();																					// Redraw
+			Sound("ding");																					// Ding
 			});
 
-			$("#copyBut").on("click", ()=> {  									// ON COPY
+		$("#removeStep").on("click",(e)=> {  																// ON REMOVE STEP
+			var i;
+			for (i=0;i<this.arcs.length;++i)																// For each step
+				if ($("#strad-"+i).prop("checked"))															// If it's checked
+					break;																					// Stop looking
+			if (i < this.arcs.length)																		// If something checked
+				ConfirmBox("Are you sure?", "", ()=> {														// If sure
+					this.arcs.splice(i,1); 																	// Remove it
+					this.Draw();																			// Redraw
+					Sound("ding");																			// Ding
+					});
+			else	Sound("delete");																		// Delete
+			});
+	}
+
+	Draw()																								// DRAW
+	{
+		var i,o,a,r,c;
+		var rcol;
+		var w=$("#mapDiv").width();
+		var str="<table style='width:100%'><tr><td style='width:50%'><b>Instructor says</b></td>";
+		str+="<td style='width:25%'><b>Student responds</td></b></td>";
+		str+="<td style='width:25%'><b>Consequence</b></td></b></td><td>";
+		str+="<tr><td colspan='4'><hr></td><td style='width:16px'></td></tr>";
+		for (i=0;i<this.arcs.length;++i) {
+			o=this.arcs[i]
+			a=(o.a < 0) ? "<i>Choose</i>" : this.as[o.a].text;												// Set text for instructor option
+			r=(o.r < 0) ? "<i>Choose</i>" : this.rs[o.r];													// Response
+			c=(o.c < 0) ? "<i>Choose</i>" : this.cs[o.c];													// Consequence
+			if (r.charAt(0) == '-')			r=r.substr(1),rcol="#880000";									// Wrong
+			else if (r.charAt(0) == '+')	r=r.substr(1),rcol="#006600";									// Right
+			else							rcol="#000000";													// Other
+			str+="<tr><td id='stpa-"+i+"'>"+(i+1)+". "+a+"</td><td id='stpr-"+i+"' style='color:"+rcol+"'>"+r+"</td><td id='stpc-"+i+"'>"+c;	// Fill step
+			str+="</td><td><input id='strad-"+i+"' name='stradgrp' type='radio'></td></tr>";
+			}
+		str+="</table>"
+		$("#mapDiv").html(str)	
+		
+		$("[id^=stpa-]").on("click",(e)=> {  																// On A click
+			var id=(e.currentTarget.id.substr(5));						 									// Get index
+			var o={ x:16, y:49, h:500, w:w/2-48, opts:[], title:"Choose Intructor Action" };				// Settings
+			for (i=0;i<this.as.length;++i)	o.opts.push(this.as[i].text);									// Add options
+			PopSelect(o, (s)=> { this.arcs[id].a=s; this.Draw(); }, (s)=>{ 									// Pick new item
+				this.as.push({ text:s, m:"question", c:"addition" })
+				});				
+			});
+
+		$("[id^=stpr-]").on("click",(e)=> {  																// On R click
+			var id=(e.currentTarget.id.substr(5));						 									// Get index
+			var o={ x:w/2, y:49, h:500, w:w/4-48, opts:[], title:"Choose Student Response" };				// Settings
+			for (i=0;i<this.rs.length;++i)	o.opts.push(this.rs[i]);										// Add options
+			PopSelect(o, (s)=>{ this.arcs[id].r=s; this.Draw(); }, (s)=>{ this.rs.push(s); });				// Pick new item
+			});
+		
+		$("[id^=stpc-]").on("click",(e)=> {  																// On C click
+			var id=(e.currentTarget.id.substr(5));						 									// Get index
+			var o={ x:w*.75, y:49, h:500, w:w/4-48, opts:[], title:"Choose Consequence" };					// Settings
+			for (i=0;i<this.cs.length;++i)	o.opts.push(this.cs[i]);										// Add options
+			PopSelect(o, (s)=> { this.arcs[id].c=s; this.Draw(); }, (s)=>{ this.cs.push(s); });				// Pick new item
+			});
+		}
+
+
+
+
+
+
+
+	Do()																		// DO
+	{
+//		this.undos[this.curUndo]=app.doc.MakeTabFile();								// Save undo
+		this.curUndo++;																// Inc undo count
+	}
+	
+	UnDo()																		// UNDO
+	{
+		if (this.curUndo < 1)														// Nothing to undo
+			return;																	// Quit
+//		app.doc.InitFromTSV(this.undos[this.curUndo-1]);							// Init show from undo
+		app.Draw();																	// Redraw
+		this.curUndo--;																// Dec undo count
+		Sound("ding");																// Ding
+	}
+
+} // APP CLASS CLOSURE
+																					
+$("#copyBut").on("click", ()=> {  									// ON COPY
 				trace(123,result)
 				var textArea = document.createElement("textarea");
 				textArea.style.position = 'fixed';
@@ -185,287 +284,7 @@ class App  {
 				document.body.removeChild(textArea);
 				});
 
-			}
 
-
-
-	Draw2()																		// DRAW
-	{
-		var str="<b>Learning map:</b><i> (Click to edit)</i><br>";					// Tree label
-		str+="<div id='treeDiv' class='wm-tree'></div>";							// Add div to hold tree
-		str+="<div id='addStepBut' class='wm-bs'>Add new step</div>";				// Add button
-		$("#mapDiv").html(str);														// Draw map part
-		app.tree=new Tree();														// Show arc tree				
-
-		$("#saveCourseBut").on("click", ()=> {  									// ON SAVE COURSE
-			var i,d=[];
-//			var v=app.doc.MakeTabFile().split("\n");								// Split into rows
-			for (var i=0;i<v.length;++i)											// For each row
-				d.push(v[i].split("\t"));											// Add array of fields
-//			SaveSpreadsheet(app.doc.courseId,d);									// Save to GDrive
-	});
-
-		$("#addStepBut").on("click", ()=> {  										// ON ADD ARC PANE
-			app.AddNewArc(app.tree.curId); 										// Add arc
-			var id=app.arcs[app.arcs.length-1].id;									// New id
-			app.tree.Init(id);														// Remake tree
-			Sound("ding"); 															// Ding
-			});
-
-	}
-
-
-
-	AddNewArc(parent, id, name)																					// ADD NEW ARC
-	{
-		if (parent < 0)	return;																						// Quit on invalid parent
-		if (!id)	id=this.UniqueArcId(parent);																	// If not spec'd add unique id based on parent
-		if (!name)	name="Rename this";																				// And name
-		this.arcs.push({ name:name, id:id, status:0, body:"", parent:parent, kids:[], children:[]});				// Add arc
-		
-		parent=this.FindArcById(parent);																			// Point at parent arc
-		if (parent) {																								// If has a parent
-			parent.children.push(id);																				// Add id to children	
-			parent.kids.push(this.arcs.length-1);																	// Add index to kids	
-			}
-		}
-
-	UnlinkArd(id)																								// UNLINK ARC
-	{
-		var i=this.FindArcIndexById(id);																			// Get index
-		if (i <= 0)	return;																							// Root or invalid index
-		var o=this.FindArcById(this.arcs[i].parent);																// Get pointer parent
-		if (!o)			return;																						// Invalid parent
-		for (i=0;i<o.children.length;++i) 																			// For each child
-			if (o.children[i] == id)  {																				// Matches this id
-				o.kids.splice(i,1);																					// Remove from from kids
-				o.children.splice(i,1);																				// Remove from from children
-				break;
-				}
-	}
-
-	UniqueArcId(id) 																							// MAKE UNIQUE ARC ID BASED ON PARENT
-	{	
-		var nid,add=1;																								// Add number																				
-		nid=id+""+add;																								// Add number to parent
-		while (this.FindArcById(nid))																				// While not unique
-			nid=id+""+(++add);																						// Add to count until it is																					
-		return nid;																									// Return unique id												
-	}
-	
-	FindArcById(id, objArray) {																					// FIND PTR TO OBJECT FROM ID
-		var i;
-		var o=objArray ? objArray : this.arcs;																		// Point at array of object array
-		var n=o.length;																								// Set length
-		for (i=0;i<n;++i) {																							// For each obj
-			if (id == o[i].id) 																						// A match
-				return o[i];																						// Return ptr to obj
-			}
-		return null;																								// Not found
-		}
-
-	FindArcIndexById(id, objArray ) {																			// FIND INDEX OF OBJECT FROM ID
-		var i;
-		var o=objArray ? objArray : this.arcs;																		// Point at array of object array
-		var n=o.length;																								// Set length
-		for (i=0;i<n;++i) {																							// For each arc
-			if (id == o[i].id) 																						// A match
-				return i;																							// Return ptr to arc
-			}
-		return -1;																									// Not found
-		}
-
-	DescendedFrom(id, testId) 																					// FIND IF IS A DESCENDENT
-	{		
-		var par=this.FindArcById(testId);																			// Point at parent
-		while (par) {																								// While still a parent
-			if (par.parent == id)	return true;																	// It's in the chain
-			par=this.FindArcById(par.parent);																		// Go up a level
-			}
-		return false;																								// Not in the chain
-	}
-
-	FindArcLevelById(id) {																						// FIND LEVEL FROM ID
-		var level=0;
-		var o=this.FindArcById(id);																					// Point 
-		if (!o)	return 0;																							// A floater
-		while (o.parent) {																							// While not root
-			o=this.FindArcById(o.parent);																			// Set id to parent and go up hierarchy
-			if (!o)	return 0;																						// At root level
-			++level;																								// Increase level
-			}
-		return level;																								// Return level
-	}
-
-	AddChildList()																								// ADD LIST OF CHILDREN
-	{	
-		var i,par,n=this.arcs.length;
-		for (i=0;i<n;++i) {																							// For each element
-			this.arcs[i].children=[];																				// Alloc arrays
-			this.arcs[i].kids=[];																
-			}
-		for (i=0;i<n;++i) {																							// For each element
-			if (this.arcs[i].parent === "")	delete(this.arcs[i].parent);											// Blank = undefined
-			par=this.FindArcIndexById(this.arcs[i].parent);															// Get index of parent
-			if (par < 0)	continue;																				// Skip if invalid parent
-			this.arcs[i].level=this.FindArcLevelById(this.arcs[i].id);												// Set level
-			if (par != undefined) {																					// If not root
-				this.arcs[par].children.push(this.arcs[i].id);														// Add id of child 
-				this.arcs[par].kids.push(i);																		// Add index of child 
-				}			
-			}
-	}
-
-	ChangeOrder(arcId, parent, mode)																			// CHANGE arc'S ORDER VIA PARENT OR PLACE IN CHILDREN
-	{
-		var i=this.FindArcIndexById(arcId);																			// Get index of arc to move	
-		if (i < 0)	return;																							// Quit if invalid
-		var j=this.FindArcIndexById(parent);																		// Get index of arc to move to	
-		if (j < 0)	return;																							// Quit if invalid
-	
-		if ((this.arcs[j].parent == this.arcs[i].parent) && (mode == "shift"))	{									// Pointing to same parent
-			var ii,fromKid,fromChild;
-			var o=this.FindArcById(this.arcs[j].parent);															// Point at parent arc
-			for (ii=0;ii<o.children.length;++ii) 																	// For reach child
-				if (o.children[ii] == arcId)  {																		// Save from point
-					fromKid=o.kids[ii];																				// Save from kids value
-					fromChild=o.children[ii];																		// Save from child value
-					o.kids.splice(ii,1);																			// Remove from from kids
-					o.children.splice(ii,1);																		// Remove from from children
-					break;
-					}
-			for (ii=0;ii<o.children.length;++ii) 																	// For reach child
-				if (o.children[ii] == parent)  {																	// Save from point
-					o.kids.splice(ii,0,fromKid);																	// Add from kids
-					o.children.splice(ii,0,fromChild);																// Add from children
-					break;
-					}
-		}
-	else{	
-		if (!this.DescendedFrom(this.arcs[i].id,this.arcs[j].id))													// If this log is not a descendant
-			this.arcs[i].parent=parent;																				// Set new parent
-		this.AddChildList();																						// Remake childen/kids arrays
-		}
-	}
-
-	Do()																		// DO
-	{
-//		this.undos[this.curUndo]=app.doc.MakeTabFile();								// Save undo
-		this.curUndo++;																// Inc undo count
-	}
-	
-	UnDo()																		// UNDO
-	{
-		if (this.curUndo < 1)														// Nothing to undo
-			return;																	// Quit
-//		app.doc.InitFromTSV(this.undos[this.curUndo-1]);							// Init show from undo
-		app.Draw();																	// Redraw
-		this.curUndo--;																// Dec undo count
-		Sound("ding");																// Ding
-	}
-
-}																					// CLASS CLOSURE
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TREE  
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	class Tree {
-
-		constructor()  																	// CONSTRUCTOR
-		{
-			this.Init();																	// Init tree
-		}
-
-		Init(id) 																			// INIT TREE
-		{
-			var i,o;
-			var _this=this;																	// Save context		
-			this.curId=0;																	// Start at root
-			var o=app.arcs[0];																// Point at root												
-			if (!o)	return;																	// If invalid, quit
-			var str="<ul><li class='parent active'><a id='tr-"+o.id+"'>"+o.name+"</a></li>"; // Add root tree node
-			$("#treeDiv").html(str+"</ul>");												// Add to tree div
-			this.AddChildren($("#tr-"+o.id),0);												// Add children to tree
-		
-			$("#tr-"+o.id).parent().children('ul').slideToggle('fast');            			// Open course
-			$("[id^=tr-]").draggable( {	revert:true, delay:500 });							// Make lines draggable to change spotin tree
-			$("[id^=tr-]").droppable( {														// Make lines droppable 
-				drop: function(e,ui) {														// On drop
-					var mode=e.shiftKey ? "move" : "shift";									// Move or shift
-					app.Do();																// Save for undo
-					app.ChangeOrder(ui.draggable[0].id.substr(3),e.target.id.substr(3),mode); // Rearrange
-					_this.Init(ui.draggable[0].id.substr(3));								// Re-init tree	
-					Sound("ding");															// Ding
-					}
-			});
-
-			if (id != undefined) this.Open(id);	
-
-			$('.wm-tree li > a').on("click", function(e) {									// ON CLICK OF NODE TEXT
-				_this.handleTreeClick($(this),e);  											// Handle
-				Sound("click"); 															// Click
-				});      
-		}
-
-		Open(id)																		// OPEN TREE AT ID
-		{
-			var i;
-			var row=$("#tr-"+id);															// Row
-			var par=row.parent();															// Point at previous line
-			$('.wm-tree li a').each( function() {                          					// For each line
-				$(this).css({"color":"#000","font-weight":"normal"});      					// Normal
-				}); 
-			row.css({"color":"#009900","font-weight":"bold"});          					// Bold and green   
-			for (i=0;i<20;++i) {															// Iterate upwards
-				if ($(par).attr("class") == "wm-tree")	break;								// Quit at top of tree
-				if ($(par).attr("class") == "parent") {										// Has children
-					par.addClass('active');                         						// Active class on 
-					par.children('ul').slideToggle('fast');            						// Slide into place
-					}
-				par=par.parent();															// Up a level
-				}
-		}
-
-	handleTreeClick(row, e)																// HANDLE TREE CLICK
-	{
-		if (e.offsetX < 12) {                                         				  		// In icon
-			row.parent().toggleClass('active');                         					// Toggle active class on or off
-			row.parent().children('ul').slideToggle('fast');            					// Slide into place
-			}
-		else{																				// In text
-			$('.wm-tree li a').each( function() {                          					// For each line
-				$(this).css({"color":"#000","font-weight":"normal"});      					// Normal
-				}); 
-			row.css({"color":"#009900","font-weight":"bold"});          					// Bold and green   
-			this.curRow=row;																// Save row
-			this.curId=e.target.id.substr(3);											// Save pane id
-			trace(this.curId);											// Show pane
-			}
-		}
-
-	AddChildren(row, id) 																// ADD CHILDREN TO TREE RECURSIVELY
-	{
-		var i,o,oo;
-		if (id < 0)	return;																	// Invalid index
-		var o=app.arcs[id];																	// Point at parent												
-		if (!o)	return;																		// If invalid, quit
-		if (!o.children)	return;															// Quit if no children
-		var str="<ul style='display:none'>";												// Wrapper
-		for (i=0;i<o.children.length;++i) {													// For each child
-			str+="<li";																		// Start row
-			oo=app.arcs[o.kids[i]];															// Point at child arc via index
-			if (oo.children.length)	str+=" class='parent'"									// Add parent if it has children
-			str+="><a id='tr-"+oo.id+"'>"+oo.name;											// Add index and name
-			str+"</a></li>";																// Add label
-			}
-		row.after(str+"</ul>");																// Add to tree
-		for (i=0;i<o.children.length;++i) {													// For each child
-			row=$("#tr-"+o.children[i])
-			this.AddChildren(row,o.kids[i]);												// Recurse
-			}
-		}
-}																						// Class closure
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GOOGLE DRIVE
@@ -563,12 +382,12 @@ function GetSpreadsheet(allFiles, callback)													// RUN GDRIVE PICKER
 	{
 		Sound("ding");																		// Ding sound
 		$("#confirmBoxDiv").remove();														// Remove 
-		$("body").append("<div class='wm-confirm' id='confirmBoxDiv'></div>");														
-		var str="<img src='img/scalelogo.png' width='32' style='vertical-align:-10px'/>&nbsp;&nbsp;";								
-		str+="<span style='font-size:18px; color:#666'><b>"+title+"</b></span><br>";
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");														
+		var str="<img src='img/lizalogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
+		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
 		str+="<p>"+content+"<p>";
-		str+="<div style='float:right'><div id='confirmOK' class='wm-bs'>OK</div>";
-		str+="<div id='confirmCancel' class='wm-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
+		str+="<div style='float:right'><div id='confirmOK' class='lz-bs'>OK</div>";
+		str+="<div id='confirmCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
 		$("#confirmBoxDiv").html(str);	
 	
 		$("#confirmOK").on("click", function() {											// ON OK BUT
