@@ -12,6 +12,12 @@ class Voice {
 		this.listening=false;																			// Flag if listening
 		this.talkStartTime=0;																			// Time started talking
 		this.secsPerChar=.12*1000;																		// Mseconds per char
+		var s=this.phonemes=[];																			// Holds phoneme table
+	
+		s["/u/"]="ooh"
+		s["/ah/"]="aah"
+
+
 
 		try {																							// Try
 			this.femaleVoice=1;																			// Female voice
@@ -63,7 +69,19 @@ class Voice {
 		if (this.listening)	return;																		// Quit if already started
 		try { this.recognition.start(); this.listening=true; } catch(e) { trace("Voice error",e) };		// Start recognition
 		$("#talkBut").prop("src","img/intalkbut.png");													// Talking but
+	}
 
+	ReplacePhoneme(text)																			// REPLACE PHONETIC SYMBOL WITH SOUND
+	{
+		var i;
+		var s=this.phonemes;																			// Point at phoneme associative array																		
+//	text="Hello /u/ and /ah/"
+		if (!text)	return "";																			// Quit if no text
+		var v=text.match(/\/.*?\//g);																	// Get symbols
+		if (v.length)																					// If any
+			for (i=0;i<v.length;++i)																	// For each symbol found
+				text=","+text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),s[v[i]])+","; // Convert to sounds
+		return text;																					// Return converted text
 	}
 
 	Talk(text, who)																					// SAY SOMETHING
@@ -77,6 +95,7 @@ class Voice {
 			Bubble(text,5,x-100,80);																	// Show bubble
 			return;
 			}
+		text=this.ReplacePhoneme(text);																	// Replace phonemes with sounds
 		try{																							// Try
 			if ((who == undefined) && (app.curStudent >= 0)) who=app.students[app.curStudent].sex;		// Set sex based on current student
 			else if ((who == undefined) && (app.curStudent < 0)) who="choral";							// It's choral or group
