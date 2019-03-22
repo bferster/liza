@@ -124,7 +124,6 @@
 
 			$("[id^=psopt-]").on("click",(e)=> {  																// On line click
 				var id=e.target.id.substr(6);						 											// Get id
-				trace(o.id,app.arcs)
 				if (o.ds == app.as)			app.arcs[o.id].a=id; 												// If instructor action, set slot
 				else if (o.ds == app.rs)	app.arcs[o.id].r=id; 												// Student response											
 				else						app.arcs[o.id].c=id;												// Consequence
@@ -207,7 +206,8 @@ class App  {
 			for (i=0;i<this.arcs.length;++i)																// For each step
 				if ($("#strad-"+i).prop("checked"))															// If it's checked
 					break;																					// Stop looking
-			this.arcs.splice(i,0,{ a:-1, r:-1, c:-1, n:-1 });												// Add blank step
+			var a=i ? this.arcs[i-1].a : -1;																// Use instructor action from step above
+			this.arcs.splice(i,0,{ a:a, r:-1, c:-1, n:-1 });												// Add blank step
 			this.Draw();																					// Redraw
 			Sound("ding");																					// Ding
 			});
@@ -297,7 +297,6 @@ class App  {
 } // APP CLASS CLOSURE
 																					
 $("#copyBut").on("click", ()=> {  									// ON COPY
-				trace(123,result)
 				var textArea = document.createElement("textarea");
 				textArea.style.position = 'fixed';
 				textArea.style.top=textArea.style.left = 0;

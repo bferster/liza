@@ -49,7 +49,7 @@ class ARC  {
 					o.step=step;																		// Set step
 					o.slide=(v[4] && !isNaN(v[4])) ? v[4]-1 : "";										// Add slide if set
 					o.next=v[6] ? v[6] : "";															// Add next if set
-					_this.tree.push(o);																	// Add strep to tree
+					_this.tree.push(o);																	// Add step to tree
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
@@ -103,12 +103,19 @@ class ARC  {
 		
 		}
 
-
 	Add(event)																						// ADD EVENT TO RECORD
 	{
 		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
 		this.record.push(event);																		// Add to array																	
 		if ((event.o == "R") && (event.r != NONE))  this.resChain=event.r+this.resChain;				// If an actual response, add to top of response chain
+	}
+
+	GetArcIndex(goal) 																				// GET INDEX OF ARC FROM GOAL
+	{
+		var i;
+		for (i=0;i<this.tree.length;++i)																// For each step in tree
+			if (this.tree[i].goal == goal)	return i;													// Return if a match
+		return -1;																						// No match
 	}
 
 	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM STEP
@@ -286,6 +293,7 @@ class ARC  {
 	Parse(text, data, callback)																		// PARSE TEXT STRING
 	{
 		if (!text)	return;																				// Quit if no text
+		text=text.replace(/\{.*?\}/,"");																// Remove any braced text
 		app.gettingEntities=1;																			// Waiting for entities from AI
 		try {
 			if (!window.location.search.match(/noai/i))													// Unless turned off

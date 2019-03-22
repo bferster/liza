@@ -4,8 +4,9 @@
 
 class Scene {																				 
 
-	constructor(div)																				// CONSTRUCTOR
+	constructor(div)																			// CONSTRUCTOR
 	{
+		this.lastTime=0;																			// Used to throttle rendring
 		this.cartoonScene=window.location.search.match(/real/i) ? false : true;						// Render scene as cartoon?	   		
 		this.models=[];																				// Holds models
 		this.container=$("#"+div)[0];																// Div container														
@@ -191,7 +192,7 @@ class Scene {
 
 // POSES ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	SetPose(model, id, time)																	// SET A POSE FOR A MODEL
+	SetPose(model, id)																			// SET A POSE FOR A MODEL
 	{
 		var i;
 		var v=app.poses[id];																		// Get pose string
@@ -344,14 +345,18 @@ class Scene {
 	
 // ANIMATION ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Render() 																					// RENDER LOOP
+	Render() 																			// RENDER LOOP
 	{
-		app.sc.controls.update();																	// Update control time
-		requestAnimationFrame(app.sc.Render);														// Set timer
-		app.sc.AnimateScene();																		// Animate models
-		if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );				// Render outline
-		else					app.sc.renderer.render(app.sc.scene,app.sc.camera);					// Render scene
-		}
+		var now=new Date().getTime();																// Get current time in ms
+		if (now-app.sc.lastTime > 100)	{															// Don't go too fast
+			app.sc.controls.update();																// Update control time
+			app.sc.AnimateScene();																	// Animate models
+			if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );			// Render outline
+			else					app.sc.renderer.render(app.sc.scene,app.sc.camera);				// Render scene
+			app.sc.lastTime=now;																	// Then is now
+			}
+		requestAnimationFrame(app.sc.Render);														// Recurse
+	}
 
 	AnimateScene()																				// CALLED EVERY FRAME BY ANIMATE FUNCTION
 	{

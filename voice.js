@@ -13,12 +13,15 @@ class Voice {
 		this.talkStartTime=0;																			// Time started talking
 		this.secsPerChar=.12*1000;																		// Mseconds per char
 		var s=this.phonemes=[];																			// Holds phoneme table
-	
-		s["/u/"]="ooh"
-		s["/ah/"]="aah"
-
-
-
+		s["/b/"]="ba";	  s["/d/"]="da";    s["/f/"]="if";    s["/g/"]="ga";   s["/h/"]="hah";
+		s["/j/"]="jaw";	  s["/k/"]="kit";   s["/l/"]="lah";   s["/m/"]="um";  s["/n/"]="un "; 
+		s["/ng/"]="ing";  s["/p/"]="pa";   	s["/r/"]="err";   s["/s/"]="sis";  s["/t/"]="ta";	
+		s["/v/"]="vaah "; s["/w/"]="waugh"; s["/y/"]="ya";    s["/z/"]="za";  
+		s["/zh/"]="sh";   s["/ch/"]="cha";  s["/sh/"]="shh "; s["/th/"]="tha";
+		s["/a/"]="ah";	  s["/e/"]="uhh";	s["/i/"]="ish";	  s["/o/"]="aww";  s["/u/"]="uh";   s["/oo/"]="ooh "; 
+		s["/ā/"]="a";	  s["/ē/"]="e";		s["/ī/"]="i";     s["/ō/"]="o";    s["/ü/"]="u";
+		s["/oi/"]="oy";	  s["/ow/"]="ow";	s["/ә/"]="ir";
+		s["/ã/"]="air";   s["/ä/"]="are";   s["/û/"]="ure";   s["/ēә/"]="ear";	s["/üә/"]="your";	
 		try {																							// Try
 			this.femaleVoice=1;																			// Female voice
 			this.maleVoice=0;																			// Male voice
@@ -75,13 +78,12 @@ class Voice {
 	{
 		var i;
 		var s=this.phonemes;																			// Point at phoneme associative array																		
-//	text="Hello /u/ and /ah/"
 		if (!text)	return "";																			// Quit if no text
 		var v=text.match(/\/.*?\//g);																	// Get symbols
-		if (v.length)																					// If any
+		if (v && v.length)																				// If any
 			for (i=0;i<v.length;++i)																	// For each symbol found
-				text=","+text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),s[v[i]])+","; // Convert to sounds
-		return text;																					// Return converted text
+				text=text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),s[v[i]]); 	// Convert to sounds
+				return text;																					// Return converted text
 	}
 
 	Talk(text, who)																					// SAY SOMETHING
@@ -96,6 +98,7 @@ class Voice {
 			return;
 			}
 		text=this.ReplacePhoneme(text);																	// Replace phonemes with sounds
+		text=text.replace(/\{.*?\}/,"");																// Remove any braced text
 		try{																							// Try
 			if ((who == undefined) && (app.curStudent >= 0)) who=app.students[app.curStudent].sex;		// Set sex based on current student
 			else if ((who == undefined) && (app.curStudent < 0)) who="choral";							// It's choral or group
