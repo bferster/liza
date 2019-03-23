@@ -18,12 +18,12 @@
 		.lz-header { 		background-color: #bbb; width:100%; color:#fff;	padding: 8px 0px;
 							}
 		.lz-popSelect {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
-							padding:16px 0; border-radius: 0 0 12px 12px;
+							padding:16px 0;
 							}
-		.lz-map { 			width:calc(100% - 60px);  overflow:auto; padding:16px; background-color:#fff; height:300px;
-							border-radius: 12px; margin-left:16px; margin-top:16px; border: 1px solid #999
+		.lz-map { 			width:calc(100% - 60px);  overflow:auto; padding:16px; background-color:#fff; height:75vh;
+							border-radius: 12px; margin-left:16px; margin-top:16px; border: 1px solid #999;
 							}
-		.lz-popSelInner { 	width:calc(100% - 32px); height:calc(100% - 32px); overflow-y:auto; padding:16px;
+		.lz-popSelInner { 	width:100%; height:calc(100% - 16px); overflow-y:auto; 
 							}
 		.lz-bs {			cursor: pointer; color:#fff; 
 							text-align: center; border-radius: 16px; display: inline-block; user-select: none;
@@ -37,7 +37,7 @@
 							}
 
 		 table 		{		border-spacing: 0px;  }
-		 tr:hover 	{		background-color: #e7e7f5;}
+		 tr:hover 	{		font-weight:bold;  }
 
 	</style>
 
@@ -50,108 +50,106 @@
 			<span id='menuMsg' style='display:none;margin-left:32px'></span>
 			</div>
 		<div id='mapDiv' class='lz-map'></div>
-		<div id='addStep' class='lz-bs' style='margin-left:16px;margin-top:8px'>Add new step</div>
-		<div id='removeStep' class='lz-bs' style='margin-right:16px;margin-top:8px;float:right'>Remove step</div>
+		<div id='addStep' class='lz-bs' style='margin-left:16px;margin-top:8px'>Add new line</div>
+		<div id='removeStep' class='lz-bs' style='margin-right:16px;margin-top:8px;float:right'>Remove line</div>
 	</div>
 		
 <script>
 
 	if ((location.protocol != 'https:') && (window.location.host != "localhost")) location.href = 'https:' + window.location.href.substring(window.location.protocol.length); // FORCE HTTPS!
 
-	var app=null;
-	var result="";																	
-	
-	$(document).ready(function() {								           				// ON PAGE LOADED
-		var url=window.location.search.substring(1);						   			// Get query string
-		app=new App();																	// Alloc app
+	$(document).ready(function() {								           								// ON PAGE LOADED
+		app=new App();																						// Alloc app
 		app.Draw();
-		if (window.location.host != "localhost") {										// Not in debug
-			$("#splashDiv").fadeIn();													// Fade in splash page
-			$("#mainDiv").fadeIn(2000);													// Fade in main
+		if (window.location.host != "localhost") {															// Not in debug
+			$("#splashDiv").fadeIn();																		// Fade in splash page
+			$("#mainDiv").fadeIn(2000);																		// Fade in main
 			}
-		else	$("#mainDiv").fadeIn(0);												// Load fast
+		else	$("#mainDiv").fadeIn(0);																	// Load fast
 		});
 
-		function PopSelect(o)																				// POPUP SELECT
-		{
-			var i,col,s;
-			var trsty=";clear:both;height:22px;cursor:pointer;white-space:nowrap;overflow:visible'>";
-			$("#popSelectDiv").remove();																		// Remove if open
-			var str="<div id='popSelectDiv' class='lz-popSelect' style='";										// Header
-			str+="left:"+o.x+"px;top:"+o.y+"px;width:"+o.w+"px;height:"+o.h+"px'>";								// Position and size
-			str+="<span style='margin:16px;pa'><b>"+o.title+"</b><span>";											// Title
-			str+="<img src='img/closedot.gif' style='float:right;margin-right:10px;' onclick='$(\"#popSelectDiv\").remove()'><hr style='margin-top:10px'>";	// Title and closer
-			str+="<div id='popSelInDiv' class='lz-popSelInner'>";												// Scrollable div
-			for (i=0;i<o.opts.length;++i) {																		// For each option	
-				s=o.opts[i];																					// Get text
-				if (s.charAt(0) == '-')			s=s.substr(1),col="#880000";									// Wrong
-				else if (s.charAt(0) == '+')	s=s.substr(1),col="#006600";									// Right
-				else							col="#000000";													// Other
-				str+="<div id='psopt-"+i+"' style='color:"+col+trsty+s;											// Add div
-				str+="<img id='psdel-"+i+"'src='img/trashbut.gif' style='float:right;display:none'>";			// Add delete button 
-				str+="<img id='psedt-"+i+"'src='img/editbut.gif' style='float:right;display:none'></div>";		// Add edit button 
-				}
-			str+="<p><input type='text' placeholder='Type to add new item' class='lz-is' id='psadd'></p>";		// Add add button
-			str+="</div></div>";																				// End divs
-			$("body").append(str);																				// Add to body
-	
-			$("[id^=psdel-]").on("click",(e)=> {  																// Delete button
-				e.stopPropagation();																			// Don't propagate event			
-				var id=e.target.id.substr(6);						 											// Get id
-				ConfirmBox("Are you sure?", "This will permanently delete this item:<br><i>"+o.ds[id]+"</i>", ()=> {	// If sure
-					o.ds.splice(id,1); 																			// Remove it from array
-					o.opts.splice(id,1); 																		// Remove it from selector
-					PopSelect(o)																				// Recurse
-					Sound("ding");																				// Ding
-					});
-				});
+	function PopSelect(o)																				// POPUP SELECT
+	{
+		var i,col,s;
+		var trsty=";clear:both;min-height:22px;cursor:pointer;padding-bottom:12px'>";
+		$("#popSelectDiv").remove();																		// Remove if open
+		var str="<div id='popSelectDiv' class='lz-popSelect' style='";										// Header
+		str+="left:"+o.x+"px;top:"+o.y+"px;width:"+o.w+"px;height:"+o.h+"px'>";								// Position and size
+		str+="<span style='margin:16px;pa'><b>"+o.title+"</b><span>";										// Title
+		str+="<img src='img/closedot.gif' style='float:right;margin-right:10px;' onclick='$(\"#popSelectDiv\").remove()'><hr style='margin-top:10px'>";	// Title and closer
+		str+="<div id='popSelInDiv' class='lz-popSelInner'>";												// Scrollable div
+		for (i=0;i<o.opts.length;++i) {																		// For each option	
+			s=o.opts[i];																					// Get text
+			if (s.charAt(0) == '-')			s=s.substr(1),col="#880000";									// Wrong
+			else if (s.charAt(0) == '+')	s=s.substr(1),col="#006600";									// Right
+			else							col="#000000";													// Other
+			str+="<div id='psopt-"+i+"' style='margin-left:8px;color:"+col+trsty+s;							// Add div
+			str+="<img id='psdel-"+i+"'src='img/trashbut.gif' style='float:right;display:none'>";			// Add delete button 
+			str+="<img id='psedt-"+i+"'src='img/editbut.gif' style='float:right;display:none'></div>";		// Add edit button 
+			}
+		str+="<p style='margin-left:8px'><input type='text' placeholder='Type to add new item' class='lz-is' id='psadd'></p>";		// Add add button
+		str+="</div></div>";																				// End divs
+		$("body").append(str);																				// Add to body
 
-			$("[id^=psedt-]").on("click",(e)=> {  																// Edit button
-				e.stopPropagation();																			// Don't propagate event			
-				var id=e.target.id.substr(6);						 											// Get id
-				var s=$("#psopt-"+id).text();																	// Get value
-				if (s) s=s.replace(/'/g,"&apos;");																// No 's
-				$("#psopt-"+id).html("<input type='text' class='lz-is' style='height:20px;' value='"+s+"' id='psedit'>");	// Add editor
-				$("#psedit").on("click", (e)=>{ e.stopPropagation(); });										// Don't propagate event							
-				$("#psedit").on("change", ()=>{																	// On enter key hit
-					s=$("#psedit").val();																		// Get value
-					if (o.ds == app.as)	o.ds[id].text=s;													// Add action
-					else					o.ds[id]=s;															// Add response or consequence
-					o.opts[id]=s; 																				// Change local copy
-					PopSelect(o)																				// Recurse
-					});
+		$("[id^=psdel-]").on("click",(e)=> {  																// Delete button
+			e.stopPropagation();																			// Don't propagate event			
+			var id=e.target.id.substr(6);						 											// Get id
+			ConfirmBox("Are you sure?", "This will permanently delete this item:<br><i>"+o.ds[id]+"</i>", ()=> {	// If sure
+				o.ds.splice(id,1); 																			// Remove it from array
+				o.opts.splice(id,1); 																		// Remove it from selector
+				PopSelect(o);																				// Recurse
+				Sound("ding");																				// Ding
 				});
-
-			$("[id^=psopt-]").on("click",(e)=> {  																// On line click
-				var id=e.target.id.substr(6);						 											// Get id
-				if (o.ds == app.as)			app.arcs[o.id].a=id; 												// If instructor action, set slot
-				else if (o.ds == app.rs)	app.arcs[o.id].r=id; 												// Student response											
-				else						app.arcs[o.id].c=id;												// Consequence
-				app.Draw();																						// Redraw		
-				$("#popSelectDiv").remove();																	// Kill dialog
-				});
-
-			$("[id^=psopt-]").on("mouseover",(e)=> {  															// On over line
-				var id=e.target.id.substr(6);						 											// Get id
-				$("#psopt-"+id).css("background-color","#dee7f1");												// Color bar
-				$("#psedt-"+id).css("display","inline-block");													// Show edit icon
-				$("#psdel-"+id).css("display","inline-block");													// Show delete icon
-				});
-
-			$("[id^=psopt-]").on("mouseout",(e)=> {  															// Off line
-				var id=e.target.id.substr(6);						 											// Get id
-				$("#psopt-"+id).css("background-color","#eee");													// Restore bar
-				$("#psedt-"+id).css("display","none");															// Hide edit icon
-				$("#psdel-"+id).css("display","none");															// Hide delete icon
-				});
-
-			$("#psadd").on("change",(e)=> {  																	// On add click
-				var s=$("#psadd").val();																		// Get new item
-				o.opts.push(s);																					// Add new value
-				if (o.ds == app.as)		o.ds.push({ text:s })													// Add action
-				else					o.ds.push(s);															// Add response or consequence
-				PopSelect(o)																					// Recurse
 			});
+
+		$("[id^=psedt-]").on("click",(e)=> {  																// Edit button
+			e.stopPropagation();																			// Don't propagate event			
+			var id=e.target.id.substr(6);						 											// Get id
+			var s=$("#psopt-"+id).text();																	// Get value
+			if (s) s=s.replace(/'/g,"&apos;");																// No 's
+			$("#psopt-"+id).html("<input type='text' class='lz-is' style='height:20px;' value='"+s+"' id='psedit'>");	// Add editor
+			$("#psedit").on("click", (e)=>{ e.stopPropagation(); });										// Don't propagate event							
+			$("#psedit").on("change", ()=>{																	// On enter key hit
+				s=$("#psedit").val();																		// Get value
+				o.ds[id]=s;																					// Add item
+				o.opts[id]=s; 																				// Change local copy
+				PopSelect(o)																				// Recurse
+				});
+			});
+
+		$("[id^=psopt-]").on("click",(e)=> {  																// On line click
+			var id=e.target.id.substr(6);						 											// Get id
+			if (o.ds == app.as)			app.arcs[o.id].a=id; 												// If instructor action, set slot
+			else if (o.ds == app.rs)	app.arcs[o.id].r=id; 												// Student response											
+			else if (o.ds == app.gs)	app.arcs[o.id].g=id; 												// Goal											
+			else						app.arcs[o.id].c=id;												// Consequence
+			app.Draw();																						// Redraw		
+			$("#popSelectDiv").remove();																	// Kill dialog
+			});
+
+		$("[id^=psopt-]").on("mouseover",(e)=> {  															// On over line
+			var id=e.target.id.substr(6);						 											// Get id
+			$("#psopt-"+id).css("background-color","#dee7f1");												// Color bar
+			if (id > 0) {																					// Not first one
+				$("#psedt-"+id).css("display","inline-block");												// Show edit icon
+				$("#psdel-"+id).css("display","inline-block");												// Show delete icon
+				}
+			});
+
+		$("[id^=psopt-]").on("mouseout",(e)=> {  															// Off line
+			var id=e.target.id.substr(6);						 											// Get id
+			$("#psopt-"+id).css("background-color","#eee");													// Restore bar
+			$("#psedt-"+id).css("display","none");															// Hide edit icon
+			$("#psdel-"+id).css("display","none");															// Hide delete icon
+			});
+
+		$("#psadd").on("change",(e)=> {  																	// On add click
+			var s=$("#psadd").val();																		// Get new item
+			o.opts.push(s);																					// Add new value
+			if (o.ds == app.as)		o.ds.push({ text:s })													// Add action
+			else					o.ds.push(s);															// Add response or consequence
+			PopSelect(o)																					// Recurse
+		});
 
 	}
 
@@ -159,55 +157,31 @@
 // APP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+var app=null;
+
 class App  {																
 
-	constructor(id)   															// CONSTRUCTOR
+	constructor(id)   																					// CONSTRUCTOR
 	{
 		app=this;
-		this.undos=[];																// Holds undos
-		this.curUndo=0;																// Undo counter
-		this.arcs=[];
-		this.as=[];
-		this.cs=[];
-		this.rs=[];
+		this.undos=[];																						// Holds undos
+		this.curUndo=0;																						// Undo counter
+		this.arcs=[]; this.as=[];  this.cs=[];	this.rs=[];	 this.gs=[];									// Data
+		this.gid="1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU";											// Default  spreadsheet
+		var url=window.location.search.substring(1);						   								// Get query string
+		if (url) {																							// If params
+			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);									// If params have a 'gid=' tag, use it
+			else					this.gid=url;															// Default spreadsheet
+			}
+		this.Load(this.gid);																				// Load it
 
-		this.as.push({ text:"Q:What is 2 + 2", c:"addition" });
-		this.as.push({ text:"Q:What is 3 + 3", c:"addition" });
-		this.as.push({ text:"Q:What is 4 + 4", c:"addition" });
-
-		this.as.push({ text:"A:Do you agree", c:"last" });
-		this.as.push({ text:"P:Are you sure?", c:"last" });
-		this.as.push({ text:"P:Tell me more?", m:"pump", c:"last" });
-		this.as.push({ text:"P:Elaborate", c:"last" });
-		this.as.push({ text:"W:Tell me why", c:"last" });
-		this.as.push({ text:"Q:Know the answer", c:"last" });
-
-		this.rs.push("-I'm not sure");
-		this.rs.push("-I have have no idea");
-		this.rs.push("+The answer is 4");
-		this.rs.push("-I think the answer is 22");
-		this.rs.push("+The answer is most assuredly 6");
-		this.rs.push("-Would you believe 5?");
-		this.rs.push("+The answer is 8");
-		this.rs.push("-The answer might be 44");
-		this.rs.push("-Less than half agree");
-		this.rs.push("+More than half agree");
-
-		this.cs.push("Good");
-		this.cs.push("OK, but...");
-		this.cs.push("Anyone else know?");
-		this.cs.push("You're adding the digits, not the numbers together");
-
-		this.arcs.push({ a:0, r:0, c:2, f:0 })
-		this.arcs.push({ a:1, r:4, c:0, f:0 })
-	
 		$("#addStep").on("click",(e)=> {  																	// ON ADD STEP
 			var i;
 			for (i=0;i<this.arcs.length;++i)																// For each step
 				if ($("#strad-"+i).prop("checked"))															// If it's checked
 					break;																					// Stop looking
 			var a=i ? this.arcs[i-1].a : -1;																// Use instructor action from step above
-			this.arcs.splice(i,0,{ a:a, r:-1, c:-1, n:-1 });												// Add blank step
+			this.arcs.splice(i,0,{ a:a, r:-1, c:-1, n:-1, f:-1 });											// Add blank step
 			this.Draw();																					// Redraw
 			Sound("ding");																					// Ding
 			});
@@ -227,55 +201,130 @@ class App  {
 			});
 	}
 
+	InitDefaults()																						// SET DEFAULT OPTIONS
+	{
+		this.arcs=[];  this.as=[];   this.cs=[];   this.rs=[];	this.gs=[];									// Reset data
+		this.as.push("");
+		this.as.push("A:Do you agree");
+		this.as.push("P:Are you sure?");
+		this.as.push("P:Tell me more?");
+		this.as.push("P:Elaborate");
+		this.as.push("W:Tell me why");
+		this.as.push("Q:Know the answer");
+		this.rs.push("");
+		this.rs.push("-I'm not sure");
+		this.rs.push("-I have have no idea");
+		this.rs.push("-Less than half agree");
+		this.rs.push("+More than half agree");
+		this.cs.push("");
+		this.cs.push("Good");
+		this.cs.push("OK, but...");
+		this.cs.push("Anyone else know?");
+	}
+
 	Draw()																								// DRAW
 	{
-		var i,o,a,r,c;
+		var i,o,a,r,c,g;
 		var rcol;
 		var w=$("#mapDiv").width();
-		var str="<table style='width:100%'><tr><td style='width:50%'><b>Instructor says</b></td>";
-		str+="<td style='width:25%'><b>Student responds</td></b></td>";
+		var h=$("#mapDiv").height();
+		var str="<table style='width:100%'><tr><td style='width:"+(w*.45-22)+"px'><b>Instructor says</b></td>";
+		str+="<td style='width:5%'><b>Goal</td></b></td>";
+		str+="<td style='width:"+(w*.25-12)+"px'><b>Student responds</td></b></td>";
 		str+="<td style='width:25%'><b>Consequence</b></td></b></td><td>";
-		str+="<tr><td colspan='4'><hr></td><td style='width:16px'></td></tr>";
+		str+="<tr><td style='background-color:#fff' colspan='5'><hr></td></tr>";
+		str+="</table><div style='height:calc(100% - 40px);overflow-y:auto'><table style='width:100%'>";
 		for (i=0;i<this.arcs.length;++i) {
 			o=this.arcs[i]
-			a=(o.a < 0) ? "<i>Choose</i>" : this.as[o.a].text;												// Set text for instructor option
-			r=(o.r < 0) ? "<i>Choose</i>" : this.rs[o.r];													// Response
-			c=(o.c < 0) ? "<i>Choose</i>" : this.cs[o.c];													// Consequence
-			if (r.charAt(0) == '-')			r=r.substr(1),rcol="#880000";									// Wrong
-			else if (r.charAt(0) == '+')	r=r.substr(1),rcol="#006600";									// Right
-			else							rcol="#000000";													// Other
-			str+="<tr><td id='stpa-"+i+"'>"+(i+1)+". "+a+"</td><td id='stpr-"+i+"' style='color:"+rcol+"'>"+r+"</td><td id='stpc-"+i+"'>"+c;	// Fill step
-			str+="</td><td><input id='strad-"+i+"' name='stradgrp' type='radio'></td></tr>";
+			a=(o.a < 0) ? "<i>Choose</i>" : this.as[o.a];													// Set text for instructor option
+			r=(o.r < 0) ? "" : this.rs[o.r];																// Response
+			c=(o.c < 0) ? "" : this.cs[o.c];																// Consequence
+			g=(o.g < 0) ? "" : this.gs[o.g];																// Goal
+			if (i && (o.a == this.arcs[i-1].a)) 	a=this.as[0];											// Ditto
+			if (i && (o.g == this.arcs[i-1].g)) 	g="";													// Don't repeat last
+			if (r.charAt(0) == '-')					r=r.substr(1),rcol="#880000";							// Wrong
+			else if (r.charAt(0) == '+')			r=r.substr(1),rcol="#006600";							// Right
+			else									rcol="#000000";											// Other
+			str+="<tr><td style='padding:8px 0;width:45%' id='stpa-"+i+"'>"+(i+1)+". "+a+"</td><td style='width:5%'";		// Instructor action
+			str+=(o.a > 0) ? " id='stpg-"+i+"'>"+g : ">";													// Add goal if a new step
+			str+="</td><td id='stpr-"+i+"' style='width:25%;color:"+rcol+"'>"+r+"</td><td style='width:25%' id='stpc-"+i+"'>"+c;		// Response / consequence
+			str+="</td><td><input id='strad-"+i+"' name='stradgrp' type='radio'></td></tr>";				// Add radio button
 			}
-		str+="</table>"
+		str+="</table></div>";
 		$("#mapDiv").html(str);																				// Add to div	
+		$("tr:odd").css({   "background-color":"#f0f0f0"});
 		
 		$("[id^=stpa-]").on("click",(e)=> {  																// On A click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
-			var o={ x:16, y:49, h:500, w:w/2-16, opts:[], title:"Choose Intructor Action", ds:this.as, id:id };		// Settings
-			for (i=0;i<this.as.length;++i)	o.opts.push(this.as[i].text);									// Add options
+			var o={ x:16, y:49, h:h, w:w*.45-16, opts:[], title:"Choose Intructor Action", ds:this.as, id:id };	// Settings
+			for (i=0;i<this.as.length;++i)	o.opts.push(this.as[i]);										// Add options
 			PopSelect(o)																					// Pick new item
+			});
+
+		$("[id^=stpg-]").on("click",(e)=> {  																// On C click
+			var id=(e.currentTarget.id.substr(5));						 									// Get index
+			var o={ x:w*.45, y:49, h:h, w:w*.1-16, opts:[], title:"Goal", ds:this.gs, id:id };				// Settings
+			for (i=0;i<this.gs.length;++i)	o.opts.push(this.gs[i]);										// Add options
+			PopSelect(o);																					// Pick new item
 			});
 
 		$("[id^=stpr-]").on("click",(e)=> {  																// On R click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
-			var o={ x:w/2, y:49, h:500, w:w/4-16, opts:[], title:"Choose Student Response", ds:this.rs, id:id };	// Settings
+			var o={ x:w*.5, y:49, h:h, w:w/4-16, opts:[], title:"Choose Student Response", ds:this.rs, id:id };	// Settings
 			for (i=0;i<this.rs.length;++i)	o.opts.push(this.rs[i]);										// Add options
 			PopSelect(o);																					// Pick new item
 			});
 		
 		$("[id^=stpc-]").on("click",(e)=> {  																// On C click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
-			var o={ x:w*.75, y:49, h:500, w:w/4-16, opts:[], title:"Choose Consequence", ds:this.cs, id:id };		// Settings
+			var o={ x:w*.75-16, y:49, h:h, w:w/4-16, opts:[], title:"Choose Consequence", ds:this.cs, id:id };	// Settings
 			for (i=0;i<this.cs.length;++i)	o.opts.push(this.cs[i]);										// Add options
 			PopSelect(o);																					// Pick new item
 			});
+
 		}
 
+	Load(id) 																							// LOAD DOC FROM GOOGLE DRIVE
+	{
+		var _this=this;																						// Save context
+		var str="https://docs.google.com/spreadsheets/d/"+id+"/export?format=tsv";							// Acces
+		var xhr=new XMLHttpRequest();																		// Ajax
+		xhr.open("GET",str);																				// Set open url
+		xhr.send();																							// Do it
 
+		xhr.onload=function() { 																			// When loaded
+			var i,v,line,str;
+			_this.InitDefaults();																			// Set default items
+			var tsv=xhr.responseText.replace(/\r/g,"");														// Remove CRs
+			tsv=tsv.split("\n");																			// Split into lines
+			for (i=1;i<tsv.length;++i) {																	// For each line
+				v=tsv[i].split("\t");																		// Split into fields
+				if (v[1].match(/ov/i))  		_this.overview=v[3].trim();									// Overview
+				else if (v[1].match(/^Q|W|A|I|S|C|P/)) {													// New step
+					line=({ a:-1, r:-1, c:-1, g: -1 });														// Blank line
+					if (v[0] && isNaN(v[0])) _this.gs.push(v[0].trim());									// If a goal set, add to goals
+					str=v[1].charAt(0)+":"+v[3].trim();														// Add text
+					if (v[4] && !isNaN(v[4]))	str+=" {S"+v[4].trim()+"}";									// Add slide if set
+					_this.as.push(str);																		// Add to actions					
+					_this.arcs.push({ a:_this.as.length-1, r:-1, c:-1, g: _this.gs.length-1 });				// Add line
+					}
+				else if (v[1].match(/^R/i)) { 																// Response
+					_this.rs.push(v[1].substr(1)+v[3].trim());												// Add response
+					_this.cs.push(v[5].trim());																// Add Consequence
+					_this.arcs.push({ a:_this.as.length-1, r:_this.rs.length-1, c:_this.cs.length-1, g: _this.gs.length-1 });	// Add line
+					}
+			}
+		_this.Draw();																						// Draw
+		};									
 
-
-
+		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
+			if ((xhr.readyState === 4) && (xhr.status !== 200)) {  										// Ready, but no load
+				Sound("delete");																		// Delete sound
+				PopUp("<p style='color:#990000'><b>Couldn't load Google Doc!</b></p>Make sure that <i>anyone</i><br>can view it in Google",5000); // Popup warning
+				}
+			};		
+		
+		}
 
 
 	Do()																		// DO

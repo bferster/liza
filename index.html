@@ -195,29 +195,11 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				app.tim.Init(true);
+				GetTextBox("Type text to speak","","",(s)=>{ app.voice.Talk(s) });
+				}
 
-				/*				var ability=.5;
-				var count=0;
-
-				var r=Math.random();																// Get random number
-				if (r/ability < .2)		so=[[1,0,0]];												// If really low, force a none response
-				else {																				// Calc starting matrix
-					r=Math.max(Math.min(ability+((r-.5)*(1+ability)),1),0); 						// Calc chance of right answer capped 0-1
-					so=[[0,r,1-r]];																	// Set starting matrix
-					}
-//                             N                 R                W									// Heading
-				var tm=[ [0.0, .40, .60], [0.0, .55, .45], [0.0, .46, .54] ];						// Markov transition matrix
-		
-				TraceMatrix(so);
-				for (i=0;i<4;++i) {
-					so=MatrixMultiply(so,tm)
-					TraceMatrix(so); 
-					} 
-				*/
-			}
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
-				app.voice.Talk("");																	// Enable audio
+				GetTextBox("Type text to speak","","",(s)=>{ app.voice.Talk(s) });
 			else if ((e.which == 71) && e.altKey) {													// Show spreadsheet (Alt+G)
 				window.open("https://docs.google.com/spreadsheets/d/"+app.gid,"_blank");			// Show it	
 				}
@@ -489,28 +471,19 @@ class App  {
 
 	function GetTextBox(title, content, def, callback)											// GET TEXT LINE BOX
 	{
-		$("#alertBoxDiv").remove();																	// Remove any old ones
-		$("body").append("<div id='alertBoxDiv'></div>");														
-		var str="<p><img src='lizalogo.png' width='32' style='vertical-align:-10px'/>&nbsp;&nbsp;";								
-		str+="<span id='gtBoxTi'style='font-size:18px'><b>"+title+"</b></span><p>";
-		str+="<div style='font-size:12px;margin:14px'>"+content;
+		$("#confirmBoxDiv").remove();																	// Remove 
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");														
+		var str="<img src='img/lizalogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
+		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
+		str+="<p>"+content+"<p>";
 		str+="<p><input class='lz-is' style='width:75%' type='text' id='gtBoxTt' value='"+def+"'></p>";
 		str+="<div id='dialogOK' class='lz-bs'>OK</div>";
 		str+="<div id='dialogCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
-		$("#alertBoxDiv").append(str);	
-		$("#alertBoxDiv").dialog({ width:400 });	
-		$("#alertBoxDiv").dialog("option","position",{ my:"center", at:"center" });
-		$("#alertBoxDiv").css({ border:"1px solid #999","border-radius":"6px"});
-
-		$("#dialogOK").on("click", function() {														// ON OK BUT
-					callback($("#gtBoxTt").val());
-					$("#alertBoxDiv").remove();  
-				});
-
-		$("#dialogCancel").on("click", function() {													// ON CANCEL BUT
-				$("#alertBoxDiv").remove();															// Remove 
-				});
-
+		$("#confirmBoxDiv").html(str);																	// Add to div
+		$("#gtBoxTt").focus();																			// Focus on button
+		$("#gtBoxTt").on("change", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ONE ENTER
+		$("#dialogOK").on("click", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ON OK 
+		$("#dialogCancel").on("click", function() {	$("#confirmBoxDiv").remove(); });								// ON CANCEL
 		}
 
 	function ConfirmBox(title, content, callback, callback2)										// CONFIRMATION BOX
