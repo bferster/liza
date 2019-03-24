@@ -469,10 +469,11 @@ class App  {
 			$("#dialogDiv").dialog("option","position",{ my:"center", at:"center", of:this.parent });
 	}
 
-	function GetTextBox(title, content, def, callback)											// GET TEXT LINE BOX
+	function GetTextBox(title, content, def, callback, x, y)										// GET TEXT LINE BOX
 	{
 		$("#confirmBoxDiv").remove();																	// Remove 
-		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");														
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add box								
+		if (x != undefined)		$("#confirmBoxDiv").css({ left:x+"px", top:y+"px" });					// Position if set
 		var str="<img src='img/lizalogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
 		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
 		str+="<p>"+content+"<p>";
