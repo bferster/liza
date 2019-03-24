@@ -20,6 +20,9 @@
 		.lz-popSelect {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							padding:16px 0;
 							}
+		.lz-help {			position: absolute; top:76px; left:16px; background-color: #eee; border: 1px solid #aaa;
+							padding:16px; border-radius: 16px; width: 600px;
+							}
 		.lz-map { 			width:calc(100% - 32px);  overflow:auto; padding:16px; background-color:#fff; height:calc(100vh - 150px);
 						}
 		.lz-popSelInner { 	width:100%; height:calc(100% - 16px); overflow-y:auto; 
@@ -52,9 +55,10 @@
 				<span id='loadBut' style='margin-right:24px;cursor:pointer'>Load</span>
 				<span id='saveBut' style='margin-right:24px;cursor:pointer'>Save</span>
 				<span id='previewBut' style='margin-right:24px;cursor:pointer'>Preview</span>
-				<span id='otherBut' style='cursor:pointer'>Other</span>
+				<span id='otherBut' style='margin-right:16px;cursor:pointer'>Other</span>
+				<img  id='helpBut' src='img/helpicon.gif' style='cursor:pointer;vertical-align:-6px'>
 			</div>
-			<hr>
+			<div style='width:100%;height:1px;background-color:#fff;margin:8px 0'></div>
 			<span style='position:absolute;left:18px'><b>Instructor says</b></span>
 			<span style='position:absolute;left:calc(45% - 20px)'><b>Goal</b></span>
 			<span style='position:absolute;left:calc(50% - 20px)'><b>Student responds</b></span>
@@ -195,8 +199,11 @@ class App  {
 				if ($("#strad-"+i).prop("checked"))															// If it's checked
 					break;																					// Stop looking
 			var a=i ? this.arcs[i-1].a : -1;																// Use instructor action from step above
-			this.arcs.splice(i,0,{ a:a, r:-1, c:-1, n:-1, f:-1 });											// Add blank step
+			var g=i ? this.arcs[i-1].g : "";																// Use goal from step above
+			this.arcs.splice(i,0,{ a:a, r:-1, c:-1, g:g });													// Add blank step
 			this.Draw();																					// Redraw
+			$("#stpl-"+i).css("background-color","#d7ebff");												// Color it to see it bettter
+			$("#mapDiv").scrollTop($("#stpl-"+i).position().top+$("#mapDiv").scrollTop()-100);				// Scroll there			
 			Sound("ding");																					// Ding
 			});
 
@@ -226,7 +233,19 @@ class App  {
 		$("#previewBut").on("click",(e)=> {  																// ON PREVIEW
 			window.open("index.html?"+this.gid,"LizaPreview");												// Open tab
 			});
-
+				
+		$("#helpBut").on("click", ()=>{ 																	// ON HELP
+			var h=$("#mapDiv").height();
+			var t=$("#mapDiv").height();
+			var str="<div id='helpDiv' class='lz-help' style='height:"+h+"px;overflow:hidden;display:none;left:calc(100vw - 654px)'>";
+			str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
+			str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
+			str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vQ8Xsudi9JzKFnArsPPkRd0xRAUc2VAH75E2h1j3t-8rI_iOvAnpOUCcCvEWKKNuigueXKH7g8MDK_A/pub?embedded=true' ";
+			str+="style='border: 1px solid #999;width:100%;height:"+(h-50)+"px' scrolling='yes'></iframe></div>";
+			$("body").append(str);																			// Add to body
+			$("#helpDiv").show("slide",{ direction:"up" });													// Slide down
+			$("#helpDiv").draggable();																		// Make it draggable on desktop
+			});
 	}
 
 	InitDefaults()																						// SET DEFAULT OPTIONS
@@ -256,9 +275,9 @@ class App  {
 		var rcol;
 		var w=$("#mapDiv").width();
 		var h=$("#mapDiv").height();
-		var str="<table style='width:100%'>";
-		for (i=0;i<this.arcs.length;++i) {
-			o=this.arcs[i]
+		var str="<table id='itemTable' style='width:100%'>";
+		for (i=0;i<this.arcs.length;++i) {																	// For each line
+			o=this.arcs[i];																					// Point at line
 			a=(o.a < 0) ? "<i>Choose</i>" : this.as[o.a];													// Set text for instructor option
 			r=(o.r < 0) ? "" : this.rs[o.r];																// Response
 			c=(o.c < 0) ? "" : this.cs[o.c];																// Consequence
@@ -283,28 +302,30 @@ class App  {
 			$("#stpl-"+id).css("background-color",id%2 ? "#f0f0f0" : "#ffffff");							// Restore striping
 			});
 		
-		$("[id^=stpa-]").on("click",(e)=> {  																// On A click
+		$("[id^=stpa-]").on("click",(e)=> {  																// On instrucor action click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
 			var o={ x:0, y:66, h:h, w:w*.45-16, opts:[], title:"Choose action", ds:this.as, id:id };		// Settings
 			for (i=0;i<this.as.length;++i)	o.opts.push(this.as[i]);										// Add options
 			PopSelect(o)																					// Pick new item
 			});
 
-		$("[id^=stpg-]").on("click",(e)=> {  																// On C click
+		$("[id^=stpg-]").on("click",(e)=> {  																// On goal click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
 			GetTextBox("Type new goal","This is a way to identify topics within your session", this.arcs[id].g, // Ask for new goal
 				(s)=> {	this.Do();	this.arcs[id].g=s;  this.Draw(); }, e.pageX, e.pageY);					// Set new goal
 			});
 
-		$("[id^=stpr-]").on("click",(e)=> {  																// On R click
+		$("[id^=stpr-]").on("click",(e)=> {  																// On response click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
+			if ((id == 0) || (this.arcs[id].a != this.arcs[id-1].a)) return;								// No reponses on action line
 			var o={ x:w*.5-16, y:66, h:h, w:w/4-16, opts:[], title:"Choose response", ds:this.rs, id:id };	// Settings
 			for (i=0;i<this.rs.length;++i)	o.opts.push(this.rs[i]);										// Add options
 			PopSelect(o);																					// Pick new item
 			});
 		
-		$("[id^=stpc-]").on("click",(e)=> {  																// On C click
+		$("[id^=stpc-]").on("click",(e)=> {  																// On consequence click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
+			if ((id == 0) || (this.arcs[id].a != this.arcs[id-1].a)) return;								// No consequences on action line
 			var o={ x:w*.75-32, y:66, h:h, w:w/4-16, opts:[], title:"Choose consequence", ds:this.cs, id:id };	// Settings
 			for (i=0;i<this.cs.length;++i)	o.opts.push(this.cs[i]);										// Add options
 			PopSelect(o);																					// Pick new item
