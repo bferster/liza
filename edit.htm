@@ -27,6 +27,10 @@
 						}
 		.lz-popSelInner { 	width:100%; height:calc(100% - 16px); overflow-y:auto; 
 							}
+		.lz-popup {			position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top: calc(50% - 50px);
+							border-radius: 8px; background-color: #eee; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
+							font-size: 14px; text-align:center; display: none;
+							}
 		.lz-bs {			cursor: pointer; color:#fff; 
 							text-align: center; border-radius: 16px; display: inline-block; user-select: none;
 							font-size: 12px; background-color: #27ae60; padding: 2px 8px 2px 8px; vertical-align:3px;
@@ -149,6 +153,8 @@
 				o.ds[id]=s;																					// Add item
 				o.opts[id]=s; 																				// Change local copy
 				PopSelect(o)																				// Recurse
+				$("#popSelInDiv").scrollTop($("#psopt-"+id).offset().top-200);								// Scroll to default		
+				$("#psopt-"+id).css("background-color","#f8dede");											// Color bar
 				});
 			});
 
@@ -219,9 +225,9 @@ class App  {
 			for (i=0;i<this.arcs.length;++i)																// For each step
 				if ($("#strad-"+i).prop("checked"))															// If it's checked
 					break;																					// Stop looking
-			var a=i ? this.arcs[i-1].a : -1;																// Use instructor action from step above
+			var a=i ? this.arcs[i-1].a : "";																// Use instructor action from step above
 			var g=i ? this.arcs[i-1].g : "";																// Use goal from step above
-			this.arcs.splice(i,0,{ a:a, r:-1, c:-1, g:g });													// Add blank step
+			this.arcs.splice(i,0,{ a:a, r:"", c:"", g:g });													// Add blank step
 			this.Draw();																					// Redraw
 			$("#stpl-"+i).css("background-color","#d7ebff");												// Color it to see it bettter
 			$("#mapDiv").scrollTop($("#stpl-"+i).position().top+$("#mapDiv").scrollTop()-100);				// Scroll there			
@@ -380,6 +386,7 @@ class App  {
 			tsv=tsv.split("\n");																			// Split into lines
 			for (i=1;i<tsv.length;++i) {																	// For each line
 				v=tsv[i].split("\t");																		// Split into fields
+				if (v.length < 4)	continue;																// Not enough fields
 				if (v[1].match(/over/i))  _this.overview=v[3].trim();										// Overview
 				else if (v[1].match(/pic/i)) _this.ps.push(v[2].trim()+"|"+v[3].trim());					// Pics
 				else if (v[1].match(/^Q|W|A|I|S|C|P/)) {													// New step
@@ -396,41 +403,28 @@ class App  {
 					_this.arcs.push({ a:_this.as[_this.as.length-1], r:_this.rs[_this.rs.length-1], c:_this.cs[_this.cs.length-1], g:goal });	// Add line
 					}
 			}
-//		_this.RemoveDuplicates(_this.as);																	// Remove duplicate actions
-//		_this.RemoveDuplicates(_this.rs);																	// Responses
-//		_this.RemoveDuplicates(_this.cs);																	// Consequences
-//		_this.RemoveDuplicates(_this.ps);																	// Pictures
+		removeDuplicates(_this.as);																			// Remove duplicate actions
+		removeDuplicates(_this.rs);																			// Responses
+		removeDuplicates(_this.cs);																			// Consequences
+		removeDuplicates(_this.ps);																			// Pictures
 		_this.Draw();																						// Draw
-		};									
+	
+		function removeDuplicates(items) {																	// REMOVE DUPLICATE ENTRIES IN ITEM LISTS
+			var i,j;
+			for (i=0;i<items.length;++i) 																	// For each item in list
+				for (j=i+1;j<items.length;++j) 																// For each remaining item															
+					if (items[i] == items[j]) 																// A duplicate
+						items.splice(j,1);																	// Remove it
+			}
 
+		}								
+		
 		xhr.onreadystatechange=function(e) { 																// ON AJAX STATE CHANGE
 			if ((xhr.readyState === 4) && (xhr.status !== 200)) {  											// Ready, but no load
 				Sound("delete");																			// Delete sound
 				PopUp("<p style='color:#990000'><b>Couldn't load Google Doc!</b></p>Make sure that <i>anyone</i><br>can view it in Google",5000); // Popup warning
 				}
 			};		
-		
-		}
-
-	RemoveDuplicates(items)																				// REMOVE DUPLICATE ENTRIES IN ITEM LISTS
-	{
-		var i,j,k;
-		var dels=[];
-		for (i=0;i<items.length;++i) {																		// For each item in list
-			for (j=i+1;j<items.length;++j) {																// For each remaining item															
-				if (items[i] == items[j]) {																	// A duplicate
-					for (k=0;k<this.arcs.length;++k) {														// Look through lines
-						if ((items == this.as) && (this.arcs[k].a == j))	this.arcs[k].a=i;				// If an instructor match, use original index															
-						if ((items == this.rs) && (this.arcs[k].r == j))	this.arcs[k].r=i;				// If an response match, use original index															
-						if ((items == this.cs) && (this.arcs[k].c == j))	this.arcs[k].c=i;				// If an consequence match, use original index															
-						if ((items == this.ps) && (this.arcs[k].p == j))	this.arcs[k].p=i;				// If an pix match, use original index															
-						}
-					dels.push(j);																			// Add to delete list
-					}
-				}
-			}
-		trace(dels)
-		for (i=dels.length-1;i>=0;--i) 	items.splice(dels[i],1);											// Delete each item backwards
 	}
 
 	Do()																		// DO
@@ -635,7 +629,7 @@ function GetSpreadsheet(allFiles, callback)													// RUN GDRIVE PICKER
 	{
 		var str="";
 		$("#popupDiv").remove();												// Kill old one, if any
-		str+="<div id='popupDiv' class='wm-popup'>"; 							// Add div
+		str+="<div id='popupDiv' class='lz-popup'>"; 							// Add div
 		if (time == -1) {														// If has close but
 			time=100000;														// Increase time
 			str+="<img id='pu-close' src='img/closedot.gif' style='float:right;cursor:pointer'>";	// Add close button
