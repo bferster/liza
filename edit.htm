@@ -18,7 +18,7 @@
 		.lz-header { 		background-color: #bbb; width:100%; padding: 8px 0; color:#fff;
 							}
 		.lz-popSelect {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
-							padding:16px 0;
+							box-shadow: 2px 2px 8px 2px #aaa;
 							}
 		.lz-help {			position: absolute; top:76px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							padding:16px; border-radius: 16px; width: 600px;
@@ -49,7 +49,7 @@
 <body>
 
 	<div id='mainDiv' class='lz-main'>
-		<div id='headerDiv' class='lz-header'>
+		<div id='headerDiv' class='lz-header' onclick='$("#popSelectDiv").remove()'>
 			<img src='img/lizalogo64.png' style='margin:0 12px 0 20px;height:18px;vertical-align:-4px'><b>Session Editor</b>
 			<div style='margin-right:16px;color:#000;float:right'>
 				<span id='loadBut' style='margin-right:24px;cursor:pointer'>Load</span>
@@ -80,6 +80,16 @@
 			$("#mainDiv").fadeIn(2000);																		// Fade in main
 			}
 		else	$("#mainDiv").fadeIn(0);																	// Load fast
+
+		$(window).on("keydown",function(e) {																// HANDLE KEYPRESS
+			if ((e.which == 84) && e.altKey && e.ctrlKey) {													// Test key (Ctrl+Alt+T)
+				}
+			else if ((e.which == 71) && e.altKey) {															// Show spreadsheet (Alt+G)
+				window.open("https://docs.google.com/spreadsheets/d/"+app.gid,"_blank");					// Show it	
+				}
+			});
+
+		$(window).resize(function() {  if (app) app.Draw();	});                                     		// ON WINDOW RESIZE
 		});
 
 	function PopSelect(o)																				// POPUP SELECT
@@ -89,13 +99,12 @@
 		$("#popSelectDiv").remove();																		// Remove if open
 		var str="<div id='popSelectDiv' class='lz-popSelect' style='";										// Header
 		str+="left:"+o.x+"px;top:"+o.y+"px;width:"+o.w+"px;height:"+o.h+"px'>";								// Position and size
-		str+="<span style='margin:16px;pa'><b>"+o.title+"</b><span>";										// Title
-		str+="<img src='img/closedot.gif' style='float:right;margin-right:10px;' onclick='$(\"#popSelectDiv\").remove()'><hr style='margin-top:10px'>";	// Title and closer
+		str+="<img src='img/closedot.gif' style='float:right;margin-right:1px' onclick='$(\"#popSelectDiv\").remove()'>";	// Closer
 		str+="<div id='popSelInDiv' class='lz-popSelInner'>";												// Scrollable div
 		for (i=0;i<o.opts.length;++i) {																		// For each option	
 			s=o.opts[i];																					// Get text
-			if (s.charAt(0) == '-')			s=s.substr(1),col="#880000";									// Wrong
-			else if (s.charAt(0) == '+')	s=s.substr(1),col="#006600";									// Right
+			if (s.charAt(0) == '-')			scol="#880000";													// Wrong
+			else if (s.charAt(0) == '+')	col="#006600";													// Right
 			else							col="#000000";													// Other
 			str+="<div id='psopt-"+i+"' style='margin-left:8px;color:"+col+trsty+s;							// Add div
 			str+="<img id='psdel-"+i+"'src='img/trashbut.gif' style='float:right;display:none'>";			// Add delete button 
@@ -104,6 +113,15 @@
 		str+="<p style='margin-left:8px'><input type='text' placeholder='Type to add new item' class='lz-is' id='psadd'></p>";		// Add add button
 		str+="</div></div>";																				// End divs
 		$("body").append(str);																				// Add to body
+
+		if (o.def) {																						// If a default set
+			for (i=0;i<o.opts.length;++i) 																	// For each option	
+				if (o.opts[i] == o.def) {																	// Matches
+					$("#popSelInDiv").scrollTop($("#psopt-"+i).offset().top-200);							// Scroll to default		
+					$("#psopt-"+i).css("background-color","#f8dede");										// Color bar
+					break;																					// Quit looking
+					}	
+			}
 
 		$("[id^=psdel-]").on("click",(e)=> {  																// Delete button
 			e.stopPropagation();																			// Don't propagate event			
@@ -120,10 +138,11 @@
 		$("[id^=psedt-]").on("click",(e)=> {  																// Edit button
 			e.stopPropagation();																			// Don't propagate event			
 			var id=e.target.id.substr(6);						 											// Get id
-			var s=$("#psopt-"+id).text();																	// Get value
+			var s=$("#psopt-"+id).text().trim();															// Get value
 			if (s) s=s.replace(/'/g,"&apos;");																// No 's
 			$("#psopt-"+id).html("<input type='text' class='lz-is' style='height:20px;' value='"+s+"' id='psedit'>");	// Add editor
 			$("#psedit").on("click", (e)=>{ e.stopPropagation(); });										// Don't propagate event							
+			$("#psedit").focus();																			// Set focus
 			$("#psedit").on("change", ()=>{																	// On enter key hit
 				app.Do();																					// Undo setup
 				s=$("#psedit").val();																		// Get value
@@ -133,12 +152,12 @@
 				});
 			});
 
-		$("[id^=psopt-]").on("click",(e)=> {  																// On line click
-			var id=e.target.id.substr(6);						 											// Get id
+		$("[id^=psopt-]").on("click", function(e) {  														// On line click
+			var s=$(this).text();																			// Get text
 			app.Do();																						// Undo setup
-			if (o.ds == app.as)			app.arcs[o.id].a=id; 												// If instructor action, set slot
-			else if (o.ds == app.rs)	app.arcs[o.id].r=id; 												// Student response											
-			else						app.arcs[o.id].c=id;												// Consequence
+			if (o.ds == app.as)			app.arcs[o.id].a=s; 												// If instructor action, set text
+			else if (o.ds == app.rs)	app.arcs[o.id].r=s; 												// Student response											
+			else						app.arcs[o.id].c=s;													// Consequence
 			app.Draw();																						// Redraw		
 			$("#popSelectDiv").remove();																	// Kill dialog
 			});
@@ -163,9 +182,9 @@
 			app.Do();																						// Undo setup
 			var s=$("#psadd").val();																		// Get new item
 			o.opts.push(s);																					// Add new value
-			if (o.ds == app.as)		o.ds.push({ text:s })													// Add action
-			else					o.ds.push(s);															// Add response or consequence
+			o.ds.push(s);																					// Add item
 			PopSelect(o)																					// Recurse
+			$("#popSelInDiv").scrollTop(100000);															// Scroll to bottom		
 		});
 
 	}
@@ -183,13 +202,15 @@ class App  {
 		app=this;
 		this.undos=[];																						// Holds undos
 		this.curUndo=0;																						// Undo counter
-		this.arcs=[]; this.as=[];  this.cs=[];	this.rs=[];													// Data
+		this.arcs=[]; this.as=[];  this.cs=[];	this.rs=[];	  this.ps=[];									// Data
+		this.overview="";																					// Overview
 		this.gid="1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU";											// Default  spreadsheet
 		var url=window.location.search.substring(1);						   								// Get query string
 		if (url) {																							// If params
 			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);									// If params have a 'gid=' tag, use it
 			else					this.gid=url;															// Default spreadsheet
 			}
+		this.InitDefaults();																				// Set up defaults
 		this.Load(this.gid);																				// Load it
 
 		$("#addStep").on("click",(e)=> {  																	// ON ADD STEP
@@ -250,7 +271,8 @@ class App  {
 
 	InitDefaults()																						// SET DEFAULT OPTIONS
 	{
-		this.arcs=[];  this.as=[];   this.cs=[];   this.rs=[];												// Reset data
+		this.arcs=[];  this.as=[];   this.cs=[];   this.rs=[];	this.p=[];									// Reset data
+		this.overview="";
 		this.as.push("");
 		this.as.push("A:Do you agree");
 		this.as.push("P:Are you sure?");
@@ -274,22 +296,23 @@ class App  {
 		var i,o,a,r,c,g;
 		var rcol;
 		var w=$("#mapDiv").width();
-		var h=$("#mapDiv").height();
+		var h=$("#mapDiv").height()+32;
 		var str="<table id='itemTable' style='width:100%'>";
 		for (i=0;i<this.arcs.length;++i) {																	// For each line
 			o=this.arcs[i];																					// Point at line
-			a=(o.a < 0) ? "<i>Choose</i>" : this.as[o.a];													// Set text for instructor option
-			r=(o.r < 0) ? "" : this.rs[o.r];																// Response
-			c=(o.c < 0) ? "" : this.cs[o.c];																// Consequence
+			a=o.a ? o.a :"<i>Choose</i>"; 																	// Set text for instructor option
+			r=o.r ? o.r : "";																				// Response
+			c=o.c ? o.c : "";																				// Consequence
 			g=o.g;																							// Goal
-			if (i && (o.a == this.arcs[i-1].a)) 	a=this.as[0];											// Ditto
+			if (i && (o.a == this.arcs[i-1].a)) 	a="";													// Blank
 			if (i && (o.g == this.arcs[i-1].g)) 	g="";													// Don't repeat last
-			if (r.charAt(0) == '-')					r=r.substr(1),rcol="#880000";							// Wrong
-			else if (r.charAt(0) == '+')			r=r.substr(1),rcol="#006600";							// Right
+			if (r && r.charAt(0) == '-')			rcol="#880000";											// Wrong
+			else if (r && r.charAt(0) == '+')		rcol="#006600";											// Right
 			else									rcol="#000000";											// Other
-			str+="<tr id='stpl-"+i+"'><td style='padding:8px 0;width:45%' id='stpa-"+i+"'>"+(i+1)+". "+a+"</td><td style='width:5%'";		// Instructor action
-			str+=(o.a > 0) ? " id='stpg-"+i+"'>"+g : ">";													// Add goal if a new step
-			str+="</td><td id='stpr-"+i+"' style='width:25%;color:"+rcol+"'>"+r+"</td><td style='width:25%' id='stpc-"+i+"'>"+c;		// Response / consequence
+			str+="<tr id='stpl-"+i+"'><td style='padding:8px 4px; 8px 9;width:45%;border-right:1px solid #ddd' id='stpa-"+i+"'>"+(i+1)+". "+a+"</td>"; // Instructor action
+			str+="<td style='width:5%;border-right:1px solid #ddd;padding-left:4px;max-width:60px;overflow:hidden'";		// Goal
+			str+=(o.a) ? " id='stpg-"+i+"'>"+g : ">";														// Add goal if a new step
+			str+="</td><td id='stpr-"+i+"' style='border-right:1px solid #ddd;padding-left:4px;width:25%;color:"+rcol+"'>"+r+"</td><td style='padding-left:4px;width:25%' id='stpc-"+i+"'>"+c;		// Response / consequence
 			str+="</td><td><input id='strad-"+i+"' name='stradgrp' type='radio'></td></tr>";				// Add radio button
 			}
 		str+="</table>";
@@ -302,31 +325,41 @@ class App  {
 			$("#stpl-"+id).css("background-color",id%2 ? "#f0f0f0" : "#ffffff");							// Restore striping
 			});
 		
-		$("[id^=stpa-]").on("click",(e)=> {  																// On instrucor action click
+		$("[id^=stpa-]").on("click",(e)=> {  																// On instructor action click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
-			var o={ x:0, y:66, h:h, w:w*.45-16, opts:[], title:"Choose action", ds:this.as, id:id };		// Settings
+			var o={ x:0, y:67, h:h, w:w*.45-24, opts:[], def:this.arcs[id].a, ds:this.as, id:id };			// Settings
 			for (i=0;i<this.as.length;++i)	o.opts.push(this.as[i]);										// Add options
 			PopSelect(o)																					// Pick new item
 			});
 
 		$("[id^=stpg-]").on("click",(e)=> {  																// On goal click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
-			GetTextBox("Type new goal","This is a way to identify topics within your session", this.arcs[id].g, // Ask for new goal
-				(s)=> {	this.Do();	this.arcs[id].g=s;  this.Draw(); }, e.pageX, e.pageY);					// Set new goal
+			var s=this.arcs[id].g;																			// Get value
+			if ($("#psedit").length) {this.Draw();  return; };												// Only one active at a time
+			if (s) s=s.replace(/'/g,"&apos;");																// No 's
+			$("#stpg-"+id).html("<input type='text' class='lz-is' style='height:20px;' value='"+s+"' id='psedit'>"); // Add editor
+			$("#psedit").on("click", (e)=>{ e.stopPropagation(); });										// Don't propagate event							
+			$("#psedit").focus();																			// Set focus
+			$("#psedit").on("change", ()=>{																	// On enter key hit
+				app.Do();																					// Undo setup
+				this.arcs[id].g=$("#psedit").val().replace(/ /g,""); 										// Get value w/ no spaces
+				this.Draw();																				// Add item
+				});
 			});
 
 		$("[id^=stpr-]").on("click",(e)=> {  																// On response click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
 			if ((id == 0) || (this.arcs[id].a != this.arcs[id-1].a)) return;								// No reponses on action line
-			var o={ x:w*.5-16, y:66, h:h, w:w/4-16, opts:[], title:"Choose response", ds:this.rs, id:id };	// Settings
+			var o={ x:w*.5-16, y:67, h:h, w:w/4-16, opts:[], def:this.arcs[id].r, ds:this.rs, id:id };		// Settings
 			for (i=0;i<this.rs.length;++i)	o.opts.push(this.rs[i]);										// Add options
 			PopSelect(o);																					// Pick new item
 			});
 		
 		$("[id^=stpc-]").on("click",(e)=> {  																// On consequence click
+			var w=$("#mapDiv").width();
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
 			if ((id == 0) || (this.arcs[id].a != this.arcs[id-1].a)) return;								// No consequences on action line
-			var o={ x:w*.75-32, y:66, h:h, w:w/4-16, opts:[], title:"Choose consequence", ds:this.cs, id:id };	// Settings
+			var o={ x:w*.75-16, y:67, h:h, w:w/4, opts:[], ds:this.cs, def:this.arcs[id].c, id:id };		// Settings
 			for (i=0;i<this.cs.length;++i)	o.opts.push(this.cs[i]);										// Add options
 			PopSelect(o);																					// Pick new item
 			});
@@ -347,33 +380,58 @@ class App  {
 			tsv=tsv.split("\n");																			// Split into lines
 			for (i=1;i<tsv.length;++i) {																	// For each line
 				v=tsv[i].split("\t");																		// Split into fields
-				if (v[1].match(/ov/i))  																	// Overview
-					$("#overDiv").html(v[3].trim());														// Add													
+				if (v[1].match(/over/i))  _this.overview=v[3].trim();										// Overview
+				else if (v[1].match(/pic/i)) _this.ps.push(v[2].trim()+"|"+v[3].trim());					// Pics
 				else if (v[1].match(/^Q|W|A|I|S|C|P/)) {													// New step
-					line=({ a:-1, r:-1, c:-1, g: -1 });														// Blank line
+					line=({ a:"", r:"", c:"", g:"" });														// Blank line
 					if (v[0] && isNaN(v[0])) goal=v[0].trim();												// If a goal set
-					str=v[1].charAt(0)+":"+v[3].trim();														// Add text
+					str=v[1].charAt(0)+": "+v[3].trim();													// Add text
 					if (v[4] && !isNaN(v[4]))	str+=" {S"+v[4].trim()+"}";									// Add slide if set
 					_this.as.push(str);																		// Add to actions					
-					_this.arcs.push({ a:_this.as.length-1, r:-1, c:-1, g:goal });							// Add line
+					_this.arcs.push({ a:_this.as[_this.as.length-1], r:"", c:"", g:goal });					// Add line
 					}
 				else if (v[1].match(/^R/i)) { 																// Response
 					_this.rs.push(v[1].substr(1)+v[3].trim());												// Add response
 					_this.cs.push(v[5].trim());																// Add Consequence
-					_this.arcs.push({ a:_this.as.length-1, r:_this.rs.length-1, c:_this.cs.length-1, g:goal });	// Add line
+					_this.arcs.push({ a:_this.as[_this.as.length-1], r:_this.rs[_this.rs.length-1], c:_this.cs[_this.cs.length-1], g:goal });	// Add line
 					}
 			}
+//		_this.RemoveDuplicates(_this.as);																	// Remove duplicate actions
+//		_this.RemoveDuplicates(_this.rs);																	// Responses
+//		_this.RemoveDuplicates(_this.cs);																	// Consequences
+//		_this.RemoveDuplicates(_this.ps);																	// Pictures
 		_this.Draw();																						// Draw
 		};									
 
-		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
-			if ((xhr.readyState === 4) && (xhr.status !== 200)) {  										// Ready, but no load
-				Sound("delete");																		// Delete sound
+		xhr.onreadystatechange=function(e) { 																// ON AJAX STATE CHANGE
+			if ((xhr.readyState === 4) && (xhr.status !== 200)) {  											// Ready, but no load
+				Sound("delete");																			// Delete sound
 				PopUp("<p style='color:#990000'><b>Couldn't load Google Doc!</b></p>Make sure that <i>anyone</i><br>can view it in Google",5000); // Popup warning
 				}
 			};		
 		
 		}
+
+	RemoveDuplicates(items)																				// REMOVE DUPLICATE ENTRIES IN ITEM LISTS
+	{
+		var i,j,k;
+		var dels=[];
+		for (i=0;i<items.length;++i) {																		// For each item in list
+			for (j=i+1;j<items.length;++j) {																// For each remaining item															
+				if (items[i] == items[j]) {																	// A duplicate
+					for (k=0;k<this.arcs.length;++k) {														// Look through lines
+						if ((items == this.as) && (this.arcs[k].a == j))	this.arcs[k].a=i;				// If an instructor match, use original index															
+						if ((items == this.rs) && (this.arcs[k].r == j))	this.arcs[k].r=i;				// If an response match, use original index															
+						if ((items == this.cs) && (this.arcs[k].c == j))	this.arcs[k].c=i;				// If an consequence match, use original index															
+						if ((items == this.ps) && (this.arcs[k].p == j))	this.arcs[k].p=i;				// If an pix match, use original index															
+						}
+					dels.push(j);																			// Add to delete list
+					}
+				}
+			}
+		trace(dels)
+		for (i=dels.length-1;i>=0;--i) 	items.splice(dels[i],1);											// Delete each item backwards
+	}
 
 	Do()																		// DO
 	{
