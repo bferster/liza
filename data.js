@@ -31,8 +31,8 @@ class ARC  {
 			tsv=tsv.split("\n");																		// Split into lines
 			for (i=1;i<tsv.length;++i) {																// For each line
 				v=tsv[i].split("\t");																	// Split into fields
-				if (v[1].match(/ov/i))  		app.rev.overview=v[3];									// Overview
-				else if (v[1].match(/pic/i)) 	app.bb.AddPic(v[2],v[3]);								// Add image or slide deck
+				if (v[1].match(/ov/i))  		app.rev.overview=v[2];									// Overview
+				else if (v[1].match(/pic/i)) 	app.bb.AddPic(v[2].split("|")[0],v[2].split("|")[1]);	// Add image or slide deck
 				else if (v[1].match(/^Q|W|A|I|S|C|P/i)) {												// New step
 					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
 					else						step++;													// New step
@@ -42,20 +42,20 @@ class ARC  {
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
 					o.meta=v[1].substr(0,1);															// Instructional meta structure
 					o.rc=v[1].substr(1).trim();															// Add 
-					o.text=v[3].trim();																	// Add text
+					o.text=v[2].trim();																	// Add text
 					o.res=[];																			// Responses array										
-					o.gist=v[2];																		// Get gist
 					o.goal=goal;																		// Set goal
 					o.step=step;																		// Set step
-					o.slide=(v[4] && !isNaN(v[4])) ? v[4]-1 : "";										// Add slide if set
-					o.next=v[6] ? v[6] : "";															// Add next if set
+					k=v[2].match(/\{S(.*)?\}/);															// Slide spec'd?
+					if (k)	o.slide=k[1];																// Set slide
+					o.next="";																			// Next 
 					_this.tree.push(o);																	// Add step to tree
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
-					o.res.push({ rc: v[1].substr(1).trim(), text:v[3].trim(), cons:v[5] ? v[5] : "", next:v[6] ? v[6] : "" });		// Add responses
+					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "", next: "" });		// Add responses
 					}
 				}
 	
@@ -91,7 +91,8 @@ class ARC  {
 					}
 				}
 			_this.Extract();																			// Extract keywords and entities
-			$("#hintBut").prop("title","Next: "+app.arc.tree[0].gist);									// Change tooltip
+			_this.tree[_this.tree.length-1].next="END";
+//			$("#hintBut").prop("title","Next: "+app.arc.tree[0].gist);									// Change tooltip
 		};									
 
 		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
@@ -178,8 +179,8 @@ class ARC  {
 				this.lastStep=best;																		// Then is now
 				}
 			str+="\n    "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str,v); 															
-			if (app.arc.tree[app.arc.curStep].next)														// If next defined
-				$("#hintBut").prop("title","Next: "+app.arc.tree[app.arc.tree[app.arc.curStep].next].gist);	// Change tooltip
+//			if (app.arc.tree[app.arc.curStep].next)														// If next defined
+//				$("#hintBut").prop("title","Next: "+app.arc.tree[app.arc.tree[app.arc.curStep].next].gist);	// Change tooltip
 			return this.curStep;																		// Return best fit
 		}
 

@@ -15,7 +15,7 @@
 							}
 		.lz-main { 			width:100%; overflow:auto;
 							}
-		.lz-header { 		background-color: #bbb; width:100%; padding: 8px 0; color:#fff;
+		.lz-header { 		background-color: #ddd; width:100%; padding: 8px 0;
 							}
 		.lz-popSelect {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							box-shadow: 2px 2px 8px 2px #aaa;
@@ -54,19 +54,20 @@
 
 	<div id='mainDiv' class='lz-main'>
 		<div id='headerDiv' class='lz-header' onclick='$("#popSelectDiv").remove()'>
-			<img src='img/lizalogo64.png' style='margin:0 12px 0 20px;height:18px;vertical-align:-4px'><b>Session Editor</b>
+			<img src='img/lizalogo64.png' style='margin:0 12px 0 20px;height:18px;vertical-align:-3px'><b>Session Editor</b>
 			<div style='margin-right:16px;color:#000;float:right'>
 				<span id='loadBut' style='margin-right:24px;cursor:pointer'>Load</span>
 				<span id='saveBut' style='margin-right:24px;cursor:pointer'>Save</span>
 				<span id='previewBut' style='margin-right:24px;cursor:pointer'>Preview</span>
 				<span id='otherBut' style='margin-right:16px;cursor:pointer'>Other</span>
-				<img  id='helpBut' src='img/helpicon.gif' style='cursor:pointer;vertical-align:-6px'>
+				<span id='helpBut' style='cursor:pointer'>Help</span>
 			</div>
-			<div style='width:100%;height:1px;background-color:#fff;margin:8px 0'></div>
+		</div>
+		<div style='width:100%;background-color:#bbb;color:#fff;padding:8px 0'>
 			<span style='position:absolute;left:18px'><b>Instructor says</b></span>
-			<span style='position:absolute;left:calc(45% - 20px)'><b>Goal</b></span>
-			<span style='position:absolute;left:calc(50% - 20px)'><b>Student responds</b></span>
-			<span style='position:absolute;left:calc(75% - 40px)'><b>Consequence</b></span><br>
+			<span style='position:absolute;left:calc(45% - 12px)'><b>Goal</b></span>
+			<span style='position:absolute;left:calc(50% - 12px)'><b>Student responds</b></span>
+			<span style='position:absolute;left:calc(75% - 32px)'><b>Consequence</b></span><br>
 		</div>
 		<div id='mapDiv' class='lz-map'></div>
 			<div id='addStep' class='lz-bs' style='margin-left:16px;margin-top:16px'>Add new line</div>
@@ -99,7 +100,7 @@
 	function PopSelect(o)																				// POPUP SELECT
 	{
 		var i,col,s;
-		var trsty=";clear:both;min-height:22px;cursor:pointer;padding-bottom:6px'>";
+		var trsty=";clear:both;min-height:22px;cursor:pointer;padding:3px 8px'>";
 		$("#popSelectDiv").remove();																		// Remove if open
 		var str="<div id='popSelectDiv' class='lz-popSelect' style='";										// Header
 		str+="left:"+o.x+"px;top:"+o.y+"px;width:"+o.w+"px;height:"+o.h+"px'>";								// Position and size
@@ -107,10 +108,10 @@
 		str+="<div id='popSelInDiv' class='lz-popSelInner'>";												// Scrollable div
 		for (i=0;i<o.opts.length;++i) {																		// For each option	
 			s=o.opts[i];																					// Get text
-			if (s.charAt(0) == '-')			scol="#880000";													// Wrong
+			if (s.charAt(0) == '-')			col="#880000";													// Wrong
 			else if (s.charAt(0) == '+')	col="#006600";													// Right
 			else							col="#000000";													// Other
-			str+="<div id='psopt-"+i+"' style='margin-left:8px;color:"+col+trsty+s;							// Add div
+			str+="<div id='psopt-"+i+"' style='color:"+col+trsty+s;											// Add div
 			str+="<img id='psdel-"+i+"'src='img/trashbut.gif' style='float:right;display:none'>";			// Add delete button 
 			str+="<img id='psedt-"+i+"'src='img/editbut.gif' style='float:right;display:none'></div>";		// Add edit button 
 			}
@@ -122,7 +123,7 @@
 			for (i=0;i<o.opts.length;++i) 																	// For each option	
 				if (o.opts[i] == o.def) {																	// Matches
 					$("#popSelInDiv").scrollTop($("#psopt-"+i).offset().top-200);							// Scroll to default		
-					$("#psopt-"+i).css("background-color","#f8dede");										// Color bar
+					$("#psopt-"+i).css("background-color","#fff");											// Highlight bar
 					break;																					// Quit looking
 					}	
 			}
@@ -130,7 +131,7 @@
 		$("[id^=psdel-]").on("click",(e)=> {  																// Delete button
 			e.stopPropagation();																			// Don't propagate event			
 			var id=e.target.id.substr(6);						 											// Get id
-			ConfirmBox("Are you sure?", "This will permanently delete this item:<br><i>"+o.ds[id]+"</i>", ()=> {	// If sure
+			ConfirmBox("Are you sure?", "This will permanently delete this item:<br><i>"+o.ds[id]+"</i>", ()=> { // If sure
 				app.Do();																					// Undo setup
 				o.ds.splice(id,1); 																			// Remove it from array
 				o.opts.splice(id,1); 																		// Remove it from selector
@@ -164,7 +165,9 @@
 			if (o.ds == app.as)			app.arcs[o.id].a=s; 												// If instructor action, set text
 			else if (o.ds == app.rs)	app.arcs[o.id].r=s; 												// Student response											
 			else						app.arcs[o.id].c=s;													// Consequence
+			Sound("click");																					// Sound
 			app.Draw();																						// Redraw		
+			$("#stpl-"+o.id).css("background-color","#d7ebff");												// Color it to see it better
 			$("#popSelectDiv").remove();																	// Kill dialog
 			});
 
@@ -229,7 +232,7 @@ class App  {
 			var g=i ? this.arcs[i-1].g : "";																// Use goal from step above
 			this.arcs.splice(i,0,{ a:a, r:"", c:"", g:g });													// Add blank step
 			this.Draw();																					// Redraw
-			$("#stpl-"+i).css("background-color","#d7ebff");												// Color it to see it bettter
+			$("#stpl-"+i).css("background-color","#d7ebff");												// Color it to see it better
 			$("#mapDiv").scrollTop($("#stpl-"+i).position().top+$("#mapDiv").scrollTop()-100);				// Scroll there			
 			Sound("ding");																					// Ding
 			});
@@ -255,6 +258,10 @@ class App  {
 				this.gid=s;																					// Set
 				this.Load(s);																				// Load up sheet 
 				});	
+			});
+
+		$("#saveBut").on("click",(e)=> {  																	// ON LOAD
+			this.Save();																					// Save to Google docs
 			});
 
 		$("#previewBut").on("click",(e)=> {  																// ON PREVIEW
@@ -315,10 +322,11 @@ class App  {
 			if (r && r.charAt(0) == '-')			rcol="#880000";											// Wrong
 			else if (r && r.charAt(0) == '+')		rcol="#006600";											// Right
 			else									rcol="#000000";											// Other
-			str+="<tr id='stpl-"+i+"'><td style='padding:8px 4px; 8px 9;width:45%;border-right:1px solid #ddd' id='stpa-"+i+"'>"+(i+1)+". "+a+"</td>"; // Instructor action
-			str+="<td style='width:5%;border-right:1px solid #ddd;padding-left:4px;max-width:60px;overflow:hidden'";		// Goal
+			str+="<tr id='stpl-"+i+"'><td style='color:#000088;padding:8px 4px; 8px 9;width:45%;border-right:1px solid #ddd' id='stpa-"+i+"'>";   // Line
+			str+="<span style='color:#999'>"+(i+1)+". </span>"+a+"</td>";									// Instructor action
+			str+="<td style='width:5%;border-right:1px solid #ddd;padding-left:6px;max-width:60px;overflow:hidden'"; // Goal
 			str+=(o.a) ? " id='stpg-"+i+"'>"+g : ">";														// Add goal if a new step
-			str+="</td><td id='stpr-"+i+"' style='border-right:1px solid #ddd;padding-left:4px;width:25%;color:"+rcol+"'>"+r+"</td><td style='padding-left:4px;width:25%' id='stpc-"+i+"'>"+c;		// Response / consequence
+			str+="</td><td id='stpr-"+i+"' style='border-right:1px solid #ddd;padding-left:6px;width:25%;color:"+rcol+"'>"+r+"</td><td style='padding-left:8px;width:25%' id='stpc-"+i+"'>"+c;		// Response / consequence
 			str+="</td><td><input id='strad-"+i+"' name='stradgrp' type='radio'></td></tr>";				// Add radio button
 			}
 		str+="</table>";
@@ -426,6 +434,48 @@ class App  {
 				}
 			};		
 	}
+
+	Save()																								// CREATE TSV FROM ARC AND SAVE TO GOOGLE DOCS
+	{
+		var i,o,goal="none",action="",type,text;
+		var str=makeTSVLine("goal","type","text","consequence");											// Add header
+		if (this.overview) 	str+=makeTSVLine("","overview",this.overview.trim(),"");						// Add overview if set
+		for (i=0;i<this.ps.length;++i) 	str+=makeTSVLine("","pic",this.ps[i].trim(),"")						// For each pic
+		str+=makeTSVLine("","","","");																		// Add blank line
+		for (i=0;i<this.arcs.length;++i) {																	// For each line
+			o=this.arcs[i];																					// Point at it
+			if (action != o.a) {																			// A new arc
+				if (!o.a)	continue;																		// Skip if blank
+				if (o.a.match(/\:/)) {																		// If a meta
+					type=o.a.split(":")[0].trim();															// Get line type											
+					text=o.a.split(":")[1].trim();															// Get text											
+					}
+				else{
+					type="Q";																				// Default to question if none spec'd
+					text=o.a.trim();																		// Get text											
+					}
+				str+=makeTSVLine(goal != o.g ? o.g : "",type,text,"");										// Add action
+				}
+			else{																							// A response
+				type=o.r.match(/^(\+|\-|\?|0)+/)[0];														// Get valences
+				text=o.r.trim().substr(type.length);														// Get response	portion										
+				str+=makeTSVLine("","R"+type,text,o.c ? o.c.trim() : "");									// Add response
+				}
+			if (o.g)	goal=o.g;																			// If a goal set, use it as current coal
+			if (o.a)	action=o.a;																			// Action
+			}
+
+		function makeTSVLine(goal, type, text, cons) {														// CREATE TSV ARC																				
+			var s=(goal ? (""+goal).replace(/(\n|\r|\t)/g,"") : "")+"\t";									// Goal, remove CRs/LFs/TABs
+			s+=(type ? (""+type).replace(/(\n|\r|\t)/g,"") : "")+"\t";										// Type 
+			s+=(text ? (""+text).replace(/(\n|\r|\t)/g,"") : "")+"\t";										// Text 
+			s+=(cons ? (""+cons).replace(/(\n|\r|\t)/g,"") : "")+"\n";										// Consequences 
+			return s;																						// Return TSV line
+			}
+trace(str)
+		}
+
+
 
 	Do()																		// DO
 	{

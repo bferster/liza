@@ -283,7 +283,7 @@ class Review  {
 		str+="id='lpTitle'></span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
 		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div>"; 
 		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0'>";
-		str+=MakeSelect("revMode",false,["Overview","Hints","Full map","Preview", "Review"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
+		str+=MakeSelect("revMode",false,["Overview","Full map","Preview", "Review"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
 		str+=MakeSelect("revStu",false,["Student"])+"</div>"; 
 			
 		$("body").append(str);																			// Add to body
@@ -315,14 +315,6 @@ class Review  {
 					app.tim.Init(mode == "Preview");													// Show timeline
 					_this.mode="Overview";																// Start next time in overview
 				}}); 
-				}
-		else if (mode == "Hints")	{																	// Gists
-				$("#lpTitle").html("Lesson map hints");													// Set title
-				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
-					o=app.arc.tree[i];																	// Point at step
-					if (o.gist)		str+="<li style='padding-bottom:4px'>"+o.gist+"</li>";				// Add gist
-					if (o.next == "END")	break;														// Quit on end
-					}
 				}
 			else if (mode == "Full map")	{															// Full map
 				$("#lpTitle").html("Full lesson map");													// Set title
