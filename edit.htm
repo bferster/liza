@@ -355,6 +355,7 @@ class App  {
 			});
 
 		$("[id^=stpg-]").on("click",(e)=> {  																// On goal click
+			trace(e)
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
 			var s=this.arcs[id].g;																			// Get value
 			if ($("#psedit").length) {this.Draw();  return; };												// Only one active at a time
@@ -371,7 +372,7 @@ class App  {
 
 		$("[id^=stpr-]").on("click",(e)=> {  																// On response click
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
-			if ((id == 0) || (this.arcs[id].a != this.arcs[id-1].a)) return;								// No reponses on action line
+			if (this.arcs[id].a) return;																	// No reponses on action line
 			var o={ x:w*.5-16, y:67, h:h, w:w/4-16, opts:[], def:this.arcs[id].r, ds:this.rs, id:id };		// Settings
 			for (i=0;i<this.rs.length;++i)	o.opts.push(this.rs[i]);										// Add options
 			PopSelect(o);																					// Pick new item
@@ -380,7 +381,7 @@ class App  {
 		$("[id^=stpc-]").on("click",(e)=> {  																// On consequence click
 			var w=$("#mapDiv").width();
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
-			if ((id == 0) || (this.arcs[id].a != this.arcs[id-1].a)) return;								// No consequences on action line
+			if (this.arcs[id].a) return;																	// No consequences on action line
 			var o={ x:w*.75-16, y:67, h:h, w:w/4, opts:[], ds:this.cs, def:this.arcs[id].c, id:id };		// Settings
 			for (i=0;i<this.cs.length;++i)	o.opts.push(this.cs[i]);										// Add options
 			PopSelect(o);																					// Pick new item
