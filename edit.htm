@@ -196,6 +196,15 @@
 			$("#popSelInDiv").scrollTop(100000);															// Scroll to bottom		
 		});
 
+
+/*			if (o.ds == app.as)	{																			// If instructor action, set text
+				var old=app.arcs[o.id];																		// Save original
+				for (var i=o.id;i<app.arcs.length;++i)														// For each step that follows
+					if (app.arcs[i].a == old)	app.arcs[i].a=s; 											// Rest if the same as original
+					else						break;														// Quit looking if different																		
+				}
+*/
+
 	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,7 +293,7 @@ class App  {
 
 	InitDefaults()																						// SET DEFAULT OPTIONS
 	{
-		this.arcs=[];  this.as=[];   this.cs=[];   this.rs=[];	this.p=[];									// Reset data
+		this.arcs=[];  this.as=[];   this.cs=[];   this.rs=[];	this.ps=[];									// Reset data
 		this.overview="";
 		this.as.push("");
 		this.as.push("A:Do you agree");
@@ -307,18 +316,16 @@ class App  {
 	Draw()																								// DRAW
 	{
 		var i,o,a,r,c,g;
-		var rcol;
+		var rcol,lastGoal="";
 		var w=$("#mapDiv").width();
 		var h=$("#mapDiv").height()+32;
 		var str="<table id='itemTable' style='width:100%'>";
 		for (i=0;i<this.arcs.length;++i) {																	// For each line
 			o=this.arcs[i];																					// Point at line
-			a=o.a ? o.a :"<i>Choose</i>"; 																	// Set text for instructor option
+			a=o.a ? o.a :""; 																				// Set text for instructor option
 			r=o.r ? o.r : "";																				// Response
 			c=o.c ? o.c : "";																				// Consequence
-			g=o.g;																							// Goal
-			if (i && (o.a == this.arcs[i-1].a)) 	a="";													// Blank
-			if (i && (o.g == this.arcs[i-1].g)) 	g="";													// Don't repeat last
+			g=(o.g == lastGoal) ? "" : o.g;																	// Don't repeat if same
 			if (r && r.charAt(0) == '-')			rcol="#880000";											// Wrong
 			else if (r && r.charAt(0) == '+')		rcol="#006600";											// Right
 			else									rcol="#000000";											// Other
@@ -328,7 +335,8 @@ class App  {
 			str+=(o.a) ? " id='stpg-"+i+"'>"+g : ">";														// Add goal if a new step
 			str+="</td><td id='stpr-"+i+"' style='border-right:1px solid #ddd;padding-left:6px;width:25%;color:"+rcol+"'>"+r+"</td><td style='padding-left:8px;width:25%' id='stpc-"+i+"'>"+c;		// Response / consequence
 			str+="</td><td><input id='strad-"+i+"' name='stradgrp' type='radio'></td></tr>";				// Add radio button
-			}
+			if (o.g)	lastGoal=o.g
+		}
 		str+="</table>";
 		$("#mapDiv").html(str);																				// Add to div	
 
@@ -395,20 +403,19 @@ class App  {
 			for (i=1;i<tsv.length;++i) {																	// For each line
 				v=tsv[i].split("\t");																		// Split into fields
 				if (v.length < 4)	continue;																// Not enough fields
-				if (v[1].match(/over/i))  _this.overview=v[3].trim();										// Overview
-				else if (v[1].match(/pic/i)) _this.ps.push(v[2].trim()+"|"+v[3].trim());					// Pics
+				if (v[1].match(/over/i))  _this.overview=v[2].trim();										// Overview
+				else if (v[1].match(/pic/i)) _this.ps.push(v[2].trim());									// Pics
 				else if (v[1].match(/^Q|W|A|I|S|C|P/)) {													// New step
 					line=({ a:"", r:"", c:"", g:"" });														// Blank line
 					if (v[0] && isNaN(v[0])) goal=v[0].trim();												// If a goal set
-					str=v[1].charAt(0)+": "+v[3].trim();													// Add text
-					if (v[4] && !isNaN(v[4]))	str+=" {S"+v[4].trim()+"}";									// Add slide if set
+					str=v[1].charAt(0)+": "+v[2].trim();													// Add text
 					_this.as.push(str);																		// Add to actions					
 					_this.arcs.push({ a:_this.as[_this.as.length-1], r:"", c:"", g:goal });					// Add line
 					}
 				else if (v[1].match(/^R/i)) { 																// Response
-					_this.rs.push(v[1].substr(1)+v[3].trim());												// Add response
-					_this.cs.push(v[5].trim());																// Add Consequence
-					_this.arcs.push({ a:_this.as[_this.as.length-1], r:_this.rs[_this.rs.length-1], c:_this.cs[_this.cs.length-1], g:goal });	// Add line
+					_this.rs.push(v[1].substr(1)+v[2].trim());												// Add response
+					_this.cs.push(v[3].trim());																// Add Consequence
+					_this.arcs.push({ a:"", r:_this.rs[_this.rs.length-1], c:_this.cs[_this.cs.length-1], g:"" });	// Add line
 					}
 			}
 		removeDuplicates(_this.as);																			// Remove duplicate actions
@@ -444,7 +451,7 @@ class App  {
 		str+=makeTSVLine("","","","");																		// Add blank line
 		for (i=0;i<this.arcs.length;++i) {																	// For each line
 			o=this.arcs[i];																					// Point at it
-			if (action != o.a) {																			// A new arc
+			if (o.a) {																						// An action
 				if (!o.a)	continue;																		// Skip if blank
 				if (o.a.match(/\:/)) {																		// If a meta
 					type=o.a.split(":")[0].trim();															// Get line type											
@@ -462,7 +469,6 @@ class App  {
 				str+=makeTSVLine("","R"+type,text,o.c ? o.c.trim() : "");									// Add response
 				}
 			if (o.g)	goal=o.g;																			// If a goal set, use it as current coal
-			if (o.a)	action=o.a;																			// Action
 			}
 
 		function makeTSVLine(goal, type, text, cons) {														// CREATE TSV ARC																				
@@ -472,12 +478,10 @@ class App  {
 			s+=(cons ? (""+cons).replace(/(\n|\r|\t)/g,"") : "")+"\n";										// Consequences 
 			return s;																						// Return TSV line
 			}
-trace(str)
+		SaveSpreadsheet(this.gid,str);																		// Save to Google drive
 		}
 
-
-
-	Do()																		// DO
+		Do()																		// DO
 	{
 //		this.undos[this.curUndo]=app.doc.MakeTabFile();								// Save undo
 		this.curUndo++;																// Inc undo count
@@ -506,7 +510,13 @@ var gdKey="AIzaSyD0jrIlONfTgL-qkfnMTNdjizsNbLBBjTk";											// Google API key
 
 function SaveSpreadsheet(id, data)															// CLEAR AND SAVE DATA TO GDRIVE
 {
-		gapi.load('client:auth2', function() {
+	var d=[];
+	var v=data.split("\n");																		// Split into rows
+	for (var i=0;i<v.length;++i)																// For each row
+		d.push(v[i].split("\t"));																// Add array of fields
+	data=d;																						// Structured data
+
+	gapi.load('client:auth2', function() {
 			gapi.client.init({																	// Init
 			apiKey: gdKey, clientId: gdClientId, scope:gdScope,									// Params
            	discoveryDocs:["https://sheets.googleapis.com/$discovery/rest?version=v4"],			// API discovery

@@ -139,7 +139,6 @@
 		<img id="slideBut" src="img/image-icon.png" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="muteBut" src="img/unmutebut.png" title="Sounds" style="cursor:pointer;margin-right:16px;float:right">
-		<img id="hintBut" src="img/hintbut.gif" title="Hints" style="cursor:pointer;margin-right:16px;float:right">
 		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">The University of Virginia @ 2019</div>
 	</div>
 	<div id='blackboardDiv' class='lz-blackboard'>
@@ -253,7 +252,6 @@ class App  {
 			$("#talkBut").hide(),$("#talkInput").show();											// Show input	
 		$("#settingsBut").on("click", ()=> { app.sc.PoseEditor();  });								// On settings button click	
 		$("#reviewBut").on("click", ()=> { app.rev.Reviewer();  });									// On review button click	
-		$("#hintBut").on("click", ()=> { app.rev.Reviewer("Hints");  });							// On hint button click	
 		$("#talkBut").on("click", ()=> { app.voice.Listen(); });									// On talk button click, start listening
 		$("#helpBut").on("click", ()=> { app.ShowHelp(); });										// On help button click, show help
 		$("#writeBut").on("click", ()=> { 															// On BB button clck

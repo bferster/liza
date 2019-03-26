@@ -47,7 +47,7 @@ class ARC  {
 					o.goal=goal;																		// Set goal
 					o.step=step;																		// Set step
 					k=v[2].match(/\{S(.*)?\}/);															// Slide spec'd?
-					if (k)	o.slide=k[1];																// Set slide
+					if (k)	o.slide=k[1]-1;																// Set slide
 					o.next="";																			// Next 
 					_this.tree.push(o);																	// Add step to tree
 					}
@@ -92,7 +92,6 @@ class ARC  {
 				}
 			_this.Extract();																			// Extract keywords and entities
 			_this.tree[_this.tree.length-1].next="END";
-//			$("#hintBut").prop("title","Next: "+app.arc.tree[0].gist);									// Change tooltip
 		};									
 
 		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
@@ -179,8 +178,6 @@ class ARC  {
 				this.lastStep=best;																		// Then is now
 				}
 			str+="\n    "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str,v); 															
-//			if (app.arc.tree[app.arc.curStep].next)														// If next defined
-//				$("#hintBut").prop("title","Next: "+app.arc.tree[app.arc.tree[app.arc.curStep].next].gist);	// Change tooltip
 			return this.curStep;																		// Return best fit
 		}
 
