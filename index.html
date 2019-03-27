@@ -235,7 +235,6 @@ class App  {
 		var url=window.location.search.substring(1);						   						// Get query string
 		if (url && !url.match(/real/i)) {															// If params
 			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
-			else if (url="ly")		this.gid="10YitC1GN1KptoR-YRXS6HxDNk9ex_NW_m-6wKD8lC-8";		// Kennedy's spreadsheet
 			else					this.gid=url;													// Default spreadsheet
 			}
 		this.arc=new ARC();																			// Make new ARC tree		

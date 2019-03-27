@@ -1,5 +1,6 @@
 // ARC / RECORD
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +26,7 @@ class ARC  {
 		xhr.send();																						// Do it
 		xhr.onload=function() { 																		// When loaded
 			var i,j,k,o,v,step=0;
-			var goal="",next;
+			var goal="";
 			_this.tree=[];																				// Clear tree
 			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
 			tsv=tsv.split("\n");																		// Split into lines
@@ -48,50 +49,18 @@ class ARC  {
 					o.step=step;																		// Set step
 					k=v[2].match(/\{S(.*)?\}/);															// Slide spec'd?
 					if (k)	o.slide=k[1]-1;																// Set slide
-					o.next="";																			// Next 
+					o.from="";																			// From command
 					_this.tree.push(o);																	// Add step to tree
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
-					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "", next: "" });		// Add responses
+					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "" });	// Add responses
 					}
 				}
-	
-			for (i=0;i<_this.tree.length;++i) {															// For each step in tree
-				if (_this.tree[i].next)	{																// If a next spec'd
-					v=_this.tree[i].next.split("-");													// Get goal and step 
-					if (!isNaN(v[0]))	goal=_this.tree[i].goal,step=v[0];								// Just a number 
-					else				goal=v[0].toUpperCase(),step=v[1] ? v[1] : 0;					// A goal and maybe a number													
-					for (j=0;j<_this.tree.length;++j) { 												// For each step in tree
-						if ((_this.tree[j].goal == goal) && (_this.tree[j].step == step)) {				// A match
-							_this.tree[i].next=j;														// Point at next
-							break;																		// Quit looking
-							}
-						}
-					}
-				else																					// No next spec'd
-					_this.tree[i].next=Math.min(i+1,_this.tree.length-1);								// Point at next in line
-					
-				for (j=0;j<_this.tree[i].res.length;++j) {												// For each response in step
-					if (_this.tree[i].res[j].next)	{													// If a next spec'd
-						v=_this.tree[i].res[j].next.split("-");											// Get goal and step 
-						if (!isNaN(v[0]))	goal=_this.tree[i].goal,step=v[0];							// Just a number 
-						else				goal=v[0].toUpperCase(),step=v[1] ? v[1] : 0;				// A goal and maybe a number													
-						for (k=0;k<_this.tree.length;++k) { 											// For each step in tree
-							if ((_this.tree[k].goal == goal) && (_this.tree[k].step == step)) {			// A match
-								_this.tree[i].res[j].next=k;											// Point at next
-								break;																	// Quit looking
-								}
-							}
-						}
-					else																				// No next spec'd
-						_this.tree[i].res[j].next=Math.min(i+1,_this.tree.length-1);					// Point at next in line
-					}
-				}
+
 			_this.Extract();																			// Extract keywords and entities
-			_this.tree[_this.tree.length-1].next="END";
 		};									
 
 		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE

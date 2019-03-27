@@ -51,14 +51,14 @@ class Timeline {
 	
 	AddEvents(preview)																			// ADD EVENTS TO TIMELINE
 	{
-		var i=0,n=0,o,x,r,col,str;
+		var i,o,x,r,col,str;
 		var last=0;
 		this.events=[];																				// Clear events
 		if (preview) {																				// If previewing session
 			this.preview=true;																		// In preview
 			this.maxTime=3000;																		// Start at 3 sec
-			while (n++ < 200) {																		// No more than 200
-				o=app.arc.tree[i];																	// Point at step
+			for (i=0;i<app.arc.tree.length;++i) {													// For each step
+				o=app.arc.tree[i];																	// Point at it
 				if (!o)	continue;																	// Skip if bad																		
 				if (o.meta == "C")	app.curStudent=-2;												// Choral response 
 				else						app.curStudent=(app.curStudent+1)%app.students.length;	// Cycle through students
@@ -71,17 +71,13 @@ class Timeline {
 				x=o.text.length*app.voice.secsPerChar+1000;											// Time to speak action with padding
 				if (r && r <= o.res.length) {														// If a response
 					this.events.push({ o:"R", t:this.maxTime+x, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add it to record
-					if (o.res[r-1].next == "*")	i=last+1;											// If going back to next step
-					else						last=i,i=o.res[r-1].next;							// Go to designated step
 					this.maxTime+=o.res[r-1].text.length*app.voice.secsPerChar+2000;				// Add padded speak time to max time
 					if (o.res[r-1].cons) {															// If a consequence
 						this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons });	 	// Add it
 						this.maxTime+=o.res[r-1].cons.length*app.voice.secsPerChar+2000;			// Add padded speak time to max time 
 						}
 					}
-				else last=i,i=o.next;
 				this.maxTime+=x;																	// Add action speak time to max time
-				if (o.next == "END")	break;														// Quit on last one
 				}
 			}
 		else{																						// If reviewing session
@@ -321,14 +317,10 @@ class Review  {
 				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
 					o=app.arc.tree[i];																	// Point at step
 					if (o.text)	{																		// If defined
-						var oo=app.arc.tree[o.next];													// Point at next step
-						w=oo ? oo.meta+": "+oo.text : "";												// Add tooltip if a valid next
-						str+="<div title='"+w+"' id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";		
+						str+="<div id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";		
 						str+="<b>"+o.meta+": "+o.text+"</b></div>";
 						for (var j=0;j<o.res.length;++j) {												// For each response
-							oo=app.arc.tree[o.res[j].next];												// Point at next
-							w=oo ? oo.meta+": "+oo.text : "";											// Add tooltip if a valid next
-							str+="<div title='"+w+"' style='margin-left:16px'>";						// Start of line
+							str+="<div style='margin-left:16px'>";										// Start of line
 							for (var k=0;k<o.res[j].rc.length;++k) {									// For each response in chain
 								str+="<span style='color:"												// Start checks/crosses
 								if (o.res[j].rc[k] == RIGHT) 			str+="#009900'><b>&check;";		// Right

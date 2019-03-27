@@ -99,7 +99,7 @@
 
 	function PopSelect(o)																				// POPUP SELECT
 	{
-		var i,col,s;
+		var i,col,s,pw=o.w-50;
 		var trsty=";clear:both;min-height:22px;cursor:pointer;padding:3px 8px'>";
 		$("#popSelectDiv").remove();																		// Remove if open
 		var str="<div id='popSelectDiv' class='lz-popSelect' style='";										// Header
@@ -115,7 +115,10 @@
 			str+="<img id='psdel-"+i+"'src='img/trashbut.gif' style='float:right;display:none'>";			// Add delete button 
 			str+="<img id='psedt-"+i+"'src='img/editbut.gif' style='float:right;display:none'></div>";		// Add edit button 
 			}
-		str+="<p style='margin-left:8px'><input type='text' placeholder='Type to add new item' class='lz-is' id='psadd'></p>";		// Add add button
+		str+="<div style='margin-left:8px;margin-bottom:12px'>"
+		if (o.ds == app.as) 		str+=MakeSelect("popPrefix",false,["Q","I","W","A","C","P","S"]),pw-=55;	 	// Meta list
+		else if (o.ds == app.rs) 	str+=MakeSelect("popPrefix",false,["+","-","?","0"]),pw-=50;					// Valence list
+		str+="<input style='width:"+pw+"px' type='text' placeholder='Type to add new item' class='lz-is' id='psadd'></div>";		// Add add button
 		str+="</div></div>";																				// End divs
 		$("body").append(str);																				// Add to body
 
@@ -188,22 +191,16 @@
 			});
 
 		$("#psadd").on("change",(e)=> {  																	// On add click
+			var s="";
 			app.Do();																						// Undo setup
-			var s=$("#psadd").val();																		// Get new item
+			if ($("#popPrefix").val()) 	s=$("#popPrefix").val();											// Add prefix
+			if (o.ds == app.as)			s+=": ";															// Add spacing
+			s+=$("#psadd").val();																			// Get new item
 			o.opts.push(s);																					// Add new value
 			o.ds.push(s);																					// Add item
 			PopSelect(o)																					// Recurse
 			$("#popSelInDiv").scrollTop(100000);															// Scroll to bottom		
 		});
-
-
-/*			if (o.ds == app.as)	{																			// If instructor action, set text
-				var old=app.arcs[o.id];																		// Save original
-				for (var i=o.id;i<app.arcs.length;++i)														// For each step that follows
-					if (app.arcs[i].a == old)	app.arcs[i].a=s; 											// Rest if the same as original
-					else						break;														// Quit looking if different																		
-				}
-*/
 
 	}
 
@@ -237,9 +234,7 @@ class App  {
 			for (i=0;i<this.arcs.length;++i)																// For each step
 				if ($("#strad-"+i).prop("checked"))															// If it's checked
 					break;																					// Stop looking
-			var a=i ? this.arcs[i-1].a : "";																// Use instructor action from step above
-			var g=i ? this.arcs[i-1].g : "";																// Use goal from step above
-			this.arcs.splice(i,0,{ a:a, r:"", c:"", g:g });													// Add blank step
+				this.arcs.splice(i,0,{ a:"", r:"", c:"", g:"" });											// Add blank step
 			this.Draw();																					// Redraw
 			$("#stpl-"+i).css("background-color","#d7ebff");												// Color it to see it better
 			$("#mapDiv").scrollTop($("#stpl-"+i).position().top+$("#mapDiv").scrollTop()-100);				// Scroll there			
@@ -262,7 +257,7 @@ class App  {
 			});
 
 		$("#loadBut").on("click",(e)=> {  																	// ON LOAD
-			GetSpreadsheet(false, (s)=>{ 																	// Get spreadsheet id
+			GetSpreadsheet(true, (s)=>{ 																	// Get spreadsheet id
 				this.Do();																					// Undo setup
 				this.gid=s;																					// Set
 				this.Load(s);																				// Load up sheet 
@@ -643,7 +638,7 @@ function GetSpreadsheet(allFiles, callback)													// RUN GDRIVE PICKER
 
 	function MakeSelect(id, multi, items, sel, extra, values)				// CREATE HTML SELECT
 	{
-		var	str="<select class='wm-is' style='width:200px' id='"+id+"'";		// Header
+		var	str="<select class='lz-is' style='width:auto' id='"+id+"'";			// Header
 		if (multi)																// Multi select
 			str+="multiple='multiple' size='"+multi+"'";						// Add flag
 		if (extra)																// If extra param
