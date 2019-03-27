@@ -113,6 +113,7 @@ class ARC  {
 		{
 			var o,i,j,n=0;
 			var kscore,escore,best=0;
+			var oentities=entities+" ";
 			entities=(""+entities).split(", ");															// Put entities into array
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
 				kscore=escore=0;																		// Start at 0
@@ -126,9 +127,8 @@ class ARC  {
 					if (o.ents.match(RegExp(entities[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a entity AND value match
 						escore+=.5;																		// Add to score
 					}
-
 				j=(""+o.ents).split(", ").length;														// Number of entities in step	
-				this.tree[i].kscore=kscore/o.keys.length;												// Save normalized kscore
+				if (kscore)  this.tree[i].kscore=kscore/o.keys.length;									// Save normalized kscore
 				this.tree[i].escore=escore/Math.max(j,entities.length);									// Save normalized escore
 				this.tree[i].score=this.tree[i].escore;													// Save score in case there are no keys
 				if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore/2+this.tree[i].kscore;	// Use weighted average of keys and entities
@@ -138,6 +138,7 @@ class ARC  {
 				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20;			// If in slide, bump
 				if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.5;				// If from matches actual last step
 				if (o.from == this.lastResLine)						this.tree[i].score+=.5;				// If from matches actual last response
+	//			if ((o.meta == "I") && oentities.match(/ask\:/i))	this.tree[i].score=0;				// Not a true match	
 				}
 			var v=[],str="<< ";;
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
@@ -148,8 +149,8 @@ class ARC  {
 
 			if (this.tree[best].meta == "I") app.curStudent=Math.max(app.curStudent,1);					// No group responses from instructions
 			if (n > this.threshold)	{																	// If above threshold
+				this.lastStep=this.curStep;																// Then is now
 				this.curStep=best;																		// Set as current step 
-				this.lastStep=best;																		// Then is now
 				}
 			str+="\n    "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str,v); 															
 			return this.curStep;																		// Return best fit
@@ -159,8 +160,9 @@ class ARC  {
 	{
 		var i,j,n=0,r,rc,o;
 		var text="";
-		if (step == -1)							return;													// Quit if no step
+		if (step == -1)														return;						// Quit if no step
 		if (!app.arc.tree[step].res.length && (app.curStudent >= 0))		return;						// Quit if no responses for individuel students
+		if (app.arc.tree[step].meta == "I") 								return;						// No responses from instruction
 		if (app.arc.tree[step].meta == "C") {															// Choral
 			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
 			if (!app.voice.thoughtBubbles) 	Bubble(text,5);												// Show response
