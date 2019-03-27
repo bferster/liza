@@ -156,9 +156,11 @@
 				s=$("#psedit").val();																		// Get value
 				o.ds[id]=s;																					// Add item
 				o.opts[id]=s; 																				// Change local copy
-				PopSelect(o)																				// Recurse
-				$("#popSelInDiv").scrollTop($("#psopt-"+id).offset().top-200);								// Scroll to default		
-				$("#psopt-"+id).css("background-color","#f8dede");											// Color bar
+				if (o.ds == app.as)			app.arcs[o.id].a=s; 											// If instructor action, set text
+				else if (o.ds == app.rs)	app.arcs[o.id].r=s; 											// Student response											
+				else						app.arcs[o.id].c=s;												// Consequence
+				$("#popSelectDiv").remove();																// Remove selector
+				app.Draw();																					// Redraw		
 				});
 			});
 
@@ -532,7 +534,7 @@ function SaveSpreadsheet(id, data)															// CLEAR AND SAVE DATA TO GDRIV
 							var request=gapi.client.sheets.spreadsheets.values.update(params,body);	// Send new data
 							request.then(function(r) {											// Good save
 								Sound("ding");													// Ding
-								PopUp("Course copied<br>to Google Drive!");						// Show popup
+								PopUp("Session copied<br>to Google Drive!");					// Show popup
 								}, 
 								function(e) { trace(e.result.error.message); })					// Error reporting for send
 							}, 

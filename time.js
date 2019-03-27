@@ -62,10 +62,6 @@ class Timeline {
 				if (!o)	continue;																	// Skip if bad																		
 				if (o.meta == "C")	app.curStudent=-2;												// Choral response 
 				else						app.curStudent=(app.curStudent+1)%app.students.length;	// Cycle through students
-				if (o.score == undefined)	o.score=0;												// Must exist to use markov function
-				if (o.escore == undefined)	o.escore=0;												
-				if (o.kscore == undefined)	o.kscore=0;												
-				if (o.matched == undefined)	o.matched=0;											
 				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.meta, slide:o.slide });	// Add action
 				r=Math.max(1,app.arc.MarkovFindResponse(i,app.curStudent)); 						// Find proper response, with no NONE responses
 				x=o.text.length*app.voice.secsPerChar+1000;											// Time to speak action with padding
@@ -345,6 +341,7 @@ class Review  {
 				if (app.voice.talking || app.gettingEntities)  return;									// Not while busy
 				var id=e.currentTarget.id.substr(8);													// Get step
 				o=app.arc.tree[id];																		// Point at step
+				if (o.slide)	app.bb.Playback({ o:"P", p:"PPT slides", s:0, n:o.slide });				// Show slide
 				app.voice.Talk(o.text,"instructor");													// Talk
 				app.OnPhrase(o.text);	
 				});

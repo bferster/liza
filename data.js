@@ -11,7 +11,9 @@ class ARC  {
 	{
 		this.tree=[];																					// Holds tree
 		this.curStep=0;																					// Current step
-		this.lastStep=0;																				// Last  step 
+		this.lastStep=0;																				// Last step 
+		this.lastResLine=0;																				// Last response line
+		this.lastActLine=0;																				// Last action line
 		this.threshold=.4;																				// Picking threshold		
 		this.record=[];																					// Holds record of actions
 		this.resChain="";																				// Holds last response chain
@@ -25,7 +27,7 @@ class ARC  {
 		xhr.open("GET",str);																			// Set open url
 		xhr.send();																						// Do it
 		xhr.onload=function() { 																		// When loaded
-			var i,j,k,o,v,step=0;
+			var i,line=0,k,o,v,step=0;
 			var goal="";
 			_this.tree=[];																				// Clear tree
 			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
@@ -46,17 +48,17 @@ class ARC  {
 					o.text=v[2].trim();																	// Add text
 					o.res=[];																			// Responses array										
 					o.goal=goal;																		// Set goal
+					o.line=line++;																		// Set line
 					o.step=step;																		// Set step
-					k=v[2].match(/\{S(.*)?\}/);															// Slide spec'd?
-					if (k)	o.slide=k[1]-1;																// Set slide
-					o.from="";																			// From command
+					k=v[2].match(/\{S(.*)?\}/);		if (k)	o.slide=k[1]-1;								// If {slide} spec'd
+					k=v[2].match(/\{F(.*)?\}/);		if (k)	o.from=k[1];								// If {from} step spec'd
 					_this.tree.push(o);																	// Add step to tree
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
-					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "" });	// Add responses
+					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "",line:line++ });	// Add responses
 					}
 				}
 
@@ -77,6 +79,8 @@ class ARC  {
 		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
 		this.record.push(event);																		// Add to array																	
 		if ((event.o == "R") && (event.r != NONE))  this.resChain=event.r+this.resChain;				// If an actual response, add to top of response chain
+		if (event.o == "S")	 		this.lastActLine=event.l;											// Save last action line number												
+		else if (event.o == "R")	this.lastResLine=event.l;											// Response											
 	}
 
 	GetArcIndex(goal) 																				// GET INDEX OF ARC FROM GOAL
@@ -107,7 +111,7 @@ class ARC  {
 
 		FindClosestStep(text, entities)																// FIND STEP CLOSEST TO TEXT + ENTITIES
 		{
-			var o,i,j,n;
+			var o,i,j,n=0;
 			var kscore,escore,best=0;
 			entities=(""+entities).split(", ");															// Put entities into array
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
@@ -122,18 +126,19 @@ class ARC  {
 					if (o.ents.match(RegExp(entities[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a entity AND value match
 						escore+=.5;																		// Add to score
 					}
-				n=(""+o.ents).split(", ").length;														// Number of entities in step	
-				this.tree[i].kscore=kscore;																// Save kscore
-				this.tree[i].matched=escore/Math.max(n,entities.length);								// Adjust by amount matched
-				if (entities.length)	escore=escore/entities.length;									// Normalize 0-1
-				this.tree[i].score=this.tree[i].matched;												// Save score 
-				this.tree[i].escore=escore;																// Save escore
-				if (o.keys.length)	this.tree[i].score=(this.tree[i].matched+(kscore/o.keys.length))/2;	// Average of both
+
+				j=(""+o.ents).split(", ").length;														// Number of entities in step	
+				this.tree[i].kscore=kscore/o.keys.length;												// Save normalized kscore
+				this.tree[i].escore=escore/Math.max(j,entities.length);									// Save normalized escore
+				this.tree[i].score=this.tree[i].escore;													// Save score in case there are no keys
+				if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore/2+this.tree[i].kscore;	// Use weighted average of keys and entities
+				
 				if (o.goal == this.tree[this.lastStep].goal)		this.tree[i].score+=.05;			// If in current goal, bump-up score 
 				if ((i == this.lastStep+1))							this.tree[i].score+=.05;			// If next in script, bump
 				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20;			// If in slide, bump
+				if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.5;				// If from matches actual last step
+				if (o.from == this.lastResLine)						this.tree[i].score+=.5;				// If from matches actual last response
 				}
-			n=0;																						// Start low
 			var v=[],str="<< ";;
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
 				if (this.tree[i].score >= n) { n=this.tree[i].score;	best=i; };						// Set if highest
@@ -159,7 +164,7 @@ class ARC  {
 		if (app.arc.tree[step].meta == "C") {															// Choral
 			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
 			if (!app.voice.thoughtBubbles) 	Bubble(text,5);												// Show response
-			app.arc.Add({ o:'R', who:null, text:text, r:1 });											// Add to record
+			app.arc.Add({ o:'R', who:null, text:text, r:1, l:app.arc.lastResLine });					// Add to record
 			app.voice.Talk(text);																		// Speak response
 			app.curStudent=0;																			// Reset student
 			return;	
@@ -176,7 +181,7 @@ class ARC  {
 				}
 			else{																						// No one reponded
 				text="Nobody responded!";																// Message
-				app.arc.Add({ o:'R', who:null, text:"", r:0 });											// Add to record
+				app.arc.Add({ o:'R', who:null, text:"", r:0, l:app.arc.tree[step].line });				// Add to record
 				Bubble(text,5);																			// Show response
 				Sound("delete");
 				}
@@ -192,7 +197,7 @@ class ARC  {
 				else if (n < 66)	r=3;																// Mixed
 				else				r=1;																// Most disagree
 				Prompt(n+"% agreed",5);																	// Show agreement
-				app.arc.Add({ o:'R', who:null, text:n+"% agreed", r:r });								// Add to record
+				app.arc.Add({ o:'R', who:null, text:n+"% agreed", r:r, l:app.arc.tree[step].line });	// Add to record
 				app.curStudent=0;																		// Reset student
 			}
 		else{																							// A single student responding
@@ -212,7 +217,8 @@ class ARC  {
 					if (o.res[i].rc[0] == "0")	rc="0"+app.arc.resChain.substr(1);						// Ignore current response
 					if (o.res[i].rc == rc.substr(0,j)) {												// If a match
 						text=randomResponse(step,i);													// Return random response if multiple matches of immediate answer
-						app.arc.record[app.arc.record.length-1].text=text;								// Place back in record
+						app.arc.record[app.arc.record.length-1].text=text;								// Place text back in record
+						app.arc.record[app.arc.record.length-1].l=app.arc.lastResLine;					// Place line back in record
 						app.voice.Talk(text);															// Speak response
 						return;																			// Quit looking
 						}
@@ -228,6 +234,7 @@ class ARC  {
 					v.push(i);																			// Add to matched list
 			var r=Math.floor(Math.random()*v.length);
 			var text=rs[v[r]].text;																		// Get response 
+			app.arc.lastResLine=rs[v[r]].line;															// Set line
 			return text;																				// Return response text
 			}	
 	
@@ -252,7 +259,6 @@ class ARC  {
 				}
 			}
 		if (sid >= 0) app.students[sid].rMatrix[step]=so;												// Save for later responses
-//		trace("   Score:"+app.arc.tree[step].score.toFixed(2)+" Entities:"+app.arc.tree[step].escore.toFixed(2)+" Match:"+app.arc.tree[step].matched.toFixed(2)+" Keywords:"+app.arc.tree[step].kscore.toFixed(2));	// Show results
 		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
 		return r;																						// Return type of response
 	}
