@@ -341,7 +341,7 @@ class Review  {
 				if (app.voice.talking || app.gettingEntities)  return;									// Not while busy
 				var id=e.currentTarget.id.substr(8);													// Get step
 				o=app.arc.tree[id];																		// Point at step
-				if (o.slide)	app.bb.Playback({ o:"P", p:"PPT slides", s:0, n:o.slide });				// Show slide
+				if (o.slide)	app.bb.ShowSlide(0, o.slide);											// Show slide
 				app.voice.Talk(o.text,"instructor");													// Talk
 				app.OnPhrase(o.text);	
 				});

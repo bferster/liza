@@ -395,7 +395,7 @@ class App  {
 			score=app.arc.tree[app.arc.curStep].score;												// Get match score			
 			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, meta:app.arc.tree[app.arc.curStep].meta, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
 			if (o.match(/action:/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);			// If an action mentioned, try to do it
-			else if ((score > app.arc.threshold) && (o.match(/ask:/i)))								// If past threshold and an ask spoken
+			else if (score > app.arc.threshold)														// If past threshold
 				app.arc.DeliverResponse(app.arc.curStep);											// Deliver response
 			});																		
 		}

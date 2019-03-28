@@ -111,7 +111,7 @@ class ARC  {
 
 		FindClosestStep(text, entities)																// FIND STEP CLOSEST TO TEXT + ENTITIES
 		{
-			var o,i,j,n=0;
+			var o,i,j,f,n=0;
 			var kscore,escore,best=0;
 			var oentities=entities+" ";
 			entities=(""+entities).split(", ");															// Put entities into array
@@ -132,27 +132,29 @@ class ARC  {
 				this.tree[i].escore=escore/Math.max(j,entities.length);									// Save normalized escore
 				this.tree[i].score=this.tree[i].escore;													// Save score in case there are no keys
 				if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore/2+this.tree[i].kscore;	// Use weighted average of keys and entities
-				
-				if (o.goal == this.tree[this.lastStep].goal)		this.tree[i].score+=.05;			// If in current goal, bump-up score 
-				if ((i == this.lastStep+1))							this.tree[i].score+=.05;			// If next in script, bump
-				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20;			// If in slide, bump
-				if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.5;				// If from matches actual last step
-				if (o.from == this.lastResLine)						this.tree[i].score+=.5;				// If from matches actual last response
-	//			if ((o.meta == "I") && oentities.match(/ask\:/i))	this.tree[i].score=0;				// Not a true match	
+				f="";																					// Clear flag
+				if (o.goal == this.tree[this.curStep].goal)			this.tree[i].score+=.05,f+="G";		// If in current goal, bump-up score 
+				if ((i == this.lastStep+1))							this.tree[i].score+=.05,f+="N";;	// If next in script, bump
+				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";;	// If in slide, bump
+				if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.5,f+="F";;		// If from matches actual last step
+				if (o.from == this.lastResLine)						this.tree[i].score+=.5,f+="R";;		// If from matches actual last response
+				if (oentities.match(/ask\:/i))						f+="A";								// An ask	
+				o.flags=f;																				// Save flags
 				}
-			var v=[],str="<< ";;
+			var v=[],str="<< ";
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
-				if (this.tree[i].score >= n) { n=this.tree[i].score;	best=i; };						// Set if highest
-				v.push({ n:this.tree[i].goal+"-"+this.tree[i].step, p:Math.round(this.tree[i].score*100), e:this.tree[i].ents }); // Add step
+				o=this.tree[i];																			// Point at it
+				if (o.score >= n) { n=o.score;	best=i; };												// Set if highest
+				v.push({ n:o.goal+"-"+o.step, p:Math.round(o.score*100), e:o.ents, f:o.flags });		// Add step
 				}
 			v.sort((a,b)=>{ return b.p-a.p });	for (i=0;i<3;++i) str+=+v[i].p+" : "+v[i].n+", ";		// Top steps
 
 			if (this.tree[best].meta == "I") app.curStudent=Math.max(app.curStudent,1);					// No group responses from instructions
-			if (n > this.threshold)	{																	// If above threshold
-				this.lastStep=this.curStep;																// Then is now
+
+			this.lastStep=this.curStep;																	// Then is now
+			if (n > this.threshold)																		// If above threshold
 				this.curStep=best;																		// Set as current step 
-				}
-			str+="\n    "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents; trace(str,v); 															
+			str+="\n    "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents+" "+this.tree[this.curStep].flags; trace(str); 															
 			return this.curStep;																		// Return best fit
 		}
 
@@ -247,14 +249,14 @@ class ARC  {
 		var so,ability=.5;
 		if (sid >= 0) ability=app.students[sid].ability;												// Get student ability
 		var r=(Math.random()-.5)*.1;																	// Get jitter factor
-		var tm=[ [0.0, .40, .60], [0.0, .55-r, .45+r], [0.0, .48, .52] ];								// Markov transition matrix
+		var tm=[ [0.0, .45, .55], [0.0, .55-r, .45+r], [0.0, .48, .52] ];								// Markov transition matrix
 		if ((sid >= 0) && app.students[sid].rMatrix[step])	{											// If been there already, for an individual student
 			so=app.students[sid].rMatrix[step];						 									// Use last stage matrix as starting matrix
 			so=MatrixMultiply(so,tm);																	// Get response matrix stage
 			}
 		else{																							// First response is random, based on ability/affect
 			r=Math.random();																			// Get random number
-			if (r*ability < .01)	so=[[1,0,0]];														// Force a none response ~5% proportional to ability
+			if (r*ability < .005)	so=[[1,0,0]];														// Force a none response ~5% proportional to ability
 			else{																						// Calc starting matrix
 				r=Math.max(Math.min(ability+((r-.5)*(1+ability)),1),0); 								// Calc chance of right answer capped 0-1
 				so=[[0,r,1-r]];																			// Set starting matrix
