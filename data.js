@@ -163,16 +163,16 @@ class ARC  {
 	{
 		var i,j,n=0,r,rc,o;
 		var text="";
-		if (step == -1)														return;						// Quit if no step
-		if (!app.arc.tree[step].res.length && (app.curStudent >= 0))		return;						// Quit if no responses for individuel students
-		if (app.arc.tree[step].meta == "I") 								return;						// No responses from instruction
+		if (step == -1)														return "";					// Quit if no step
+		if (!app.arc.tree[step].res.length && (app.curStudent >= 0))		return "";					// Quit if no responses for individual students
+		if (app.arc.tree[step].meta == "I") 								return "";					// No responses from instruction
 		if (app.arc.tree[step].meta == "C") {															// Choral
 			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
 			if (!app.voice.thoughtBubbles) 	Bubble(text,5);												// Show response
 			app.arc.Add({ o:'R', who:null, text:text, r:1, l:app.arc.lastResLine });					// Add to record
 			app.voice.Talk(text);																		// Speak response
 			app.curStudent=0;																			// Reset student
-			return;	
+			return text;																	
 			}
 		else if (app.curStudent == -1) {																// If whole class responding and looking for answer
 			var n=Math.floor(Math.random()*app.students.length);										// Random number of students responding
@@ -202,7 +202,8 @@ class ARC  {
 				else if (n < 66)	r=3;																// Mixed
 				else				r=1;																// Most disagree
 				Prompt(n+"% agreed",5);																	// Show agreement
-				app.arc.Add({ o:'R', who:null, text:n+"% agreed", r:r, l:app.arc.tree[step].line });	// Add to record
+				text=n+"% agreed";																		// Save response
+				app.arc.Add({ o:'R', who:null, text:text, r:r, l:app.arc.tree[step].line });		// Add to record
 				app.curStudent=0;																		// Reset student
 			}
 		else{																							// A single student responding
@@ -211,6 +212,7 @@ class ARC  {
 			if (r == NONE) 	{																			// No response
 				Prompt(app.students[app.curStudent].id+" didn't repond to you!",5);						// Show prompt
 				Sound("delete");																		// Delete sound
+				text="No response";																		// Save response
 				}
 			else if (r == RIGHT) 		Prompt("Right answer");											// Show prompt
 			else if (r == WRONG) 		Prompt("Wrong answer");
@@ -225,7 +227,7 @@ class ARC  {
 						app.arc.record[app.arc.record.length-1].text=text;								// Place text back in record
 						app.arc.record[app.arc.record.length-1].l=app.arc.lastResLine;					// Place line back in record
 						app.voice.Talk(text);															// Speak response
-						return;																			// Quit looking
+						return text;																	// Quit looking
 						}
 					}
 				}
@@ -243,7 +245,8 @@ class ARC  {
 			return text;																				// Return response text
 			}	
 	
-		}
+		return text;																					// Return text response
+	}
 		
 	MarkovFindResponse(step, sid) 																	// FIND RESPONSE USING MARKOV CHAIN
 	{	

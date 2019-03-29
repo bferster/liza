@@ -275,9 +275,8 @@ class Review  {
 		str+="id='lpTitle'></span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
 		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div>"; 
 		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0'>";
-		str+=MakeSelect("revMode",false,["Overview","Full map","Preview", "Review"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
+		str+=MakeSelect("revMode",false,["Overview","Full map","Preview", "Review", "Texting"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
 		str+=MakeSelect("revStu",false,["Student"])+"</div>"; 
-			
 		$("body").append(str);																			// Add to body
 		for (i=0;i<app.students.length;++i)																// For each student
 			$("#revStu").append("<option>"+app.students[i].id+"</option>");								// Add to pulldown
@@ -341,7 +340,15 @@ class Review  {
 					}
 				str+="</ol>";
 				}
+			else if (mode == "Texting")	{																// Texting mode
+				$("#lpTitle").html("texting");															// Set title
+				str="<div style='position:absolute;top:"+$("#revMode").position().top+"px;left:8px'>"	// Container div
+				str+="<input id='revText' placeholder='Talk to class...' class='lz-is' style='width:280px'>";				// Input
+				str+="&nbsp;<img id='revTextBut'src='img/sendtext.png' style='vertical-align:-7px;cursor:pointer'></div>";	// Button
+				}
 			$("#revBodyDiv").html(str);																	// Add to div
+			$("#revText").focus();																		// Focus on
+
 			$("[id^=revTalk-]").off("click");															// Remove existing handlers
 			$("[id^=revTalk-]").on("click", function(e) {												// On click of step
 				if (app.voice.talking || app.gettingEntities)  return;									// Not while busy
@@ -351,6 +358,16 @@ class Review  {
 				app.voice.Talk(o.text,"instructor");													// Talk
 				app.OnPhrase(o.text);	
 				});
+			
+			$("#revText").on("change",   function(e) { chat();	});										// On text enter
+			$("#revTextBut").on("click", function(e) { chat();	});										// On text button click
+	
+			function chat() {																			// TEXT CHATTING
+				var s=$("#revText").val();																// Get text
+				$("#revText").val("");																	// Clear input
+				$("#revBodyDiv").append("<div class='lz-textS'>"+s+"</div>");							// Add to display
+				app.OnPhrase(s);		
+				}
 			}
 		}
 

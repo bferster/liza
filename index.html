@@ -40,10 +40,11 @@
 		.lz-blackboard {	position: absolute; left:16px; top: calc(100vh - 336px); width: 550px; height: 256px;  display:none;
 							background-color: #999; border: 1px solid #999;	padding:12px; border-radius: 8px; 
 							}
-		.lz-textS {			background-color:#eeeeee; border-radius:8px; padding:8px; width:fit-content; max-width: 66%; 
-							margin-bottom:8px; cursor:pointer;
+		.lz-textS {			background-color:#ddd; border-radius:16px; padding:4px 8px; width:fit-content;
+		 					max-width: 66%; clear:both; margin:5px 0;
 							}
-		.lz-textR {			background-color:#a7e5fd; border-radius:8px; padding:8px; width:fit-content; max-width: 66%; float:right
+		.lz-textR {			background-color:#0099ff; border-radius:16px; padding: 4px 8px; width:fit-content;
+		 					max-width: 66%; float:right; color:#fff;
 							}
 		.lz-canvas {		position: absolute; left:50px; top: 12px; width: 512px; height:256px; border-radius: 4px;
 							}
@@ -248,7 +249,7 @@ class App  {
 		this.LoadModels();																			// Load 3D models
 		this.Draw();																				// Start 
 
-		if (!this.voice.hasRecognition) 															// This platform doesn't have voice recognition
+		if ((!this.voice.hasRecognition) && (!isMobile))											// This platform doesn't have voice recognition
 			$("#talkBut").hide(),$("#talkInput").show();											// Show input	
 		$("#settingsBut").on("click", ()=> { app.sc.PoseEditor();  });								// On settings button click	
 		$("#reviewBut").on("click", ()=> { app.rev.Reviewer();  });									// On review button click	
@@ -395,8 +396,10 @@ class App  {
 			score=app.arc.tree[app.arc.curStep].score;												// Get match score			
 			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, meta:app.arc.tree[app.arc.curStep].meta, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
 			if (o.match(/action:/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);			// If an action mentioned, try to do it
-			else if (score > app.arc.threshold)														// If past threshold
-				app.arc.DeliverResponse(app.arc.curStep);											// Deliver response
+			else if (score > app.arc.threshold)	{													// If past threshold
+				var s=app.arc.DeliverResponse(app.arc.curStep);										// Deliver response
+				if (s)	$("#revBodyDiv").append("<div class='lz-textR'>"+s+"</div>");				// Add to texting display display, if texting
+				}
 			});																		
 		}
 		
