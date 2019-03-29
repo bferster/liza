@@ -332,8 +332,14 @@ class Review  {
 					}
 				}
 			else if (mode == "Overview") {																// Overview
-				$("#lpTitle").html("Lesson map overview");												// Set title
+				$("#lpTitle").html("class overview");													// Set title
 				str=app.rev.overview;																	// Show it
+				str+="<br><ol>";
+				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
+					o=app.arc.tree[i];																	// Point at step
+					if (o.hint)		str+="<li style='padding-bottom:4px'>"+o.meta+": "+o.hint+"</li>";	// Add hint, if set
+					}
+				str+="</ol>";
 				}
 			$("#revBodyDiv").html(str);																	// Add to div
 			$("[id^=revTalk-]").off("click");															// Remove existing handlers

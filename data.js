@@ -50,6 +50,7 @@ class ARC  {
 					o.goal=goal;																		// Set goal
 					o.line=line++;																		// Set line
 					o.step=step;																		// Set step
+					o.hint=v[3] ? v[3].trim() : "";														// Set hint
 					k=v[2].match(/\{S(.*)?\}/);		if (k)	o.slide=k[1]-1;								// If {slide} spec'd
 					k=v[2].match(/\{F(.*)?\}/);		if (k)	o.from=k[1];								// If {from} step spec'd
 					_this.tree.push(o);																	// Add step to tree

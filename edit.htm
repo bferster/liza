@@ -53,7 +53,7 @@
 <body>
 
 	<div id='mainDiv' class='lz-main'>
-		<div id='headerDiv' class='lz-header' onclick='$("#popSelectDiv").remove()'>
+		<div id='headerDiv' class='lz-header' onclick='app.Draw();$("#popSelectDiv").remove()'>
 			<img src='img/lizalogo64.png' style='margin:0 12px 0 20px;height:18px;vertical-align:-3px'><b>Session Editor</b>
 			<div style='margin-right:16px;color:#000;float:right'>
 				<span id='loadBut' style='margin-right:24px;cursor:pointer'>Load</span>
@@ -67,7 +67,7 @@
 			<span style='position:absolute;left:18px'><b>Instructor says</b></span>
 			<span style='position:absolute;left:calc(45% - 12px)'><b>Goal</b></span>
 			<span style='position:absolute;left:calc(50% - 12px)'><b>Student responds</b></span>
-			<span style='position:absolute;left:calc(75% - 32px)'><b>Consequence</b></span><br>
+			<span style='position:absolute;left:calc(75% - 32px)'><b>Feedback/hint</b></span><br>
 		</div>
 		<div id='mapDiv' class='lz-map'></div>
 			<div id='addStep' class='lz-bs' style='margin-left:16px;margin-top:16px'>Add new line</div>
@@ -330,7 +330,9 @@ class App  {
 			str+="<span style='color:#999'>"+(i+1)+". </span>"+a+"</td>";									// Instructor action
 			str+="<td style='width:5%;border-right:1px solid #ddd;padding-left:6px;max-width:60px;overflow:hidden'"; // Goal
 			str+=(o.a) ? " id='stpg-"+i+"'>"+g : ">";														// Add goal if a new step
-			str+="</td><td id='stpr-"+i+"' style='border-right:1px solid #ddd;padding-left:6px;width:25%;color:"+rcol+"'>"+r+"</td><td style='padding-left:8px;width:25%' id='stpc-"+i+"'>"+c;		// Response / consequence
+			str+="</td><td id='stpr-"+i+"' style='border-right:1px solid #ddd;padding-left:6px;width:25%;color:"+rcol+"'>"+r+"</td><td style='";  // Response
+			if (a) str+="color:#999;font-style:italic";		else  str+="color:#000088";						// Style
+			str+=";padding-left:8px;width:25%' id='stpc-"+i+"'>"+c;											// Feedback or hint
 			str+="</td><td><input id='strad-"+i+"' name='stradgrp' type='radio'></td></tr>";				// Add radio button
 			if (o.g)	lastGoal=o.g
 		}
@@ -345,6 +347,7 @@ class App  {
 			});
 		
 		$("[id^=stpa-]").on("click",(e)=> {  																// On instructor action click
+			if ($("#psedit").length) {this.Draw();  return; };											// Only one active at a time
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
 			var o={ x:0, y:67, h:h, w:w*.45-24, opts:[], def:this.arcs[id].a, ds:this.as, id:id };			// Settings
 			for (i=0;i<this.as.length;++i)	o.opts.push(this.as[i]);										// Add options
@@ -352,10 +355,9 @@ class App  {
 			});
 
 		$("[id^=stpg-]").on("click",(e)=> {  																// On goal click
-			trace(e)
+			if ($("#psedit").length) {this.Draw();  return; };												// Only one active at a time
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
 			var s=this.arcs[id].g;																			// Get value
-			if ($("#psedit").length) {this.Draw();  return; };												// Only one active at a time
 			if (s) s=s.replace(/'/g,"&apos;");																// No 's
 			$("#stpg-"+id).html("<input type='text' class='lz-is' style='height:20px;' value='"+s+"' id='psedit'>"); // Add editor
 			$("#psedit").on("click", (e)=>{ e.stopPropagation(); });										// Don't propagate event							
@@ -368,6 +370,7 @@ class App  {
 			});
 
 		$("[id^=stpr-]").on("click",(e)=> {  																// On response click
+			if ($("#psedit").length) {this.Draw();  return; };											// Only one active at a time
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
 			if (this.arcs[id].a) return;																	// No reponses on action line
 			var o={ x:w*.5-16, y:67, h:h, w:w/4-16, opts:[], def:this.arcs[id].r, ds:this.rs, id:id };		// Settings
@@ -375,13 +378,27 @@ class App  {
 			PopSelect(o);																					// Pick new item
 			});
 		
-		$("[id^=stpc-]").on("click",(e)=> {  																// On consequence click
+		$("[id^=stpc-]").on("click",(e)=> {  																// On Feedback/hint click
 			var w=$("#mapDiv").width();
 			var id=(e.currentTarget.id.substr(5));						 									// Get index
-			if (this.arcs[id].a) return;																	// No consequences on action line
-			var o={ x:w*.75-16, y:67, h:h, w:w/4, opts:[], ds:this.cs, def:this.arcs[id].c, id:id };		// Settings
-			for (i=0;i<this.cs.length;++i)	o.opts.push(this.cs[i]);										// Add options
-			PopSelect(o);																					// Pick new item
+			if (this.arcs[id].a) {																			// An action, so it's a hint
+				if ($("#psedit").length) {this.Draw();  return; };											// Only one active at a time
+				var s=this.arcs[id].c;																		// Get value
+				if (s) s=s.replace(/'/g,"&apos;");															// No 's
+				$("#stpc-"+id).html("<input type='text' class='lz-is' style='height:20px;width:calc(100% -16px)' value='"+s+"' id='psedit'>"); // Add editor
+				$("#psedit").on("click", (e)=>{ e.stopPropagation(); });									// Don't propagate event							
+				$("#psedit").focus();																		// Set focus
+				$("#psedit").on("change", ()=>{																// On enter key hit
+					app.Do();																				// Undo setup
+					this.arcs[id].c=$("#psedit").val(); 													// Get value
+					this.Draw();																			// Add item
+					});
+				}
+			else{																							// Feedback
+				var o={ x:w*.75-16, y:67, h:h, w:w/4, opts:[], ds:this.cs, def:this.arcs[id].c, id:id };	// Settings
+				for (i=0;i<this.cs.length;++i)	o.opts.push(this.cs[i]);									// Add options
+				PopSelect(o);																				// Pick new item
+				}
 			});
 	}
 
@@ -408,7 +425,7 @@ class App  {
 					if (v[0] && isNaN(v[0])) goal=v[0].trim();												// If a goal set
 					str=v[1].charAt(0)+": "+v[2].trim();													// Add text
 					_this.as.push(str);																		// Add to actions					
-					_this.arcs.push({ a:_this.as[_this.as.length-1], r:"", c:"", g:goal });					// Add line
+					_this.arcs.push({ a:_this.as[_this.as.length-1], r:"", c:v[3].trim(), g:goal });		// Add line
 					}
 				else if (v[1].match(/^R/i)) { 																// Response
 					_this.rs.push(v[1].substr(1)+v[2].trim());												// Add response
@@ -442,13 +459,14 @@ class App  {
 
 	Save()																								// CREATE TSV FROM ARC AND SAVE TO GOOGLE DOCS
 	{
-		var i,o,goal="none",action="",type,text;
-		var str=makeTSVLine("goal","type","text","consequence");											// Add header
+		var i,o,goal="none",action="",type,text,cons;
+		var str=makeTSVLine("goal","type","text","consequent");												// Add header
 		if (this.overview) 	str+=makeTSVLine("","overview",this.overview.trim(),"");						// Add overview if set
 		for (i=0;i<this.ps.length;++i) 	str+=makeTSVLine("","pic",this.ps[i].trim(),"")						// For each pic
 		str+=makeTSVLine("","","","");																		// Add blank line
 		for (i=0;i<this.arcs.length;++i) {																	// For each line
 			o=this.arcs[i];																					// Point at it
+			cons=o.c ? o.c.trim() : "";																		// Get consequence
 			if (o.a) {																						// An action
 				if (!o.a)	continue;																		// Skip if blank
 				if (o.a.match(/\:/)) {																		// If a meta
@@ -459,12 +477,12 @@ class App  {
 					type="Q";																				// Default to question if none spec'd
 					text=o.a.trim();																		// Get text											
 					}
-				str+=makeTSVLine(goal != o.g ? o.g : "",type,text,"");										// Add action
+				str+=makeTSVLine(goal != o.g ? o.g : "", type, text, cons);									// Add action
 				}
 			else{																							// A response
 				type=o.r.match(/^(\+|\-|\?|0)+/)[0];														// Get valences
 				text=o.r.trim().substr(type.length);														// Get response	portion										
-				str+=makeTSVLine("","R"+type,text,o.c ? o.c.trim() : "");									// Add response
+				str+=makeTSVLine("","R"+type, text, cons);													// Add response
 				}
 			if (o.g)	goal=o.g;																			// If a goal set, use it as current coal
 			}
