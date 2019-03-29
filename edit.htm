@@ -116,8 +116,8 @@
 			str+="<img id='psedt-"+i+"'src='img/editbut.gif' style='float:right;display:none'></div>";		// Add edit button 
 			}
 		str+="<div style='margin-left:8px;margin-bottom:12px'>"
-		if (o.ds == app.as) 		str+=MakeSelect("popPrefix",false,["Q","I","W","A","C","P","S"]),pw-=55;	 	// Meta list
-		else if (o.ds == app.rs) 	str+=MakeSelect("popPrefix",false,["+","-","?","0"]),pw-=50;					// Valence list
+		if (o.ds == app.as) 		str+=MakeSelect("popPrefix",false,["Q","I","W","A","C","P","S"]),pw-=55; // Move list
+		else if (o.ds == app.rs) 	str+=MakeSelect("popPrefix",false,["+","-","?","0"]),pw-=50;			// Valence list
 		str+="<input style='width:"+pw+"px' type='text' placeholder='Type to add new item' class='lz-is' id='psadd'></div>";		// Add add button
 		str+="</div></div>";																				// End divs
 		$("body").append(str);																				// Add to body
@@ -469,7 +469,7 @@ class App  {
 			cons=o.c ? o.c.trim() : "";																		// Get consequence
 			if (o.a) {																						// An action
 				if (!o.a)	continue;																		// Skip if blank
-				if (o.a.match(/\:/)) {																		// If a meta
+				if (o.a.match(/\:/)) {																		// If a move
 					type=o.a.split(":")[0].trim();															// Get line type											
 					text=o.a.split(":")[1].trim();															// Get text											
 					}

@@ -36,8 +36,8 @@ class Voice {
 				this.voices=[];																			// Clear list
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
 					if (voice.lang == "en-US")		_this.voices.push(voice);							// Just look at English
-					if (voice.name == "Samantha")	_this.femaleVoice=_this.voices.length-1,_this.tts.pitch=1.5;	// Use Samantha if available on Mac
-					if (voice.name == "Alex")		_this.maleVoice=_this.voices.length-1,_this.tts.pitch=1.5;		// And Alex too
+					if (voice.name == "Samantha")	_this.femaleVoice=_this.voices.length-1,_this.tts.pitch=1.3,_this.tts.rate=1;	// Use Samantha if available on Mac
+					if (voice.name == "Alex")		_this.maleVoice=_this.voices.length-1,_this.tts.pitch=1.3,_this.tts.rate=1;		// And Alex too
 					});
 				};
 
@@ -104,7 +104,7 @@ class Voice {
 			else if ((who == undefined) && (app.curStudent < 0)) who="choral";							// It's choral or group
 			else if (who != "instructor")	app.curStudent=who,who=app.students[app.curStudent].sex;	// Set current student
 			var oldPitch=this.tts.pitch;																// Save old pitch
-			if (who == "instructor") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=0;	// Lower pitch if instructor
+			if (who == "instructor") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=.5;	// Lower pitch if instructor
 			else if (who == "choral") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=3;	// Higher pitch if choral
 			else if (who == "male")		this.tts.voice=this.voices[this.maleVoice];						// Set male voice
 			else 						this.tts.voice=this.voices[this.femaleVoice];					// Set female voice

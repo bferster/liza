@@ -297,11 +297,11 @@ class App  {
 		this.desks.push({ id:"desk5", src:"assets/desk.dae", x:0, y:100, z:0, s:20, r:0, tex:tex} );		
 		this.desks.push({ id:"desk6", src:"assets/desk.dae", x:120, y:100, z:0, s:20, r:0, tex:tex} );		
 		if (!window.location.search.match(/one/i)) {
-			this.students.push({ id:"Freddy", src:"assets/body.dae", x:-120, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/freddyskin.png" : "assets/skin1.png", sex: "male", fidget:0, ability:.2} );
+			this.students.push({ id:"Robert", src:"assets/body.dae", x:-120, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0, ability:.2} );
 //			this.students.push({ id:"Joe", src:"assets/body.dae", x:0, y:-112, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/joeskin.png" : "assets/skin1.png", sex: "male", fidget:0, ability:.5 } );
 //			this.students.push({ id:"Sally", src:"assets/body.dae", x:120, y:-112, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/sallyskin.png" : "assets/skin1.png", sex: "female", fidget:0, ability:.5 } );
 			this.students.push({ id:"Sara", src:"assets/body.dae", x:-120, y:88, z:0, s:15, r:-10, tex:this.sc.cartoonScene ? "assets/saraskin.png" : "assets/skin1.png", sex: "female", fidget:0, ability:.8 } );
-			this.students.push({ id:"Robert", src:"assets/body.dae", x:0, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/robertskin.png" : "assets/skin1.png", sex: "male", fidget:0, ability:.5 } );
+			this.students.push({ id:"Freddy", src:"assets/body.dae", x:0, y:88, z:0, s:15, r:0, tex:this.sc.cartoonScene ? "assets/freddyskin.png" : "assets/skin1.png", sex: "male", fidget:0, ability:.5 } );
 			}
 		this.students.push({ id:"Liza", src:"assets/body.dae", x:120, y:88, z:1, s:15, r:0, tex:this.sc.cartoonScene ? "assets/lizaskin.png" : "assets/skin1.png", sex: "female", fidget:0, ability:.8 } );
 	
@@ -372,8 +372,8 @@ class App  {
 			else if (o.match(/who:all/i)) 		app.curStudent=-1;									// Whole class
 			else if (o.match(/who:Class/i)) 	app.curStudent=-1;									// Whole class
 			else if (o.match(/who:Liza/i)) 		app.curStudent=3;									// Set current student
-			else if (o.match(/who:Freddy/i)) 	app.curStudent=0;
-			else if (o.match(/who:Robert/i)) 	app.curStudent=2;
+			else if (o.match(/who:Freddy/i)) 	app.curStudent=2;
+			else if (o.match(/who:Robert/i)) 	app.curStudent=0;
 			else if (o.match(/who:Sara/i)) 		app.curStudent=1;
 
 			if (text.match(/set goal to/i)) {														// If setting goal		
@@ -394,7 +394,7 @@ class App  {
 				}
 			app.arc.FindClosestStep(text,o);														// Match closest step to text
 			score=app.arc.tree[app.arc.curStep].score;												// Get match score			
-			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, meta:app.arc.tree[app.arc.curStep].meta, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
+			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, move:app.arc.tree[app.arc.curStep].move, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
 			if (o.match(/action:/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);			// If an action mentioned, try to do it
 			else if (score > app.arc.threshold)	{													// If past threshold
 				var s=app.arc.DeliverResponse(app.arc.curStep);										// Deliver response
@@ -403,7 +403,7 @@ class App  {
 			});																		
 		}
 		
-		DoAction(act, all)																			// PERFORM ACTION
+		DoAction(act, all)																		// PERFORM ACTION
 		{
 			var i;
 			if ((app.curStudent < 0) || all) 														// If the whole class

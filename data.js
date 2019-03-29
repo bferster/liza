@@ -43,7 +43,7 @@ class ARC  {
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
-					o.meta=v[1].substr(0,1);															// Instructional meta structure
+					o.move=v[1].substr(0,1);															// Instructional meta structure
 					o.rc=v[1].substr(1).trim();															// Add 
 					o.text=v[2].trim();																	// Add text
 					o.res=[];																			// Responses array										
@@ -150,7 +150,7 @@ class ARC  {
 				}
 			v.sort((a,b)=>{ return b.p-a.p });	for (i=0;i<3;++i) str+=+v[i].p+" : "+v[i].n+", ";		// Top steps
 
-			if (this.tree[best].meta == "I") app.curStudent=Math.max(app.curStudent,1);					// No group responses from instructions
+			if (this.tree[best].move == "I") app.curStudent=Math.max(app.curStudent,1);					// No group responses from instructions
 
 			this.lastStep=this.curStep;																	// Then is now
 			if (n > this.threshold)																		// If above threshold
@@ -165,8 +165,8 @@ class ARC  {
 		var text="";
 		if (step == -1)														return "";					// Quit if no step
 		if (!app.arc.tree[step].res.length && (app.curStudent >= 0))		return "";					// Quit if no responses for individual students
-		if (app.arc.tree[step].meta == "I") 								return "";					// No responses from instruction
-		if (app.arc.tree[step].meta == "C") {															// Choral
+		if (app.arc.tree[step].move == "I") 								return "";					// No responses from instruction
+		if (app.arc.tree[step].move == "C") {															// Choral
 			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
 			if (!app.voice.thoughtBubbles) 	Bubble(text,5);												// Show response
 			app.arc.Add({ o:'R', who:null, text:text, r:1, l:app.arc.lastResLine });					// Add to record

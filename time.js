@@ -60,9 +60,9 @@ class Timeline {
 			for (i=0;i<app.arc.tree.length;++i) {													// For each step
 				o=app.arc.tree[i];																	// Point at it
 				if (!o)	continue;																	// Skip if bad																		
-				if (o.meta == "C")	app.curStudent=-2;												// Choral response 
-				else						app.curStudent=(app.curStudent+1)%app.students.length;	// Cycle through students
-				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.meta, slide:o.slide });	// Add action
+				if (o.move == "C")	app.curStudent=-2;												// Choral response 
+				else				app.curStudent=(app.curStudent+1)%app.students.length;			// Cycle through students
+				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.move, slide:o.slide });	// Add action
 				r=Math.max(1,app.arc.MarkovFindResponse(i,app.curStudent)); 						// Find proper response, with no NONE responses
 				x=o.text.length*app.voice.secsPerChar+1000;											// Time to speak action with padding
 				if (r && r <= o.res.length) {														// If a response
@@ -80,13 +80,12 @@ class Timeline {
 			this.maxTime=0;																			// Reset time
 			for (i=0;i<app.arc.record.length;++i) {													// For each event
 				o=app.arc.record[i];																// Point at event
+			trace(o)
 				x=o.t-app.startTime;																// Set time in mseconds
 				if (o.o == 'S') 																	// Instructor statement
-					this.events.push({ o:"S", t:x, text:o.text, m:o.meta });						// Add action
-				else if (o.o == 'R') {																// Student response
+					this.events.push({ o:"S", t:x, text:o.text, m:o.move });						// Add action
+				else if (o.o == 'R') 																// Student response
 					this.events.push({ o:"R", t:x, text:o.text, who:o.who, r:o.r });				// Add action
-//					this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons, rev:1 });	// Add it, flagging for review
-					}
 				if ((o.o == 'S') ||  (o.o == 'R'))													// If statement or response
 					this.maxTime=Math.max(x,this.maxTime);											// Set to max time
 				}
@@ -313,7 +312,7 @@ class Review  {
 					o=app.arc.tree[i];																	// Point at step
 					if (o.text)	{																		// If defined
 						str+="<div id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";		
-						str+="<b>"+o.meta+": "+o.text+"</b></div>";
+						str+="<b>"+o.move+": "+o.text+"</b></div>";
 						for (var j=0;j<o.res.length;++j) {												// For each response
 							str+="<div style='margin-left:16px'>";										// Start of line
 							for (var k=0;k<o.res[j].rc.length;++k) {									// For each response in chain
@@ -336,7 +335,7 @@ class Review  {
 				str+="<br><ol>";
 				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
 					o=app.arc.tree[i];																	// Point at step
-					if (o.hint)		str+="<li style='padding-bottom:4px'>"+o.meta+": "+o.hint+"</li>";	// Add hint, if set
+					if (o.hint)		str+="<li style='padding-bottom:4px'>"+o.move+": "+o.hint+"</li>";	// Add hint, if set
 					}
 				str+="</ol>";
 				}
