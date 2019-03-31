@@ -304,7 +304,8 @@ class App  {
 				}
 			for (i=this.students.length-1;i>=0;i--) 												// For each student spec'd
 				if (this.students[i] == "absent") 	this.students.splice(i,1);						// Remove absent students
-				else								this.roster[this.students[i].id]=i;				// Add to roster
+			for (i=0;i<this.students.length;i++) 													// For each student spec'd
+				this.roster[this.students[i].id]=i;													// Add to roster
 			this.LoadModels();																		// Load 3D models
 			});
 		this.poses["startUp"]="armL,-51,4,-44,armR,-51,-4,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-78,-8,0,thighR,-78,10,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-50,0,wristR,8,0,0";
@@ -379,15 +380,8 @@ class App  {
 			else if (o.match(/who:Freddy/i)) 	app.curStudent=app.roster["Freddy"];
 			else if (o.match(/who:Robert/i)) 	app.curStudent=app.roster["Robert"];
 			else if (o.match(/who:Sara/i)) 		app.curStudent=app.roster["Sara"];
-
-			if (text.match(/set goal to/i)) {														// If setting goal		
-				app.lastGoal=app.curGoal;															// Save last goal
-				app.curGoal=text.replace(/set goal to/i,"").trim().toUpperCase();					// Remove goal tag
-				Prompt("Now focusing on the goal "+app.curGoal,5),									// Prompt
-				Sound("ding");																		// Ding
-				return;
-				}
-				
+			if (o.match(/action:/i)) 			app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an action mentioned, do it
+		
 			if (app.pickingStudent) {																// If students have their hands up
 				app.curStudent=Math.max(app.curStudent);											// Default to 1st if still talking to class
 				app.DoAction("sit",true);															// Hands down
@@ -396,11 +390,11 @@ class App  {
 				Prompt("");																			// Clear prompt
 				return;	
 				}
+
 			app.arc.FindClosestStep(text,o);														// Match closest step to text
 			score=app.arc.tree[app.arc.curStep].score;												// Get match score			
 			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, move:app.arc.tree[app.arc.curStep].move, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
-			if (o.match(/action:/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);			// If an action mentioned, try to do it
-			else if (score > app.arc.threshold)	{													// If past threshold
+			if (score > app.arc.threshold) {														// If past threshold
 				var s=app.arc.DeliverResponse(app.arc.curStep).replace(/\{.*?\}/,"");				// Deliver response without braced tags
 				if (s)	$("#revTextDiv").append("<div class='lz-textR'>"+s+"</div>");				// Add to texting display display, if texting
 				}

@@ -11,7 +11,7 @@ class Voice {
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		this.listening=false;																			// Flag if listening
 		this.talkStartTime=0;																			// Time started talking
-		this.secsPerChar=.12*1000;																		// Mseconds per char
+		this.secsPerChar=.095*1000;																		// Mseconds per char
 		var s=this.phonemes=[];																			// Holds phoneme table
 		s["/b/"]="ba";	  s["/d/"]="da";    s["/f/"]="if";    s["/g/"]="ga";   s["/h/"]="hah";
 		s["/j/"]="jaw";	  s["/k/"]="kit";   s["/l/"]="lah";   s["/m/"]="um";  s["/n/"]="un "; 

@@ -37,7 +37,7 @@ class ARC  {
 				if (v[1].match(/ov/i))  		 app.rev.overview=v[2];									// Overview
 				else if (v[1].match(/student/i)) app.students=v[2].split(",");							// Add student list
 				else if (v[1].match(/pic/i)) 	 app.bb.AddPic(v[2].split("|")[0],v[2].split("|")[1]);	// Add image or slide deck
-				else if (v[1].match(/^Q|W|A|I|S|C|P/i)) {												// New step
+				else if (v[1].match(/^Q|W|A|I|S|C|P|E/i)) {												// New step
 					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
 					else						step++;													// New step
 					o={ con:[], rso:null, aso:null, cso:null }; 										// A new step object
@@ -99,7 +99,7 @@ class ARC  {
 			var i,j,k,o,v,val;
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
 				o=this.tree[i];																			// Point at step
-				o.keys=[];																				// Create keyword array
+			o.keys=[];																				// Create keyword array
 				v=(o.text+" ").match(/\(.+?\)/g);														// Get array of key words (keyword)
 				if (v) {																				// If keys flagged
 					for (j=0;j<v.length;++j) {															// For each key
@@ -124,11 +124,13 @@ class ARC  {
 				for (j=0;j<o.keys.length;++j)															// For each key
 					if (text.match(RegExp(o.keys[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"))))		// Check for key in text
 						kscore++;																		// Add to key score
-				for (j=0;j<entities.length;++j) {														// For each entity spoken
-					if (o.ents.match(RegExp(entities[j].split(':')[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/i))))  // If a basic enities match
-						escore+=.5;																		// Add to score
-					if (o.ents.match(RegExp(entities[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a entity AND value match
-						escore+=.5;																		// Add to score
+				if (o.ents)	{																			// If any entities		
+					for (j=0;j<entities.length;++j) {													// For each entity spoken
+						if (o.ents.match(RegExp(entities[j].split(':')[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/i))))  // If a basic enities match
+							escore+=.5;																	// Add to score
+						if (o.ents.match(RegExp(entities[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 		// If a entity AND value match
+							escore+=.5;																	// Add to score
+						}
 					}
 				j=(""+o.ents).split(", ").length;														// Number of entities in step	
 				if (kscore)  this.tree[i].kscore=kscore/o.keys.length;									// Save normalized kscore
@@ -221,7 +223,6 @@ class ARC  {
 			else if (r == WRONG) 		Prompt("Wrong answer");
 			else if (r == INCOMPLETE) 	Prompt("Incomplete answer");
 			
-			
 			app.arc.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
 			rc=app.arc.resChain;																		// Get response chain
 			for (var i=0;i<o.res.length;++i) {															// For each response	
@@ -256,7 +257,7 @@ class ARC  {
 		
 	MarkovFindResponse(step, sid) 																	// FIND RESPONSE USING MARKOV CHAIN
 	{	
-		var so,ability=.5;
+		var i,so,ability=.5;
 		if (sid >= 0) ability=app.students[sid].ability;												// Get student ability
 		var r=(Math.random()-.5)*.1;																	// Get jitter factor
 		var tm=[ [0.0, .45, .55], [0.0, .55-r, .45+r], [0.0, .48, .52] ];								// Markov transition matrix
@@ -274,6 +275,9 @@ class ARC  {
 			}
 		if (sid >= 0) app.students[sid].rMatrix[step]=so;												// Save for later responses
 		r=so[0].indexOf(Math.max(...so[0]));															// Convert [0=none, 1=right, 2=wrong]															
+		var o=this.tree[step].res;																		// Point at responses
+		for (i=0;i<o.length;++i)			if (o[i].rc == r)	break;									// Look through responses for a match
+		if (o.length && (i == o.length))	r=o[0].rc;													// If none, use first one 
 		return r;																						// Return type of response
 	}
 

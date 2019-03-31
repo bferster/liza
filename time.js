@@ -54,7 +54,6 @@ class Timeline {
 	AddEvents(preview)																			// ADD EVENTS TO TIMELINE
 	{
 		var i,o,x,r,col,str;
-		var last=0;
 		this.events=[];																				// Clear events
 		if (preview) {																				// If previewing session
 			this.preview=true;																		// In preview
@@ -66,16 +65,15 @@ class Timeline {
 				else				app.curStudent=(app.curStudent+1)%app.students.length;			// Cycle through students
 				this.events.push({ o:"S", t:this.maxTime, text:o.text, m:o.move, slide:o.slide });	// Add action
 				r=Math.max(1,app.arc.MarkovFindResponse(i,app.curStudent)); 						// Find proper response, with no NONE responses
-				x=o.text.length*app.voice.secsPerChar+1000;											// Time to speak action with padding
-				if (r && r <= o.res.length) {														// If a response
-					this.events.push({ o:"R", t:this.maxTime+x, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add it to record
-					this.maxTime+=o.res[r-1].text.length*app.voice.secsPerChar+2000;				// Add padded speak time to max time
+				this.maxTime+=(o.text.length*app.voice.secsPerChar)+1000;							// Time to speak action with padding
+					if (r && r <= o.res.length) {													// If a response
+					this.events.push({ o:"R", t:this.maxTime, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add it to record
+					this.maxTime+=(o.res[r-1].text.length*app.voice.secsPerChar)+2000;				// Add padded response time to max time
 					if (o.res[r-1].cons) {															// If a consequence
-						this.events.push({ o:"CON", t:this.maxTime+x, text:o.res[r-1].cons });	 	// Add it
-						this.maxTime+=o.res[r-1].cons.length*app.voice.secsPerChar+2000;			// Add padded speak time to max time 
+						this.events.push({ o:"CON", t:this.maxTime, text:o.res[r-1].cons });	 	// Add it
+						this.maxTime+=(o.res[r-1].cons.length*app.voice.secsPerChar)+1000;			// Add padded feedback  time to max time 
 						}
 					}
-				this.maxTime+=x;																	// Add action speak time to max time
 				}
 			}
 		else{																						// If reviewing session
@@ -105,7 +103,7 @@ class Timeline {
 			if (o.o == "S")																			// If an instructor action	
 				str+="<div class='lz-timeEventI' style='left:"+(x-6)+"px' title='"+o.text.replace(/\{.*?\}/,"").trim()+"'>"+(o.m ? o.m : "")+"</div>";								
 			else if (o.o == "R") {																	// If a student response
-				x=i ? w*this.events[i-1].t/this.maxTime+30 : 30 +30;								// Position under action
+//				x=i ? w*this.events[i-1].t/this.maxTime+30 : 30 +30;								// Position under action
 				str+="<div class='lz-timeEventS' style='left:"+x+"px;background-color:"+col+"' title='";
 				if ((o.who != null) && (o.who >= 0)) 	str+-app.students[o.who].id+": ";			// Add student name if individual
 				str+=o.text.replace(/\{.*?\}/,"").trim()+"'>"+(o.m ? o.m : "")+"</div>";				
@@ -123,7 +121,7 @@ class Timeline {
 		app.rev.ShowBlackboard(app.startTime+100);													// Draw starting blackboard
 		var str="<div id='timeBar' class='lz-timebar'>";											// Add timebar div
 		str+="<div class='lz-timeback'></div>";														// Backing div
-		str+="<div id='insTextDiv' style='width:100%;text-align:center;float:left;color:#333;margin-top:-52px;font-size:14px'></div>";									
+		str+="<div id='insTextDiv' style='width:80%;text-align:center;float:left;color:#333;margin:-60px 10% 0 10% ;font-size:14px'></div>";									
 		str+="<div id='stuTextDiv' style='width:100%;text-align:center;float:left;color:#000;margin-top:-26px;font-size:14px'></div>";								
 		
 		str+="<div id='timeSlider' class='lz-timeslider'></div>";									// Add time slider div

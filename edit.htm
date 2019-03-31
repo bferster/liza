@@ -422,7 +422,7 @@ class App  {
 				if (v[1].match(/over/i))  	 _this.overview=v[2].trim();									// Overview
 				if (v[1].match(/student/i))  _this.students=v[2].trim();									// Students
 				else if (v[1].match(/pic/i)) _this.ps.push(v[2].trim());									// Pics
-				else if (v[1].match(/^Q|W|A|I|S|C|P/)) {													// New step
+				else if (v[1].match(/^Q|W|A|I|S|C|P|E/)) {													// New step
 					line=({ a:"", r:"", c:"", g:"" });														// Blank line
 					if (v[0] && isNaN(v[0])) goal=v[0].trim();												// If a goal set
 					str=v[1].charAt(0)+": "+v[2].trim();													// Add text
