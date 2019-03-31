@@ -6,6 +6,9 @@ class Scene {
 
 	constructor(div)																			// CONSTRUCTOR
 	{
+		this.seats=[ { x: 120, y:100,  z:0, r:0 },   { x:  0,  y:100,  z:0, r:0   },				// Seat locations
+					 { x:-120, y:100,  z:0, r:-10 }, { x:-120, y:-100, z:0, r:0 },
+					 { x:   0, y:-100, z:0, r:0 },   { x: 120, y:-100, z:0, r:30  } ];
 		this.lastTime=0;																			// Used to throttle rendring
 		this.cartoonScene=window.location.search.match(/real/i) ? false : true;						// Render scene as cartoon?	   		
 		this.models=[];																				// Holds models
@@ -165,10 +168,12 @@ class Scene {
 					}							
 			});
 			
-			object.oxp=o.x;		object.ozp=o.y;		object.oyp=o.z;	object.orp=o.r;					// Save start pos's
+			var loc=_this.seats[o.seat];															// Get location
+			object.oxp=loc.x;		object.ozp=loc.y;		object.oyp=loc.z;	object.orp=loc.r;	// Save start pos's
 			object.scale.x=object.scale.y=object.scale.z=o.s;										// Scale 
-			object.position.x=o.x;	object.position.z=o.y;	object.position.y=o.z;					// Position
-			object.rotation.z=o.r*Math.PI/180;														// Rotation
+			object.position.x=loc.x;	object.position.z=loc.y;	object.position.y=loc.z;		// Position
+			object.rotation.z=loc.r*Math.PI/180;													// Rotation
+			if (o.sex) object.position.z-=12,object.ozp-=12;
 			_this.scene.add(object);																// Add model to scene
 		}
 	}
@@ -401,9 +406,7 @@ class Scene {
 			if (app.students[i].fidget)	{															// If fidgeting
 				app.sc.SetBone(app.students[i].id,"thighR",-78,Math.cos(app.sc.aniTimer/15*Math.PI)*1+1*.0001,0);		// LegR
 				app.sc.SetBone(app.students[i].id,"thighL",-78,-Math.cos((app.sc.aniTimer+10)/15*Math.PI)*1+1*.0001,0);	// LegL
-				app.sc.SetBone(app.students[i].id,"thumbR",Math.cos(app.sc.aniTimer/30*Math.PI)*20,0,0);				// ThumbR
-				app.sc.SetBone(app.students[i].id,"thumbL",Math.cos((app.sc.aniTimer+20)/30*Math.PI)*20,0,0);			// ThumbL
-				app.sc.SetBone(app.students[i].id,"neck",0,0,Math.cos(app.sc.aniTimer/15*Math.PI)*2+2*.0001);			// Neck
+				app.sc.SetBone(app.students[i].id,"spine",0,0,Math.cos((app.sc.aniTimer+20)/15*Math.PI)*.8+.8*.00001);	// Spine
 				}	
 		++app.sc.aniTimer;																			// Advance timer
 	}

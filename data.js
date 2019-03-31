@@ -19,7 +19,7 @@ class ARC  {
 		this.resChain="";																				// Holds last response chain
 		}
 
-	Load(id) 																						// LOAD DOC FROM GOOGLE DRIVE
+	Load(id, callback) 																				// LOAD DOC FROM GOOGLE DRIVE
 	{
 		var _this=this;																					// Save context
 		var str="https://docs.google.com/spreadsheets/d/"+id+"/export?format=tsv";						// Access tto
@@ -34,8 +34,9 @@ class ARC  {
 			tsv=tsv.split("\n");																		// Split into lines
 			for (i=1;i<tsv.length;++i) {																// For each line
 				v=tsv[i].split("\t");																	// Split into fields
-				if (v[1].match(/ov/i))  		app.rev.overview=v[2];									// Overview
-				else if (v[1].match(/pic/i)) 	app.bb.AddPic(v[2].split("|")[0],v[2].split("|")[1]);	// Add image or slide deck
+				if (v[1].match(/ov/i))  		 app.rev.overview=v[2];									// Overview
+				else if (v[1].match(/student/i)) app.students=v[2].split(",");							// Add student list
+				else if (v[1].match(/pic/i)) 	 app.bb.AddPic(v[2].split("|")[0],v[2].split("|")[1]);	// Add image or slide deck
 				else if (v[1].match(/^Q|W|A|I|S|C|P/i)) {												// New step
 					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
 					else						step++;													// New step
@@ -64,6 +65,7 @@ class ARC  {
 				}
 
 			_this.Extract();																			// Extract keywords and entities
+			if (callback)	callback();																	// Run callback
 		};									
 
 		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
@@ -150,7 +152,7 @@ class ARC  {
 				}
 			v.sort((a,b)=>{ return b.p-a.p });	for (i=0;i<3;++i) str+=+v[i].p+" : "+v[i].n+", ";		// Top steps
 
-			if (this.tree[best].move == "I") app.curStudent=Math.max(app.curStudent,1);					// No group responses from instructions
+			if (this.tree[best].move == "I") app.curStudent=Math.max(app.curStudent,0);					// No group responses from instructions
 
 			this.lastStep=this.curStep;																	// Then is now
 			if (n > this.threshold)																		// If above threshold
@@ -203,7 +205,7 @@ class ARC  {
 				else				r=1;																// Most disagree
 				Prompt(n+"% agreed",5);																	// Show agreement
 				text=n+"% agreed";																		// Save response
-				app.arc.Add({ o:'R', who:null, text:text, r:r, l:app.arc.tree[step].line });		// Add to record
+				app.arc.Add({ o:'R', who:null, text:text, r:r, l:app.arc.tree[step].line });			// Add to record
 				app.curStudent=0;																		// Reset student
 			}
 		else{																							// A single student responding
@@ -214,9 +216,12 @@ class ARC  {
 				Sound("delete");																		// Delete sound
 				text="No response";																		// Save response
 				}
+	
 			else if (r == RIGHT) 		Prompt("Right answer");											// Show prompt
 			else if (r == WRONG) 		Prompt("Wrong answer");
 			else if (r == INCOMPLETE) 	Prompt("Incomplete answer");
+			
+			
 			app.arc.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
 			rc=app.arc.resChain;																		// Get response chain
 			for (var i=0;i<o.res.length;++i) {															// For each response	
@@ -226,6 +231,7 @@ class ARC  {
 						text=randomResponse(step,i);													// Return random response if multiple matches of immediate answer
 						app.arc.record[app.arc.record.length-1].text=text;								// Place text back in record
 						app.arc.record[app.arc.record.length-1].l=app.arc.lastResLine;					// Place line back in record
+						i=text.match(/\{\*(.*)?\}/);	if (i) app.DoAction(i[1]);						// If {*action} spec'd, do it
 						app.voice.Talk(text);															// Speak response
 						return text;																	// Quit looking
 						}

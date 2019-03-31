@@ -23,11 +23,12 @@ class Voice {
 		s["/oi/"]="oy";	  s["/ow/"]="ow";	s["/ә/"]="ir";
 		s["/ã/"]="air";   s["/ä/"]="are";   s["/û/"]="ure";   s["/ēә/"]="ear";	s["/üә/"]="your";	
 		try {																							// Try
-			this.femaleVoice=1;																			// Female voice
-			this.maleVoice=0;																			// Male voice
+			var mac=(navigator.platform == "MacIntel");													// A mac?
+			this.femaleVoice=mac ? 0 : 1;																// Female voice
+			this.maleVoice=mac ? 1 : 0;																	// Male voice
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			this.tts.pitch=2;																			// Set pitch
-			this.tts.rate=1.5;																			// Set rate 
+			this.tts.pitch=mac ? 1.0 : 2.0;																// Set pitch
+			this.tts.rate=mac ? 1.0 : 1.5;																// Set rate 
 			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
 			this.secsPerChar/=this.tts.rate;															// Adjust for rate
@@ -35,9 +36,8 @@ class Voice {
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
 				this.voices=[];																			// Clear list
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
-					if (voice.lang == "en-US")		_this.voices.push(voice);							// Just look at English
-					if (voice.name == "Samantha")	_this.femaleVoice=_this.voices.length-1,_this.tts.pitch=1.3,_this.tts.rate=1;	// Use Samantha if available on Mac
-					if (voice.name == "Alex")		_this.maleVoice=_this.voices.length-1,_this.tts.pitch=1.3,_this.tts.rate=1;		// And Alex too
+					if (voice.lang == "en-US")						_this.voices.push(voice);			// Just look at English
+					if (voice.name == "Google UK English Female")	_this.voices.push(voice),_this.instructorVoice=_this.voices.length-1;		// Instructor's voice
 					});
 				};
 
@@ -55,7 +55,6 @@ class Voice {
 			this.recognition.lang="en-US";																// US English
 			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png"); this.listening=false; };	// On end, restore button
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
-
 
 			this.recognition.onresult=(e)=> { 															// On some speech recognized
 				for (var i=e.resultIndex;i<e.results.length;++i) {										// For each result
@@ -103,15 +102,17 @@ class Voice {
 			if ((who == undefined) && (app.curStudent >= 0)) who=app.students[app.curStudent].sex;		// Set sex based on current student
 			else if ((who == undefined) && (app.curStudent < 0)) who="choral";							// It's choral or group
 			else if (who != "instructor")	app.curStudent=who,who=app.students[app.curStudent].sex;	// Set current student
-			var oldPitch=this.tts.pitch;																// Save old pitch
-			if (who == "instructor") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=.5;	// Lower pitch if instructor
-			else if (who == "choral") 	this.tts.voice=this.voices[this.femaleVoice],this.tts.pitch=3;	// Higher pitch if choral
+			var oldPitch=this.tts.pitch,oldRate=this.tts.rate;											// Save old pitch/rate
+			if (who == "instructor") {																	// If instructor
+				this.tts.pitch=this.tts.rate=1;															// Slow rate
+				this.tts.voice=this.voices[this.instructorVoice];										// Instructor's  voice
+				}
 			else if (who == "male")		this.tts.voice=this.voices[this.maleVoice];						// Set male voice
 			else 						this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
 			this.tts.text=text;																			// Set text
 			if (who != "instructor") 	this.talking=1;													// Trigger mouth animation if a student
 			speechSynthesis.speak(this.tts);															// Speak
-			this.tts.pitch=oldPitch;																	// Restore pitch	
+			this.tts.pitch=oldPitch;	this.tts.rate=oldRate;											// Restore pitch/rate	
 		
 		}
 		catch(e) { trace("Speech error",e) };															// Catch

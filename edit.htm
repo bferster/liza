@@ -221,6 +221,7 @@ class App  {
 		this.curUndo=0;																						// Undo counter
 		this.arcs=[]; this.as=[];  this.cs=[];	this.rs=[];	  this.ps=[];									// Data
 		this.overview="";																					// Overview
+		this.students="";																					// Students
 		this.gid="1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU";											// Default  spreadsheet
 		var url=window.location.search.substring(1);						   								// Get query string
 		if (url) {																							// If params
@@ -418,7 +419,8 @@ class App  {
 			for (i=1;i<tsv.length;++i) {																	// For each line
 				v=tsv[i].split("\t");																		// Split into fields
 				if (v.length < 4)	continue;																// Not enough fields
-				if (v[1].match(/over/i))  _this.overview=v[2].trim();										// Overview
+				if (v[1].match(/over/i))  	 _this.overview=v[2].trim();									// Overview
+				if (v[1].match(/student/i))  _this.students=v[2].trim();									// Students
 				else if (v[1].match(/pic/i)) _this.ps.push(v[2].trim());									// Pics
 				else if (v[1].match(/^Q|W|A|I|S|C|P/)) {													// New step
 					line=({ a:"", r:"", c:"", g:"" });														// Blank line
@@ -462,6 +464,7 @@ class App  {
 		var i,o,goal="none",action="",type,text,cons;
 		var str=makeTSVLine("goal","type","text","consequent");												// Add header
 		if (this.overview) 	str+=makeTSVLine("","overview",this.overview.trim(),"");						// Add overview if set
+	 	str+=makeTSVLine("","students",this.students ? this.students.trim() : "Liza,Freddy,Sara,Robert","");// Add students
 		for (i=0;i<this.ps.length;++i) 	str+=makeTSVLine("","pic",this.ps[i].trim(),"")						// For each pic
 		str+=makeTSVLine("","","","");																		// Add blank line
 		for (i=0;i<this.arcs.length;++i) {																	// For each line
@@ -495,7 +498,7 @@ class App  {
 			return s;																						// Return TSV line
 			}
 		SaveSpreadsheet(this.gid,str);																		// Save to Google drive
-		}
+	}
 
 		Do()																		// DO
 	{

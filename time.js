@@ -13,37 +13,39 @@ class Timeline {
 		this.events=[];																				// Holds timeline events
 		this.preview=false;																			// Preview/review mode flag
 		this.lastSlide=-1;																			// Last slide shown
+		this.interval=null;																			// Timer
 	}
 
 	Draw(playing)																				// DRAW
 	{
-		var i,o,col;
+		var i,o,col,text,act;
 		if (this.curTime == 0)	$("#stuTextDiv").html(""),$("#insTextDiv").html("");				// Clear at start
 		for (i=0;i<this.events.length;++i) {														// For each event
 			o=this.events[i];																		// Point at it
 			if (this.curTime < o.t) 	break;														// If before this one
 				if ((this.curTime >= o.t) && (this.curTime < o.e)) {								// If in this one
+				text=o.text.replace(/\{.*?\}/,"");													// Remove braced text
 				if (o.o == "R")  {																	// Student
 					app.curStudent=o.who;															// Set current student
 					if (o.r == RIGHT)				col="#009900";									// Color if right
 					else if (o.r == WRONG)			col="#990000";									// Wrong
 					else if (o.r == INCOMPLETE)		col="#e88632";									// Incomplete
 					$("#stuTextDiv").css("color",col);												// Set color
-					
-					if ((o.who != null) && (o.who >= 0))  	$("#stuTextDiv").html(app.students[o.who].id+": "+o.text);	// Add name if a single student
-					if ((o.who != null) && (o.who < 0))  	$("#stuTextDiv").html("Choral response: "+o.text);			// Add choral response flag
-					else									$("#stuTextDiv").html(o.text);								// Just response
+					act=o.text.match(/\{\*(.*)?\}/);		if (act) app.DoAction(act[1]);			// If {*action} spec'd, do it
+					if ((o.who != null) && (o.who >= 0))  	$("#stuTextDiv").html(app.students[o.who].id+": "+text);	// Add name if a single student
+					if ((o.who != null) && (o.who < 0))  	$("#stuTextDiv").html("Choral response: "+text);			// Add choral response flag
+					else									$("#stuTextDiv").html(text);								// Just response
 					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text),o.played=1;			// Speak it
 					}							
 				else if ((o.o == "S") || (o.o == "CON")) {											// Instructor
 					if (o.o != "CON")  $("#stuTextDiv").html("");									// Clear student response if not a consequence
-					$("#insTextDiv").html("<b>"+o.text+"</b>");	}									// Show
+					$("#insTextDiv").html("<b>"+text+"</b>");	}									// Show
 					if (!isNaN(o.slide)) 															// If a slide is spec'ed
 						if (o.slide != this.lastSlide) {											// If not same one as before
 							this.lastSlide=o.slide;													// Then is now
 							app.bb.Playback({ o:"P", p:"PPT slides", s:0, n:o.slide });				// Show slide
 							}					
-					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(o.text,"instructor"),o.played=1;	// Speak it
+					if (playing && !o.played && !app.voice.thoughtBubbles) app.voice.Talk(text,"instructor"),o.played=1;	// Speak it
 					}
 				}
 		if (!this.preview)		app.rev.ShowBlackboard(this.curTime+app.startTime);					// Draw blackboard if in review only
@@ -80,7 +82,6 @@ class Timeline {
 			this.maxTime=0;																			// Reset time
 			for (i=0;i<app.arc.record.length;++i) {													// For each event
 				o=app.arc.record[i];																// Point at event
-			trace(o)
 				x=o.t-app.startTime;																// Set time in mseconds
 				if (o.o == 'S') 																	// Instructor statement
 					this.events.push({ o:"S", t:x, text:o.text, m:o.move });						// Add action
@@ -102,12 +103,12 @@ class Timeline {
 			else if (o.r == INCOMPLETE)		col="#e88632";											// Incomplete
 			else							col="#fff";												// Instructor
 			if (o.o == "S")																			// If an instructor action	
-				str+="<div class='lz-timeEventI' style='left:"+(x-6)+"px' title='"+o.text.trim()+"'>"+(o.m ? o.m : "")+"</div>";								
+				str+="<div class='lz-timeEventI' style='left:"+(x-6)+"px' title='"+o.text.replace(/\{.*?\}/,"").trim()+"'>"+(o.m ? o.m : "")+"</div>";								
 			else if (o.o == "R") {																	// If a student response
 				x=i ? w*this.events[i-1].t/this.maxTime+30 : 30 +30;								// Position under action
 				str+="<div class='lz-timeEventS' style='left:"+x+"px;background-color:"+col+"' title='";
 				if ((o.who != null) && (o.who >= 0)) 	str+-app.students[o.who].id+": ";			// Add student name if individual
-				str+=o.text.trim()+"'>"+(o.m ? o.m : "")+"</div>";				
+				str+=o.text.replace(/\{.*?\}/,"").trim()+"'>"+(o.m ? o.m : "")+"</div>";				
 				}
 			}
 		$("#timeBar").append(str);																	// Add events to timebar	
@@ -118,6 +119,7 @@ class Timeline {
 		$("#timeBar").remove();																		// Remove old one
 		var _this=this;																				// Save context
 		this.curTime=0;																				// Start at 0
+		clearInterval(this.interval);																// Clear timer
 		app.rev.ShowBlackboard(app.startTime+100);													// Draw starting blackboard
 		var str="<div id='timeBar' class='lz-timebar'>";											// Add timebar div
 		str+="<div class='lz-timeback'></div>";														// Backing div
@@ -176,11 +178,6 @@ class Timeline {
 			   var x=$($(this).children('.ui-slider-handle')).offset().left;						// Get pos       			
 			   _this.ShowTime(x,ui.value);															// Show time			
 			   _this.Draw();																		// Draw state at time	
-			},
-		   stop: function(event,ui) {																// On slide stop
-			   var x=$($(this).children('.ui-slider-handle')).offset().left;						// Get pos       			
-				_this.ShowTime(x,ui.value);															// Show time			
-//				_this.Draw();																		// Draw state at time	
 			}
 		   });
 	}
@@ -264,6 +261,7 @@ class Review  {
 		var i,w,o;
 		var _this=this;																					// Save context
 		$("#timeBar").remove();																			// Remove timeline, if up
+		clearInterval(app.tim.interval);																// Clear timer
 		if ($("#reviewDiv").length) {																	// If already up, bring it down
 			$("#reviewDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#reviewDiv").remove(); } }); // Slide down
 			return;																						// Quit																					
@@ -312,7 +310,7 @@ class Review  {
 					o=app.arc.tree[i];																	// Point at step
 					if (o.text)	{																		// If defined
 						str+="<div id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";		
-						str+="<b>"+o.move+": "+o.text+"</b></div>";
+						str+="<b>"+o.move+": "+o.text.replace(/\{.*?\}/,"")+"</b></div>";				// Instructor action
 						for (var j=0;j<o.res.length;++j) {												// For each response
 							str+="<div style='margin-left:16px'>";										// Start of line
 							for (var k=0;k<o.res[j].rc.length;++k) {									// For each response in chain
@@ -323,7 +321,7 @@ class Review  {
 								else if (o.res[j].rc[k] == NONE)		str+="#999999'><b>0"; 			// None
 								str+="</b></span>";														// Finish checks/crosses
 								}
-							str+=" &nbsp;"+o.res[j].text+"</div>";										// Finish response
+							str+=" &nbsp;"+o.res[j].text.replace(/\{.*?\}/,"")+"</div>";				// Finish response
 							}
 						str+="<br>";
 						}
@@ -344,6 +342,7 @@ class Review  {
 				str="<div style='position:absolute;top:"+$("#revMode").position().top+"px;left:8px'>"	// Container div
 				str+="<input id='revText' placeholder='Talk to class...' class='lz-is' style='width:280px'>";				// Input
 				str+="&nbsp;<img id='revTextBut'src='img/sendtext.png' style='vertical-align:-7px;cursor:pointer'></div>";	// Button
+				str+="<div id='revTextDiv'></div>";														// Holds texts
 				}
 			$("#revBodyDiv").html(str);																	// Add to div
 			$("#revText").focus();																		// Focus on
