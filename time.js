@@ -23,7 +23,7 @@ class Timeline {
 		for (i=0;i<this.events.length;++i) {														// For each event
 			o=this.events[i];																		// Point at it
 			if (this.curTime < o.t) 	break;														// If before this one
-				if ((this.curTime >= o.t) && (this.curTime < o.e)) {								// If in this one
+			if ((this.curTime >= o.t) && (this.curTime < o.e)) {									// If in this one
 				text=o.text.replace(/\{.*?\}/,"");													// Remove braced text
 				if (o.o == "R")  {																	// Student
 					app.curStudent=o.who;															// Set current student
@@ -68,10 +68,10 @@ class Timeline {
 				this.maxTime+=(o.text.length*app.voice.secsPerChar)+1000;							// Time to speak action with padding
 					if (r && r <= o.res.length) {													// If a response
 					this.events.push({ o:"R", t:this.maxTime, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add it to record
-					this.maxTime+=(o.res[r-1].text.length*app.voice.secsPerChar)+2000;				// Add padded response time to max time
+					this.maxTime+=(o.res[r-1].text.length*app.voice.secsPerChar)+1000;				// Add padded response time to max time
 					if (o.res[r-1].cons) {															// If a consequence
 						this.events.push({ o:"CON", t:this.maxTime, text:o.res[r-1].cons });	 	// Add it
-						this.maxTime+=(o.res[r-1].cons.length*app.voice.secsPerChar)+1000;			// Add padded feedback  time to max time 
+						this.maxTime+=(o.res[r-1].cons.length*app.voice.secsPerChar)+2000;			// Add padded feedback  time to max time 
 						}
 					}
 				}
@@ -103,7 +103,7 @@ class Timeline {
 			if (o.o == "S")																			// If an instructor action	
 				str+="<div class='lz-timeEventI' style='left:"+(x-6)+"px' title='"+o.text.replace(/\{.*?\}/,"").trim()+"'>"+(o.m ? o.m : "")+"</div>";								
 			else if (o.o == "R") {																	// If a student response
-//				x=i ? w*this.events[i-1].t/this.maxTime+30 : 30 +30;								// Position under action
+				x=i ? w*this.events[i-1].t/this.maxTime+30 : 30 +30;								// Position under action
 				str+="<div class='lz-timeEventS' style='left:"+x+"px;background-color:"+col+"' title='";
 				if ((o.who != null) && (o.who >= 0)) 	str+-app.students[o.who].id+": ";			// Add student name if individual
 				str+=o.text.replace(/\{.*?\}/,"").trim()+"'>"+(o.m ? o.m : "")+"</div>";				
@@ -351,6 +351,7 @@ class Review  {
 				var id=e.currentTarget.id.substr(8);													// Get step
 				o=app.arc.tree[id];																		// Point at step
 				if (o.slide)	app.bb.ShowSlide(0, o.slide);											// Show slide
+				app.voice.talkStartTime=new Date().getTime();											// Set actual start talk time in record
 				app.voice.Talk(o.text,"instructor");													// Talk
 				app.OnPhrase(o.text);	
 				});
@@ -360,9 +361,9 @@ class Review  {
 	
 			function chat() {																			// TEXT CHATTING
 				var s=$("#revText").val();																// Get text
+				$("#revTextDiv").append("<div class='lz-textS'>"+s+"</div>");							// Add to display
 				$("#revText").val("");																	// Clear input
-				$("#revBodyDiv").append("<div class='lz-textS'>"+s+"</div>");							// Add to display
-				app.OnPhrase(s);		
+				app.OnPhrase(s);																		// Send it to get response		
 				}
 			}
 		}

@@ -27,8 +27,8 @@ class Voice {
 			this.femaleVoice=mac ? 0 : 1;																// Female voice
 			this.maleVoice=mac ? 1 : 0;																	// Male voice
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			this.tts.pitch=mac ? 1.0 : 2.0;																// Set pitch
-			this.tts.rate=mac ? 1.0 : 1.5;																// Set rate 
+			this.tts.pitch=mac ? 1.2 : 2.0;																// Set pitch
+			this.tts.rate=mac ? 1.2 : 1.5;																// Set rate 
 			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
 			this.secsPerChar/=this.tts.rate;															// Adjust for rate
@@ -67,8 +67,8 @@ class Voice {
 
 	Listen()																						// TURN ON SPEECH RECOGNITIOM
 	{
-		this.talkStartTime=new Date().getTime();														// Record start talk time
 		if (this.listening)	return;																		// Quit if already started
+		this.talkStartTime=new Date().getTime();														// Record start talk time
 		try { this.recognition.start(); this.listening=true; } catch(e) { trace("Voice error",e) };		// Start recognition
 		$("#talkBut").prop("src","img/intalkbut.png");													// Talking but
 	}
