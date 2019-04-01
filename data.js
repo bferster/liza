@@ -99,7 +99,8 @@ class ARC  {
 			var i,j,k,o,v,val;
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
 				o=this.tree[i];																			// Point at step
-			o.keys=[];																				// Create keyword array
+				o.keys=[];																				// Create keyword array
+				o.ask=this.Question(o.text);															// If this a question?
 				v=(o.text+" ").match(/\(.+?\)/g);														// Get array of key words (keyword)
 				if (v) {																				// If keys flagged
 					for (j=0;j<v.length;++j) {															// For each key
@@ -109,6 +110,7 @@ class ARC  {
 						}
 					}
 				app.arc.Parse(o.text,o);																// Parse first text portion
+				
 				}
 		}
 
@@ -139,10 +141,11 @@ class ARC  {
 				if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore/2+this.tree[i].kscore;	// Use weighted average of keys and entities
 				f="";																					// Clear flag
 				if (o.goal == this.tree[this.curStep].goal)			this.tree[i].score+=.05,f+="G";		// If in current goal, bump-up score 
-				if ((i == this.lastStep+1))							this.tree[i].score+=.05,f+="N";;	// If next in script, bump
-				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";;	// If in slide, bump
-				if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.5,f+="F";;		// If from matches actual last step
-				if (o.from == this.lastResLine)						this.tree[i].score+=.5,f+="R";;		// If from matches actual last response
+				if ((i == this.lastStep+1))							this.tree[i].score+=.05,f+="N";		// If next in script, bump
+				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";		// If in slide, bump
+				if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.50,f+="F";		// If from matches actual last step
+				if (o.from == this.lastResLine)						this.tree[i].score+=.50,f+="R";		// If from matches actual last response
+				if (o.ask && this.Question(text))					this.tree[i].score+=.25,f+="Q";		// If a question
 				if (oentities.match(/ask\:/i))						f+="A";								// An ask	
 				o.flags=f;																				// Save flags
 				}
@@ -167,9 +170,12 @@ class ARC  {
 	{
 		var i,j,n=0,r,rc,o;
 		var text="";
-		if (step == -1)														return "";					// Quit if no step
-		if (!app.arc.tree[step].res.length && (app.curStudent >= 0))		return "";					// Quit if no responses for individual students
-		if (app.arc.tree[step].move == "I") 								return "";					// No responses from instruction
+		if (step == -1)		return "";																	// Quit if no step
+		if (app.hinting && this.tree[step+1]) Prompt("Next &rarr; "+this.tree[step+1].hint,10);			// Show hint	
+		if (app.arc.tree[step].move == "I") {															// If instruction
+			return "";																					// No response
+			}
+		if (!app.arc.tree[step].res.length && (app.curStudent >= 0))  return "";						// Quit if no responses for individual students
 		if (app.arc.tree[step].move == "C") {															// Choral
 			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
 			if (!app.voice.thoughtBubbles) 	Bubble(text,5);												// Show response
@@ -205,7 +211,7 @@ class ARC  {
 				if (n < 33)			r=2;																// Most agree
 				else if (n < 66)	r=3;																// Mixed
 				else				r=1;																// Most disagree
-				Prompt(n+"% agreed",5);																	// Show agreement
+				if (!app.hinting)  Prompt(n+"% agreed",5);												// Show agreement
 				text=n+"% agreed";																		// Save response
 				app.arc.Add({ o:'R', who:null, text:text, r:r, l:app.arc.tree[step].line });			// Add to record
 				app.curStudent=0;																		// Reset student
@@ -218,7 +224,7 @@ class ARC  {
 				Sound("delete");																		// Delete sound
 				text="No response";																		// Save response
 				}
-	
+			else if (app.hinting) 		i=i;															// Showing hints	
 			else if (r == RIGHT) 		Prompt("Right answer");											// Show prompt
 			else if (r == WRONG) 		Prompt("Wrong answer");
 			else if (r == INCOMPLETE) 	Prompt("Incomplete answer");
@@ -314,6 +320,14 @@ class ARC  {
 						}
 				});
 		} catch(e) { app.gettingEntities=0;	trace("***********\nWIT error: "+e.error+"\n*********"); }	// Show error
+	}
+
+	Question(text)																					// IS THIS A QUESTION?
+	{
+		if (text.match(/who |what |how |when |where |why |which|\? /i))										return 1;			
+		if (text.match(/questions |would you |could you |can you |can I |are you /i))						return 2;			
+		if (text.match(/does |did I |did you |did he |did she |did it |did they /i))						return 3;
+		return 0;																					
 	}
 
 } // ARC class closure
