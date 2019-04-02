@@ -18,6 +18,7 @@
 	<script src="blackboard.js"></script>
 	<script src="voice.js"></script>
 	<script src="time.js"></script>
+	<script src="nlp.js"></script>
 	
 	<style>
 		 body { 			font-family:Verdana,Geneva,sans-serif;font-size:13px; box-sizing:border-box; 
@@ -196,6 +197,7 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
+				GetTextBox("Type text to stem","","",(s)=>{ trace(app.nlp.Stem(s)) });
 				}
 
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
@@ -247,6 +249,7 @@ class App  {
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.rev=new Review();																		// Make new reviewer		
 		this.tim=new Timeline();																	// Make timeline	
+		this.nlp=new NLP();																			// Make NLP	
 		this.LoadProject(this.gid);																	// Load project file
 		this.Draw();																				// Start 
 
@@ -396,7 +399,7 @@ class App  {
 			score=app.arc.tree[app.arc.curStep].score;												// Get match score			
 			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, move:app.arc.tree[app.arc.curStep].move, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
 			if (score > app.arc.threshold) {														// If past threshold
-				var s=app.arc.DeliverResponse(app.arc.curStep).replace(/\{.*?\}/,"");				// Deliver response without braced tags
+				var s=app.arc.DeliverResponse(app.arc.curStep).replace(/\{.*?\}/g,"");				// Deliver response without braced tags
 				if (s)	$("#revTextDiv").append("<div class='lz-textR'>"+s+"</div>");				// Add to texting display display, if texting
 				}
 			trace(app.arc.stepData);																// Show response data
@@ -643,7 +646,6 @@ class App  {
 			}
  	 	return m;																						// Return multiplied matrix
 	}
-	
 
 </script>
 

@@ -87,7 +87,7 @@ class Voice {
 			Bubble(text,5,x-100,80);																	// Show bubble
 			return;
 			}
-		text=text.replace(/\{.*?\}/,"");																// Remove any braced text
+		text=text.replace(/\{.*?\}/g,"");																// Remove any braced text
 		try{																							// Try
 			speechSynthesis.cancel();																	// Clear current speak queue			
 			if ((who == undefined) && (app.curStudent >= 0)) who=app.students[app.curStudent].sex;		// Set sex based on current student

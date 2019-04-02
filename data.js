@@ -1,6 +1,5 @@
 // ARC / RECORD
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +153,7 @@ class ARC  {
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
 				o=this.tree[i];																			// Point at it
 				if (o.score >= n) { n=o.score;	best=i; };												// Set if highest
-				v.push({ n:o.goal+"-"+o.step, p:Math.round(o.score*100), e:o.ents, f:o.flags });		// Add step
+				v.push({ id: i, n:o.goal+"-"+o.step, p:Math.round(o.score*100), e:o.ents, f:o.flags });	// Add step
 				}
 			v.sort((a,b)=>{ return b.p-a.p });
 			if (this.tree[best].move == "I") app.curStudent=Math.max(app.curStudent,0);					// No group responses from instructions
@@ -300,7 +299,7 @@ class ARC  {
 	Parse(text, data, callback)																		// PARSE TEXT STRING
 	{
 		if (!text)	return;																				// Quit if no text
-		text=text.replace(/\{.*?\}/,"");																// Remove any braced text
+		text=text.replace(/\{.*?\}/g,"");																// Remove any braced text
 		app.gettingEntities=1;																			// Waiting for entities from AI
 		try {
 			if (!window.location.search.match(/noai/i))													// Unless turned off
