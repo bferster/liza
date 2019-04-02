@@ -17,7 +17,8 @@ class ARC  {
 		this.threshold=.4;																				// Picking threshold		
 		this.record=[];																					// Holds record of actions
 		this.resChain="";																				// Holds last response chain
-		}
+		this.stepData={};																				// Data about current step
+	}
 
 	Load(id, callback) 																				// LOAD DOC FROM GOOGLE DRIVE
 	{
@@ -149,20 +150,22 @@ class ARC  {
 				if (oentities.match(/ask\:/i))						f+="A";								// An ask	
 				o.flags=f;																				// Save flags
 				}
-			var v=[],str="<< ";
+			var v=[];
 			for (i=0;i<this.tree.length;++i) {															// For each step in tree
 				o=this.tree[i];																			// Point at it
 				if (o.score >= n) { n=o.score;	best=i; };												// Set if highest
 				v.push({ n:o.goal+"-"+o.step, p:Math.round(o.score*100), e:o.ents, f:o.flags });		// Add step
 				}
-			v.sort((a,b)=>{ return b.p-a.p });	for (i=0;i<3;++i) str+=+v[i].p+" : "+v[i].n+", ";		// Top steps
-
+			v.sort((a,b)=>{ return b.p-a.p });
 			if (this.tree[best].move == "I") app.curStudent=Math.max(app.curStudent,0);					// No group responses from instructions
 
 			this.lastStep=this.curStep;																	// Then is now
 			if (n > this.threshold)																		// If above threshold
 				this.curStep=best;																		// Set as current step 
-			str+="\n    "+this.tree[this.curStep].goal+"-"+this.tree[this.curStep].step+" = "+this.tree[this.curStep].ents+" "+this.tree[this.curStep].flags; trace(str); 															
+			o=this.tree[this.curStep];																	// Point at step
+			this.stepData={ spoken: text, entities: entities, step: o, 									// Set data
+				score: o.score, escore: o.escore, kscore: o.kscore, flags:o.flags,
+				hitList:v, move: o.move, stepLine:o.line, stepNum: this.curStep }; 	
 			return this.curStep;																		// Return best fit
 		}
 
@@ -171,7 +174,11 @@ class ARC  {
 		var i,j,n=0,r,rc,o;
 		var text="";
 		if (step == -1)		return "";																	// Quit if no step
-		if (app.hinting && this.tree[step+1]) Prompt("Next &rarr; "+this.tree[step+1].hint,10);			// Show hint	
+		if (app.hinting && this.tree[step+1]) {															// If a valid hint
+			Prompt("Next &rarr; "+this.tree[step+1].hint,10);											// Show hint	
+			this.stepData.hint=this.tree[step+1].hint;													// Save to data
+			}	
+		this.stepData.res=""; 	this.stepData.r=0;														// Assume no response
 		if (app.arc.tree[step].move == "I") {															// If instruction
 			return "";																					// No response
 			}
@@ -180,6 +187,7 @@ class ARC  {
 			text=randomResponse(step,0);																// Return random response if multiple matches of immediate answer
 			if (!app.voice.thoughtBubbles) 	Bubble(text,5);												// Show response
 			app.arc.Add({ o:'R', who:null, text:text, r:1, l:app.arc.lastResLine });					// Add to record
+			this.stepData.r=1;	this.stepData.res="Choral: "+text;										// Set response data
 			app.voice.Talk(text);																		// Speak response
 			app.curStudent=0;																			// Reset student
 			return text;																	
@@ -213,6 +221,7 @@ class ARC  {
 				else				r=1;																// Most disagree
 				if (!app.hinting)  Prompt(n+"% agreed",5);												// Show agreement
 				text=n+"% agreed";																		// Save response
+				this.stepData.r=r;	this.stepData.res="Agree: "+text;									// Set response data
 				app.arc.Add({ o:'R', who:null, text:text, r:r, l:app.arc.tree[step].line });			// Add to record
 				app.curStudent=0;																		// Reset student
 			}
@@ -239,6 +248,7 @@ class ARC  {
 						app.arc.record[app.arc.record.length-1].text=text;								// Place text back in record
 						app.arc.record[app.arc.record.length-1].l=app.arc.lastResLine;					// Place line back in record
 						i=text.match(/\{\*(.*)?\}/);	if (i) app.DoAction(i[1]);						// If {*action} spec'd, do it
+						this.stepData.r=r;	this.stepData.res=text;										// Set response data
 						app.voice.Talk(text);															// Speak response
 						return text;																	// Quit looking
 						}
@@ -264,7 +274,7 @@ class ARC  {
 	MarkovFindResponse(step, sid) 																	// FIND RESPONSE USING MARKOV CHAIN
 	{	
 		var i,so,ability=.5;
-		if (sid >= 0) ability=app.students[sid].ability;												// Get student ability
+		if ((sid >= 0) && (sid < app.students.length))  ability=app.students[sid].ability;				// Get student ability
 		var r=(Math.random()-.5)*.1;																	// Get jitter factor
 		var tm=[ [0.0, .45, .55], [0.0, .55-r, .45+r], [0.0, .48, .52] ];								// Markov transition matrix
 		if ((sid >= 0) && app.students[sid].rMatrix[step])	{											// If been there already, for an individual student
@@ -300,7 +310,6 @@ class ARC  {
 					success: (r)=> {																	// When parsed
 						app.gettingEntities=0;															// Not waiting
 						var i,c,v,s="";
-						var str=">> "+r._text+"\n   ";													// Show text
 						if (r.error) {																	// If an error
 							trace("************\nWit error: "+r.error+"\n***********");					// Show error
 							return;																		// Quit
@@ -310,10 +319,8 @@ class ARC  {
 								v=r.entities[entity][i].value;											// Add value
 								c=Math.floor(r.entities[entity][i].confidence*100);						// Confidence
 								s+=entity+":"+v+", ";													// Add entities
-								str+=entity+":"+v+", ";													// Print value and confidence
 								}
 							}
-						trace(str);
 						s=s.substr(0,s.length-2)														// Remove last comma
 						if (data)		data.ents=s;													// Add to object
 						if (callback) 	callback(s);													// Return entities to callback	
@@ -324,9 +331,9 @@ class ARC  {
 
 	Question(text)																					// IS THIS A QUESTION?
 	{
-		if (text.match(/who |what |how |when |where |why |which|\? /i))										return 1;			
-		if (text.match(/questions |would you |could you |can you |can I |are you /i))						return 2;			
-		if (text.match(/does |did I |did you |did he |did she |did it |did they /i))						return 3;
+		if (text.match(/who |what |how |when |where |why |which|\? /i))					return 1;			
+		if (text.match(/questions |would you |could you |can you |can I |are you /i))	return 2;			
+		if (text.match(/does |did I |did you |did he |did she |did it |did they /i))	return 3;
 		return 0;																					
 	}
 

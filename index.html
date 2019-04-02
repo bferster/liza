@@ -32,7 +32,7 @@
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
 		.lz-controller {	position: fixed; top: calc(100% - 39px); left:0; background-color: #aaa; border: 1px solid #999;
-							padding:6px 12px; width: calc(100% - 24px); height:25px;  display:none;
+							padding:6px 12px; width: calc(100% - 24px); height:25px; display:none; user-select:none;
 							}
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							padding:16px; border-radius: 16px; width: 600px;
@@ -60,7 +60,7 @@
 							font-size: 16px; text-align:center; display: none;
 							}
 		.lz-timebar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 128px);
-							background-color:#aaa; border-radius: 12px 12px 0 0; height:90px;
+							background-color:#aaa; border-radius: 12px 12px 0 0; height:90px; user-select:none;
 							}
 		.lz-timeback { 		position:absolute;width:calc(100% - 32px); height:68px; left:0; top:0; background-color:#fff; border-radius:8px; margin:16px 16px 0 16px;
 							}
@@ -375,13 +375,13 @@ class App  {
 		app.arc.Parse(text, null, (o)=> {															// Parse text
 			var score=0;
 			if (o.match(/response:agree/i) && o.match(/who:all/i)) app.curStudent=-2;				// Looking for nods from whole class
-			else if (o.match(/who:all/i)) 		app.curStudent=-1;									// Whole class
-			else if (o.match(/who:Class/i)) 	app.curStudent=-1;									// Whole class
-			else if (o.match(/who:Liza/i)) 		app.curStudent=app.roster["Liza"];					// Set current student
-			else if (o.match(/who:Freddy/i)) 	app.curStudent=app.roster["Freddy"];
-			else if (o.match(/who:Robert/i)) 	app.curStudent=app.roster["Robert"];
-			else if (o.match(/who:Sara/i)) 		app.curStudent=app.roster["Sara"];
-			if (o.match(/action:/i)) 			app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an action mentioned, do it
+			else if (o.match(/who:youAll/i)) 		app.curStudent=-2;								// Whole class
+			else if (o.match(/who:wholeClass/i)) 	app.curStudent=-1;								// Whole class
+			else if (o.match(/who:Liza/i)) 			app.curStudent=app.roster["Liza"];				// Set current student
+			else if (o.match(/who:Freddy/i)) 		app.curStudent=app.roster["Freddy"];
+			else if (o.match(/who:Robert/i)) 		app.curStudent=app.roster["Robert"];
+			else if (o.match(/who:Sara/i)) 			app.curStudent=app.roster["Sara"];
+			if (o.match(/action:/i)) 				app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an action mentioned, do it
 		
 			if (app.pickingStudent) {																// If students have their hands up
 				app.curStudent=Math.max(app.curStudent);											// Default to 1st if still talking to class
@@ -399,6 +399,7 @@ class App  {
 				var s=app.arc.DeliverResponse(app.arc.curStep).replace(/\{.*?\}/,"");				// Deliver response without braced tags
 				if (s)	$("#revTextDiv").append("<div class='lz-textR'>"+s+"</div>");				// Add to texting display display, if texting
 				}
+			trace(app.arc.stepData);																// Show response data
 			});																		
 		}
 		

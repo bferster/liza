@@ -347,13 +347,16 @@ class Review  {
 
 			$("[id^=revTalk-]").off("click");															// Remove existing handlers
 			$("[id^=revTalk-]").on("click", function(e) {												// On click of step
+				$("#timDiv").remove();																	// Kill old one, if any
 				if (app.voice.talking || app.gettingEntities)  return;									// Not while busy
 				var id=e.currentTarget.id.substr(8);													// Get step
 				o=app.arc.tree[id];																		// Point at step
 				if (o.slide)	app.bb.ShowSlide(0, o.slide);											// Show slide
 				app.voice.talkStartTime=new Date().getTime();											// Set actual start talk time in record
 				app.voice.Talk(o.text,"instructor");													// Talk
-				app.OnPhrase(o.text);	
+				var t=o.text.length*app.voice.secsPerChar;												// Time of text
+				$("body").append("<div id='timDiv' style='display:none'>");								// Add timer div to body
+				$("#timDiv").fadeIn(t,()=>{app.OnPhrase(o.text); $("#timDiv").remove()});				// Delay response until after instructor speaks
 				});
 			
 			$("#revText").on("change",   function(e) { chat();	});										// On text enter

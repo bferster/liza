@@ -12,16 +12,6 @@ class Voice {
 		this.listening=false;																			// Flag if listening
 		this.talkStartTime=0;																			// Time started talking
 		this.secsPerChar=.095*1000;																		// Mseconds per char
-		var s=this.phonemes=[];																			// Holds phoneme table
-		s["/b/"]="ba";	  s["/d/"]="da";    s["/f/"]="if";    s["/g/"]="ga";   s["/h/"]="hah";
-		s["/j/"]="jaw";	  s["/k/"]="kit";   s["/l/"]="lah";   s["/m/"]="um";  s["/n/"]="un "; 
-		s["/ng/"]="ing";  s["/p/"]="pa";   	s["/r/"]="err";   s["/s/"]="sis";  s["/t/"]="ta";	
-		s["/v/"]="vaah "; s["/w/"]="waugh"; s["/y/"]="ya";    s["/z/"]="za";  
-		s["/zh/"]="sh";   s["/ch/"]="cha";  s["/sh/"]="shh "; s["/th/"]="tha";
-		s["/a/"]="ah";	  s["/e/"]="uhh";	s["/i/"]="ish";	  s["/o/"]="aww";  s["/u/"]="uh";   s["/oo/"]="ooh "; 
-		s["/ā/"]="a";	  s["/ē/"]="e";		s["/ī/"]="i";     s["/ō/"]="o";    s["/ü/"]="u";
-		s["/oi/"]="oy";	  s["/ow/"]="ow";	s["/ә/"]="ir";
-		s["/ã/"]="air";   s["/ä/"]="are";   s["/û/"]="ure";   s["/ēә/"]="ear";	s["/üә/"]="your";	
 		try {																							// Try
 			var mac=(navigator.platform == "MacIntel");													// A mac?
 			this.femaleVoice=mac ? 0 : 1;																// Female voice
@@ -31,7 +21,7 @@ class Voice {
 			this.tts.rate=mac ? 1.2 : 1.5;																// Set rate 
 			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
-			this.secsPerChar/=this.tts.rate;															// Adjust for rate
+			this.secsPerChar/=1.5;																		// Adjust for rate
 
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
 				this.voices=[];																			// Clear list
@@ -53,6 +43,7 @@ class Voice {
 			this.recognition=new SpeechRecognition();													// Init STT
 			this.recognition.continuous=false;															// Continual recognition off
 			this.recognition.lang="en-US";																// US English
+			this.recognition.interimResults=true
 			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png"); this.listening=false; };	// On end, restore button
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 
@@ -96,9 +87,9 @@ class Voice {
 			Bubble(text,5,x-100,80);																	// Show bubble
 			return;
 			}
-		text=this.ReplacePhoneme(text);																	// Replace phonemes with sounds
 		text=text.replace(/\{.*?\}/,"");																// Remove any braced text
 		try{																							// Try
+			speechSynthesis.cancel();																	// Clear current speak queue			
 			if ((who == undefined) && (app.curStudent >= 0)) who=app.students[app.curStudent].sex;		// Set sex based on current student
 			else if ((who == undefined) && (app.curStudent < 0)) who="choral";							// It's choral or group
 			else if (who != "instructor")	app.curStudent=who,who=app.students[app.curStudent].sex;	// Set current student
@@ -107,6 +98,7 @@ class Voice {
 				this.tts.pitch=this.tts.rate=1;															// Slow rate
 				this.tts.voice=this.voices[this.instructorVoice];										// Instructor's  voice
 				}
+
 			else if (who == "male")		this.tts.voice=this.voices[this.maleVoice];						// Set male voice
 			else 						this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
 			this.tts.text=text;																			// Set text
