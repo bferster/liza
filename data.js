@@ -17,6 +17,8 @@ class ARC  {
 		this.record=[];																					// Holds record of actions
 		this.resChain="";																				// Holds last response chain
 		this.stepData={};																				// Data about current step
+		this.entities=[];																				// Holds entities
+		this.SetEntities();																				// Set entity list
 	}
 
 	Load(id, callback) 																				// LOAD DOC FROM GOOGLE DRIVE
@@ -334,6 +336,41 @@ class ARC  {
 		if (text.match(/questions |would you |could you |can you |can I |are you /i))	return 2;			
 		if (text.match(/does |did I |did you |did he |did she |did it |did they /i))	return 3;
 		return 0;																					
+	}
+
+	SetEntities()																					// POPULATE ENTITIES
+	{
+		var o;
+		this.entities=[];																				// Clear entities
+		this.entities.push( { name: "who", keys:[] } );													// Who entity
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"Freddy", syns:"fred,pretty" });													// Add keys
+		o.push({ name:"Sara", syns:"fara,siri,tara" });
+		o.push({ name:"Robert", syns:"robert,robbie,robby," });
+		o.push({ name:"Liza", syns:"liza,elijah,lies,plaza" });
+		o.push({ name:"youAll", syns:"everybody,everyone,u-haul,uhaul,y'all,you all,you guys, you kids" });
+		o.push({ name:"wholeClass", syns:"anybody,anyone,children,somebody,who knows" });
+	}
+
+	GetEntities(text)																				// EXTRACT ENTITIES
+	{
+		var i,j,k,r,es,ks,ents=[];
+		if (!text)	return [];																			// Quit on no text
+		var ne=this.entities.length;																	// Number of entity categories
+		var words=text.split(/\b\s+(?!$)/);																// Tokenize
+		var nw=words.length;																			// Number of words
+		for (i=0;i<nw;++i) {																			// For each word
+			r=RegExp(words[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"));								// Make regex of word
+			for (j=0;j<ne;++j) {																		// For each entity category
+				es=this.entities[j];																	// Point at entity
+				ks=es.keys;																				// Point at the keys array
+				for (k=0;k<ks.length;++k) 																// For each key in entity
+					if (ks[k].syns.match(r)) 															// If word in key
+						ents.push({ e: es.name, k:ks[k].name, v:ks[k].syns.match(r) });					// Add to match list 
+				}
+			}
+		trace(ents)
+		return ents;																					// Return entity array		
 	}
 
 } // ARC class closure

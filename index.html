@@ -189,11 +189,6 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 			$("#controllerDiv").fadeIn(0);															// Controller too
 			}
 
-		if (window.addEventListener) 																// If supported this way
-			window.addEventListener("message",html5MessageHandler,false);							// Add event handler
-		else																						// Use other method
-			window.attachEvent("message",html5MessageHandler);										// Add handler
-		
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
@@ -208,12 +203,6 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 			});
 	});	
  
-
-	function html5MessageHandler(e)																// ON HTML5 MESSAGE
-	{
-	//	if (e && e.data) 																			// If a valid message				
-	//		trace(e);																				// Route
-	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // APP
