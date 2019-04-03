@@ -323,6 +323,7 @@ class ARC  {
 								}
 							}
 						s=s.substr(0,s.length-2)														// Remove last comma
+trace(s);	trace(">"+this.GetEntities(r._text))
 						if (data)		data.ents=s;													// Add to object
 						if (callback) 	callback(s);													// Return entities to callback	
 						}
@@ -342,35 +343,72 @@ class ARC  {
 	{
 		var o;
 		this.entities=[];																				// Clear entities
-		this.entities.push( { name: "who", keys:[] } );													// Who entity
+		this.entities.push( { name: "who", keys:[] } );													// WHO
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"Freddy", syns:"fred,pretty" });													// Add keys
-		o.push({ name:"Sara", syns:"fara,siri,tara" });
-		o.push({ name:"Robert", syns:"robert,robbie,robby," });
-		o.push({ name:"Liza", syns:"liza,elijah,lies,plaza" });
-		o.push({ name:"youAll", syns:"everybody,everyone,u-haul,uhaul,y'all,you all,you guys, you kids" });
-		o.push({ name:"wholeClass", syns:"anybody,anyone,children,somebody,who knows" });
+		o.push({ name:"Freddy", syns:",freddy,freddie,pretty," });										// Add keys
+		o.push({ name:"Sara", syns:",sara,siri,tara," });												// Needs leading and trailing commas
+		o.push({ name:"Robert", syns:",robert,robbie,robby," });
+		o.push({ name:"Liza", syns:",liza,elij,lies,plaza," });
+		o.push({ name:"youAll", syns:",everybody,everyone,u-haul,uhaul,y'all,you_all,you_guys,you_kids," });
+		o.push({ name:"wholeClass", syns:",anybody,anyone,children,somebody,who knows," });
+
+		this.entities.push( { name: "response", keys:[] } );											// RESPONSE
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"agree", syns:",agree,concur,"});
+		o.push({ name:"wrong", syns:",incorrect,innacurate,not_right,wrong,"});
+		o.push({ name:"right", syns:",accurate,correct,right,"});
+		o.push({ name:"opinion", syns:","});
+		o.push({ name:"answer", syns:",tell,identify,answer,assertion,claim,comment,conclusion,decide,decision,equal,equals,evaluate,explanation,interpretation,observation,outcome,product,reaction,rebuttal,recap,relate,remark,report,response,restate,result,solution,statement,summarize,summary,understand,value,"});
+
+		this.entities.push( { name: "teacher", keys:[] } );												// TEACHER
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"me", syns:",I,me,teacher," });													// Add keys
+
+		this.entities.push( { name: "classroom", keys:[] } );											// CLASSROOM
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"pump", syns:",add_to,any_more,anything_else,anything_more,there_more,what_else,"});
+		o.push({ name:"review", syns:",review,"});
+		o.push({ name:"done", syns:",class_is,we're_done,are_done,class_over,"});
+		o.push({ name:"start", syns:",begin,us_begin,us_start,let's_begin,let's_start,get_started,"});
+
+		this.entities.push( { name: "concept", keys:[] } );												// CONCEPT
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"idea", syns:",belief,idea,"});
+		o.push({ name:"rule", syns:",algorithm,basis,guideline,law,maxim,plan,regulation,rule,theory,"});
+	
 	}
 
 	GetEntities(text)																				// EXTRACT ENTITIES
 	{
-		var i,j,k,r,es,ks,ents=[];
+		var i,j,k,r,es,ks;
+		var s="",ents=[];
+		var _this=this;																					// Save context
 		if (!text)	return [];																			// Quit on no text
 		var ne=this.entities.length;																	// Number of entity categories
 		var words=text.split(/\b\s+(?!$)/);																// Tokenize
-		var nw=words.length;																			// Number of words
+		var nw=words.length-1;																			// Number of words-1
 		for (i=0;i<nw;++i) {																			// For each word
-			r=RegExp(words[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"));								// Make regex of word
+			findMatch(words[i]+"_"+words[i+1]);															// Look for digram
+			findMatch(words[i]);																		// Look for single word
+			}
+		findMatch(words[i]);																			// Look for last word
+		
+		for (i=0;i<ents.length;++i) s+=ents[i].e+":"+ents[i].k+", ";									// Form list
+		s=s.substr(0,s.length-2);																		// Remove last comma
+
+		/// RESOLVE BIGRAM/SINGLE WORD MATCHES
+
+		function findMatch(word) {																		// FIND TOKEN IN ENTITIES LIST
+			r=RegExp((","+word+",").replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"i");					// Make regex of word
 			for (j=0;j<ne;++j) {																		// For each entity category
-				es=this.entities[j];																	// Point at entity
+				es=_this.entities[j];																	// Point at entity
 				ks=es.keys;																				// Point at the keys array
 				for (k=0;k<ks.length;++k) 																// For each key in entity
 					if (ks[k].syns.match(r)) 															// If word in key
-						ents.push({ e: es.name, k:ks[k].name, v:ks[k].syns.match(r) });					// Add to match list 
+						ents.push({ e:es.name, k:ks[k].name, v:ks[k].syns.match(r)[0] });				// Add to match list 
 				}
-			}
-		trace(ents)
-		return ents;																					// Return entity array		
+		}
+		return s;																						// Return entity string		
 	}
 
 } // ARC class closure

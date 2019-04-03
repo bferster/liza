@@ -192,7 +192,7 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				GetTextBox("Type text to stem","","",(s)=>{ trace(app.nlp.Stem(s)) });
+				GetTextBox("Type text to entity","","",(s)=>{ trace(app.arc.GetEntities(s)) });
 				}
 
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
