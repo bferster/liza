@@ -345,7 +345,7 @@ trace(s);	trace(">"+this.GetEntities(r._text))
 		this.entities=[];																				// Clear entities
 		this.entities.push( { name: "who", keys:[] } );													// WHO
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"Freddy", syns:",freddy,freddie,pretty," });										// Add keys
+		o.push({ name:"Freddy", syns:",freddy,freddie,pretty," });	
 		o.push({ name:"Sara", syns:",sara,siri,tara," });												// Needs leading and trailing commas
 		o.push({ name:"Robert", syns:",robert,robbie,robby," });
 		o.push({ name:"Liza", syns:",liza,elij,lies,plaza," });
@@ -360,9 +360,25 @@ trace(s);	trace(">"+this.GetEntities(r._text))
 		o.push({ name:"opinion", syns:","});
 		o.push({ name:"answer", syns:",tell,identify,answer,assertion,claim,comment,conclusion,decide,decision,equal,equals,evaluate,explanation,interpretation,observation,outcome,product,reaction,rebuttal,recap,relate,remark,report,response,restate,result,solution,statement,summarize,summary,understand,value,"});
 
+		this.entities.push( { name: "ask", keys:[] } );													// ASK
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"which", syns:",," });				
+		o.push({ name:"how", syns:",," });				
+		o.push({ name:"when", syns:",," });				
+		o.push({ name:"where", syns:",," });				
+		o.push({ name:"what", syns:",," });				
+
+		this.entities.push( { name: "number", keys:[] } );												// NUMBER
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"", syns:",," });				
+	
+		this.entities.push( { name: "action", keys:[] } );												// ACTION
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"", syns:",," });				
+
 		this.entities.push( { name: "teacher", keys:[] } );												// TEACHER
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"me", syns:",I,me,teacher," });													// Add keys
+		o.push({ name:"me", syns:",I,me,teacher," });				
 
 		this.entities.push( { name: "classroom", keys:[] } );											// CLASSROOM
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
@@ -371,11 +387,40 @@ trace(s);	trace(">"+this.GetEntities(r._text))
 		o.push({ name:"done", syns:",class_is,we're_done,are_done,class_over,"});
 		o.push({ name:"start", syns:",begin,us_begin,us_start,let's_begin,let's_start,get_started,"});
 
+		this.entities.push( { name: "progress", keys:[] } );											// PROGRESS
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"again", syns:",again,anew," });				
+		o.push({ name:"middle", syns:",during,within,middle," });	
+		o.push({ name:"end", syns:",end,done," });					
+		o.push({ name:"start", syns:",begin,start" });				
+
 		this.entities.push( { name: "concept", keys:[] } );												// CONCEPT
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
 		o.push({ name:"idea", syns:",belief,idea,"});
 		o.push({ name:"rule", syns:",algorithm,basis,guideline,law,maxim,plan,regulation,rule,theory,"});
-	
+
+		this.entities.push( { name: "math", keys:[] } );												// MATH
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"geometry", syns:",acute,angle,box,circle,geometry,hexagon,obtuse,octagon,pentagon,polygon,quadrilateral,round,shape,square,"});
+		o.push({ name:"decimal", syns:",dot,point,"});
+		o.push({ name:"fraction", syns:",bottom_number,bottom_value,denominator,fraction,numerator,top_number,top_value,"});
+		o.push({ name:"multiply", syns:",*multiplication,multiplied,multiply,times,"});
+		o.push({ name:"divide", syns:",/,divide,divided,division,"});
+		o.push({ name:"subtract", syns:"-,less,minus,subtracting,subtraction,take_away,"});
+		o.push({ name:"add", syns:",+,add,adding,addition,combine,"});
+		
+		this.entities.push( { name: "praise", keys:[] } );												// PRAISE
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"bad", syns:",bad,not_correct,not_right,sorry,wrong,"});
+		o.push({ name:"good", syns:",good,great,nice work,perfect,right,well_done,"});
+
+		this.entities.push( { name: "polarity", keys:[] } );											// POLARITY
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"bigger", syns:",bigger,fat,fatter,greater,heavier,high,higher,more,taller,thick,thicker,wider,"});
+		o.push({ name:"smaller", syns:",less,lighter,littler,low,lower,shorter,smaller,thin,thinner,"});
+		o.push({ name:"maybe", syns:",could,maybe,might,perhaps,"});
+		o.push({ name:"no", syns:",can_not,can't,is_not,isn't,no,non,not,should_not,shouldn't,will_not,won't,"});
+		o.push({ name:"yes", syns:",definitely,should,surely,truly,will,"});
 	}
 
 	GetEntities(text)																				// EXTRACT ENTITIES
