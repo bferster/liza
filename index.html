@@ -18,7 +18,6 @@
 	<script src="blackboard.js"></script>
 	<script src="voice.js"></script>
 	<script src="time.js"></script>
-	<script src="nlp.js"></script>
 	
 	<style>
 		 body { 			font-family:Verdana,Geneva,sans-serif;font-size:13px; box-sizing:border-box; 
@@ -192,7 +191,7 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				GetTextBox("Type text to entity","","",(s)=>{ trace(app.arc.GetEntities(s)) });
+				GetTextBox("Type text to entity","","",(s)=>{ trace(app.arc.GetEntities(s,true)) });
 				}
 
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
@@ -238,7 +237,6 @@ class App  {
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.rev=new Review();																		// Make new reviewer		
 		this.tim=new Timeline();																	// Make timeline	
-		this.nlp=new NLP();																			// Make NLP	
 		this.LoadProject(this.gid);																	// Load project file
 		this.Draw();																				// Start 
 
@@ -364,73 +362,72 @@ class App  {
 
 	OnPhrase(text) 																			// ON PHRASE UTTERED
 	{
-		app.arc.Parse(text, null, (o)=> {															// Parse text
-			var score=0;
-			if (o.match(/response:agree/i) && o.match(/who:all/i)) app.curStudent=-2;				// Looking for nods from whole class
-			else if (o.match(/who:youAll/i)) 		app.curStudent=-2;								// Whole class
-			else if (o.match(/who:wholeClass/i)) 	app.curStudent=-1;								// Whole class
-			else if (o.match(/who:Liza/i)) 			app.curStudent=app.roster["Liza"];				// Set current student
-			else if (o.match(/who:Freddy/i)) 		app.curStudent=app.roster["Freddy"];
-			else if (o.match(/who:Robert/i)) 		app.curStudent=app.roster["Robert"];
-			else if (o.match(/who:Sara/i)) 			app.curStudent=app.roster["Sara"];
-			if (o.match(/action:/i)) 				app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an action mentioned, do it
-		
-			if (app.pickingStudent) {																// If students have their hands up
-				app.curStudent=Math.max(app.curStudent);											// Default to 1st if still talking to class
-				app.DoAction("sit",true);															// Hands down
-				app.arc.DeliverResponse(app.pickingStudent);										// Deliver response
-				app.pickingStudent="";																// Clear flag
-				Prompt("");																			// Clear prompt
-				return;	
-				}
+		var o=app.arc.GetEntities(text);														// Get entities
+		var score=0;
+		if (o.match(/response:agree/i) && o.match(/who:all/i)) app.curStudent=-2;				// Looking for nods from whole class
+		else if (o.match(/who:youAll/i)) 		app.curStudent=-2;								// Whole class
+		else if (o.match(/who:wholeClass/i)) 	app.curStudent=-1;								// Whole class
+		else if (o.match(/who:Liza/i)) 			app.curStudent=app.roster["Liza"];				// Set current student
+		else if (o.match(/who:Freddy/i)) 		app.curStudent=app.roster["Freddy"];
+		else if (o.match(/who:Robert/i)) 		app.curStudent=app.roster["Robert"];
+		else if (o.match(/who:Sara/i)) 			app.curStudent=app.roster["Sara"];
+		if (o.match(/action:/i)) 				app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an action mentioned, do it
+	
+		if (app.pickingStudent) {																// If students have their hands up
+			app.curStudent=Math.max(app.curStudent);											// Default to 1st if still talking to class
+			app.DoAction("sit",true);															// Hands down
+			app.arc.DeliverResponse(app.pickingStudent);										// Deliver response
+			app.pickingStudent="";																// Clear flag
+			Prompt("");																			// Clear prompt
+			return;	
+			}
 
-			app.arc.FindClosestStep(text,o);														// Match closest step to text
-			score=app.arc.tree[app.arc.curStep].score;												// Get match score			
-			app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, move:app.arc.tree[app.arc.curStep].move, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
-			if (score > app.arc.threshold) {														// If past threshold
-				var s=app.arc.DeliverResponse(app.arc.curStep).replace(/\{.*?\}/g,"");				// Deliver response without braced tags
-				if (s)	$("#revTextDiv").append("<div class='lz-textR'>"+s+"</div>");				// Add to texting display display, if texting
-				}
-			trace(app.arc.stepData);																// Show response data
-			});																		
+		app.arc.FindClosestStep(text,o);														// Match closest step to text
+		score=app.arc.tree[app.arc.curStep].score;												// Get match score			
+		app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, move:app.arc.tree[app.arc.curStep].move, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
+		if (score > app.arc.threshold) {														// If past threshold
+			var s=app.arc.DeliverResponse(app.arc.curStep).replace(/\{.*?\}/g,"");				// Deliver response without braced tags
+			if (s)	$("#revTextDiv").append("<div class='lz-textR'>"+s+"</div>");				// Add to texting display display, if texting
+			}
+		trace(">> "+text+"\n",app.arc.curStep,app.arc.tree[app.arc.curStep].text.substr(0,20),app.arc.stepData);
 		}
 		
-		DoAction(act, all)																		// PERFORM ACTION
+	DoAction(act, all)																		// PERFORM ACTION
 		{
-			var i;
-			if ((app.curStudent < 0) || all) 														// If the whole class
-				for (i=0;i<this.students.length;++i)												// For each student
-					animateIt(i);																	// Animate them									
-			else																					// Just one
-				animateIt(app.curStudent);															// Animate that one	
+		var i;
+		if ((app.curStudent < 0) || all) 														// If the whole class
+			for (i=0;i<this.students.length;++i)												// For each student
+				animateIt(i);																	// Animate them									
+		else																					// Just one
+			animateIt(app.curStudent);															// Animate that one	
 
-			function animateIt(student) {															// ANIMATE STUDENT
-				var mod=app.students[student].id;													// Get model id
-				if (act.match(/sleep/i))	 		app.sc.StartAnimation(mod,app.seqs["sleep"]);	// Route on action type							
-				else if (act.match(/sit/i))	 		app.sc.StartAnimation(mod,app.seqs["sit"]);							
-				else if (act.match(/stand/i))		app.sc.StartAnimation(mod,app.seqs["standUp"]);								
-				else if (act.match(/handUp/i)) 		app.sc.StartAnimation(mod,app.seqs["armUp"]);								
-				else if (act.match(/handDown/i)) 	app.sc.StartAnimation(mod,app.seqs["armDown"]);								
-				else if (act.match(/nodYes/i))		app.sc.StartAnimation(mod,app.seqs["nodYes"]);								
-				else if (act.match(/nodNo/i))		app.sc.StartAnimation(mod,app.seqs["nodNo"]);								
-				else if (act.match(/wave/i))		app.sc.StartAnimation(mod,app.seqs["wave"]);						
-				else if (act.match(/headUp/i))		app.sc.StartAnimation(mod,app.seqs["headUp"]);								
-				else if (act.match(/headDown/i)) 	app.sc.StartAnimation(mod,app.seqs["headDown"]);									
-				else if (act.match(/headLeft/i))	app.sc.StartAnimation(mod,app.seqs["headLeft"]);								
-				else if (act.match(/headCenter/i)) 	app.sc.StartAnimation(mod,app.seqs["headCenter"]);									
-				else if (act.match(/headRight/i))	app.sc.StartAnimation(mod,app.seqs["headRight"]);								
-				else if (act.match(/write/i))		app.sc.StartAnimation(mod,app.seqs["write"]);								
-				else if (act.match(/fidgetStop/i))	app.students[student].fidget=0;							
-				else if (act.match(/fidget/i))		app.students[student].fidget=1;							
-				else if (act.match(/twistLeft/i))	app.sc.StartAnimation(mod,app.seqs["twistLeft"]);								
-				else if (act.match(/twistRight/i))	app.sc.StartAnimation(mod,app.seqs["twistRight"]);								
-				else if (act.match(/nextSlide/i))	app.bb.ShowSlide(1);	
-				else if (act.match(/lastSlide/i))	app.bb.ShowSlide(-1);	
-				else if (act.match(/firstSlide/i))	app.bb.ShowSlide(0,0);	
-				else								return false;
-				return true;
-				}					
-			}
+		function animateIt(student) {															// ANIMATE STUDENT
+			var mod=app.students[student].id;													// Get model id
+			if (act.match(/sleep/i))	 		app.sc.StartAnimation(mod,app.seqs["sleep"]);	// Route on action type							
+			else if (act.match(/sit/i))	 		app.sc.StartAnimation(mod,app.seqs["sit"]);							
+			else if (act.match(/stand/i))		app.sc.StartAnimation(mod,app.seqs["standUp"]);								
+			else if (act.match(/handUp/i)) 		app.sc.StartAnimation(mod,app.seqs["armUp"]);								
+			else if (act.match(/handDown/i)) 	app.sc.StartAnimation(mod,app.seqs["armDown"]);								
+			else if (act.match(/nodYes/i))		app.sc.StartAnimation(mod,app.seqs["nodYes"]);								
+			else if (act.match(/nodNo/i))		app.sc.StartAnimation(mod,app.seqs["nodNo"]);								
+			else if (act.match(/wave/i))		app.sc.StartAnimation(mod,app.seqs["wave"]);						
+			else if (act.match(/headUp/i))		app.sc.StartAnimation(mod,app.seqs["headUp"]);								
+			else if (act.match(/headDown/i)) 	app.sc.StartAnimation(mod,app.seqs["headDown"]);									
+			else if (act.match(/headLeft/i))	app.sc.StartAnimation(mod,app.seqs["headLeft"]);								
+			else if (act.match(/headCenter/i)) 	app.sc.StartAnimation(mod,app.seqs["headCenter"]);									
+			else if (act.match(/headRight/i))	app.sc.StartAnimation(mod,app.seqs["headRight"]);								
+			else if (act.match(/write/i))		app.sc.StartAnimation(mod,app.seqs["write"]);								
+			else if (act.match(/fidgetStop/i))	app.students[student].fidget=0;							
+			else if (act.match(/fidget/i))		app.students[student].fidget=1;							
+			else if (act.match(/twistLeft/i))	app.sc.StartAnimation(mod,app.seqs["twistLeft"]);								
+			else if (act.match(/twistRight/i))	app.sc.StartAnimation(mod,app.seqs["twistRight"]);								
+			else if (act.match(/nextSlide/i))	app.bb.ShowSlide(1);	
+			else if (act.match(/lastSlide/i))	app.bb.ShowSlide(-1);	
+			else if (act.match(/firstSlide/i))	app.bb.ShowSlide(0,0);	
+			else								return false;
+			return true;
+			}					
+		}
 
 } // App class closure
 

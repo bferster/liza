@@ -68,10 +68,10 @@ class Timeline {
 				this.maxTime+=(o.text.length*app.voice.secsPerChar)+1000;							// Time to speak action with padding
 					if (r && r <= o.res.length) {													// If a response
 					this.events.push({ o:"R", t:this.maxTime, text:o.res[r-1].text, who:app.curStudent, r:r });	// Add it to record
-					this.maxTime+=(o.res[r-1].text.length*app.voice.secsPerChar)+1000;				// Add padded response time to max time
+					this.maxTime+=(o.res[r-1].text.length*app.voice.secsPerChar)+2000;				// Add padded response time to max time
 					if (o.res[r-1].cons) {															// If a consequence
 						this.events.push({ o:"CON", t:this.maxTime, text:o.res[r-1].cons });	 	// Add it
-						this.maxTime+=(o.res[r-1].cons.length*app.voice.secsPerChar)+2000;			// Add padded feedback  time to max time 
+						this.maxTime+=(o.res[r-1].cons.length*app.voice.secsPerChar)+1000;			// Add padded feedback  time to max time 
 						}
 					}
 				}
@@ -354,7 +354,7 @@ class Review  {
 				if (o.slide)	app.bb.ShowSlide(0, o.slide);											// Show slide
 				app.voice.talkStartTime=new Date().getTime();											// Set actual start talk time in record
 				app.voice.Talk(o.text,"instructor");													// Talk
-				var t=o.text.length*app.voice.secsPerChar;												// Time of text
+				var t=o.text.length*app.voice.secsPerChar+1000;											// Time of text + padding
 				$("body").append("<div id='timDiv' style='display:none'>");								// Add timer div to body
 				$("#timDiv").fadeIn(t,()=>{app.OnPhrase(o.text); $("#timDiv").remove()});				// Delay response until after instructor speaks
 				});

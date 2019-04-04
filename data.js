@@ -98,77 +98,76 @@ class ARC  {
 
 	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM STEP
 	{
-			var i,j,k,o,v,val;
-			for (i=0;i<this.tree.length;++i) {															// For each step in tree
-				o=this.tree[i];																			// Point at step
-				o.keys=[];																				// Create keyword array
-				o.ask=this.Question(o.text);															// If this a question?
-				v=(o.text+" ").match(/\(.+?\)/g);														// Get array of key words (keyword)
-				if (v) {																				// If keys flagged
-					for (j=0;j<v.length;++j) {															// For each key
-						val=v[j].substr(1,v[j].length-2);												// Extract text
-						o.keys.push(val);																// Add to keys
-						o.text=o.text.replace(RegExp(v[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
-						}
+		var i,j,k,o,v,val;
+		for (i=0;i<this.tree.length;++i) {																// For each step in tree
+			o=this.tree[i];																				// Point at step
+			o.keys=[];																					// Create keyword array
+			o.ask=this.Question(o.text);																// If this a question?
+			v=(o.text+" ").match(/\(.+?\)/g);															// Get array of key words (keyword)
+			if (v) {																					// If keys flagged
+				for (j=0;j<v.length;++j) {																// For each key
+					val=v[j].substr(1,v[j].length-2);													// Extract text
+					o.keys.push(val);																	// Add to keys
+					o.text=o.text.replace(RegExp(v[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),val);	// Remove ()'s
 					}
-				app.arc.Parse(o.text,o);																// Parse first text portion
-				
 				}
+			o.ents=app.arc.GetEntities(o.text);															// Parse text
+			}
 		}
 
-		FindClosestStep(text, entities)																// FIND STEP CLOSEST TO TEXT + ENTITIES
-		{
-			var o,i,j,f,n=0;
-			var kscore,escore,best=0;
-			var oentities=entities+" ";
-			entities=(""+entities).split(", ");															// Put entities into array
-			for (i=0;i<this.tree.length;++i) {															// For each step in tree
-				kscore=escore=0;																		// Start at 0
-				o=this.tree[i];																			// Point at step
-				for (j=0;j<o.keys.length;++j)															// For each key
-					if (text.match(RegExp(o.keys[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"))))		// Check for key in text
-						kscore++;																		// Add to key score
-				if (o.ents)	{																			// If any entities		
-					for (j=0;j<entities.length;++j) {													// For each entity spoken
-						if (o.ents.match(RegExp(entities[j].split(':')[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/i))))  // If a basic enities match
-							escore+=.5;																	// Add to score
-						if (o.ents.match(RegExp(entities[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 		// If a entity AND value match
-							escore+=.5;																	// Add to score
-						}
+	FindClosestStep(text, entities)																	// FIND STEP CLOSEST TO TEXT + ENTITIES
+	{
+		var o,i,j,f,n=0;
+		var kscore,escore,best=0;
+		var oentities=entities+" ";
+		entities=(""+entities).split(", ");																// Put entities into array
+		for (i=0;i<this.tree.length;++i) {																// For each step in tree
+			kscore=escore=0;																			// Start at 0
+			o=this.tree[i];																				// Point at step
+			for (j=0;j<o.keys.length;++j)																// For each key
+				if (text.match(RegExp(o.keys[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"))))			// Check for key in text
+					kscore++;																			// Add to key score
+			if (o.ents)	{																				// If any entities		
+				for (j=0;j<entities.length;++j) {														// For each entity spoken
+					if (o.ents.match(RegExp(entities[j].split(':')[0].replace(/[-[\]{}()*+?.,\\^$|#\s]/i))))  // If a basic enities match
+						escore+=.5;																		// Add to score
+					if (o.ents.match(RegExp(entities[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/i)))) 			// If a entity AND value match
+						escore+=.5;																		// Add to score
 					}
-				j=(""+o.ents).split(", ").length;														// Number of entities in step	
-				if (kscore)  this.tree[i].kscore=kscore/o.keys.length;									// Save normalized kscore
-				this.tree[i].escore=escore/Math.max(j,entities.length);									// Save normalized escore
-				this.tree[i].score=this.tree[i].escore;													// Save score in case there are no keys
-				if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore/2+this.tree[i].kscore;	// Use weighted average of keys and entities
-				f="";																					// Clear flag
-				if (o.goal == this.tree[this.curStep].goal)			this.tree[i].score+=.05,f+="G";		// If in current goal, bump-up score 
-				if ((i == this.lastStep+1))							this.tree[i].score+=.05,f+="N";		// If next in script, bump
-				if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";		// If in slide, bump
-				if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.50,f+="F";		// If from matches actual last step
-				if (o.from == this.lastResLine)						this.tree[i].score+=.50,f+="R";		// If from matches actual last response
-				if (o.ask && this.Question(text))					this.tree[i].score+=.25,f+="Q";		// If a question
-				if (oentities.match(/ask\:/i))						f+="A";								// An ask	
-				o.flags=f;																				// Save flags
 				}
-			var v=[];
-			for (i=0;i<this.tree.length;++i) {															// For each step in tree
-				o=this.tree[i];																			// Point at it
-				if (o.score >= n) { n=o.score;	best=i; };												// Set if highest
-				v.push({ id: i, n:o.goal+"-"+o.step, p:Math.round(o.score*100), e:o.ents, f:o.flags });	// Add step
-				}
-			v.sort((a,b)=>{ return b.p-a.p });
-			if (this.tree[best].move == "I") app.curStudent=Math.max(app.curStudent,0);					// No group responses from instructions
+			j=(""+o.ents).split(", ").length;															// Number of entities in step	
+			if (kscore)  this.tree[i].kscore=kscore/o.keys.length;										// Save normalized kscore
+			this.tree[i].escore=escore/Math.max(j,entities.length);										// Save normalized escore
+			this.tree[i].score=this.tree[i].escore;														// Save score in case there are no keys
+			if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore/2+this.tree[i].kscore;	// Use weighted average of keys and entities
+			f="";																						// Clear flag
+			if (o.goal == this.tree[this.curStep].goal)			this.tree[i].score+=.05,f+="G";			// If in current goal, bump-up score 
+			if ((i == this.lastStep+1))							this.tree[i].score+=.05,f+="N";			// If next in script, bump
+			if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";			// If in slide, bump
+			if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.50,f+="F";			// If from matches actual last step
+			if (o.from == this.lastResLine)						this.tree[i].score+=.50,f+="R";			// If from matches actual last response
+			if (o.ask && this.Question(text))					this.tree[i].score+=.25,f+="Q";			// If a question
+			if (oentities.match(/ask\:/i))						f+="A";									// An ask	
+			o.flags=f;																					// Save flags
+			}
+		var v=[];
+		for (i=0;i<this.tree.length;++i) {																// For each step in tree
+			o=this.tree[i];																				// Point at it
+			if (o.score >= n) { n=o.score;	best=i; };													// Set if highest
+			v.push({ id: i, n:o.goal+"-"+o.step, p:Math.round(o.score*100), e:o.ents, f:o.flags });		// Add step
+			}
+		v.sort((a,b)=>{ return b.p-a.p });
+		if (this.tree[best].move == "I") app.curStudent=Math.max(app.curStudent,0);						// No group responses from instructions
 
-			this.lastStep=this.curStep;																	// Then is now
-			if (n > this.threshold)																		// If above threshold
-				this.curStep=best;																		// Set as current step 
-			o=this.tree[this.curStep];																	// Point at step
-			this.stepData={ spoken: text, entities: entities, step: o, 									// Set data
-				score: o.score, escore: o.escore, kscore: o.kscore, flags:o.flags,
-				hitList:v, move: o.move, stepLine:o.line, stepNum: this.curStep }; 	
-			return this.curStep;																		// Return best fit
-		}
+		this.lastStep=this.curStep;																		// Then is now
+		if (n > this.threshold)																			// If above threshold
+			this.curStep=best;																			// Set as current step 
+		o=this.tree[this.curStep];																		// Point at step
+		this.stepData={ spoken: text, entities: entities, step: o, 										// Set data
+			score: o.score, escore: o.escore, kscore: o.kscore, flags:o.flags,
+			hitList:v, move: o.move, stepLine:o.line, stepNum: this.curStep }; 	
+		return this.curStep;																			// Return best fit
+	}
 
 	DeliverResponse(step)																			// DELIVER RESPONSE
 	{
@@ -253,7 +252,7 @@ class ARC  {
 						app.voice.Talk(text);															// Speak response
 						return text;																	// Quit looking
 						}
-					}
+					} 
 				}
 			}
 		
@@ -298,45 +297,57 @@ class ARC  {
 		return r;																						// Return type of response
 	}
 
-	Parse(text, data, callback)																		// PARSE TEXT STRING
-	{
-		if (!text)	return;																				// Quit if no text
-		text=text.replace(/\{.*?\}/g,"");																// Remove any braced text
-		app.gettingEntities=1;																			// Waiting for entities from AI
-		try {
-			if (!window.location.search.match(/noai/i))													// Unless turned off
-				$.ajax({ url: 'https://api.wit.ai/message',												// Send to WIT
-					data: { 'q': text, "access_token":"YWNFSLOCAMKGLMSWEAZA5JZBSER6MJ4O" },				// Text and api id
-					dataType: "jsonp", method: "GET",													// JSONP
-					success: (r)=> {																	// When parsed
-						app.gettingEntities=0;															// Not waiting
-						var i,c,v,s="";
-						if (r.error) {																	// If an error
-							trace("************\nWit error: "+r.error+"\n***********");					// Show error
-							return;																		// Quit
-							}	
-						for (var entity in r.entities) {												// For each entity parsed
-							for (i=0;i<r.entities[entity].length;++i) {									// For each entity instance
-								v=r.entities[entity][i].value;											// Add value
-								c=Math.floor(r.entities[entity][i].confidence*100);						// Confidence
-								s+=entity+":"+v+", ";													// Add entities
-								}
-							}
-						s=s.substr(0,s.length-2)														// Remove last comma
-trace(s);	trace(">"+this.GetEntities(r._text))
-						if (data)		data.ents=s;													// Add to object
-						if (callback) 	callback(s);													// Return entities to callback	
-						}
-				});
-		} catch(e) { app.gettingEntities=0;	trace("***********\nWIT error: "+e.error+"\n*********"); }	// Show error
-	}
-
 	Question(text)																					// IS THIS A QUESTION?
 	{
 		if (text.match(/who |what |how |when |where |why |which|\? /i))					return 1;			
 		if (text.match(/questions |would you |could you |can you |can I |are you /i))	return 2;			
 		if (text.match(/does |did I |did you |did he |did she |did it |did they /i))	return 3;
 		return 0;																					
+	}
+
+	GetEntities(text)																				// EXTRACT ENTITIES
+	{
+		var i,j,k,r,es,ks;
+		var s="",ents=[];
+		var _this=this;																					// Save contex	
+		if (!text)	return [];																			// Quit on no text
+		var ne=this.entities.length;																	// Number of entity categories
+		text=text.replace(/’/g,"'");																	// Normalize apostrophes
+		text=text.replace(/\{.*?\}/g,"");																// Remove text in braces
+		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
+		text=text.replace(/\W(the|a|is|so|from|in|we|you|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
+		text=text.replace(/\W(the|a|is|so|from|in|we|you|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
+		text=text.replace(/\+/g," + ");		text=text.replace(/\-/g," - ");								// Separate math functions
+		text=text.replace(/\*/g," * ");		text=text.replace(/\\/g," \\ "); 	text=text.replace(/\=/g," = ");																	
+		var words=text.split(/ +/);																		// Tokenize
+		var nw=words.length-1;																			// Number of words-1
+		words[0]=words[0].replace(/s$/,"");																// Remove final s from first word
+		words[0]=words[0].replace(/ing$/,"");															// Remove gerunds
+		for (i=0;i<nw;++i) {																			// For each word
+			if (!isNaN(words[i])) {																		// If a number
+				ents.push({ e:"number", k:words[i], v:words[i] });										// Add to match list 
+				continue;																				// Next
+				}
+			words[i+1]=words[i+1].replace(/s$/,"");														// Remove final s from next word
+			words[i+1]=words[i+1].replace(/ing$/,"");													// Remove gerund
+			findMatch(words[i]+"_"+words[i+1]);															// Look for digram
+			findMatch(words[i]);																		// Look for single word
+			}
+		findMatch(words[i]);																			// Look for last word
+		for (i=0;i<ents.length;++i) s+=ents[i].e+":"+ents[i].k+", ";									// Form list
+		s=s.substr(0,s.length-2);																		// Remove last comma
+
+		function findMatch(word) {																		// FIND TOKEN IN ENTITIES LIST
+			r=RegExp((","+word+",").replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"));						// Make regex of word
+			for (j=0;j<ne;++j) {																		// For each entity category
+				es=_this.entities[j];																	// Point at entity
+				ks=es.keys;																				// Point at the keys array
+				for (k=0;k<ks.length;++k) 																// For each key in entity
+					if (ks[k].syns.match(r)) 															// If word in key
+						ents.push({ e:es.name, k:ks[k].name, v:ks[k].syns.match(r)[0] });				// Add to match list 
+				}
+			}
+		return s;																						// Return entity string		
 	}
 
 	SetEntities()																					// POPULATE ENTITIES
@@ -348,113 +359,140 @@ trace(s);	trace(">"+this.GetEntities(r._text))
 		o.push({ name:"Freddy", syns:",freddy,freddie,pretty," });	
 		o.push({ name:"Sara", syns:",sara,siri,tara," });												// Needs leading and trailing commas
 		o.push({ name:"Robert", syns:",robert,robbie,robby," });
-		o.push({ name:"Liza", syns:",liza,elij,lies,plaza," });
-		o.push({ name:"youAll", syns:",everybody,everyone,u-haul,uhaul,y'all,you_all,you_guys,you_kids," });
-		o.push({ name:"wholeClass", syns:",anybody,anyone,children,somebody,who knows," });
+		o.push({ name:"Liza", syns:",liza,elija,elijah,lie,plaza," });
+		o.push({ name:"youAll", syns:",everybody,everyone,u-haul,uhaul,y'all,you_all,you_guy,you_kid," });
+		o.push({ name:"wholeClass", syns:",anybody,anyone,children,somebody,who_know," });
 
 		this.entities.push( { name: "response", keys:[] } );											// RESPONSE
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
 		o.push({ name:"agree", syns:",agree,concur,"});
-		o.push({ name:"wrong", syns:",incorrect,innacurate,not_right,wrong,"});
-		o.push({ name:"right", syns:",accurate,correct,right,"});
-		o.push({ name:"opinion", syns:","});
-		o.push({ name:"answer", syns:",tell,identify,answer,assertion,claim,comment,conclusion,decide,decision,equal,equals,evaluate,explanation,interpretation,observation,outcome,product,reaction,rebuttal,recap,relate,remark,report,response,restate,result,solution,statement,summarize,summary,understand,value,"});
+		o.push({ name:"wrong", syns:",wrong,incorrect,innacurate,not_right,"});
+		o.push({ name:"right", syns:",right,accurate,correct,"});
+		o.push({ name:"opinion", syns:",opinion,hypothesi,idea,think,thought,"});
+		o.push({ name:"answer", syns:",answer,definition,tell,identify,assertion,claim,comment,conclusion,decide,decision,,evaluate,explanation,interpretation,observation,outcome,product,reaction,rebuttal,recap,relate,remark,report,response,restate,result,solution,statement,summarize,summary,value,"});
 
 		this.entities.push( { name: "ask", keys:[] } );													// ASK
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"which", syns:",," });				
-		o.push({ name:"how", syns:",," });				
-		o.push({ name:"when", syns:",," });				
-		o.push({ name:"where", syns:",," });				
-		o.push({ name:"what", syns:",," });				
+		o.push({ name:"which", syns:",which,choose,chose,chosen,pick,select," });				
+		o.push({ name:"how", syns:",how,arrive_at,because,by_do,by_mean,cause,come_up,define,describe,explain,expres,know,make_plain,method,point_out,proces,remind,show,solve," });				
+		o.push({ name:"why", syns:",why,because,what_respect,interpret,motive,prove,reason,elaborate,reveal,mean," });
+		o.push({ name:"when", syns:",when,today,tomorrow,hour,minute,day,week,month,year,century,decade,after,the_time,what_time,before,dur,immediately,a_bit,little_while,later,meanwhile,soon,still,time,while," });				
+		o.push({ name:"where", syns:",where,addres,direction,location,locu,place,point,position,site,spot,stage,wherabout," });				
+		o.push({ name:"what", syns:",what,i_thi,i_that,i_she,i_he,i_it,what'," });				
 
-		this.entities.push( { name: "number", keys:[] } );												// NUMBER
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"", syns:",," });				
-	
 		this.entities.push( { name: "action", keys:[] } );												// ACTION
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"", syns:",," });				
+		o.push({ name:"firstSlide", syns:",begin_slide,start_slide," });				
+		o.push({ name:"nextSlide", syns:",advance_side,next_side,next_slide," });				
+		o.push({ name:"headCenter", syns:",eye_front,head_center," });				
+		o.push({ name:"headRight", syns:",head_right," });				
+		o.push({ name:"headLeft", syns:",head_left," });				
+		o.push({ name:"headUp", syns:",head_up,raise_head," });				
+		o.push({ name:"headDown", syns:",head_down,look_down,lower_head," });				
+		o.push({ name:"headRight", syns:",head_right,head_right," });				
+		o.push({ name:"fidget", syns:",fidget," });				
+		o.push({ name:"fidgetStop", syns:",stop_fidget,stop_squirm,"});				
+		o.push({ name:"handDown", syns:",arm_down,hand_down,"});				
+		o.push({ name:"handUp", syns:",arm_up,hand_up,"});				
+		o.push({ name:"nodYes", syns:",nod_ye,"});				
+		o.push({ name:"nodNo", syns:",non_no,"});				
+		o.push({ name:"stand", syns:",stand,stand_up,please_stand,"});				
+		o.push({ name:"sit", syns:",setup,sit_down,sit_up,wake_up,"});				
 
 		this.entities.push( { name: "teacher", keys:[] } );												// TEACHER
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"me", syns:",I,me,teacher," });				
+		o.push({ name:"me", syns:",i,me,my,mine,teacher," });				
 
 		this.entities.push( { name: "classroom", keys:[] } );											// CLASSROOM
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"pump", syns:",add_to,any_more,anything_else,anything_more,there_more,what_else,"});
+		o.push({ name:"pump", syns:",add_to,any_more,anyth_else,anyth_more,there_more,there'_more,what_else,"});
 		o.push({ name:"review", syns:",review,"});
-		o.push({ name:"done", syns:",class_is,we're_done,are_done,class_over,"});
-		o.push({ name:"start", syns:",begin,us_begin,us_start,let's_begin,let's_start,get_started,"});
+		o.push({ name:"learn", syns:",learn,learned,learn't,study,master,become_versed,train,understand,memorize,grok,"});
+		o.push({ name:"goal", syns:",goal,objective,aim,intent,intention,mission,"});
+		o.push({ name:"done", syns:",clas_i,we're_done,are_done,clas_over,"});
+		o.push({ name:"school", syns:",school,classroom,build,room,cubby,middle_school,high_school,"});
+		o.push({ name:"start", syns:",begin,u_begin,u_start,let'_begin,let'_start,get_started,"});
+		o.push({ name:"item", syns:",text,exam,pen,pencil,paper,notebook,folder,desk,crayon,marker,laptop,computer,chalk,eraser,board,blackboard,whiteboard,workbook,worksheet,book,sheet,phone,,mobile,iphone,chromebook,chrome,"});
+		o.push({ name:"session", syns:",session,clas,lesson,period,"});
 
+		this.entities.push( { name: "subject", keys:[] } );												// SUBJECT
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"math", syns:",math,mathematic,algebra,geometry," });
+		o.push({ name:"science", syns:",science,chemistry,geoeology,physic,astronomy,"});
+		o.push({ name:"vocab", syns:",vocab,vocabulary,word_study," });
+		o.push({ name:"social", syns:",,history,civic,social_studie,"});
+	
 		this.entities.push( { name: "progress", keys:[] } );											// PROGRESS
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"again", syns:",again,anew," });				
-		o.push({ name:"middle", syns:",during,within,middle," });	
+		o.push({ name:"again", syns:",again,again,anew," });				
+		o.push({ name:"middle", syns:",middle,dur,within," });	
 		o.push({ name:"end", syns:",end,done," });					
-		o.push({ name:"start", syns:",begin,start" });				
+		o.push({ name:"start", syns:",start,begin" });				
+
+		this.entities.push( { name: "aspect", keys:[] } );												// ASPECT
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"physical", syns:",size,color,shape,length,width,weight,height,depth,breadth,volume,space,area,straight,curved,curved,hue,dimension,amount,"});
+		o.push({ name:"body", syns:",body,eye,leg,arm,finger,head,wrist,face,hair,stomach,foot,feet,tooth,teeth,"});
+		o.push({ name:"change", syns:",change,transition,evolve,turn_into,become,"});
+		o.push({ name:"relative", syns:",same,smaller,littler,"});
+
+		this.entities.push( { name: "act", keys:[] } );													// ACT
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"look", syns:",look,see,gaze,view,pay_attention,acknowledge,detect,recognize,distinguish,"});
+		o.push({ name:"write", syns:",write,scribble,compose,print,record,scrawl,sign,copy,"});
+		o.push({ name:"talk", syns:",talk,scream,yell,mumble,speak,scrawl,sign,copy,say,tell,utter,whisper,enunciate,expres,declar,convey,verbalize,vocalize,"});
+		o.push({ name:"read", syns:",read,read,"});
+		o.push({ name:"distract", syns:",distract,distraction,distracted,not_pay,not_focused"});
 
 		this.entities.push( { name: "concept", keys:[] } );												// CONCEPT
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"idea", syns:",belief,idea,"});
-		o.push({ name:"rule", syns:",algorithm,basis,guideline,law,maxim,plan,regulation,rule,theory,"});
+		o.push({ name:"idea", syns:",idea,belief,topic,theme,motif,argument,subject,proposition,information,data,datum,stuff,"});
+		o.push({ name:"rule", syns:",rule,algorithm,basi,guideline,law,maxim,plan,regulation,theory,"});
+		o.push({ name:"key", syns:",key,important,critical,essential,significant,meanful,bigleague,ponderou,imperitive,chief,considerable,principal,seriou,"});
+		o.push({ name:"example", syns:",example,case,illustration,pattern,symbol,examplar,stereotype,for_instance,specimen,paragon,ideal,archetype,"});
 
 		this.entities.push( { name: "math", keys:[] } );												// MATH
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"geometry", syns:",acute,angle,box,circle,geometry,hexagon,obtuse,octagon,pentagon,polygon,quadrilateral,round,shape,square,"});
-		o.push({ name:"decimal", syns:",dot,point,"});
-		o.push({ name:"fraction", syns:",bottom_number,bottom_value,denominator,fraction,numerator,top_number,top_value,"});
-		o.push({ name:"multiply", syns:",*multiplication,multiplied,multiply,times,"});
-		o.push({ name:"divide", syns:",/,divide,divided,division,"});
-		o.push({ name:"subtract", syns:"-,less,minus,subtracting,subtraction,take_away,"});
-		o.push({ name:"add", syns:",+,add,adding,addition,combine,"});
+		o.push({ name:"geometry", syns:",acute,angle,triangle,fbox,circle,hexagon,obtuse,octagon,pentagon,polygon,quadrilateral,round,shape,square,closed,open,"});
+		o.push({ name:"decimal", syns:",decimal,dot,point,"});
+		o.push({ name:"fraction", syns:",fraction,bottom_number,bottom_value,denominator,numerator,top_number,top_value,"});
+		o.push({ name:"multiply", syns:",multiply,*,multiplication,multiplied,time,"});
+		o.push({ name:"divide", syns:",divide,/,divided,division,"});
+		o.push({ name:"subtract", syns:"-,subtract,les,minu,subtraction,take_away,"});
+		o.push({ name:"add", syns:",add,+,addition,combine,"});
 		
 		this.entities.push( { name: "praise", keys:[] } );												// PRAISE
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
 		o.push({ name:"bad", syns:",bad,not_correct,not_right,sorry,wrong,"});
-		o.push({ name:"good", syns:",good,great,nice work,perfect,right,well_done,"});
+		o.push({ name:"good", syns:",good,great,nice_work,perfect,right,well_done,thank,appreciate,amaz,awesome,cool"});
+
+		this.entities.push( { name: "ands", keys:[] } );												// AND/ORS
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"and", syns:",and,too,also,includ,together,a_well,"});
+		o.push({ name:"or", syns:",or,either,conversely,but,alternatively,else,"});
+		o.push({ name:"not", syns:",exclude,exclud,except,"});
 
 		this.entities.push( { name: "polarity", keys:[] } );											// POLARITY
 		o=this.entities[this.entities.length-1].keys;													// Point at keys
 		o.push({ name:"bigger", syns:",bigger,fat,fatter,greater,heavier,high,higher,more,taller,thick,thicker,wider,"});
-		o.push({ name:"smaller", syns:",less,lighter,littler,low,lower,shorter,smaller,thin,thinner,"});
-		o.push({ name:"maybe", syns:",could,maybe,might,perhaps,"});
-		o.push({ name:"no", syns:",can_not,can't,is_not,isn't,no,non,not,should_not,shouldn't,will_not,won't,"});
-		o.push({ name:"yes", syns:",definitely,should,surely,truly,will,"});
+		o.push({ name:"smaller", syns:",smaller,les_than,lighter,littler,low,lower,shorter,thin,thinner,"});
+		o.push({ name:"maybe", syns:",maybe,could,might,perhap,"});
+		o.push({ name:"no", syns:",no,can_not,can't,i_not,isn't,no,non,not,should_not,shouldn't,will_not,won't,"});
+		o.push({ name:"yes", syns:",ye,definitely,should,surely,truly,will,"});
+		o.push({ name:"equal", syns:",equal,same,just_like,even,equivelant,identical,match,identical,comparable,"});
+		o.push({ name:"notEqual", syns:",unequal,different,not_the,uneven,other,distinct,inconsistent,unalike,not_like,"});
+
+		this.entities.push( { name: "ordinal", keys:[] } );												// ORDINAL
+		o=this.entities[this.entities.length-1].keys;													// Point at keys
+		o.push({ name:"1", syns:",first,1st," });	o.push({ name:"2", syns:",second,2nd," });				
+		o.push({ name:"3", syns:",third,3rd," });	o.push({ name:"4", syns:",fourth,4th," });				
+		o.push({ name:"5", syns:",fifth,5th," });	o.push({ name:"6", syns:",sixth,6th," });				
+		o.push({ name:"7", syns:",seventh,7th," });	o.push({ name:"8", syns:",eigth,8th," });
+		o.push({ name:"9", syns:",tenth,9th," });	o.push({ name:"10", syns:",tenth,10th," });	
+		o.push({ name:"20", syns:",twentieth,20th" });	o.push({ name:"100", syns:",hundredth,100th," });
+		o.push({ name:"1000", syns:",thousandth,1000th" });	o.push({ name:"100000", syns:",millionth," });
 	}
 
-	GetEntities(text)																				// EXTRACT ENTITIES
-	{
-		var i,j,k,r,es,ks;
-		var s="",ents=[];
-		var _this=this;																					// Save context
-		if (!text)	return [];																			// Quit on no text
-		var ne=this.entities.length;																	// Number of entity categories
-		var words=text.split(/\b\s+(?!$)/);																// Tokenize
-		var nw=words.length-1;																			// Number of words-1
-		for (i=0;i<nw;++i) {																			// For each word
-			findMatch(words[i]+"_"+words[i+1]);															// Look for digram
-			findMatch(words[i]);																		// Look for single word
-			}
-		findMatch(words[i]);																			// Look for last word
-		
-		for (i=0;i<ents.length;++i) s+=ents[i].e+":"+ents[i].k+", ";									// Form list
-		s=s.substr(0,s.length-2);																		// Remove last comma
-
-		/// RESOLVE BIGRAM/SINGLE WORD MATCHES
-
-		function findMatch(word) {																		// FIND TOKEN IN ENTITIES LIST
-			r=RegExp((","+word+",").replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"i");					// Make regex of word
-			for (j=0;j<ne;++j) {																		// For each entity category
-				es=_this.entities[j];																	// Point at entity
-				ks=es.keys;																				// Point at the keys array
-				for (k=0;k<ks.length;++k) 																// For each key in entity
-					if (ks[k].syns.match(r)) 															// If word in key
-						ents.push({ e:es.name, k:ks[k].name, v:ks[k].syns.match(r)[0] });				// Add to match list 
-				}
-		}
-		return s;																						// Return entity string		
-	}
 
 } // ARC class closure
 
