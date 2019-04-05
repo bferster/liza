@@ -59,10 +59,15 @@ class ARC  {
 					_this.tree.push(o);																	// Add step to tree
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
+					if ((v[1] == 'r') || (v[1] == 'R'))		v[1]="R+";									// Plain R become R+										
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
 					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "",line:line++ });	// Add responses
+					}
+				else{ 																					// Response?
+					if (v[2])																			// If some text
+						o.res.push({ rc:""+RIGHT, text:v[2].trim(), cons:v[3] ? v[3] : "",line:line++ });	// Add response
 					}
 				}
 
@@ -163,7 +168,7 @@ class ARC  {
 		if (n > this.threshold)																			// If above threshold
 			this.curStep=best;																			// Set as current step 
 		o=this.tree[this.curStep];																		// Point at step
-		this.stepData={ spoken: text, entities: entities, step: o, 										// Set data
+		this.stepData={  entities: entities, step: o, 													// Set data
 			score: o.score, escore: o.escore, kscore: o.kscore, flags:o.flags,
 			hitList:v, move: o.move, stepLine:o.line, stepNum: this.curStep }; 	
 		return this.curStep;																			// Return best fit
