@@ -29,7 +29,7 @@ class ARC  {
 		xhr.open("GET",str);																			// Set open url
 		xhr.send();																						// Do it
 		xhr.onload=function() { 																		// When loaded
-			var i,line=0,k,o,v,step=0;
+			var i,k,o,v,step=0;
 			var goal="";
 			_this.tree=[];																				// Clear tree
 			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
@@ -51,7 +51,7 @@ class ARC  {
 					o.text=v[2].trim();																	// Add text
 					o.res=[];																			// Responses array										
 					o.goal=goal;																		// Set goal
-					o.line=line++;																		// Set line
+					o.line=i;																			// Set line
 					o.step=step;																		// Set step
 					o.hint=v[3] ? v[3].trim() : "";														// Set hint
 					k=v[2].match(/\{S(.*)?\}/);		if (k)	o.slide=k[1]-1;								// If {slide} spec'd
@@ -63,11 +63,11 @@ class ARC  {
 					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
 					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
 					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
-					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "",line:line++ });	// Add responses
+					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add responses
 					}
 				else{ 																					// Response?
 					if (v[2])																			// If some text
-						o.res.push({ rc:""+RIGHT, text:v[2].trim(), cons:v[3] ? v[3] : "",line:line++ });	// Add response
+						o.res.push({ rc:""+RIGHT, text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add response
 					}
 				}
 
@@ -180,7 +180,8 @@ class ARC  {
 		var text="";
 		if (step == -1)		return "";																	// Quit if no step
 		if (app.hinting && this.tree[step+1]) {															// If a valid hint
-			Prompt("Next &rarr; "+this.tree[step+1].hint,10);											// Show hint	
+			if (this.tree[step+1].hint)																	// If hint set
+				Prompt("Next &rarr; "+this.tree[step+1].hint,10);										// Show hint	
 			this.stepData.hint=this.tree[step+1].hint;													// Save to data
 			}	
 		this.stepData.res=""; 	this.stepData.r=0;														// Assume no response
