@@ -139,7 +139,7 @@
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="reviewBut" src="img/scriptbut.gif" title="Lesson map" style="cursor:pointer;margin-right:16px;float:right">
-		<img id="slideBut" src="img/image-icon.png" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="slideBut" src="img/nextslide.gif" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="muteBut" src="img/unmutebut.png" title="Sounds" style="cursor:pointer;margin-right:16px;float:right">
 		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">The University of Virginia @ 2019</div>
 	</div>
@@ -450,7 +450,7 @@ class App  {
 
 		$("#settingsEditor").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$("#settingsEditor").show("slide",{ direction:"down"});										// Bring up	
-		$("#setHint").on("click", ()=> { this.hinting=$(this).prop("checked") ? 1 : 0 });			// Toggle hint flag
+		$("#setHint").on("click", function() { app.hinting=$(this).prop("checked") ? 1 : 0 });		// Toggle hint flag
 		$("#setPose").on("click", ()=> {$("#settingsEditor").remove(); this.sc.PoseEditor(); });	// Show pose editor
 		$("#setDemo").on("change", function() {
 			var ids=["1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU", "1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU",
