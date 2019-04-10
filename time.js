@@ -24,7 +24,7 @@ class Timeline {
 			o=this.events[i];																		// Point at it
 			if (this.curTime < o.t) 	break;														// If before this one
 			if ((this.curTime >= o.t) && (this.curTime < o.e)) {									// If in this one
-				text=o.text.replace(/\{.*?\}/,"");													// Remove braced text
+				text=o.text.replace(/\{.*?\}/g,"");													// Remove braced text
 				if (o.o == "R")  {																	// Student
 					app.curStudent=o.who;															// Set current student
 					if (o.r == RIGHT)				col="#009900";									// Color if right
