@@ -144,16 +144,19 @@ class ARC  {
 			if (kscore)  this.tree[i].kscore=kscore/o.keys.length;										// Save normalized kscore
 			this.tree[i].escore=escore/Math.max(j,entities.length);										// Save normalized escore
 			this.tree[i].score=this.tree[i].escore;														// Save score in case there are no keys
-			if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore/2+this.tree[i].kscore;	// Use weighted average of keys and entities
+			if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore+this.tree[i].kscore/2;	// Use weighted average of keys and entities
+
 			f="";																						// Clear flag
-			if (o.goal == this.tree[this.curStep].goal)			this.tree[i].score+=.05,f+="G";			// If in current goal, bump-up score 
-			if ((i == this.lastStep+1))							this.tree[i].score+=.05,f+="N";			// If next in script, bump
+			if (o.goal == this.tree[this.curStep].goal) {												// If in current goal
+				if (o.text.match(/\{G\}/i))						this.tree[i].score+=.50,f+="G";			// If only matching this goal, bump big
+				else											this.tree[i].score+=.05,f+="g";			// Simple match, bump small
+				}
+			if ((i == this.lastStep+1))							this.tree[i].score+=.10,f+="N";			// If next in script, bump
 			if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";			// If in slide, bump
 			if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.50,f+="F";			// If from matches actual last step
 			if (o.from == this.lastResLine)						this.tree[i].score+=.50,f+="R";			// If from matches actual last response
 			if (o.ask && this.Question(text))					this.tree[i].score+=.25,f+="Q";			// If a question
-			if (oentities.match(/ask\:/i))						f+="A";									// An ask	
-			o.flags=f;																					// Save flags
+			o.flags=f;				 																	// Save flags
 			}
 		var v=[];
 		for (i=0;i<this.tree.length;++i) {																// For each step in tree

@@ -308,7 +308,7 @@ class Review  {
 					o=app.arc.tree[i];																	// Point at step
 					if (o.text)	{																		// If defined
 						str+="<div id='revTalk-"+i+"' style='padding-bottom:8px;cursor:pointer'>";		
-						str+="<b>"+o.move+": "+o.text.replace(/\{.*?\}/,"")+"</b></div>";				// Instructor action
+						str+="<b>"+o.move+": "+o.text.replace(/\{.*?\}/g,"")+"</b></div>";				// Instructor action with braced text removed
 						for (var j=0;j<o.res.length;++j) {												// For each response
 							str+="<div style='margin-left:16px'>";										// Start of line
 							for (var k=0;k<o.res[j].rc.length;++k) {									// For each response in chain
@@ -319,7 +319,7 @@ class Review  {
 								else if (o.res[j].rc[k] == NONE)		str+="#999999'><b>0"; 			// None
 								str+="</b></span>";														// Finish checks/crosses
 								}
-							str+=" &nbsp;"+o.res[j].text.replace(/\{.*?\}/,"")+"</div>";				// Finish response
+							str+=" &nbsp;"+o.res[j].text.replace(/\{.*?\}/g,"")+"</div>";				// Finish response with braced text removed
 							}
 						str+="<br>";
 						}

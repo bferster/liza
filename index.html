@@ -389,7 +389,7 @@ class App  {
 			var s=app.arc.DeliverResponse(app.arc.curStep).replace(/\{.*?\}/g,"");				// Deliver response without braced tags
 			if (s)	$("#revTextDiv").append("<div class='lz-textR'>"+s+"</div>");				// Add to texting display display, if texting
 			}
-		trace(">> "+text+"\n",app.arc.curStep,app.arc.tree[app.arc.curStep].text.substr(0,20),app.arc.stepData);
+		trace(">> "+text+"\n",app.arc.stepData.score.toFixed(2)+app.arc.stepData.flags,app.arc.tree[app.arc.curStep].text.substr(0,20)+" "+app.arc.stepData.entities,app.arc.stepData);
 		}
 		
 	DoAction(act, all)																		// PERFORM ACTION
