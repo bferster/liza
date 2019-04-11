@@ -141,11 +141,12 @@ class ARC  {
 					}
 				}
 			j=(""+o.ents).split(", ").length;															// Number of entities in step	
-			if (kscore)  this.tree[i].kscore=kscore/o.keys.length;										// Save normalized kscore
+			if (o.keys.length)  this.tree[i].kscore=kscore/o.keys.length;								// Save normalized kscore
+			else				this.tree[i].kscore=0;													// No keywords
 			this.tree[i].escore=escore/Math.max(j,entities.length);										// Save normalized escore
-			this.tree[i].score=this.tree[i].escore;														// Save score in case there are no keys
-			if (o.keys.length && kscore) this.tree[i].score=this.tree[i].escore+this.tree[i].kscore/2;	// Use weighted average of keys and entities
-
+			if (o.keys.length && o.ents.length) this.tree[i].score=(this.tree[i].escore+this.tree[i].kscore)/2;	// Use weighted average of keys and entities
+			else if (o.keys.length) 			this.tree[i].score=this.tree[i].kscore;					// Just look at keys if no entities
+			else								this.tree[i].score=this.tree[i].escore;					// Just look at entities
 			f="";																						// Clear flag
 			if (o.goal == this.tree[this.curStep].goal) {												// If in current goal
 				if (o.text.match(/\{G\}/i))						this.tree[i].score+=.50,f+="G";			// If only matching this goal, bump big
