@@ -364,8 +364,7 @@ class App  {
 	{
 		var o=app.arc.GetEntities(text);														// Get entities
 		var score=0;
-		if (o.match(/response:agree/i) && o.match(/who:all/i)) app.curStudent=-2;				// Looking for nods from whole class
-		else if (o.match(/who:youAll/i)) 		app.curStudent=-2;								// Whole class
+		if (o.match(/response:agree/i) && o.match(/who:youAll/i)) app.curStudent=-2;			// Looking for nods from whole class
 		else if (o.match(/who:wholeClass/i)) 	app.curStudent=-1;								// Whole class
 		else if (o.match(/who:Liza/i)) 			app.curStudent=app.roster["Liza"];				// Set current student
 		else if (o.match(/who:Freddy/i)) 		app.curStudent=app.roster["Freddy"];

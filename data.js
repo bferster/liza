@@ -184,7 +184,7 @@ class ARC  {
 		if (step == -1)		return "";																	// Quit if no step
 		if (app.hinting && this.tree[step+1]) {															// If a valid hint
 			if (this.tree[step+1].hint)																	// If hint set
-				Prompt("Next &rarr; "+this.tree[step+1].hint,10);										// Show hint	
+				Prompt("&rarr; "+this.tree[step+1].hint,5);												// Show hint	
 			this.stepData.hint=this.tree[step+1].hint;													// Save to data
 			}	
 		this.stepData.res=""; 	this.stepData.r=0;														// Assume no response
@@ -324,8 +324,8 @@ class ARC  {
 		text=text.replace(/’/g,"'");																	// Normalize apostrophes
 		text=text.replace(/\{.*?\}/g,"");																// Remove text in braces
 		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
-		text=text.replace(/\W(the|a|is|so|from|in|we|you|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
-		text=text.replace(/\W(the|a|is|so|from|in|we|you|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
+		text=text.replace(/\W(the|a|so|from|in|we|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
+		text=text.replace(/\W(the|a|so|from|in|we|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
 		text=text.replace(/\+/g," + ");		text=text.replace(/\-/g," - ");								// Separate math functions
 		text=text.replace(/\*/g," * ");		text=text.replace(/\\/g," \\ "); 	text=text.replace(/\=/g," = ");																	
 		var words=text.split(/ +/);																		// Tokenize
@@ -361,145 +361,111 @@ class ARC  {
 
 	SetEntities()																					// POPULATE ENTITIES
 	{
-		var o;
-		this.entities=[];																				// Clear entities
-		this.entities.push( { name: "who", keys:[] } );													// WHO
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"Freddy", syns:",freddy,freddie,pretty," });	
-		o.push({ name:"Sara", syns:",sara,siri,tara," });												// Needs leading and trailing commas
-		o.push({ name:"Robert", syns:",robert,robbie,robby," });
-		o.push({ name:"Liza", syns:",liza,elija,elijah,lie,plaza," });
-		o.push({ name:"youAll", syns:",everybody,everyone,u-haul,uhaul,y'all,you_all,you_guy,you_kid," });
-		o.push({ name:"wholeClass", syns:",anybody,anyone,children,somebody,who_know," });
-
-		this.entities.push( { name: "response", keys:[] } );											// RESPONSE
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"agree", syns:",agree,concur,"});
-		o.push({ name:"wrong", syns:",wrong,incorrect,innacurate,not_right,"});
-		o.push({ name:"right", syns:",right,accurate,correct,"});
-		o.push({ name:"opinion", syns:",opinion,hypothesi,idea,think,thought,"});
-		o.push({ name:"answer", syns:",answer,definition,tell,identify,assertion,claim,comment,conclusion,decide,decision,,evaluate,explanation,interpretation,observation,outcome,product,reaction,rebuttal,recap,relate,remark,report,response,restate,result,solution,statement,summarize,summary,value,"});
-
-		this.entities.push( { name: "ask", keys:[] } );													// ASK
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"which", syns:",which,choose,chose,chosen,pick,select," });				
-		o.push({ name:"how", syns:",how,arrive_at,because,by_do,by_mean,cause,come_up,define,describe,explain,expres,know,make_plain,method,point_out,proces,remind,show,solve," });				
-		o.push({ name:"why", syns:",why,because,what_respect,interpret,motive,prove,reason,elaborate,reveal,mean," });
-		o.push({ name:"when", syns:",when,today,tomorrow,hour,minute,day,week,month,year,century,decade,after,the_time,what_time,before,dur,immediately,a_bit,little_while,later,meanwhile,soon,still,time,while," });				
-		o.push({ name:"where", syns:",where,addres,direction,location,locu,place,point,position,site,spot,stage,wherabout," });				
-		o.push({ name:"what", syns:",what,i_thi,i_that,i_she,i_he,i_it,what'," });				
-
-		this.entities.push( { name: "action", keys:[] } );												// ACTION
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"firstSlide", syns:",begin_slide,start_slide," });				
-		o.push({ name:"nextSlide", syns:",advance_side,next_side,next_slide," });				
-		o.push({ name:"headCenter", syns:",eye_front,head_center," });				
-		o.push({ name:"headRight", syns:",head_right," });				
-		o.push({ name:"headLeft", syns:",head_left," });				
-		o.push({ name:"headUp", syns:",head_up,raise_head," });				
-		o.push({ name:"headDown", syns:",head_down,look_down,lower_head," });				
-		o.push({ name:"headRight", syns:",head_right,head_right," });				
-		o.push({ name:"fidget", syns:",fidget," });				
-		o.push({ name:"fidgetStop", syns:",stop_fidget,stop_squirm,"});				
-		o.push({ name:"handDown", syns:",arm_down,hand_down,"});				
-		o.push({ name:"handUp", syns:",arm_up,hand_up,"});				
-		o.push({ name:"nodYes", syns:",nod_ye,"});				
-		o.push({ name:"nodNo", syns:",non_no,"});				
-		o.push({ name:"stand", syns:",stand,stand_up,please_stand,"});				
-		o.push({ name:"sit", syns:",setup,sit_down,sit_up,wake_up,"});				
-
-		this.entities.push( { name: "teacher", keys:[] } );												// TEACHER
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"me", syns:",i,me,my,mine,teacher," });				
-
-		this.entities.push( { name: "classroom", keys:[] } );											// CLASSROOM
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"pump", syns:",add_to,any_more,anyth_else,anyth_more,there_more,there'_more,what_else,"});
-		o.push({ name:"review", syns:",review,"});
-		o.push({ name:"learn", syns:",learn,learned,learn't,study,master,become_versed,train,understand,memorize,grok,"});
-		o.push({ name:"goal", syns:",goal,objective,aim,intent,intention,mission,"});
-		o.push({ name:"done", syns:",clas_i,we're_done,are_done,clas_over,"});
-		o.push({ name:"school", syns:",school,classroom,build,room,cubby,middle_school,high_school,"});
-		o.push({ name:"start", syns:",begin,u_begin,u_start,let'_begin,let'_start,get_started,"});
-		o.push({ name:"item", syns:",text,exam,pen,pencil,paper,notebook,folder,desk,crayon,marker,laptop,computer,chalk,eraser,board,blackboard,whiteboard,workbook,worksheet,book,sheet,phone,,mobile,iphone,chromebook,chrome,"});
-		o.push({ name:"session", syns:",session,clas,lesson,period,"});
-
-		this.entities.push( { name: "subject", keys:[] } );												// SUBJECT
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"math", syns:",math,mathematic,algebra,geometry," });
-		o.push({ name:"science", syns:",science,chemistry,geoeology,physic,astronomy,"});
-		o.push({ name:"vocab", syns:",vocab,vocabulary,word_study," });
-		o.push({ name:"social", syns:",,history,civic,social_studie,"});
-	
-		this.entities.push( { name: "progress", keys:[] } );											// PROGRESS
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"again", syns:",again,again,anew," });				
-		o.push({ name:"middle", syns:",middle,dur,within," });	
-		o.push({ name:"end", syns:",end,done," });					
-		o.push({ name:"start", syns:",start,begin" });				
-
-		this.entities.push( { name: "aspect", keys:[] } );												// ASPECT
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"physical", syns:",size,color,shape,length,width,weight,height,depth,breadth,volume,space,area,straight,curved,curved,hue,dimension,amount,"});
-		o.push({ name:"body", syns:",body,eye,leg,arm,finger,head,wrist,face,hair,stomach,foot,feet,tooth,teeth,"});
-		o.push({ name:"change", syns:",change,transition,evolve,turn_into,become,"});
-		o.push({ name:"relative", syns:",same,smaller,littler,"});
-
-		this.entities.push( { name: "act", keys:[] } );													// ACT
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"look", syns:",look,see,gaze,view,pay_attention,acknowledge,detect,recognize,distinguish,"});
-		o.push({ name:"write", syns:",write,scribble,compose,print,record,scrawl,sign,copy,"});
-		o.push({ name:"talk", syns:",talk,scream,yell,mumble,speak,scrawl,sign,copy,say,tell,utter,whisper,enunciate,expres,declar,convey,verbalize,vocalize,"});
-		o.push({ name:"read", syns:",read,read,"});
-		o.push({ name:"distract", syns:",distract,distraction,distracted,not_pay,not_focused"});
-
-		this.entities.push( { name: "concept", keys:[] } );												// CONCEPT
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"idea", syns:",idea,belief,topic,theme,motif,argument,subject,proposition,information,data,datum,stuff,"});
-		o.push({ name:"rule", syns:",rule,algorithm,basi,guideline,law,maxim,plan,regulation,theory,"});
-		o.push({ name:"key", syns:",key,important,critical,essential,significant,meanful,bigleague,ponderou,imperitive,chief,considerable,principal,seriou,"});
-		o.push({ name:"example", syns:",example,case,illustration,pattern,symbol,examplar,stereotype,for_instance,specimen,paragon,ideal,archetype,"});
-
-		this.entities.push( { name: "math", keys:[] } );												// MATH
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"geometry", syns:",acute,angle,triangle,fbox,circle,hexagon,obtuse,octagon,pentagon,polygon,quadrilateral,round,shape,square,closed,open,"});
-		o.push({ name:"decimal", syns:",decimal,dot,point,"});
-		o.push({ name:"fraction", syns:",fraction,bottom_number,bottom_value,denominator,numerator,top_number,top_value,"});
-		o.push({ name:"multiply", syns:",multiply,*,multiplication,multiplied,time,"});
-		o.push({ name:"divide", syns:",divide,/,divided,division,"});
-		o.push({ name:"subtract", syns:"-,subtract,les,minu,subtraction,take_away,"});
-		o.push({ name:"add", syns:",add,+,addition,combine,"});
-		
-		this.entities.push( { name: "praise", keys:[] } );												// PRAISE
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"bad", syns:",bad,not_correct,not_right,sorry,wrong,"});
-		o.push({ name:"good", syns:",good,great,nice_work,perfect,right,well_done,thank,appreciate,amaz,awesome,cool"});
-
-		this.entities.push( { name: "ands", keys:[] } );												// AND/ORS
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"and", syns:",and,too,also,includ,together,a_well,"});
-		o.push({ name:"or", syns:",or,either,conversely,but,alternatively,else,"});
-		o.push({ name:"not", syns:",exclude,exclud,except,"});
-
-		this.entities.push( { name: "polarity", keys:[] } );											// POLARITY
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"bigger", syns:",bigger,fat,fatter,greater,heavier,high,higher,more,taller,thick,thicker,wider,"});
-		o.push({ name:"smaller", syns:",smaller,les_than,lighter,littler,low,lower,shorter,thin,thinner,"});
-		o.push({ name:"maybe", syns:",maybe,could,might,perhap,"});
-		o.push({ name:"no", syns:",no,can_not,can't,i_not,isn't,no,non,not,should_not,shouldn't,will_not,won't,"});
-		o.push({ name:"yes", syns:",ye,definitely,should,surely,truly,will,"});
-		o.push({ name:"equal", syns:",equal,same,just_like,even,equivelant,identical,match,identical,comparable,"});
-		o.push({ name:"notEqual", syns:",unequal,different,not_the,uneven,other,distinct,inconsistent,unalike,not_like,"});
-
-		this.entities.push( { name: "ordinal", keys:[] } );												// ORDINAL
-		o=this.entities[this.entities.length-1].keys;													// Point at keys
-		o.push({ name:"1", syns:",first,1st," });	o.push({ name:"2", syns:",second,2nd," });				
-		o.push({ name:"3", syns:",third,3rd," });	o.push({ name:"4", syns:",fourth,4th," });				
-		o.push({ name:"5", syns:",fifth,5th," });	o.push({ name:"6", syns:",sixth,6th," });				
-		o.push({ name:"7", syns:",seventh,7th," });	o.push({ name:"8", syns:",eigth,8th," });
-		o.push({ name:"9", syns:",tenth,9th," });	o.push({ name:"10", syns:",tenth,10th," });	
-		o.push({ name:"20", syns:",twentieth,20th" });	o.push({ name:"100", syns:",hundredth,100th," });
-		o.push({ name:"1000", syns:",thousandth,1000th" });	o.push({ name:"100000", syns:",millionth," });
+		this.entities=[ 
+			{"name":"who","keys":[{"name":"Freddy","syns":",freddy,freddie,pretty,"},
+				{"name":"Sara","syns":",sara,siri,tara,"},
+				{"name":"Robert","syns":",robert,robbie,robby,"},
+				{"name":"Liza","syns":",liza,elija,elijah,lie,plaza,"},
+				{"name":"youAll","syns":",everybody,everyone,u-haul,uhaul,you_all,you_guy,you_kid,y'all,"},
+				{"name":"wholeClass","syns":",anybody,anyone,children,somebody,who_know,"}
+				]},
+			{"name":"response","keys":[{"name":"agree","syns":",agree,concur,"},
+				{"name":"wrong","syns":",wrong,incorrect,innacurate,not_right,"},
+				{"name":"right","syns":",right,accurate,correct,"},
+				{"name":"opinion","syns":",opinion,hypothesi,idea,think,thought,"},
+				{"name":"answer","syns":",answer,definition,tell,identify,assertion,claim,comment,conclusion,decide,decision,,evaluate,explanation,interpretation,observation,outcome,product,reaction,rebuttal,recap,relate,remark,report,response,restate,result,solution,statement,summarize,summary,value,"}
+				]},
+			{"name":"ask","keys":[{"name":"which","syns":",which,choose,chose,chosen,pick,select,"},
+				{"name":"how","syns":",how,arrive_at,because,by_do,by_mean,cause,come_up,define,describe,explain,expres,know,make_plain,method,point_out,proces,remind,show,solve,"},
+				{"name":"why","syns":",why,because,what_respect,interpret,motive,prove,reason,elaborate,reveal,mean,"},
+				{"name":"when","syns":",when,today,tomorrow,hour,minute,day,week,month,year,century,decade,after,the_time,what_time,before,dur,immediately,a_bit,little_while,later,meanwhile,soon,still,time,while,"},
+				{"name":"where","syns":",where,addres,direction,location,locu,place,point,position,site,spot,stage,wherabout,"},
+				{"name":"what","syns":",what,i_thi,i_that,i_she,i_he,i_it,what',"}
+				]},
+			{"name":"action","keys":[{"name":"firstSlide","syns":",begin_slide,start_slide,"},
+				{"name":"nextSlide","syns":",advance_side,next_side,next_slide,"},
+				{"name":"headCenter","syns":",eye_front,head_center,"},
+				{"name":"headRight","syns":",head_right,"},
+				{"name":"headLeft","syns":",head_left,"},
+				{"name":"headUp","syns":",head_up,raise_head,"},
+				{"name":"headDown","syns":",head_down,look_down,lower_head,"},
+				{"name":"headRight","syns":",head_right,head_right,"},
+				{"name":"fidget","syns":",fidget,"},
+				{"name":"fidgetStop","syns":",stop_fidget,stop_squirm,"},
+				{"name":"handDown","syns":",arm_down,hand_down,"},
+				{"name":"handUp","syns":",arm_up,hand_up,"},
+				{"name":"nodYes","syns":",nod_ye,"},
+				{"name":"nodNo","syns":",non_no,"},
+				{"name":"stand","syns":",stand,stand_up,please_stand,"},
+				{"name":"sit","syns":",setup,sit_down,sit_up,wake_up,"}
+				]},
+			{"name":"teacher","keys":[{"name":"me","syns":",i,me,my,mine,teacher,"}
+				]},
+			{"name":"classroom","keys":[{"name":"pump","syns":",add_to,any_more,anyth_else,anyth_more,there_more,there'_more,what_else,"},
+				{"name":"review","syns":",review,"},
+				{"name":"learn","syns":",learn,learned,learn't,study,master,become_versed,train,understand,memorize,grok,"},
+				{"name":"goal","syns":",goal,objective,aim,intent,intention,mission,"},
+				{"name":"done","syns":",clas_i,we're_done,are_done,clas_over,"},
+				{"name":"school","syns":",school,classroom,build,room,cubby,middle_school,high_school,"},
+				{"name":"start","syns":",begin,u_begin,u_start,let'_begin,let'_start,get_started,"},
+				{"name":"item","syns":",text,exam,pen,pencil,paper,notebook,folder,desk,crayon,marker,laptop,computer,chalk,eraser,board,blackboard,whiteboard,workbook,worksheet,book,sheet,phone,,mobile,iphone,chromebook,chrome,"},
+				{"name":"session","syns":",session,clas,lesson,period,"}
+				]},
+			{"name":"subject","keys":[{"name":"math","syns":",math,mathematic,algebra,geometry,"},
+				{"name":"science","syns":",science,chemistry,geoeology,physic,astronomy,"},
+				{"name":"vocab","syns":",vocab,vocabulary,word_study,"},
+				{"name":"social","syns":",,history,civic,social_studie,"}
+				]},
+			{"name":"progress","keys":[{"name":"again","syns":",again,again,anew,"},
+				{"name":"middle","syns":",middle,dur,within,"},
+				{"name":"end","syns":",end,done,"},
+				{"name":"start","syns":",start,begin"}
+				]},
+			{"name":"aspect","keys":[{"name":"physical","syns":",size,color,shape,length,width,weight,height,depth,breadth,volume,space,area,straight,curved,curved,hue,dimension,amount,"},
+				{"name":"body","syns":",body,eye,leg,arm,finger,head,wrist,face,hair,stomach,foot,feet,tooth,teeth,"},
+				{"name":"change","syns":",change,transition,evolve,turn_into,become,"},
+				{"name":"relative","syns":",same,smaller,littler,"}
+				]},
+			{"name":"act","keys":[{"name":"look","syns":",look,see,gaze,view,pay_attention,acknowledge,detect,recognize,distinguish,"},
+				{"name":"write","syns":",write,scribble,compose,print,record,scrawl,sign,copy,"},
+				{"name":"talk","syns":",talk,scream,yell,mumble,speak,scrawl,sign,copy,say,tell,utter,whisper,enunciate,expres,declar,convey,verbalize,vocalize,"},
+				{"name":"read","syns":",read,read,"},
+				{"name":"distract","syns":",distract,distraction,distracted,not_pay,not_focused"}
+				]},
+			{"name":"concept","keys":[{"name":"idea","syns":",idea,belief,topic,theme,motif,argument,subject,proposition,information,data,datum,stuff,"},
+				{"name":"rule","syns":",rule,algorithm,basi,guideline,law,maxim,plan,regulation,theory,"},
+				{"name":"key","syns":",key,important,critical,essential,significant,meanful,bigleague,ponderou,imperitive,chief,considerable,principal,seriou,"},
+				{"name":"example","syns":",example,case,illustration,pattern,symbol,examplar,stereotype,for_instance,specimen,paragon,ideal,archetype,"}
+				]},
+			{"name":"math","keys":[{"name":"geometry","syns":",acute,angle,triangle,fbox,circle,hexagon,obtuse,octagon,pentagon,polygon,quadrilateral,round,shape,square,closed,open,"},
+				{"name":"decimal","syns":",decimal,dot,point,"},
+				{"name":"fraction","syns":",fraction,bottom_number,bottom_value,denominator,numerator,top_number,top_value,"},
+				{"name":"multiply","syns":",multiply,*,multiplication,multiplied,time,"},{"name":"divide","syns":",divide,/,divided,division,"},
+				{"name":"subtract","syns":"-,subtract,les,minu,subtraction,take_away,"},{"name":"add","syns":",add,+,addition,combine,"}
+				]},
+			{"name":"praise","keys":[{"name":"bad","syns":",bad,not_correct,not_right,sorry,wrong,"},
+				{"name":"good","syns":",good,great,nice_work,perfect,right,well_done,thank,appreciate,amaz,awesome,cool"}]},
+				{"name":"ands","keys":[{"name":"and","syns":",and,too,also,includ,together,a_well,"},
+				{"name":"or","syns":",or,either,conversely,but,alternatively,else,"},
+				{"name":"not","syns":",exclude,exclud,except,"}
+				]},
+			{"name":"polarity","keys":[{"name":"bigger","syns":",bigger,fat,fatter,greater,heavier,high,higher,more,taller,thick,thicker,wider,"},
+				{"name":"smaller","syns":",smaller,les_than,lighter,littler,low,lower,shorter,thin,thinner,"},
+				{"name":"maybe","syns":",maybe,could,might,perhap,"},
+				{"name":"no","syns":",no,can_not,can't,i_not,isn't,no,non,not,should_not,shouldn't,will_not,won't,"},
+				{"name":"yes","syns":",ye,definitely,should,surely,truly,will,"},
+				{"name":"equal","syns":",equal,same,just_like,even,equivelant,identical,match,identical,comparable,"},
+				{"name":"notEqual","syns":",unequal,different,not_the,uneven,other,distinct,inconsistent,unalike,not_like,"}]},
+				{"name":"ordinal","keys":[{"name":"1","syns":",first,1st,"},
+				{"name":"2","syns":",second,2nd,"},	{"name":"3","syns":",third,3rd,"},
+				{"name":"4","syns":",fourth,4th,"},	{"name":"5","syns":",fifth,5th,"},
+				{"name":"6","syns":",sixth,6th,"},	{"name":"7","syns":",seventh,7th,"},
+				{"name":"8","syns":",eigth,8th,"},	{"name":"9","syns":",tenth,9th,"},
+				{"name":"10","syns":",tenth,10th,"},{"name":"20","syns":",twentieth,20th"},
+				{"name":"100","syns":",hundredth,100th,"},{"name":"1000","syns":",thousandth,1000th"},
+				{"name":"100000","syns":",millionth,"
+			}]
+		}];
 	}
 
 

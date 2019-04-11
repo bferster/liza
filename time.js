@@ -266,7 +266,7 @@ class Review  {
 			}
 		var str="<div id='reviewDiv' class='lz-dialog' 	style='background-color:#ccc;";
 		str+="width:324px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 358px);top:calc(50vh - 178px)'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px;padding-bottom:30px'";
+		str+="&nbsp;<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px;padding-bottom:30px'";
 		str+="id='lpTitle'></span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
 		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div>"; 
 		str+="<div style='width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0'>";
@@ -303,7 +303,7 @@ class Review  {
 				}}); 
 				}
 			else if (mode == "Full map")	{															// Full map
-				$("#lpTitle").html("Full lesson map");													// Set title
+				$("#lpTitle").html("full lesson map");													// Set title
 				for (var i=0;i<app.arc.tree.length;++i) {												// For each step in tree
 					o=app.arc.tree[i];																	// Point at step
 					if (o.text)	{																		// If defined
