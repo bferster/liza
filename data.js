@@ -103,10 +103,15 @@ class ARC  {
 
 	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM STEP
 	{
-		var i,j,k,o,v,val;
+		var i,j,o,v,val,ks=[];
+		v=(app.rev.overview+" ").match(/\(.+?\)/g);											 			// Get array of key words (keyword)
+		if (v) {																						// If any keys
+			for (i=0;i<v.length;++i)																	// For each one
+				ks.push(v[i].substr(1,v[i].length-2));													// Add to ks array
+			}
 		for (i=0;i<this.tree.length;++i) {																// For each step in tree
 			o=this.tree[i];																				// Point at step
-			o.keys=[];																					// Create keyword array
+			o.keys=[].concat(ks);																		// Create keyword array
 			o.ask=this.Question(o.text);																// If this a question?
 			v=(o.text+" ").match(/\(.+?\)/g);															// Get array of key words (keyword)
 			if (v) {																					// If keys flagged
@@ -152,7 +157,8 @@ class ARC  {
 				if (o.text.match(/\{G\}/i))						this.tree[i].score+=.50,f+="G";			// If only matching this goal, bump big
 				else											this.tree[i].score+=.05,f+="g";			// Simple match, bump small
 				}
-			if ((i == this.lastStep+1))							this.tree[i].score+=.10,f+="N";			// If next in script, bump
+			if (i == this.lastStep+1)							this.tree[i].score+=.10,f+="n";			// If next in script, bump
+			if ((i == this.lastStep+1) && (text.split(" ").length < 5)) this.tree[i].score+=.30,f+="N";	// If next in script and small # of words, bump big
 			if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";			// If in slide, bump
 			if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.50,f+="F";			// If from matches actual last step
 			if (o.from == this.lastResLine)						this.tree[i].score+=.50,f+="R";			// If from matches actual last response
