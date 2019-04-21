@@ -111,7 +111,7 @@ class ARC  {
 			}
 		for (i=0;i<this.tree.length;++i) {																// For each step in tree
 			o=this.tree[i];																				// Point at step
-			o.keys=[].concat(ks);																		// Create keyword array
+			o.keys=[];																					// Create keyword array
 			o.ask=this.Question(o.text);																// If this a question?
 			v=(o.text+" ").match(/\(.+?\)/g);															// Get array of key words (keyword)
 			if (v) {																					// If keys flagged
@@ -122,6 +122,11 @@ class ARC  {
 					}
 				}
 			o.ents=app.arc.GetEntities(o.text);															// Parse text
+			if (o.text) {																				// If text, check for overview key matches
+				for (j=0;j<ks.length;++j) 																// For each overview key
+					if (o.text.match(RegExp(ks[j].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&"),"i")))		// Check for key in text
+						o.keys.push(ks[j]);																// Add to keys
+				}
 			}
 		}
 
