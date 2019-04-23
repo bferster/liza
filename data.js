@@ -396,6 +396,7 @@ class ARC  {
 				]},
 			{"name":"action","keys":[{"name":"firstSlide","syns":",begin_slide,start_slide,"},
 				{"name":"nextSlide","syns":",advance_side,next_side,next_slide,"},
+				{"name":"sleep","syns":",sleep,snooze,"},
 				{"name":"headCenter","syns":",eye_front,head_center,"},
 				{"name":"headRight","syns":",head_right,"},
 				{"name":"headLeft","syns":",head_left,"},
