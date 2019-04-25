@@ -164,7 +164,8 @@ class ARC  {
 				else											this.tree[i].score+=.05,f+="g";			// Simple match, bump small
 				}
 			if (i == this.lastStep+1)							this.tree[i].score+=.10,f+="n";			// If next in script, bump
-			if ((i == this.lastStep+1) && (text.split(" ").length < 5)) this.tree[i].score+=.30,f+="N";	// If next in script and small # of words, bump big
+			if ((i == this.lastStep+1) && (text.split(" ").length < 4)) this.tree[i].score+=.30,f+="N";	// If next in script and small # of words, bump big
+			else												this.tree[i].score+=this.tree[i].cosim*.5;	// Use cosine similarity
 			if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";			// If in slide, bump
 			if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.50,f+="F";			// If from matches actual last step
 			if (o.from == this.lastResLine)						this.tree[i].score+=.50,f+="R";			// If from matches actual last response
@@ -185,7 +186,7 @@ class ARC  {
 			this.curStep=best;																			// Set as current step 
 		o=this.tree[this.curStep];																		// Point at step
 		this.stepData={  entities: entities, step: o, 													// Set data
-			score: o.score, escore: o.escore, kscore: o.kscore, flags:o.flags,
+			score: o.score, escore: o.escore, kscore: o.kscore, flags:o.flags, cos:o.cosim,
 			hitList:v, move: o.move, stepLine:o.line, stepNum: this.curStep }; 	
 		return this.curStep;																			// Return best fit
 	}

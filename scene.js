@@ -137,7 +137,6 @@ class Scene {
 		loader.load(o.src, (obj)=> { 																// Load model
 			loadModel(obj);																			// Load it
 			if (o.sex) 				_this.SetPose(o.id,"startUp");									// If a student set starting pose
-			if (o.id == "liza") 	_this.SetPose(o.id,"handUp");									// Raise hand											
 			}, onProgress, onError );																// Load
 
 		function onProgress(xhr) {}																	// ON PROGRESS
@@ -182,7 +181,7 @@ class Scene {
 	{
 		if (!this.models[model] || !this.models[model].bones[bone])	return;							// Quit on bad model or bone
 		if (bone == "base") {																		// X and Z axes set model positon directly, not via the bone
-			this.models[model].model.position.x=x-0+this.models[model].model.oxp;					// Set base X position via model
+			this.models[model].model.position.x=x-0+this.models[model].model.oxp+1.5;				// Set base X position via model (fudge)
 			this.models[model].model.position.z=z-0+this.models[model].model.ozp;					// Z
 			x=z=0;
 			}
