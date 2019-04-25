@@ -154,6 +154,7 @@ class ARC  {
 			if (o.keys.length)  this.tree[i].kscore=kscore/o.keys.length;								// Save normalized kscore
 			else				this.tree[i].kscore=0;													// No keywords
 			this.tree[i].escore=escore/Math.max(j,entities.length);										// Save normalized escore
+			this.tree[i].cosim=this.CosineSimilarity(text,o.text);										// Save similarity
 			if (o.keys.length && o.ents.length) this.tree[i].score=(this.tree[i].escore+this.tree[i].kscore)/2;	// Use weighted average of keys and entities
 			else if (o.keys.length) 			this.tree[i].score=this.tree[i].kscore;					// Just look at keys if no entities
 			else								this.tree[i].score=this.tree[i].escore;					// Just look at entities
@@ -370,6 +371,61 @@ class ARC  {
 			}
 		return s;																						// Return entity string		
 	}
+
+	CosineSimilarity(textA, textB)																	// HOW SIMILAR TWO STRINGS ARE
+	{
+		var dict={};
+		if (!textA || !textB)	return(0)																// Nothing to compare
+		var termFreqA=termFreqMap(textA);																// Create freq map A
+		var termFreqB=termFreqMap(textB);																// B
+		addKeysToDict(termFreqA, dict);																	// Count A
+		addKeysToDict(termFreqB, dict);																	// B
+		var termFreqVecA=termFreqMapToVector(termFreqA, dict);											// Vector A
+		var termFreqVecB=termFreqMapToVector(termFreqB, dict);											// B
+		return cosineSimilarity(termFreqVecA, termFreqVecB);											// Return calc
+
+		function termFreqMap(str) {																		
+			var words=tokenize(str)
+			var termFreq={};
+			words.forEach(function(w) {	termFreq[w] = (termFreq[w] || 0) + 1; });
+			return termFreq;
+			}
+
+		function addKeysToDict(map, dict) {
+			for (var key in map) 	dict[key] = true; 
+		}
+
+		function termFreqMapToVector(map, dict) {
+			var termFreqVector = [];
+			for (var term in dict) 	termFreqVector.push(map[term] || 0);
+			return termFreqVector;
+		}
+
+		function vecDotProduct(vecA, vecB) {
+			var product = 0;
+			for (var i = 0; i < vecA.length; i++) 	product += vecA[i] * vecB[i];
+			return product;
+		}
+
+		function vecMagnitude(vec) {
+			var sum = 0;
+			for (var i = 0; i < vec.length; i++) 	sum += vec[i] * vec[i];
+			return Math.sqrt(sum);
+		}
+
+		function cosineSimilarity(vecA, vecB) {
+			return vecDotProduct(vecA, vecB) / (vecMagnitude(vecA) * vecMagnitude(vecB));
+		}
+
+		function tokenize(text) {
+			text=(" "+text).replace(/\{.*?\}/g,"");														// Remove text in braces
+			text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");					// Keep only germane chars(alph, space, num, *-+/'%$)
+			text=text.replace(/\W(the|a|so|from|in|we|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
+			text=text.replace(/\W(the|a|so|from|in|we|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
+			return text.split(/ +/);																	// Tokenize
+			}
+	}
+
 
 	SetEntities()																					// POPULATE ENTITIES
 	{
