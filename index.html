@@ -216,7 +216,7 @@ class App  {
 		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
-		this.students=[];																			// Holds students	
+		this.students=["Liza","Freddy","Sara","Robert"];												// Holds students	
 		this.roster=[];																				// Associative array of student numbers by na,e
 		this.startTime=new Date().getTime();														// Session start time
 		this.pickingStudent="";																		// Flag for picking student
@@ -365,12 +365,12 @@ class App  {
 		var o=app.arc.GetEntities(text);														// Get entities
 		var score=0;
 		if (o.match(/response:agree/i) && o.match(/who:youAll/i)) app.curStudent=-2;			// Looking for nods from whole class
-		else if (o.match(/who:wholeClass/i)) 	app.curStudent=-1;								// Whole class
-		else if (o.match(/who:Liza/i)) 			app.curStudent=app.roster["Liza"];				// Set current student
-		else if (o.match(/who:Freddy/i)) 		app.curStudent=app.roster["Freddy"];
-		else if (o.match(/who:Robert/i)) 		app.curStudent=app.roster["Robert"];
-		else if (o.match(/who:Sara/i)) 			app.curStudent=app.roster["Sara"];
-		if (o.match(/action:/i)) 				app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an action mentioned, do it
+		else if (o.match(/who:wholeClass/i)) 			app.curStudent=-1;						// Whole class
+		else if (o.match(/who:Liza/i)) 					app.curStudent=app.roster["Liza"];		// Set current student
+		else if (o.match(/who:Freddy/i)) 				app.curStudent=app.roster["Freddy"];
+		else if (o.match(/who:Robert/i)) 				app.curStudent=app.roster["Robert"];
+		else if (o.match(/who:Sara/i)) 					app.curStudent=app.roster["Sara"];
+		if (o.match(/action:/i) && o.match(/please/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an please + action mentioned, do it
 	
 		if (app.pickingStudent) {																// If students have their hands up
 			app.curStudent=Math.max(app.curStudent);											// Default to 1st if still talking to class
