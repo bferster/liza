@@ -370,7 +370,7 @@ class App  {
 		else if (o.match(/who:Freddy/i)) 				app.curStudent=app.roster["Freddy"];
 		else if (o.match(/who:Robert/i)) 				app.curStudent=app.roster["Robert"];
 		else if (o.match(/who:Sara/i)) 					app.curStudent=app.roster["Sara"];
-		if (o.match(/action:/i) && o.match(/please/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an please + action mentioned, do it
+		if (o.match(/action:/i) && text.match(/please/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an please + action mentioned, do it
 	
 		if (app.pickingStudent) {																// If students have their hands up
 			app.curStudent=Math.max(app.curStudent);											// Default to 1st if still talking to class
