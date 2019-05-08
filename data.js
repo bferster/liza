@@ -134,8 +134,8 @@ class ARC  {
 	{
 		var o,i,j,f,n=0;
 		var kscore,escore,best=0;
-		var oentities=entities+" ";
-		entities=(""+entities).split(", ");																// Put entities into array
+		if (entities)	entities=(""+entities).split(", ");												// Put entities into array
+		else			entities=[];																	// No entities
 		for (i=0;i<this.tree.length;++i) {																// For each step in tree
 			kscore=escore=0;																			// Start at 0
 			o=this.tree[i];																				// Point at step
@@ -158,6 +158,7 @@ class ARC  {
 			if (o.keys.length && o.ents.length) this.tree[i].score=(this.tree[i].escore+this.tree[i].kscore)/2;	// Use weighted average of keys and entities
 			else if (o.keys.length) 			this.tree[i].score=this.tree[i].kscore;					// Just look at keys if no entities
 			else								this.tree[i].score=this.tree[i].escore;					// Just look at entities
+			this.tree[i].score+=this.tree[i].cosim*.5;													// Add cosine similarity
 			f="";																						// Clear flag
 			if (o.goal == this.tree[this.curStep].goal) {												// If in current goal
 				if (o.text.match(/\{G\}/i))						this.tree[i].score+=.50,f+="G";			// If only matching this goal, bump big
@@ -165,7 +166,6 @@ class ARC  {
 				}
 			if (i == this.lastStep+1)							this.tree[i].score+=.10,f+="n";			// If next in script, bump
 			if ((i == this.lastStep+1) && (text.split(" ").length < 4)) this.tree[i].score+=.30,f+="N";	// If next in script and small # of words, bump big
-			else												this.tree[i].score+=this.tree[i].cosim*.5;	// Use cosine similarity
 			if ((o.slide !="") && (o.slide == app.bb.curSlide))	this.tree[i].score+=.20,f+="S";			// If in slide, bump
 			if (o.from == this.tree[this.lastStep].line)		this.tree[i].score+=.50,f+="F";			// If from matches actual last step
 			if (o.from == this.lastResLine)						this.tree[i].score+=.50,f+="R";			// If from matches actual last response
