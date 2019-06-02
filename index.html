@@ -4,7 +4,7 @@
 	<meta charset="UTF-8" />
 	<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
 	<title>Classroom</title>
-	<meta name="viewport" content="width=device-width", initial-scale=1.0, user-scalable=no>
+	<meta name="viewport" content="width=device-width">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	<link rel="preload" href="img/Inkfree.ttf" as="font" type="font/ttf" crossorigin>
@@ -247,6 +247,8 @@ class App  {
 		$("#talkBut").on("click", ()=> { this.voice.Listen(); });									// On talk button click, start listening
 		$("#helpBut").on("click", ()=> { this.ShowHelp(); });										// On help button click, show help
 		$("#writeBut").on("click", ()=> { 															// On BB button clck
+			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
+			$("#blackboardDiv").css("top",h+"px");													// Set top
 			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			app.arc.Add({ o:'B', m:m }); 															// Add to record

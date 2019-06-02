@@ -215,7 +215,7 @@ class Scene {
 			$("#poseEditor").hide("slide",{ direction:"down", complete: ()=>{ $("#poseEditor").remove(); } }); // Slide down
 			return;																					// Quit																					
 			}
-		var str="<div id='poseEditor' class='lz-dialog' style='display:none;top:calc(100vh - 300px) '>";
+		var str="<div id='poseEditor' class='lz-dialog' style='display:none'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();'><br><br>";
 		str+="<table>";
@@ -238,6 +238,8 @@ class Scene {
 		str+="</div>";
 
 		$("body").append(str);																		// Add to body
+		var h=window.innerHeight-$("#poseEditor").height()-88;										// Calc top
+		$("#poseEditor").css("top",h+"px");															// Set top
 		$("#poseEditor").show("slide",{ direction:"down"});											// Bring up	
 		addModels();																				// Load models for pulldown
 		addBones();																					// Load bones for pulldown

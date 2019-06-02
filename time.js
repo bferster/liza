@@ -265,7 +265,7 @@ class Review  {
 			return;																						// Quit																					
 			}
 		var str="<div id='reviewDiv' class='lz-dialog' 	style='background-color:#ccc;";
-		str+="width:324px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 358px);top:calc(50vh - 178px)'>";
+		str+="width:324px;overflow:hidden;display:none;padding:8px;left:calc(100vw - 358px)'>";
 		str+="&nbsp;<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px;padding-bottom:30px'";
 		str+="id='lpTitle'></span><img src='img/closedot.gif' style='float:right' onclick='$(\"#reviewDiv\").remove()'>";	
 		str+="<div id='revBodyDiv'style='height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div>"; 
@@ -273,6 +273,9 @@ class Review  {
 		str+=MakeSelect("revMode",false,["Overview","Full map","Preview", "Review", "Texting"])+"&nbsp;&nbsp;&nbsp;&nbsp;"; 
 		str+=MakeSelect("revStu",false,["Student"])+"</div>"; 
 		$("body").append(str);																			// Add to body
+		var h=window.innerHeight-$("#reviewDiv").height()-70;											// Calc top
+		$("#reviewDiv").css("top",h+"px");																// Set top
+
 		for (i=0;i<app.students.length;++i)																// For each student
 			$("#revStu").append("<option>"+app.students[i].id+"</option>");								// Add to pulldown
 		refreshBody(mode ? mode : this.mode);															// Fill content use mode if spec's
