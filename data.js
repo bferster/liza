@@ -24,18 +24,29 @@ class ARC  {
 	Load(id, callback) 																				// LOAD DOC FROM GOOGLE DRIVE
 	{
 		var _this=this;																					// Save context
-		var str="https://docs.google.com/spreadsheets/d/"+id+"/export?format=tsv";						// Access tto
-		var xhr=new XMLHttpRequest();																	// Ajax
-		xhr.open("GET",str);																			// Set open url
-		xhr.send();																						// Do it
-		xhr.onload=function() { 																		// When loaded
-			var i,k,o,v,step=0;
-			var goal="";
+		var str="https://spreadsheets.google.com/feeds/cells/"+id+"/1/public/values?alt=json";			// Make url
+		$.ajax( { url:str, dataType:'json'	})
+			.done((data)=>{	InitFromJSON(data.feed.entry); })				// Extract data								
+		.fail(()=>{ alert("Couldn't load Google Doc!\nMake sure that it is \"Published to web\" in Google"); })
+	
+		function InitFromJSON(cells) {																	// EXTRACT DATA
+			var goal="",step=0;
+			let i,j,k,v,col,row,con,o,s=[];
 			_this.tree=[];																				// Clear tree
-			var tsv=xhr.responseText.replace(/\r/g,"");													// Remove CRs
-			tsv=tsv.split("\n");																		// Split into lines
-			for (i=1;i<tsv.length;++i) {																// For each line
-				v=tsv[i].split("\t");																	// Split into fields
+			let n=4;																					// Number of fields
+			for (i=0;i<cells.length;++i) {																// For each cell
+				o=cells[i];																				// Point at it
+				col=o.gs$cell.col-1; 	row=o.gs$cell.row-1;											// Get cell coords
+				con=o.content.$t;																		// Get content
+				if (!con) 				continue;														// Skip blank cells
+				if (!s[row])			s[row]=new Array(n).fill("");			 					    // Add new row if not there already
+				if (col < n)			s[row][col]=con;												// Add cell to array
+				}
+			for (i=1;i<s.length;++i) {																	// For each line
+				v=s[i];																					// Point at fields
+				trace(v)
+				if (!v) 								continue;										// Skip blanks
+				if (!v[0] && !v[1] && !v[2] && !v[3]) 	continue;										// Skip blanks
 				if (v[1].match(/ov/i))  		 app.rev.overview=v[2];									// Overview
 				else if (v[1].match(/student/i)) app.students=v[2].split(",");							// Add student list
 				else if (v[1].match(/pic/i)) 	 app.bb.AddPic(v[2].split("|")[0],v[2].split("|")[1]);	// Add image or slide deck
@@ -70,19 +81,11 @@ class ARC  {
 						o.res.push({ rc:""+RIGHT, text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add response
 					}
 				}
-
 			_this.Extract();																			// Extract keywords and entities
 			if (callback)	callback();																	// Run callback
 		};									
 
-		xhr.onreadystatechange=function(e) { 															// ON AJAX STATE CHANGE
-			if ((xhr.readyState === 4) && (xhr.status !== 200)) {  										// Ready, but no load
-				Sound("delete");																		// Delete sound
-				PopUp("<p style='color:#990000'><b>Couldn't load Google Doc!</b></p>Make sure that <i>anyone</i><br>can view it in Google",5000); // Popup warning
-				}
-			};		
-		
-		}
+	}
 
 	Add(event)																						// ADD EVENT TO RECORD
 	{
