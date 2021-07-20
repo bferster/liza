@@ -1,122 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - collada</title>
+		<title>WIT.ai test</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	</head>
+	<style>
+		body { 	font-family:Verdana,Geneva,sans-serif;font-size:13px; margin:20px; }
+	</style>
 	<body>
+		<input type="text" id="inp"/>
+		<br><br>
+		<div id="outp"></div>
+	
+	<script>
 
-		<div id="container"></div>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader<br/>
-			Elf Girl by <a href="https://sketchfab.com/yellow09" target="_blank" rel="noopener">halloween</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
-		</div>
+		const SERVER_TOKEN="3ISBCQZSCQ37KJIZA7U2VFFSGEM75NDH";
+		const CLIENT_TOKEN="HZNYC4A6QBJ5D6U6W4WDVGCIQIOQFADK";	
 
-		<script type="module">
+		$("#inp").on("change",()=>{ GetWit($("#inp").val()); });
+	
+	
+		function GetWit(q) 
+		{
+			q=encodeURIComponent(q);
+			const uri = 'https://api.wit.ai/message?v=20200513&q=' + q;
+				fetch(uri, {headers: {Authorization: 'Bearer ' + CLIENT_TOKEN}})
+				.then(res => res.json())
+				.then(res => ShowIntents(res))
+		}
 
-			import * as THREE from 'https://github.com/mrdoob/three.js/tree/dev/build/three.module.js';
+		function ShowIntents(res)
+		{
+			let i,k;str=""
+			for (let i=0;i<res.intents.length;++i)
+				str=res.intents[i].name.replace(/liza_/,"").toUpperCase()+"="+Math.floor(res.intents[i].confidence*100)+"% &nbsp;";
+			for (k in res.traits)
+				str+=k.replace(/wit\$/,"")+"="+Math.floor(res.traits[k][0].confidence*100)+"% &nbsp;";
+				$("#outp").html(str);
+			console.log(res)
+		}
 
-			import Stats from 'https://github.com/mrdoob/three.js/tree/dev/jsm/libs/stats.module.js';
 
-			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 
-			let container, stats, clock;
-			let camera, scene, renderer, elf;
 
-			init();
-			animate();
-
-			function init() {
-
-				container = document.getElementById( 'container' );
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
-				camera.position.set( 8, 10, 8 );
-				camera.lookAt( 0, 3, 0 );
-
-				scene = new THREE.Scene();
-
-				clock = new THREE.Clock();
-
-				// loading manager
-
-				const loadingManager = new THREE.LoadingManager( function () {
-
-					scene.add( elf );
-
-				} );
-
-				// collada
-
-				const loader = new ColladaLoader( loadingManager );
-				loader.load( './models/collada/elf/elf.dae', function ( collada ) {
-
-					elf = collada.scene;
-
-				} );
-
-				//
-
-				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-				scene.add( ambientLight );
-
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
-				directionalLight.position.set( 1, 1, 0 ).normalize();
-				scene.add( directionalLight );
-
-				//
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize );
-
-			}
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
-				const delta = clock.getDelta();
-
-				if ( elf !== undefined ) {
-
-					elf.rotation.z += delta * 0.5;
-
-				}
-
-				renderer.render( scene, camera );
-
-			}
-
-		</script>
+	</script>
 	</body>
 </html>
 
