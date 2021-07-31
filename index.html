@@ -141,7 +141,7 @@
 		<img id="reviewBut" src="img/scriptbut.gif" title="Lesson map" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="slideBut" src="img/nextslide.gif" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="muteBut" src="img/unmutebut.png" title="Sounds" style="cursor:pointer;margin-right:16px;float:right">
-		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">The University of Virginia @ 2019</div>
+		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">StageTools &copy;2021</div>
 	</div>
 	<div id='blackboardDiv' class='lz-blackboard'>
 		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer;margin-bottom:12px;margin-top:-12px" title="Draw"><br>
@@ -216,7 +216,7 @@ class App  {
 		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
-		this.students=["Liza","Freddy","Sara","Robert"];												// Holds students	
+		this.students=["Liza","Freddy","Sara","Robert"];											// Holds students	
 		this.roster=[];																				// Associative array of student numbers by na,e
 		this.startTime=new Date().getTime();														// Session start time
 		this.pickingStudent="";																		// Flag for picking student
@@ -227,10 +227,16 @@ class App  {
 
 		this.gid="1JUEWVr25tktaON17Vi3VREvHpEy54Lz4Ou9NIIBYsRE";									// Default ARC tree spreadshet
 		var url=window.location.search.substring(1);						   						// Get query string
-		if (url && !url.match(/real/i)) {															// If params
+		if (url && url.match(/rer/i)) {																// If params
+			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
+			else					this.gid="1keSF_cB0Y0I6q8l6c06q9MZgu6lILo1hvh8LkXRenm8"			// Default RER spreadsheet
+			this.students=["Liza","Freddy","Sara","Farrah"];										// Holds students	
+		}
+		else if (url && !url.match(/real/i)) {														// If params
 			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
 			else					this.gid=url;													// Default spreadsheet
 			}
+
 		this.arc=new ARC();																			// Make new ARC tree		
 		this.bb=new Blackboard();																	// Make blackboard		
 		this.sc=new Scene("mainDiv");																// Make new scene		
@@ -279,7 +285,7 @@ class App  {
 	{
 		this.arc.Load(id, ()=>{																		// Load from Google doc
 			var i,v;
-			var tex=this.sc.cartoonScene ? 0xffffff : "lib/wgl/map.jpg";							// Desks cartoon or real				
+			var tex=this.sc.cartoonScene ? 0xffffff : 0xcccccc;										// Desks cartoon or real				
 			for (i=0;i<6;++i)																		// For each desk
 				this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20,  tex:tex} );	// Add desk
 			for (i=0;i<this.students.length;++i) {													// For each student spec'd
@@ -287,19 +293,23 @@ class App  {
 				v=this.students[i].split("=");														// Get name=[ability] pair 
 				v[0]=v[0].trim();																	// Trim
 				this.students[i]={ id:v[0].trim(), seat:i, s:15, fidget:0, src:"assets/body.dae"};	// Boilerplate
-				this.students[i].tex=this.sc.cartoonScene ? "assets/"+v[0].toLowerCase()+"skin.png" : "assets/skin1.png";	// Clothing
+				this.students[i].tex="assets/"+v[0].toLowerCase()+"skin.png";						// Clothing
 				if (v[0] == "Robert") 	  	{ this.students[i].sex="male";   this.students[i].ability=v[1] ? v[1].trim() : .2; }
 				else if (v[0] == "Sara") 	{ this.students[i].sex="female"; this.students[i].ability=v[1] ? v[1].trim() : .5; }
 				else if (v[0] == "Freddy")	{ this.students[i].sex='male';   this.students[i].ability=v[1] ? v[1].trim() : .5; }
 				else if (v[0] == "Liza") 	{ this.students[i].sex='female'; this.students[i].ability=v[1] ? v[1].trim() : .8; }
-				else if (v[0] == "Joe") 	{ this.students[i].sex='male';   this.students[i].ability=v[1] ? v[1].trim() : .5; }
-				else if (v[0] == "Sally") 	{ this.students[i].sex='female'; this.students[i].ability=v[1] ? v[1].trim() : .5; }
+				else if (v[0] == "Luis") 	{ this.students[i].sex='male';   this.students[i].ability=v[1] ? v[1].trim() : .5; }
+				else if (v[0] == "Oliver") 	{ this.students[i].sex='male';   this.students[i].ability=v[1] ? v[1].trim() : .5; }
+				else if (v[0] == "Chris") 	{ this.students[i].sex='male';   this.students[i].ability=v[1] ? v[1].trim() : .5; }
+				else if (v[0] == "Farrah") 	{ this.students[i].sex='female'; this.students[i].ability=v[1] ? v[1].trim() : .5; }
+				else if (v[0] == "Jazmin") 	{ this.students[i].sex='female'; this.students[i].ability=v[1] ? v[1].trim() : .5; }
+				else if (v[0] == "Mihyun") 	{ this.students[i].sex='female'; this.students[i].ability=v[1] ? v[1].trim() : .5; }
 				}
 			for (i=this.students.length-1;i>=0;i--) 												// For each student spec'd
 				if (this.students[i] == "absent") 	this.students.splice(i,1);						// Remove absent students
 			for (i=0;i<this.students.length;i++) 													// For each student spec'd
 				this.roster[this.students[i].id]=i;													// Add to roster
-			this.LoadModels();																		// Load 3D models
+			this.LoadModels();										  								// Load 3D models
 			});
 		this.poses["startUp"]="armL,-51,4,-44,armR,-51,-4,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-78,-8,0,thighR,-78,10,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-50,0,wristR,8,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";
@@ -372,6 +382,12 @@ class App  {
 		else if (o.match(/who:Freddy/i)) 				app.curStudent=app.roster["Freddy"];
 		else if (o.match(/who:Robert/i)) 				app.curStudent=app.roster["Robert"];
 		else if (o.match(/who:Sara/i)) 					app.curStudent=app.roster["Sara"];
+		else if (o.match(/who:Oliver/i)) 				app.curStudent=app.roster["Oliver"];
+		else if (o.match(/who:Luis/i)) 					app.curStudent=app.roster["Luis"];
+		else if (o.match(/who:Chris/i)) 				app.curStudent=app.roster["Chris"];
+		else if (o.match(/who:Jazmin/i)) 				app.curStudent=app.roster["Jazmin"];
+		else if (o.match(/who:Farrah/i)) 				app.curStudent=app.roster["Farrah"];
+		else if (o.match(/who:Mihyun/i)) 				app.curStudent=app.roster["Mihyun"];
 		if (o.match(/action:/i) && text.match(/please/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an please + action mentioned, do it
 	
 		if (app.pickingStudent) {																// If students have their hands up

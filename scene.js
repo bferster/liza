@@ -144,7 +144,7 @@ class Scene {
 		function onError(err) {	console.log(err) };													// ON ERROR
 
 		function loadModel(object) {															// ON LOAD
-			var i=0,texture=null;
+			var texture=null;
 			if (object.scene)	object=object.scene;												// Point at scene if there (GLTF/DAE)			
 			_this.models[o.id]=({ name:o.src, bones:[], model: object });							// Add new model	
 			var cm=_this.models[o.id];																// Point at new model
@@ -163,7 +163,7 @@ class Scene {
 					if (!isNaN(o.tex)) 																// If a cartoon shading
 						child.material.color=new THREE.Color(o.tex);								// Set color
 					if (child.material.userData)													// If user data
-						child.material.userData.outlineParameters= { visible:app.sc.cartoonScene }; // Outline if cartoon
+						child.material.userData.outlineParameters= { visible:true }; 				// Outline if cartoon
 					}							
 			});
 			

@@ -333,6 +333,7 @@ class ARC  {
 
 	GetEntities(text)																				// EXTRACT ENTITIES
 	{
+trace(1,text);
 		var i,j,k,r,es,ks;
 		var s="",ents=[];
 		var _this=this;																					// Save contex	
@@ -349,6 +350,7 @@ class ARC  {
 		var nw=words.length-1;																			// Number of words-1
 		words[0]=words[0].replace(/s$/,"");																// Remove final s from first word
 		words[0]=words[0].replace(/ing$/,"");															// Remove gerunds
+		trace(2,words)
 		for (i=0;i<nw;++i) {																			// For each word
 			if (!isNaN(words[i])) {																		// If a number
 				ents.push({ e:"number", k:words[i], v:words[i] });										// Add to match list 
@@ -439,8 +441,14 @@ class ARC  {
 				{"name":"Robert","syns":",robert,robbie,robby,"},
 				{"name":"Liza","syns":",liza,elija,elijah,lie,plaza,"},
 				{"name":"youAll","syns":",everybody,everyone,u-haul,uhaul,you_all,you_guy,you_kid,y'all,"},
-				{"name":"wholeClass","syns":",anybody,anyone,children,somebody,who_know,"}
-				]},
+				{"name":"wholeClass","syns":",anybody,anyone,children,somebody,who_know,"},
+				{"name":"Luis","syns":",luis,louise,lewis,louis,louey,lou,lui,"},
+				{"name":"Chris","syns":",chris,chri,crisp,"},
+				{"name":"Oliver","syns":",oliver,liver,however,"},
+				{"name":"Farrah","syns":",farrah,farah,ferel,farrell,"},
+				{"name":"Jazmin","syns":",jazmin,jazz,jasmine,jasmina,"},
+				{"name":"Mihyun","syns":",mihyun,neon,beyond,"}
+			]},
 			{"name":"response","keys":[{"name":"agree","syns":",agree,concur,"},
 				{"name":"wrong","syns":",wrong,incorrect,innacurate,not_right,"},
 				{"name":"right","syns":",right,accurate,correct,"},
