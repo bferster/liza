@@ -152,7 +152,8 @@
 		<div id="BBSideBut" style="cursor:pointer;color:#fff;font-size:11px;margin-left:-5px" title="Side">&nbsp;LEFT</div>
 		<canvas id="blackboardCan-0" height=256 width=512 class='lz-canvas' tabindex='1'></canvas>
 		<canvas id="blackboardCan-1" height=256 width=512 class='lz-canvas' tabindex='1'></canvas>
-		</div>
+	</div>
+</div>
 <script>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,14 +225,16 @@ class App  {
 		this.curStudent=0;																			// Currently active student
 		this.gettingEntities=0;																		// Flag when waiting for entities from AI
 		this.hinting=0;																				// Whether to give hints to instructor
+		this.horseshoe=false;																		// Horseshoe seating?
+		this.curClock=0;																			// Current clock time
 
 		this.gid="1JUEWVr25tktaON17Vi3VREvHpEy54Lz4Ou9NIIBYsRE";									// Default ARC tree spreadshet
 		var url=window.location.search.substring(1);						   						// Get query string
 		if (url && url.match(/rer/i)) {																// If params
+			this.horseshoe=true;																	// Horsehow seating
 			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
 			else					this.gid="1keSF_cB0Y0I6q8l6c06q9MZgu6lILo1hvh8LkXRenm8"			// Default RER spreadsheet
-			this.students=["Liza","Freddy","Sara","Farrah"];										// Holds students	
-		}
+			}
 		else if (url && !url.match(/real/i)) {														// If params
 			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
 			else					this.gid=url;													// Default spreadsheet
@@ -286,7 +289,7 @@ class App  {
 		this.arc.Load(id, ()=>{																		// Load from Google doc
 			var i,v;
 			var tex=this.sc.cartoonScene ? 0xffffff : 0xcccccc;										// Desks cartoon or real				
-			for (i=0;i<6;++i)																		// For each desk
+			for (i=0;i<10;++i)																		// For each desk
 				this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20,  tex:tex} );	// Add desk
 			for (i=0;i<this.students.length;++i) {													// For each student spec'd
 				if (!this.students[i] || this.students[i].match(/absent/i)) continue;				// Skip this seat

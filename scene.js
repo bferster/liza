@@ -9,6 +9,19 @@ class Scene {
 		this.seats=[ { x: 120, y:100,  z:0, r:0 },   { x:  0,  y:100,  z:0, r:0   },				// Seat locations
 					 { x:-120, y:100,  z:0, r:-10 }, { x:-120, y:-100, z:0, r:0 },
 					 { x:   0, y:-100, z:0, r:0 },   { x: 120, y:-100, z:0, r:30  } ];
+
+		if (app.horseshoe)																			// Horseshoe seating
+					 this.seats=[ { x: 200, y:110,  z:0, r:-25 },													
+			   		 { x: 100, y:70,   z:0, r:-15 },				
+					 { x:0,    y:50,   z:0, r:0 },
+					 { x:-100, y:75,   z:0, r:15 },
+					 { x:-200, y:110,  z:0, r:25 },
+					 { x: -200, y:-100, z:0, r:0 },   
+					 { x: -100, y:-100, z:0, r:0 },   
+					 { x:   0, y:-100, z:0, r:0 },   
+					 { x: 100, y:-100, z:0, r:0 },   
+					 { x: 200, y:-100, z:0, r:30 } ];
+
 		this.lastTime=0;																			// Used to throttle rendring
 		this.cartoonScene=window.location.search.match(/real/i) ? false : true;						// Render scene as cartoon?	   		
 		this.models=[];																				// Holds models
@@ -25,7 +38,7 @@ class Scene {
 		this.rightWall=this.cartoonScene ? "" : "assets/windowwall.png";							// Side wall texture
 		this.aniTimer=0;																			// Timer for talking and fidgeting
 		this.Init();																				// Init 3D system
-		}
+	}
 
 	Init()																						// INIT 3D SYSTEM
 	{
@@ -123,6 +136,21 @@ class Scene {
 		app.bb.texMap[1]=mat.map=new THREE.CanvasTexture($("#blackboardCan-1")[0]);					// Left blackboard
 		mesh.position.x=200; 		mesh.position.y=150;		mesh.position.z=-511;				// Position
 		this.scene.add(mesh);																		// Add to scene		
+	
+		app.clockHand=new THREE.Group();															// Clock hand group
+		mat=new THREE.MeshPhongMaterial();															// Make material for clock hand
+		mat.color=new THREE.Color(0x333333);														// Set color
+		cbg=new THREE.PlaneGeometry(18,2,1);														// Make grid
+		mesh=new THREE.Mesh(cbg,mat);																// Make mesh
+		mesh.position.x=9;																			// Spin by left end
+		app.clockHand.add(mesh);																	// Add line
+		app.clockHand.position.x=1; app.clockHand.position.y=180;	app.clockHand.position.z=-510;	// Position
+		this.scene.add(app.clockHand);																// Add to scene		
+	}
+
+	SetClock(degree)																			// SET CLOCK ANGLE
+	{
+		app.clockHand.rotation.z=((degree-90)%360)*Math.PI/-180;									// Rotate hand
 	}
 
 	AddModel(o)																					// ADD MODEL TO SCENE
@@ -360,6 +388,7 @@ class Scene {
 			if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );			// Render outline
 			else					app.sc.renderer.render(app.sc.scene,app.sc.camera);				// Render scene
 			app.sc.lastTime=now;																	// Then is now
+			app.sc.SetClock(app.curClock+=.75);		
 			}
 		requestAnimationFrame(app.sc.Render);														// Recurse
 	}
