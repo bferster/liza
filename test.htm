@@ -26,7 +26,7 @@
 		{
 			q=encodeURIComponent(q);
 			const url="https://api.wit.ai/traits?v=20210806"
-			let body={  name:"phase2", values:[1,2,3,4,5] }
+			let body={  name:"phase", values:[] }
   			fetch(url,{ method:"POST",
 						headers: { Authorization:'Bearer '+SERVER_TOKEN, 'Content-Type':'application/json'}, 
 						body: JSON.stringify(body)
