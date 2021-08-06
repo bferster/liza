@@ -25,11 +25,31 @@
 		function GetWit(q) 
 		{
 			q=encodeURIComponent(q);
-			const uri = 'https://api.wit.ai/message?v=20200513&q=' + q;
+			const url="https://api.wit.ai/traits?v=20210806"
+			let body={  name:"phase2", values:[1,2,3,4,5] }
+  			fetch(url,{ method:"POST",
+						headers: { Authorization:'Bearer '+SERVER_TOKEN, 'Content-Type':'application/json'}, 
+						body: JSON.stringify(body)
+						})	
+				.then(res => res.json())
+				.then(res => console.log(res))
+
+
+	
+	return;
+
+	
+	
+					
+
+/*			const uri = 'https://api.wit.ai/message?&q=' + q;
 				fetch(uri, {headers: {Authorization: 'Bearer ' + CLIENT_TOKEN}})
 				.then(res => res.json())
 				.then(res => ShowIntents(res))
-		}
+*/
+
+
+			}
 
 		function ShowIntents(res)
 		{
