@@ -36,9 +36,9 @@ class AI  {
 		for (i=0;i<app.sd.length;++i) {
 			o=app.sd[i];
 			if (o.type == "TRAIT")			this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
-//			else if (o.type == "ENTITY")	this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text]);
-			else if (o.type == "INTENT")	this.SetIntent(this.lut[o.text]);
-			else if (o.type == "REMARK")	this.SetRemark(this.lut[o.text]);
+//			else if (o.type == "ENTITY")	this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text);
+			else if (o.type == "INTENT")	this.SetIntent(o.intent);
+//			else if (o.type == "REMARK")	this.SetRemark(this.lut[o.text]);
 			}
 	}
 
@@ -51,9 +51,11 @@ class AI  {
 
 	SetEntity(entity)
 	{
-		if (entity.match(/wit\//)) return;
-		let body={ name:entity, role:entity.replace(/wit\//,"") };
-		this.SendCommand("entitities", body);
+//		if (entity.match(/wit\//)) return;
+		let body={ name:entity, roles:[] };
+		trace(body)
+		
+		this.SendCommand("entities", body);
 	}
 	
 	SetRemark(remark)
@@ -62,6 +64,9 @@ class AI  {
 
 	SetIntent(intent)
 	{
+		trace(intent)
+		let body={ name:intent };
+		this.SendCommand("intents", body);
 	}
 
 	SendCommand(type, body)
