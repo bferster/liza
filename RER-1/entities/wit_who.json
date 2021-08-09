@@ -1,0 +1,11 @@
+{
+    "name": "wit_who",
+    "roles": [
+        "wit_who"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": []
+}

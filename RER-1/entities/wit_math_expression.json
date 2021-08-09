@@ -1,0 +1,11 @@
+{
+    "name": "wit_math_expression",
+    "roles": [
+        "wit_math_expression"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "wit_temperature",
+    "roles": [
+        "wit_temperature"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": []
+}

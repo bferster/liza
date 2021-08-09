@@ -1,0 +1,11 @@
+{
+    "name": "who",
+    "roles": [
+        "who"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": []
+}

@@ -1,0 +1,36 @@
+{
+    "name": "ask_which",
+    "roles": [
+        "ask_which"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": [
+        {
+            "keyword": "choose",
+            "synonyms": [
+                "choose"
+            ]
+        },
+        {
+            "keyword": "pick",
+            "synonyms": [
+                "pick"
+            ]
+        },
+        {
+            "keyword": "select",
+            "synonyms": [
+                "select"
+            ]
+        },
+        {
+            "keyword": "which",
+            "synonyms": [
+                "which"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "version": 20200513,
+    "zip-command": "zip RER-1.zip RER-1\/app.json RER-1\/entities\/*.json RER-1\/intents\/*.json RER-1\/traits\/*.json RER-1\/utterances\/*.json",
+    "name": "RER-1",
+    "lang": "en",
+    "timezone": "US\/Eastern"
+}

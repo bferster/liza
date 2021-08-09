@@ -1,0 +1,11 @@
+{
+    "name": "wit_reminder",
+    "roles": [
+        "wit_reminder"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": []
+}

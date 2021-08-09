@@ -1,0 +1,30 @@
+{
+    "name": "ask_what",
+    "roles": [
+        "ask_what"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": [
+        {
+            "keyword": "is_that",
+            "synonyms": [
+                "is_that"
+            ]
+        },
+        {
+            "keyword": "is_this",
+            "synonyms": [
+                "is_this"
+            ]
+        },
+        {
+            "keyword": "what",
+            "synonyms": [
+                "what"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,24 @@
+{
+    "name": "ask_where",
+    "roles": [
+        "ask_where"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": [
+        {
+            "keyword": "what_location",
+            "synonyms": [
+                "what_location"
+            ]
+        },
+        {
+            "keyword": "where",
+            "synonyms": [
+                "where"
+            ]
+        }
+    ]
+}

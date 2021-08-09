@@ -1,0 +1,11 @@
+{
+    "name": "wit_notable_person",
+    "roles": [
+        "wit_notable_person"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": []
+}

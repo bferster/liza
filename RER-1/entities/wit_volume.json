@@ -1,0 +1,11 @@
+{
+    "name": "wit_volume",
+    "roles": [
+        "wit_volume"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": []
+}

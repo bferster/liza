@@ -1,0 +1,24 @@
+{
+    "name": "wit_location",
+    "roles": [
+        "wit_location"
+    ],
+    "lookups": [
+        "free-text",
+        "keywords"
+    ],
+    "keywords": [
+        {
+            "keyword": "china",
+            "synonyms": [
+                "china"
+            ]
+        },
+        {
+            "keyword": "latvia",
+            "synonyms": [
+                "latvia"
+            ]
+        }
+    ]
+}
