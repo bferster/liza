@@ -28,7 +28,6 @@ this.sessionId="RER-1";
 		$("#jsGridData").jsGrid({ width:"100%", height:"calc(100vh - 168px)",						// Init JSGrid
 				inserting:true, editing:true, sorting:true,
 				fields: this.pFields, data:[],
-				onItemEditing: function(args) { app.curRow=args.itemIndex;  }
 				});
 		$("#jsGridData").css("padding",0)		
 	}
@@ -83,9 +82,9 @@ this.sessionId="RER-1";
 			this.sd=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
 			for (i=0;i<this.sd.length;++i)															// For each line
 				for (k in this.sd[i]) if (!k) delete this.sd[i][k];									// If empty field, delete it
+			$("#jsGridData").jsGrid("option","data",this.sd);										// Load into spreadsheet
 			Sound("ding");																			// Ding
 			};
-		$("#jsGridData").jsGrid("option","data",this.sd);											// Load into spreadsheet
 		}
 
 	Login()																						// LOGIN
