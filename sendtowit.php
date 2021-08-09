@@ -1,10 +1,16 @@
 <?php
-	$ch=curl_init($url);
-	$fp=fopen("example_homepage.txt", "w");
-	
-	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_exec($ch);
-	if(curl_error($ch))   fwrite($fp, curl_error($ch));
-	curl_close($ch);
-	fclose($fp);
+	$url="https://api.wit.ai/".$_REQUEST['c']."?v=20210806";
+	$header = array();
+	$header[]="Authorization: Bearer 3ISBCQZSCQ37KJIZA7U2VFFSGEM75NDH";
+	$data=json_encode($_REQUEST['q']);
+
+	$ch=curl_init();
+	curl_setopt($ch,CURLOPT_URL, $url);
+	curl_setopt($request, CURLOPT_POST, 1);
+	curl_setopt($ch,CURLOPT_HTTPHEADER,$header); 
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER, true); 
+	echo curl_exec($ch); 
+	curl_close($ch); 
+
 ?>
