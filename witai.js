@@ -17,7 +17,15 @@ class AI  {
 		this.lut.ordinal="wit/ordinal";					this.lut.quantity="wit/quantity";
 		this.lut.reminder="wit/reminder";				this.lut.temperature="wit/temperature"
 		this.lut.volume="wit/volume";
+		this.GetToken();									
 	}
+
+	GetToken()																				// GET API ACCESS TOKEN
+	{
+		const url="https://viseyes.org/liza/tokentowit.php"										// URL
+		$.ajax({ url:url, method:'GET' })														// Send to PHP
+		.done(res =>{trace(123,res);  })														// Send return data
+		}
 
 	Save(type)
 	{
@@ -37,9 +45,9 @@ class AI  {
 		this.SetStudents();
 		for (i=0;i<app.sd.length;++i) {
 			o=app.sd[i];
-			if (o.type == "TRAIT")			this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
-			else if (o.type == "ENTITY")	this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text,o.traits);
-			else if (o.type == "INTENT")	this.SetIntent(o.intent);
+//			if (o.type == "TRAIT")			this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
+//			else if (o.type == "ENTITY")	this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text,o.traits);
+//			else if (o.type == "INTENT")	this.SetIntent(o.intent);
 //			else if (o.type == "REMARK")	this.SetRemark(this.lut[o.text]);
 			}
 	}
@@ -114,13 +122,9 @@ class AI  {
 
 	SendCommand(type, body, callback)
 	{
-		const url="https://api.wit.ai/"+type+"?v=20210806"
-		fetch(url,{ method:"POST",
-			  headers: { Authorization:'Bearer '+this.token, 'Content-Type':'application/json'}, 
-			  body: JSON.stringify(body)
-			  })	
-	  	.then(res => res.json())
-	  	.then(res =>{ if (callback) callback(); })
+		const url="https://viseyes.org/liza/sendtowit.php?c="+type;									// URL
+		$.ajax({ url:url, method:'POST', data:body })												// Send to PHP
+		.done(res =>{trace(123,res); if (callback)  callback(); })									// Send return data to callback
 	}
 
 
