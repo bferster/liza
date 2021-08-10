@@ -22,7 +22,7 @@ class AI  {
 
 	GetToken()																				// GET API ACCESS TOKEN
 	{
-		const url="https://viseyes.org/liza/tokentowit.php"										// URL
+		const url="https://viseyes.org/liza/config/getwittoken.php"								// URL
 		$.ajax({ url:url, method:'GET' })														// Send to PHP
 		.done(res =>{trace(123,res);  })														// Send return data
 		}
