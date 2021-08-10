@@ -1,9 +1,6 @@
 class AI  {	
 	constructor()   																			// CONSTRUCTOR
 	{
-		this.token="3ISBCQZSCQ37KJIZA7U2VFFSGEM75NDH";	
-		this.clientToken="HZNYC4A6QBJ5D6U6W4WDVGCIQIOQFADK";	
-
 		this.lut=[];
 		this.lut.bye="wit/bye";							this.lut.greetings="wit/greetings";
 		this.lut.onoff="wit/on_off";					this.lut.sentiment="wit/sentiment";
@@ -17,15 +14,8 @@ class AI  {
 		this.lut.ordinal="wit/ordinal";					this.lut.quantity="wit/quantity";
 		this.lut.reminder="wit/reminder";				this.lut.temperature="wit/temperature"
 		this.lut.volume="wit/volume";
-		this.GetToken();									
+		this.token=this.GetToken();	
 	}
-
-	GetToken()																				// GET API ACCESS TOKEN
-	{
-		const url="https://viseyes.org/liza/config/getwittoken.php"								// URL
-		$.ajax({ url:url, method:'GET' })														// Send to PHP
-		.done(res =>{trace(123,res);  })														// Send return data
-		}
 
 	Save(type)
 	{
@@ -50,6 +40,13 @@ class AI  {
 //			else if (o.type == "INTENT")	this.SetIntent(o.intent);
 //			else if (o.type == "REMARK")	this.SetRemark(this.lut[o.text]);
 			}
+			Sound("ding");
+	}
+
+	GetToken()																					// GET API TOKEN
+	{
+		const url="https://viseyes.org/liza/config/getwittoken.php";								// URL
+		$.ajax({ url:url }).done(res =>{ this.token=res; })											// Send to PHP and get token
 	}
 
 	SetTrait(trait, traits)																		// SEND TRAIT TO AI
@@ -90,7 +87,11 @@ class AI  {
 			}
 			for (i=0;i<data.length;++i)																// For each student
 				keywords.push( { "keyword": data[i].name, "synonyms":data[i].synonyms } );			// Add data
-		let body={ name:"student", roles:[], keywords:keywords };									// Make payload
+			this.GetItem("entities","student", (d)=>{														// If it exists
+					
+				});
+	
+				let body={ name:"student", roles:[], keywords:keywords };									// Make payload
 		this.SendCommand("entities", body);															// Send to wit.ai
 	}
 
@@ -98,7 +99,7 @@ class AI  {
 	SetEntity(entity, traits)																	// SEND ENTITIES TO AI
 	{
 		let i,keywords=[];
-		this.GetItem("entities",entity, (d)=>{
+		this.GetItem("entities",entity, (d)=>{														// If it exits
 			if (traits) {																			// If any keywords defined
 				traits=traits.replace(/ /g,"");														// Remove spaces
 				traits=traits.split(",");															// Put into array
@@ -122,10 +123,20 @@ class AI  {
 
 	SendCommand(type, body, callback)
 	{
-		const url="https://viseyes.org/liza/sendtowit.php?c="+type;									// URL
+	
+		const url="https://api.wit.ai/"+type+"?v=20210806"
+		fetch(url,{ method:"POST",
+			  headers: { Authorization:'Bearer '+this.token, 'Content-Type':'application/json'}, 
+			  body: JSON.stringify(body)
+			  })	
+	  	.then(res => res.json())
+	  	.then(res =>{ if (callback) callback(); })
+	
+/*		const url="https://viseyes.org/liza/sendtowit.php?c="+type;									// URL
 		$.ajax({ url:url, method:'POST', data:body })												// Send to PHP
 		.done(res =>{trace(123,res); if (callback)  callback(); })									// Send return data to callback
-	}
+			*/
+}
 
 
 } // AI class closure

