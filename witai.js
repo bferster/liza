@@ -17,10 +17,6 @@ class AI  {
 		this.token=this.GetToken();	
 	}
 
-	Save(type)
-	{
-	}
-
 	AddRemark(remark, intent, traits, entities)
 	{
 	}
@@ -29,18 +25,18 @@ class AI  {
 	{
 	}
 
-	Train()
+	Train()																						// TRAIN AI
 	{
 		let i,o;
-		this.SetStudents();
-		for (i=0;i<app.sd.length;++i) {
-			o=app.sd[i];
-//			if (o.type == "TRAIT")			this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
-//			else if (o.type == "ENTITY")	this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text,o.traits);
-//			else if (o.type == "INTENT")	this.SetIntent(o.intent);
-//			else if (o.type == "REMARK")	this.SetRemark(this.lut[o.text]);
+		this.SetStudents();																			// Add student data
+		for (i=0;i<app.sd.length;++i) {																// For each line
+			o=app.sd[i];																			// Point at it
+			if (o.type == "TRAIT")		 this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
+			else if (o.type == "ENTITY") this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text,o.traits);
+			else if (o.type == "INTENT") this.SetIntent(o.intent);
+			else if (o.type == "REMARK") this.SetRemark(this.lut[o.text]);
 			}
-			Sound("ding");
+		Sound("ding");																				// Ding
 	}
 
 	GetToken()																					// GET API TOKEN
@@ -49,28 +45,23 @@ class AI  {
 		$.ajax({ url:url }).done(res =>{ this.token=res; })											// Send to PHP and get token
 	}
 
-	SetTrait(trait, traits)																		// SEND TRAIT TO AI
-	{
-		let i,values=[];
-		this.GetItem("traits",trait, (d)=>{
-			if (traits) {																			// If any keywords defined
-				traits=traits.replace(/ /g,"");														// Remove spaces
-				traits=traits.split(",");															// Put into array
-				for (i=0;i<traits.length;++i)														// For each keyword
-					values.push( traits[i] );														// Add value
-				}
-			let body={ name:trait, values: values };												// Make payload (no values for built-ns)
-			this.SendCommand("traits", body);														// Send to wit.ai
-			})
-	}
-
 	GetItem(type, tag, callback)																// GET ITEM FROM AI
 	{
-		let url=`https://api.wit.ai/${type}/${tag}?v=20210806`;									// URL
-		fetch(url, { headers: { Authorization:'Bearer '+this.token, 'Content-Type':'application/json' }})
+		let url=`https://api.wit.ai/${type}/${tag}?v=20210806`;										// URL
+		fetch(url, { headers: { Authorization:'Bearer '+this.token, 'Content-Type':'application/json' }})	// Fetch/GET
 		.then(res => res.json())																	// Get json
 			.then(res => { callback(res); })														// Run callback
 		}
+
+	DeleteItem(type, tag, callback)																// DELETE ITEM FROM AI
+	{
+		let url=`https://api.wit.ai/${type}/${tag}?v=20210806`;										// URL
+		fetch(url,{ method:"DELETE",																// Fetch/DELETE
+			  headers: { Authorization:'Bearer '+this.token, 'Content-Type':'application/json'},
+			  })	
+	  	.then(res => res.json())
+	  	.then(res =>{ if (callback) callback(); })													// Run callback
+	}
 
 	SetStudents()																				// ADD NEW STUDENTS TO AI
 	{
@@ -82,31 +73,47 @@ class AI  {
 			d=data[data.length-1];																	// Point at slot
 			if (o.entities) {																		// If any entities spec'd
 				d.synonyms=o.entities.replace(/ /g,"");												// Remove spaces
+				d.synonyms=d.synonyms.replace(/_/g," ");											d// Underscores to spaces
 				d.synonyms=d.synonyms.split(",");													// Put into array
 				}
 			}
 			for (i=0;i<data.length;++i)																// For each student
 				keywords.push( { "keyword": data[i].name, "synonyms":data[i].synonyms } );			// Add data
-			this.GetItem("entities","student", (d)=>{														// If it exists
-					
-				});
-	
-				let body={ name:"student", roles:[], keywords:keywords };									// Make payload
-		this.SendCommand("entities", body);															// Send to wit.ai
+		let body={ name:"student", roles:[], keywords:keywords };									// Make payload
+		this.DeleteItem("entities","student", (d)=>{												// Selete existing
+			this.SendCommand("entities", body);														// Send new one to wit.ai
+			});
 	}
 
+	SetTrait(trait, traits)																		// SEND TRAIT TO AI
+	{
+		let i,values=[];
+		if (traits) {																				// If any keywords defined
+			traits=traits.replace(/ /g,"");															// Remove spaces
+			traits=traits.replace(/_/g," ");														// Underscores to spaces
+			traits=traits.split(",");																// Put into array
+			for (i=0;i<traits.length;++i)															// For each keyword
+				values.push( traits[i] );															// Add value
+			}
+		let body={ name:trait, values:values };														// Make payload
+		this.DeleteItem("traits",trait, (d)=>{														// Delete existing
+			this.SendCommand("traits", body);														// Send to wit.ai
+			})
+	}
 
 	SetEntity(entity, traits)																	// SEND ENTITIES TO AI
 	{
-		let i,keywords=[];
-		this.GetItem("entities",entity, (d)=>{														// If it exits
-			if (traits) {																			// If any keywords defined
-				traits=traits.replace(/ /g,"");														// Remove spaces
-				traits=traits.split(",");															// Put into array
-				for (i=0;i<traits.length;++i)														// For each keyword
-					keywords.push( { "keyword": traits[i], "synonyms":[ traits[i] ]} );				// Add it
-				}
-			let body={ name:entity, roles:[], keywords:keywords };									// Make payload
+		let keywords=[];
+		if (traits) {																				// If any keywords defined
+			traits=traits.replace(/ /g,"");															// Remove spaces
+			traits=traits.replace(/_/g," ");														// Underscores to spaces
+			traits=traits.split(",");																// Put into array
+			let first=traits[0];																	// Save first
+			traits.shift();																			// Remove first
+			keywords.push( { "keyword": first, "synonyms":traits } );								// Add it
+			}
+		let body={ name:entity, roles:[], keywords:keywords };										// Make payload
+		this.DeleteItem("entities",entity, (d)=>{													// Delete existing
 			this.SendCommand("entities", body);														// Send to wit.ai
 			})
 	}
@@ -114,7 +121,9 @@ class AI  {
 	SetIntent(intent)																			// SEND INTENT TO AI
 	{
 		let body={ name: intent };																	// Make payload														
-		this.SendCommand("intents", body);															// Send to wit.ai
+		this.DeleteItem("intents",intent, (d)=>{													// Delete existing
+			this.SendCommand("intents", body);														// Send to wit.ai
+			})
 	}
 
 	SetRemark(remark)																			// SEND REMARK TO AI
@@ -123,7 +132,6 @@ class AI  {
 
 	SendCommand(type, body, callback)
 	{
-	
 		const url="https://api.wit.ai/"+type+"?v=20210806"
 		fetch(url,{ method:"POST",
 			  headers: { Authorization:'Bearer '+this.token, 'Content-Type':'application/json'}, 
