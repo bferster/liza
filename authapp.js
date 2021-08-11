@@ -11,9 +11,11 @@ class App  {
 		this.InitSpreadSheet();																		// Init data spreadsheet
 		this.sessionId=window.location.search.substring(1); 										// Set id
 		this.sd=[];																					// Session data
+		this.curRemark=1;																			// Remark being edited	
+		this.curResponse=1;																			// Response being edited	
 this.sessionId="RER-1";
 		this.LoadSession();																			// Load curent session
-		}
+	}
 
 	InitSpreadSheet()																			// INIT DATA SPREADSHEET
 	{
@@ -90,5 +92,51 @@ this.sessionId="RER-1";
 	Login()																						// LOGIN
 	{
 	}
+	
+	RemarksEditor(type)																			// EDIT REMARKS AND RESPONSES
+	{
+		let text,curItem=0,maxItems=10;
+		let str=`<div class="lz-remarks">
+		<p>${type.toUpperCase()}: <span id="${type}Counter"/></b></p>
+		<table style="width:50%;max-width:800px;margin:0 auto;text-align:right">
+			<tr><td style="float:right;margin-right:-6px"><img id="${type}LeftArrow" src="img/arrowleft.png" class="lz-arrow"></td>
+			<td><input id="${type}Text" type="text" class="lz-mainText"></td>
+			<td><img style="float:left" id="${type}RightArrow" src="img/arrowright.png" class="lz-arrow"></td></tr>
+			<tr><td>INTENT: &nbsp;</td><td><select class="lz-is" style="width:calc(100% + 6px)" id="${type}Intent"></select></td><td></td></tr>
+			<tr><td>TOPIC: &nbsp;</td><td><select class="lz-is" style="width:calc(100% + 6px)" id="${type}Topic"></select></td><td></td></tr>
+			<tr><td>ENTITIES: &nbsp;</td><td style="text-align:center;border:1px solid #999;border-radius:12px" id="${type}Entities"></td><td></td></tr>
+				<tr><td>TRAITS: &nbsp;</td><td style="text-align:center;border:1px solid #999;border-radius:12px" id="${type}Traits"></td><td></td></tr>
+
+			</table>
+		</div>`;
+		$("#"+type+"sEditor").html(str.replace(/\t|\n|\r/g,""));									// Add to div
+		Draw();																						// Draw dynamic data
+	
+		$("#"+type+"Intent").append("<option>None</option>");
+		$("#"+type+"Intent").append("<option>110.1 Giving feeedback to student</option>");
+																									
+		$("#"+type+"LeftArrow").on("click", ()=>{													// ON LEFT ARROW
+			curItem=Math.max(--curItem,0);  														// Decrement													  
+			Draw(); 																				// Redraw
+			});
+		$("#"+type+"RightArrow").on("click", ()=>{													// ON RIGHT ARROW
+			curItem=Math.min(++curItem,maxItems);  													// Increment
+			Draw(); 																				// Redraw
+			});
+
+		function Draw()																				// DRAW DYNAMIC DATA
+		{
+			text="How did you come up with that answer? "+curItem;									// Get text
+			$("#"+type+"Text").val(text);															// Set text
+			$("#"+type+"Counter").html(curItem);													// Set count
+			let str="<b>STUDENT</b>: Luis<span style='float:right'>x&nbsp;</span>"	
+			$("#"+type+"Entities").html(str)		
+			str="<b>SENTIMENT</b>: POSITIVE";	
+		
+			$("#"+type+"Traits").html(str)		
+		}
+
+	}
+
 
 } // Class closure

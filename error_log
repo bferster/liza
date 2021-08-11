@@ -1,2 +1,0 @@
-[10-Aug-2021 15:53:30 UTC] PHP Warning:  Use of undefined constant Wit - assumed 'Wit' (this will throw an Error in a future version of PHP) in /home/bferster/public_html/vis/liza/config/getwittoken.php on line 7
-[10-Aug-2021 15:55:58 UTC] PHP Warning:  Use of undefined constant Wit - assumed 'Wit' (this will throw an Error in a future version of PHP) in /home/bferster/public_html/vis/liza/config/getwittoken.php on line 7

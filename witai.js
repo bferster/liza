@@ -29,14 +29,16 @@ class AI  {
 	{
 		let i,o;
 		this.SetStudents();																			// Add student data
-		for (i=0;i<app.sd.length;++i) {																// For each line
+
+/*		for (i=0;i<app.sd.length;++i) {																// For each line
 			o=app.sd[i];																			// Point at it
 			if (o.type == "TRAIT")		 this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
 			else if (o.type == "ENTITY") this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text,o.traits);
 			else if (o.type == "INTENT") this.SetIntent(o.intent);
 			else if (o.type == "REMARK") this.SetRemark(this.lut[o.text]);
 			}
-		Sound("ding");																				// Ding
+*/
+			Sound("ding");																				// Ding
 	}
 
 	GetToken()																					// GET API TOKEN
@@ -73,7 +75,7 @@ class AI  {
 			d=data[data.length-1];																	// Point at slot
 			if (o.entities) {																		// If any entities spec'd
 				d.synonyms=o.entities.replace(/ /g,"");												// Remove spaces
-				d.synonyms=d.synonyms.replace(/_/g," ");											d// Underscores to spaces
+				d.synonyms=d.synonyms.replace(/_/g," ");											// Underscores to spaces
 				d.synonyms=d.synonyms.split(",");													// Put into array
 				}
 			}

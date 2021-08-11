@@ -18,6 +18,11 @@
 </head> 
 <style>
 	body 		{ 	font-family:Segoe UI,Verdana,Geneva,sans-serif; font-size:12px; padding:0px; margin:16px; box-sizing:content-box; }
+	.lz-remarks { 	height:calc(100vh - 180px); width:calc(100% - 32px); margin:0; padding:16px; background-color:#d5e8f3; 
+					text-align:center; }
+	.lz-mainText{	width:100%; height:48px; max-width:800px; text-align:center; font-size:16px; border-radius: 8px;
+					border:1px solid #999; }
+	.lz-arrow   {	vertical-align:middle; cursor: pointer; margin:8px; } 
 	.lz-bar		{	position:absolute; color:#000; text-align:center; width:100%; user-select:none; display:none;
 					padding: 12px 0; top:66px; left:0; pointer-events: none; }
    	.lz-dialog 	{	position: absolute; top:16px; left:16px; background-color: #eee; border: 2px solid #aaa;
@@ -27,7 +32,7 @@
 	.lz-popup 	{	position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top: calc(50% - 50px);
 					border-radius: 8px; background-color: #eee; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 					font-size: 14px; text-align:center; display: none; }
-	.lz-is 		{	border-radius:12px; padding:1px 8px; border:1px solid #999; width:94px; font-size:12px; }
+	.lz-is 		{	border-radius:12px; padding:1px 8px; border:1px solid #999; font-size:12px; height:32px; }
 	.lz-bs 		{	cursor: pointer; color:#fff; text-align: center; border-radius: 16px; display: inline-block; user-select: none;
 					font-size: 13px; background-color:  #999; padding: 0 8px 2px 8px; }
 	#lz-tab		{ background:transparent;  border:none; margin-left:-8px; }
@@ -53,9 +58,9 @@
 			<li id="lz-tab3"><a href="#responsesEditor">RESPONSES</a></li>
 			<li id="lz-tab4"><a href="#jsGridData">DATA</a></li>
 		</ul>
-		<div id="sessionEditor" style="padding:0></div>
-		<div id="remarksEditor" style="padding:0"></div>
-		<div id="responsesEditor" style="padding:0"></div>
+		<div id="sessionEditor"    style="padding:0"></div>
+		<div id="remarksEditor"    style="padding:0"></div>
+		<div id="responsesEditor"  style="padding:0"></div>
 		<div id="jsGridData"></div>
 	</div>	
 	<input type="file" id="lz-tempFile" style="display:none">
@@ -117,10 +122,10 @@
 // UI																							    http://js-grid.com
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	$("#lz-tab1").on("click",()=>{ $("#lz-tData").css("display","none"); app.LoadSession((s)=>{ trace(s); }); });
-	$("#lz-tab2").on("click",()=>{ $("#lz-tData").css("display","none");  });
-	$("#lz-tab3").on("click",()=>{ $("#lz-tData").css("display","none");  });
-	$("#lz-tab4").on("click",()=>{ $("#lz-tData").css("display","block"); });
+	$("#lz-tab1").on("click",()=>{ $("#lz-tData").css("display","none");  app.tab="session"; 	});
+	$("#lz-tab2").on("click",()=>{ $("#lz-tData").css("display","block");  app.tab="remarks";	app.RemarksEditor("remark");   });
+	$("#lz-tab3").on("click",()=>{ $("#lz-tData").css("display","none");  app.tab="responses";	app.RemarksEditor("response"); });
+	$("#lz-tab4").on("click",()=>{ $("#lz-tData").css("display","block"); app.tab="data";		});
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS
