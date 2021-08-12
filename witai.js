@@ -30,14 +30,14 @@ class AI  {
 		let i,o;
 		this.SetStudents();																			// Add student data
 
-/*		for (i=0;i<app.sd.length;++i) {																// For each line
+		for (i=0;i<app.sd.length;++i) {																// For each line
 			o=app.sd[i];																			// Point at it
 			if (o.type == "TRAIT")		 this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
 			else if (o.type == "ENTITY") this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text,o.traits);
 			else if (o.type == "INTENT") this.SetIntent(o.intent);
 			else if (o.type == "REMARK") this.SetRemark(this.lut[o.text]);
 			}
-*/
+
 			Sound("ding");																				// Ding
 	}
 
@@ -122,7 +122,7 @@ class AI  {
 	
 	SetIntent(intent)																			// SEND INTENT TO AI
 	{
-		let body={ name: intent };																	// Make payload														
+		let body={ name: "R"+intent.replace(/\.| /g,"_") };											// Make payload														
 		this.DeleteItem("intents",intent, (d)=>{													// Delete existing
 			this.SendCommand("intents", body);														// Send to wit.ai
 			})

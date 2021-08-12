@@ -53,7 +53,7 @@
 	<div id="lz-sessionName" style="text-align:center;font-size:30px;color:#999;font-weight:bold;margin:-8px 0 4px 0"></div>
 	<div id="lz-tab">
 		<ul>
-			<li id="lz-tab1"><a href="#jsGridData">DATA</a></li>
+			<li id="lz-tab1"><a href="#jsGridData">SESSION</a></li>
 			<li id="lz-tab2"><a href="#remarksEditor">REMARKS</a></li>
 			<li id="lz-tab3"><a href="#responsesEditor">RESPONSES</a></li>
 		</ul>
@@ -88,9 +88,9 @@
 	$(document).ready(function() {								           							// ON PAGE LOADED
 		$("#lz-tab" ).tabs();																		// Init tabs
 		app=new App();                                      										// Alloc app
-		$("#lz-tab1").on("click",()=>{ $("#lz-tData").css("display","block");  app.tab="data"; 		});
-		$("#lz-tab2").on("click",()=>{ $("#lz-tData").css("display","block");  app.tab="remarks";	app.RemarksEditor("remark");   });
-		$("#lz-tab3").on("click",()=>{ $("#lz-tData").css("display","none");   app.tab="responses";	app.RemarksEditor("response"); });
+		$("#lz-tab1").on("click",()=>{ $("#lz-saveData").css("display","block");  app.tab="sesion"; });
+		$("#lz-tab2").on("click",()=>{ $("#lz-saveData").css("display","none");   app.tab="remarks";	app.RemarksEditor("remark");   });
+		$("#lz-tab3").on("click",()=>{ $("#lz-saveData").css("display","none");   app.tab="responses";	app.RemarksEditor("response"); });
 //		Login((e, p, m)=>{ /* app.ws.send(`I|${e}|${p}|${m}`); */ });								// Send login data to WS
 		$("#lz-sessionName").text("SESSION ID: " +app.sessionId);									// Set title
 		$("#lz-dashHelp").on("click",()=> { 														// ON HELP

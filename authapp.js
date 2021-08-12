@@ -95,20 +95,22 @@ this.sessionId="RER-1";
 	
 	RemarksEditor(type)																			// EDIT REMARKS AND RESPONSES
 	{
-		let i,o,entval="";
-		let traits=[],entities=["Choose entitity"],intents=["None"],students=["Whole class"];
-		let myEntities=["student:Luis"], myTraits=["Sentiment:POSITIVE"]
+		let i,o,entval="",changed=false;
+		let traits=["Add new trait"],topics=[],entities=["Choose entitity"],intents=["None"],students=["Whole class"];
+		let myEntities=["student:Luis"], myTraits=["Sentiment:POSITIVE"];
+		
 		for (i=0;i<this.sd.length;++i) {															// For each item
 			o=this.sd[i];																			// Point at it
 			if (o.type == "TRAIT")		  traits.push(o.text);										// Add trait
 			else if (o.type == "ENTITY")  entities.push(o.text);									// Add entity
 			else if (o.type == "INTENT")  intents.push(o.intent+" - "+o.text);						// Add intent
 			else if (o.type == "STUDENT") students.push(o.text);									// Add student
+			else if (o.type == "TOPIC")   topics=o.text.replace(/ /g,"").split(",");				// Add topic
 			}
 
 		let text,curItem=0,maxItems=10;
 		let str=`<div class="lz-remarks">
-		<p><b>${type.toUpperCase()}: <span id="${type}Counter"/></b></p>
+		<p><b>${type.toUpperCase()}: <span id="${type}Counter"/> of ${maxItems}</b></p>
 		<table style="width:100%;max-width:1200px;margin:0 auto;text-align:right">
 			<tr><td style="float:right;margin-right:-6px"><img id="${type}LeftArrow" src="img/arrowleft.png" class="lz-arrow"></td>
 			<td><input id="${type}Text" type="text" class="lz-mainText"></td>
@@ -128,6 +130,9 @@ this.sessionId="RER-1";
 			$("#"+type+"Intent").append("<option>"+intents[i]+"</option>");							// Add it
 		for (i=0;i<students.length;++i)																// For each student
 			$("#"+type+"Student").append("<option>"+students[i]+"</option>");						// Add it
+		$("#"+type+"Topic").append("<option>None</option>");										// Add null topic
+		for (i=0;i<topics.length;++i)																// For each topic
+			$("#"+type+"Topic").append("<option>"+topics[i]+"</option>");							// Add it
 																									
 		$("#"+type+"LeftArrow").on("click", ()=>{													// ON LEFT ARROW
 			curItem=Math.max(--curItem,0);  														// Decrement													  
@@ -137,7 +142,10 @@ this.sessionId="RER-1";
 			curItem=Math.min(++curItem,maxItems);  													// Increment
 			Draw(); 																				// Redraw
 			});
-
+		$("#"+type+"Text").on("change", ()=>{ 		changed=true;	});								// TEXT CHANGE
+		$("#"+type+"Student").on("change", ()=>{ 	changed=true;	});								// STUDENT CHANGE
+		$("#"+type+"Topic").on("change", ()=>{ 		changed=true;	});								// TOPIC CHANGE
+		
 		function Draw()																				// DRAW DYNAMIC DATA
 		{
 			let str="";
@@ -146,32 +154,78 @@ this.sessionId="RER-1";
 			$("#"+type+"Counter").html(curItem);													// Set count
 			for (i=0;i<myEntities.length;++i) {														// For each entity coded
 				str+=`<b>${myEntities[i].split(":")[0].toUpperCase()}</b> : ${myEntities[i].split(":")[1]}
-				<img src="img/trashbut.gif" style="cursor:pointer;float:right"><br style="clear:both">`;
+				<img id="entityDelete-${i}" src="img/trashbut.gif" style="cursor:pointer;float:right"><br style="clear:both">`;
 				}
-			str+=`<br><select class="lz-is" style="margin-left:8px;width:150px;height:22px;display:none" placeholder="choose" id="${type}NewEntity">`;
+			str+=`<select class="lz-is" style="margin-left:8px;width:150px;height:22px;display:none" id="${type}NewEntity">`;
 			for (i=0;i<entities.length;++i) str+="<option>"+entities[i]+"</option>";				// Add entities
 			str+="</select>" 
 			$("#"+type+"Entities").html(str);														// Add markup		
-			str="<b>SENTIMENT</b> : POSITIVE";	
-		
-			$("#"+type+"Traits").html(str);		
 			
-			$("#"+type+"NewEntity").on("change", ()=>{
-				$("#"+type+"NewEntity").css("display","none")	
-				myEntities.push($("#"+type+"NewEntity").val()+":"+entval.trim());
+			str="";
+			for (i=0;i<myTraits.length;++i) {														// For each trait coded
+				str+=`<b>${myTraits[i].split(":")[0].toUpperCase()}</b> : ${myTraits[i].split(":")[1]}
+				<img id="traitDelete-${i}" src="img/trashbut.gif" style="cursor:pointer;float:right"><br style="clear:both">`;
+				}
+			str+=`<select class="lz-is" style="margin-left:8px;width:150px;height:22px;margin-top:8px" id="${type}NewTrait">`
+			for (i=0;i<traits.length;++i) str+="<option>"+traits[i]+"</option>";					// Add traits
+			str+=`</select> :<select class="lz-is" style="margin-left:8px;width:150px;height:22px" id="${type}TraitVal">
+			</select><img id="addTrait" src="img/addbut.gif" style="cursor:pointer;float:right;margin-top:8px">`;
+			$("#"+type+"Traits").html(str);															// Set traits markup
+
+			$("[id^=entityDelete-]").on("click",(e)=>{												// ON DELETE ENTITY										
+				let id=e.target.id.substr(13);														// Get index
+				changed=true;																		// Set changed flag
+				myEntities.splice(id,1);															// Remove entity
+				Sound("delete");																	// Sound
+				Draw();																				// Redraw();
+				});
+
+			$("[id^=traitDelete-]").on("click",(e)=>{												// ON DELETE ENTITY										
+				let id=e.target.id.substr(12);														// Get index
+				changed=true;																		// Set changed flag
+				myTraits.splice(id,1);																// Remove entity
+				Sound("delete");																	// Sound
+				Draw();																				// Redraw;
+				});
+				
+			$("#"+type+"NewEntity").on("change", ()=>{												// ON ENTITY SELECTED
+				$("#"+type+"NewEntity").css("display","none")										// Hide select
+				myEntities.push($("#"+type+"NewEntity").val()+":"+entval.trim());					// Add entity
+				changed=true;																		// Set changed flag
+				Sound("ding");																		// Sound
 				Draw();																				// Redraw
 				});
-			
-			$('input').mouseup(function() {
-				if (window.getSelection) 	 entval=window.getSelection().toString();
-				else if (document.selection) entval=document.selection.createRange().text;
-				$("#"+type+"NewEntity").css("display","block");
-				$("#"+type+"NewEntity").val("Choose entitity")
 
-			});
-		
+			$("#"+type+"NewTrait").on("change", ()=>{												// ON TRAIT SELECTED
+				let i,o;
+				let trait=$("#"+type+"NewTrait").val();												// Get trait value
+				for (i=0;i<app.sd.length;++i) {														// For each item
+					o=app.sd[i];																	// Point at it
+					if ((o.type == "TRAIT") && (o.text == trait)) {									// Get trait itemm
+						$("#"+type+"TraitVal").empty();												// Clear select											
+						let v=o.traits.replace(/ /g,"").split(",");									// Extract values					
+						for (i=0;i<v.length;++i) $("#"+type+"TraitVal").append("<option>"+v[i]+"</option>");	// Add values
+						break;																		// Quit looking
+						}
+					}
+				});
 
-		}
+			$("#addTrait").on("click",(e)=>{														// ON ADD TRAIT										
+				let val=$("#"+type+"TraitVal").val();												// Get trait value
+				myTraits.push($("#"+type+"NewTrait").val()+":"+val);								// Add trait
+				changed=true;																		// Set changed flag
+				Sound("ding");																		// Sound
+				$("#"+type+"TraitVal").empty();
+				Draw();																				// Redraw;
+				});
+					
+			$('input').mouseup(()=> {																// ON WORD SELECTION
+				if (window.getSelection) 	 entval=window.getSelection().toString();				// Get selction this way
+				else if (document.selection) entval=document.selection.createRange().text;			// Or that
+				$("#"+type+"NewEntity").css("display","block");										// Hide entity display
+				$("#"+type+"NewEntity").val("Choose entitity");										// Reset to top
+				});
+			}
 
 	}
 
