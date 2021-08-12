@@ -14,6 +14,7 @@ class AI  {
 		this.lut.ordinal="wit/ordinal";					this.lut.quantity="wit/quantity";
 		this.lut.reminder="wit/reminder";				this.lut.temperature="wit/temperature"
 		this.lut.volume="wit/volume";
+		
 		this.token=this.GetToken();	
 	}
 
