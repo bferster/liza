@@ -18,8 +18,9 @@ class AI  {
 		this.token=this.GetToken();	
 	}
 
-	AddRemark(remark, intent, traits, entities)
+	AddRemark(item)
 	{
+		trace("TRAIN",item)
 	}
 
 	ParseRemark(remark)
@@ -30,15 +31,14 @@ class AI  {
 	{
 
 		let i,o;
-return;		
+return;	
 		this.SetStudents();																			// Add student data
-
 		for (i=0;i<app.sd.length;++i) {																// For each line
 			o=app.sd[i];																			// Point at it
 			if (o.type == "TRAIT")		 this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
 			else if (o.type == "ENTITY") this.SetEntity(this.lut[o.text] ? this.lut[o.text] : o.text,o.traits);
 			else if (o.type == "INTENT") this.SetIntent(o.intent);
-			else if (o.type == "REMARK") this.SetRemark(this.lut[o.text]);
+			else if (o.type == "TOPIC")  this.SetTrait("topic","1,2,3,4,5,6,7,8,9,10");				// Add topic as a trait
 			}
 		Sound("ding");																				// Ding
 	}
@@ -48,7 +48,7 @@ return;
 		const url="https://viseyes.org/liza/config/getwittoken.php";								// URL
 		$.ajax({ url:url }).done(res =>{ this.token=res; })											// Send to PHP and get token
 	}
-
+	
 	GetItem(type, tag, callback)																// GET ITEM FROM AI
 	{
 		let url=`https://api.wit.ai/${type}/${tag}?v=20210806`;										// URL

@@ -88,7 +88,7 @@
 	$(document).ready(function() {								           							// ON PAGE LOADED
 		$("#lz-tab" ).tabs();																		// Init tabs
 		app=new App();                                      										// Alloc app
-		$("#lz-tab1").on("click",()=>{  app.tab="session";	$("#lz-saveData").css("display","block"); 	$("#dialogEditor settingsEditor").html(""); });
+		$("#lz-tab1").on("click",()=>{  app.tab="session";	$("#lz-saveData").css("display","block"); 	$("#dialogEditor,settingsEditor").html(""); });
 		$("#lz-tab2").on("click",()=>{  app.tab="dialog";	app.DialogEditor();  	$("#settingsEditor").html(""); });
 		$("#lz-tab3").on("click",()=>{  app.tab="settings"; app.SettingsEditor();  	$("#dialogEditor").html("");   });
 
@@ -98,13 +98,12 @@
 //			window.open("https://docs.google.com/document/d/1MzQp9xoYiREUsb3iE94WZAV1gybIZNz4XZKLWg_YHek","_blank");
 			});
 		$("#lz-saveData").on("click",()=>  { app.SaveSession(); });									// ON SAVE
-		$("#lz-exportData").on("click",()=>{ app.ExportSession(); });								// ON EXPORT
+		$("#lz-exportData").on("click",()=>{ app.ExportCSV(); });									// ON EXPORT
 		$("#lz-importData").on("click",()=>{ $("#lz-tempFile").trigger("click"); });				// ON IMPORT
 		$("#lz-tempFile").on("change",(e)=>{														// ON FILE LOAD
-			app.ImportSession(e);																	// Read file
+			app.ImportCSV(e);																		// Read file
 			$("lz-tempFile").val("");																// Clear value		
 			});
-
 		
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.keyCode == 90) && !e.shiftKey && e.ctrlKey) 	{									// UNDO KEY (Ctrl+Z)  

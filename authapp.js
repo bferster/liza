@@ -11,6 +11,7 @@ class App  {
 		this.InitSpreadSheet();																		// Init data spreadsheet
 		this.sessionId=window.location.search.substring(1); 										// Set id
 		this.sd=[];																					// Session data
+		this.dd=[];																					// Dialog data
 		this.curRemark=1;																			// Remark being edited	
 		this.curResponse=1;																			// Response being edited	
 this.sessionId="RER-1";
@@ -57,13 +58,14 @@ this.sessionId="RER-1";
 				})		
 	}
 
-	ExportSession()																				// EXPORT SESSION TO CSV
+	ExportCSV()																					// EXPORT SESSION TO CSV
 	{
+		let dataStore=(this.tab == "dialog") ? this.dd : this.sd;									// Set where data comes from
 		let fields=["type","text","intent","topic","traits","entities"];							// Fields
-		let data=Papa.unparse(this.sd,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib
+		let data=Papa.unparse(dataStore,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib
 		let textFileAsBlob=new Blob([data], {type:'text/plain'});									// Get blob
 		let downloadLink=document.createElement("a");												// Fake link
-		downloadLink.download=app.sessionId+".csv";													// Filename
+		downloadLink.download=((this.tab == "dialog") ? "D" : "" )+app.sessionId+".csv";			// Filename (add D for dialog)
 		downloadLink.innerHTML="Download File";														// Fake html														
 		downloadLink.href=window.URL.createObjectURL(textFileAsBlob);								// Payload
 		downloadLink.style.display="none";															// Hide
@@ -73,18 +75,20 @@ this.sessionId="RER-1";
 		downloadLink.click();																		// Trigger fake link
 	}
 	
-	ImportSession(e)																			// IMPORT SESSION FROM CSV
+	ImportCSV(e)																				// IMPORT SESSION FROM CSV
 	{	
 		let i,k;
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
+		let dataStore=this.tab == "dialog" ? this.dd : this.sd;										// Set where data goes
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
-			this.sd=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
-			for (i=0;i<this.sd.length;++i)															// For each line
-				for (k in this.sd[i]) if (!k) delete this.sd[i][k];									// If empty field, delete it
-			$("#jsGridData").jsGrid("option","data",this.sd);										// Load into spreadsheet
+			dataStore=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
+			for (i=0;i<dataStore.length;++i)														// For each line
+				for (k in dataStore[i]) if (!k) delete dataStore[i][k];								// If empty field, delete it
+			if (this.tab == "dialog") 	this.DialogEditor(dataStore);								// Open dialog editor									
+			else						$("#jsGridData").jsGrid("option","data",dataStore);			// Load into spreadsheet
 			Sound("ding");																			// Ding
 			};
 		}
@@ -93,13 +97,16 @@ this.sessionId="RER-1";
 	{
 	}
 	
-	DialogEditor()																			// EDIT REMARKS AND RESPONSES
+	DialogEditor(data)																			// EDIT REMARKS AND RESPONSES
 	{
 		$("#lz-saveData").css("display","none");
+		if (data) this.dd=data;																		// Add data if set
 		let i,o,entval="",changed=false;
 		let traits=["Add new trait"],topics=[],entities=["Choose entitity"],intents=["None"],students=["All"];
-		let myEntities=["student:Luis"], myTraits=["Sentiment:POSITIVE"];
-		
+		let myEntities=["ask_why:How"], myTraits=["Sentiment:POSITIVE"];
+	
+		let items=[];
+
 		for (i=0;i<this.sd.length;++i) {															// For each item
 			o=this.sd[i];																			// Point at it
 			if (o.type == "TRAIT")		  traits.push(o.text);										// Add trait
@@ -126,6 +133,8 @@ this.sessionId="RER-1";
 			<tr><td>ENTITIES: &nbsp;</td><td style="text-align:center;border:1px solid #999;border-radius:12px;padding:8px;background-color:#d5e8f3" id="dialogEntities"></td><td></td></tr>
 			<tr><td>TRAITS: &nbsp;</td>	<td style="text-align:center;border:1px solid #999;border-radius:12px;padding:8px;background-color:#d5efd2" id="dialogTraits"></td><td></td></tr>
 			</table>
+		
+		<br><div id="dialogTrain" class="lz-bs" style="font-size:20px;padding:4px 24px;background-color:#b72828"> Save and send to AI to train model </>	
 		</div>`;
 
 		$("#dialogEditor").html(str.replace(/\t|\n|\r/g,""));										// Add to div
@@ -136,7 +145,7 @@ this.sessionId="RER-1";
 		for (i=0;i<students.length;++i)																// For each student
 			$("#dialogStudent").append("<option>"+students[i]+"</option>");							// Add it
 		$("#dialogTopic").append("<option>None</option>");											// Add null topic
-		for (i=0;i<topics.length;++i)																// For each topic
+		for (i=0;i<topics.length;++i) 																// For each topic
 			$("#dialogTopic").append("<option>"+topics[i]+"</option>");								// Add it
 		for (i=1;i<11;++i)																			// For each step
 			$("#dialogStep").append("<option>"+i+"</option>");										// Add it
@@ -157,15 +166,19 @@ this.sessionId="RER-1";
 			curItem=Math.min(++curItem,maxItems);  													// Increment
 			Draw(); 																				// Redraw
 			});
+		
+		$("#dialogTrain").on("click", ()=>{															// ON TRAIN
+			this.ai.AddRemark({});																	// Train remark
+			});
+	
 		$("#dialogText").on("change", ()=>{ 		changed=true;	});								// TEXT CHANGE
 		$("#dialogStudent").on("change", ()=>{ 		changed=true;	});								// STUDENT CHANGE
 		$("#dialogTopic").on("change", ()=>{ 		changed=true;	});								// TOPIC CHANGE
 		$("#dialogStep").on("change", ()=>{ 		changed=true;	});								// STEP CHANGE
 		
-		function Draw()																				// DRAW DYNAMIC DATA
-		{
+		function Draw()	{																			// DRAW DYNAMIC DATA
 			let str="";
-			text="How did you come up with that answer? "+curItem;									// Get text
+			text="How did you come up with that answer? ";											// Get text
 			$("#dialogText").val(text);																// Set text
 			$("#dialogCounter").html(curItem);														// Set count
 			for (i=0;i<myEntities.length;++i) {														// For each entity coded
@@ -179,11 +192,14 @@ this.sessionId="RER-1";
 			
 			str="";
 			for (i=0;i<myTraits.length;++i) {														// For each trait coded
+				if (myTraits[i].match(/topic|step/)) continue;										// Skip step and topic
 				str+=`<b>${myTraits[i].split(":")[0].toUpperCase()}</b> : ${myTraits[i].split(":")[1]}
 				<img id="traitDelete-${i}" src="img/trashbut.gif" style="cursor:pointer;float:right"><br style="clear:both">`;
 				}
 			str+=`<select class="lz-is" style="margin-left:8px;width:150px;height:22px;margin-top:8px" id="dialogNewTrait">`
-			for (i=0;i<traits.length;++i) str+="<option>"+traits[i]+"</option>";					// Add traits
+			for (i=0;i<traits.length;++i) 															// For each trait
+				if (!traits[i].match(/topic|step/))													// Not a topic or step
+					str+="<option>"+traits[i]+"</option>";											// Add trait
 			str+=`</select> :<select class="lz-is" style="margin-left:8px;width:150px;height:22px" id="dialogTraitVal">
 			</select><img id="addTrait" src="img/addbut.gif" style="cursor:pointer;float:right;margin-top:8px">`;
 			$("#dialogTraits").html(str);															// Set traits markup
@@ -242,7 +258,6 @@ this.sessionId="RER-1";
 				$("#dialogNewEntity").val("Choose entitity");										// Reset to top
 				});
 			}
-
 	}
 
 	SettingsEditor()
