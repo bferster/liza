@@ -18,7 +18,7 @@
 </head> 
 <style>
 	body 		{ 	font-family:Segoe UI,Verdana,Geneva,sans-serif; font-size:12px; padding:0px; margin:16px; box-sizing:content-box; }
-	.lz-remarks { 	height:calc(100vh - 180px); width:calc(100% - 32px); margin:0; padding:16px; background-color:#eee; 
+	.lz-remarks { 	height:calc(100vh - 180px); width:calc(100% - 32px); margin:0; padding:16px; background-color:#f4f4f4; 
 					text-align:center; }
 	.lz-mainText{	width:100%; height:48px; max-width:1400px; text-align:center; font-size:16px; border-radius: 8px;
 					border:1px solid #999; }
@@ -54,11 +54,11 @@
 	<div id="lz-tab">
 		<ul>
 			<li id="lz-tab1"><a href="#jsGridData">SESSION</a></li>
-			<li id="lz-tab2"><a href="#remarksEditor">REMARKS</a></li>
-			<li id="lz-tab3"><a href="#responsesEditor">RESPONSES</a></li>
+			<li id="lz-tab2"><a href="#remarksEditor">DIALOG</a></li>
+			<li id="lz-tab3"><a href="#settingsEditor">SETTINGS</a></li>
 		</ul>
-		<div id="remarksEditor"    style="padding:0"></div>
-		<div id="responsesEditor"  style="padding:0"></div>
+		<div id="dialogEditor"   style="padding:0"></div>
+		<div id="settingsEditor" style="padding:0"></div>
 		<div id="jsGridData"></div>
 	</div>	
 	<input type="file" id="lz-tempFile" style="display:none">
@@ -88,10 +88,11 @@
 	$(document).ready(function() {								           							// ON PAGE LOADED
 		$("#lz-tab" ).tabs();																		// Init tabs
 		app=new App();                                      										// Alloc app
-		$("#lz-tab1").on("click",()=>{ $("#lz-saveData").css("display","block");  app.tab="sesion"; });
-		$("#lz-tab2").on("click",()=>{ $("#lz-saveData").css("display","none");   app.tab="remarks";	app.RemarksEditor("remark");   });
-		$("#lz-tab3").on("click",()=>{ $("#lz-saveData").css("display","none");   app.tab="responses";	app.RemarksEditor("response"); });
-//		Login((e, p, m)=>{ /* app.ws.send(`I|${e}|${p}|${m}`); */ });								// Send login data to WS
+		$("#lz-tab1").on("click",()=>{  app.tab="session";	$("#lz-saveData").css("display","block"); 	$("#dialogEditor settingsEditor").html(""); });
+		$("#lz-tab2").on("click",()=>{  app.tab="dialog";	app.DialogEditor();  	$("#settingsEditor").html(""); });
+		$("#lz-tab3").on("click",()=>{  app.tab="settings"; app.SettingsEditor();  	$("#dialogEditor").html("");   });
+
+		//		Login((e, p, m)=>{ /* app.ws.send(`I|${e}|${p}|${m}`); */ });								// Send login data to WS
 		$("#lz-sessionName").text("SESSION ID: " +app.sessionId);									// Set title
 		$("#lz-dashHelp").on("click",()=> { 														// ON HELP
 //			window.open("https://docs.google.com/document/d/1MzQp9xoYiREUsb3iE94WZAV1gybIZNz4XZKLWg_YHek","_blank");

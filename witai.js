@@ -28,7 +28,9 @@ class AI  {
 
 	Train()																						// TRAIN AI
 	{
+
 		let i,o;
+return;		
 		this.SetStudents();																			// Add student data
 
 		for (i=0;i<app.sd.length;++i) {																// For each line
@@ -38,8 +40,7 @@ class AI  {
 			else if (o.type == "INTENT") this.SetIntent(o.intent);
 			else if (o.type == "REMARK") this.SetRemark(this.lut[o.text]);
 			}
-
-			Sound("ding");																				// Ding
+		Sound("ding");																				// Ding
 	}
 
 	GetToken()																					// GET API TOKEN
