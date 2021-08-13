@@ -102,10 +102,8 @@ this.sessionId="RER-1";
 		$("#lz-saveData").css("display","none");
 		if (data) this.dd=data;																		// Add data if set
 		let i,o,entval="",changed=false;
-		let traits=["Add new trait"],topics=[],entities=["Choose entitity"],intents=["None"],students=["All"];
+		let traits=["Add new trait"],topics=[],entities=["Choose entitity"],intents=["None"],students=["None"];
 		let myEntities=["ask_why:How"], myTraits=["Sentiment:POSITIVE"];
-	
-		let items=[];
 
 		for (i=0;i<this.sd.length;++i) {															// For each item
 			o=this.sd[i];																			// Point at it
@@ -116,15 +114,15 @@ this.sessionId="RER-1";
 			else if (o.type == "TOPIC")   topics=o.text.replace(/ /g,"").split(",");				// Add topic
 			}
 
-		let type="remark";
-		let text,curItem=0,maxItems=10;
+		let curItem=0;
+		let dd=this.dd[curItem] ? this.dd[curItem] : [];
 		let str=`<div class="lz-remarks">
 		<p><b><span id="dialogType" style="font-size:32px;vertical-align:-7px;cursor:pointer" 
-		title="Click to toggle between REMARK and RESPONSE">${type.toUpperCase()}</span></b>
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span id="dialogCounter"/> of ${maxItems})</p>
+		title="Click to toggle between REMARK and RESPONSE"></span></b>
+		&nbsp;&nbsp;&nbsp;(<span id="dialogCounter">0</span> of ${this.dd.length})</p>
 		<table style="width:100%;max-width:1200px;margin:0 auto;text-align:right">
 			<tr><td style="float:right;margin-right:-6px"><img id="dialogLeftArrow" src="img/arrowleft.png" class="lz-arrow"></td>
-			<td><input id="dialogText" type="text" class="lz-mainText"></td>
+			<td><textarea id="dialogText" type="text" class="lz-mainText"/></td>
 			<td><img style="float:left" id="dialogRightArrow" src="img/arrowright.png" class="lz-arrow"></td></tr>
 			<tr><td>INTENT: &nbsp;</td><td><select class="lz-is" style="width:calc(100% + 4px)" id="dialogIntent"></select></td><td></td></tr>
 			<tr><td>STUDENT: &nbsp;</td><td><select class="lz-is" style="width:calc(100% + 4px)" id="dialogStudent"></select></td><td></td></tr>
@@ -138,10 +136,9 @@ this.sessionId="RER-1";
 		</div>`;
 
 		$("#dialogEditor").html(str.replace(/\t|\n|\r/g,""));										// Add to div
-		Draw();																						// Draw dynamic data
 	
 		for (i=0;i<intents.length;++i)																// For each intent
-			$("#dialogIntent").append("<option>"+intents[i]+"</option>");							// Add it
+			$("#dialogIntent").append("<option value="+intents[i].split(" - ")[0]+">"+intents[i]+"</option>");	// Add it
 		for (i=0;i<students.length;++i)																// For each student
 			$("#dialogStudent").append("<option>"+students[i]+"</option>");							// Add it
 		$("#dialogTopic").append("<option>None</option>");											// Add null topic
@@ -151,19 +148,21 @@ this.sessionId="RER-1";
 			$("#dialogStep").append("<option>"+i+"</option>");										// Add it
 
 		$("#dialogType").on("click", ()=>{															// ON CLICK OF TYPE
-			if (type == "remark") 	type="response";												// Toggle
-			else					type="remark"	
-			$("#dialogType").text(type.toUpperCase());												// Set label
+			if (dd.type == "remark") 	dd.type="response";											// Toggle
+			else						dd.type="remark"	
+			$("#dialogType").text(dd.type.toUpperCase());											// Set label
 			Sound("ding");																			// Sound
 			changed=true;																			// Item changed	
 			});
 
 		$("#dialogLeftArrow").on("click", ()=>{														// ON LEFT ARROW
 			curItem=Math.max(--curItem,0);  														// Decrement													  
+			dd=this.dd[curItem];																	// Point at current item
 			Draw(); 																				// Redraw
 			});
 		$("#dialogRightArrow").on("click", ()=>{													// ON RIGHT ARROW
-			curItem=Math.min(++curItem,maxItems);  													// Increment
+			curItem=Math.min(++curItem,this.dd.length-1);  											// Increment
+			dd=this.dd[curItem];																	// Point at current item
 			Draw(); 																				// Redraw
 			});
 		
@@ -171,16 +170,23 @@ this.sessionId="RER-1";
 			this.ai.AddRemark({});																	// Train remark
 			});
 	
-		$("#dialogText").on("change", ()=>{ 		changed=true;	});								// TEXT CHANGE
-		$("#dialogStudent").on("change", ()=>{ 		changed=true;	});								// STUDENT CHANGE
-		$("#dialogTopic").on("change", ()=>{ 		changed=true;	});								// TOPIC CHANGE
-		$("#dialogStep").on("change", ()=>{ 		changed=true;	});								// STEP CHANGE
+		$("#dialogText").on("change", ()=>{ 	dd.text=$("#dialogText").val();			changed=true;	});	// TEXT CHANGE
+		$("#dialogIntent").on("change", ()=>{ 	dd.intent=$("#dialogIntent").val();		changed=true;	});	// INTENT CHANGE
+		$("#dialogStudent").on("change", ()=>{ 	dd.student=$("#dialogStudent").val();	changed=true;	});	// STUDENT CHANGE
+		$("#dialogTopic").on("change", ()=>{ 	dd.topic=$("#dialogTopic").val();		changed=true;	});	// TOPIC CHANGE
+		$("#dialogStep").on("change", ()=>{ 	dd.step=$("#dialogStep").val();			changed=true;	});	// STEP CHANGE
+		Draw();																						// Draw dynamic data
 		
 		function Draw()	{																			// DRAW DYNAMIC DATA
 			let str="";
-			text="How did you come up with that answer? ";											// Get text
-			$("#dialogText").val(text);																// Set text
-			$("#dialogCounter").html(curItem);														// Set count
+			$("#dialogType").text(dd ? dd.type.toUpperCase() : "Import a dialog file");				// Set type label
+			$("#dialogText").val(dd.text ? dd.text : "");											// Set text
+			trace(dd)
+			$("#dialogIntent").val(dd.intent ? dd.intent : "None" );								// Set intent
+			$("#dialogStudent").val(dd.student ? dd.student : "None" );								// Set student
+			$("#dialogStep").val(dd.step ? dd.step : "");											// Set step
+			$("#dialogTopic").val(dd.topic ? dd.topic : "None");									// Set topic
+			$("#dialogCounter").html(curItem+1);													// Set count
 			for (i=0;i<myEntities.length;++i) {														// For each entity coded
 				str+=`<b>${myEntities[i].split(":")[0].toUpperCase()}</b> : ${myEntities[i].split(":")[1]}
 				<img id="entityDelete-${i}" src="img/trashbut.gif" style="cursor:pointer;float:right"><br style="clear:both">`;
@@ -251,7 +257,7 @@ this.sessionId="RER-1";
 				Draw();																				// Redraw;
 				});
 					
-			$('input').mouseup(()=> {																// ON WORD SELECTION
+			$('textarea').mouseup(()=> {															// ON WORD SELECTION
 				if (window.getSelection) 	 entval=window.getSelection().toString();				// Get selction this way
 				else if (document.selection) entval=document.selection.createRange().text;			// Or that
 				$("#dialogNewEntity").css("display","block");										// Hide entity display
