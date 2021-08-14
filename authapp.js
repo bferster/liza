@@ -65,7 +65,7 @@ this.sessionId="RER-1";
 		let data=Papa.unparse(dataStore,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib
 		let textFileAsBlob=new Blob([data], {type:'text/plain'});									// Get blob
 		let downloadLink=document.createElement("a");												// Fake link
-		downloadLink.download=((this.tab == "dialog") ? "D" : "" )+app.sessionId+".csv";			// Filename (add D for dialog)
+		downloadLink.download=((this.tab == "dialog") ? "Dialog-" : "" )+app.sessionId+".csv";		// Filename (add dialog-)
 		downloadLink.innerHTML="Download File";														// Fake html														
 		downloadLink.href=window.URL.createObjectURL(textFileAsBlob);								// Payload
 		downloadLink.style.display="none";															// Hide
@@ -101,10 +101,9 @@ this.sessionId="RER-1";
 	{
 		$("#lz-saveData").css("display","none");
 		if (data) this.dd=data;																		// Add data if set
-		let i,o,entval="",changed=false;
+		let i,o,entval="";
 		let traits=["Add new trait"],topics=[],entities=["Choose entitity"],intents=["None"],students=["None"];
-		let myEntities=["ask_why:How"], myTraits=["Sentiment:POSITIVE"];
-
+	
 		for (i=0;i<this.sd.length;++i) {															// For each item
 			o=this.sd[i];																			// Point at it
 			if (o.type == "TRAIT")		  traits.push(o.text);										// Add trait
@@ -132,7 +131,7 @@ this.sessionId="RER-1";
 			<tr><td>TRAITS: &nbsp;</td>	<td style="text-align:center;border:1px solid #999;border-radius:12px;padding:8px;background-color:#d5efd2" id="dialogTraits"></td><td></td></tr>
 			</table>
 		
-		<br><div id="dialogTrain" class="lz-bs" style="font-size:20px;padding:4px 24px;background-color:#b72828"> Save and send to AI to train model </>	
+		<br><div id="dialogTrain" class="lz-bs" style="font-size:20px;padding:4px 24px;background-color:#b72828;display:none"> Save and send to AI to train model </>	
 		</div>`;
 
 		$("#dialogEditor").html(str.replace(/\t|\n|\r/g,""));										// Add to div
@@ -152,7 +151,7 @@ this.sessionId="RER-1";
 			else						dd.type="remark"	
 			$("#dialogType").text(dd.type.toUpperCase());											// Set label
 			Sound("ding");																			// Sound
-			changed=true;																			// Item changed	
+			dd.changed=true;																		// Item dd.changed	
 			});
 
 		$("#dialogLeftArrow").on("click", ()=>{														// ON LEFT ARROW
@@ -167,21 +166,37 @@ this.sessionId="RER-1";
 			});
 		
 		$("#dialogTrain").on("click", ()=>{															// ON TRAIN
-			this.ai.AddRemark({});																	// Train remark
+			dd.trained=1;																			// Set trained flag
+			dd.changed=false;																		// Reset any changes
+			this.ai.AddRemark(dd);																	// Train remark
+			Draw();																					// Redraw();
 			});
 	
-		$("#dialogText").on("change", ()=>{ 	dd.text=$("#dialogText").val();			changed=true;	});	// TEXT CHANGE
-		$("#dialogIntent").on("change", ()=>{ 	dd.intent=$("#dialogIntent").val();		changed=true;	});	// INTENT CHANGE
-		$("#dialogStudent").on("change", ()=>{ 	dd.student=$("#dialogStudent").val();	changed=true;	});	// STUDENT CHANGE
-		$("#dialogTopic").on("change", ()=>{ 	dd.topic=$("#dialogTopic").val();		changed=true;	});	// TOPIC CHANGE
-		$("#dialogStep").on("change", ()=>{ 	dd.step=$("#dialogStep").val();			changed=true;	});	// STEP CHANGE
+		$("#dialogText").on("change keyup paste", ()=>{												// TEXT CHANGE
+			if ($("#dialogText").val() == dd.text) return;											// Quit if no change
+		 	dd.text=$("#dialogText").val();															// Set new val	
+			dd.changed=true; 																		// Item changed
+			Draw(); 																				// Redraw
+			});	
+			
+		$("#dialogIntent").on("change", ()=>{ 	dd.intent=$("#dialogIntent").val();		dd.changed=true; Draw(); });	// INTENT CHANGE
+		$("#dialogTopic").on("change", ()=>{ 	dd.topic=$("#dialogTopic").val();		dd.changed=true; Draw();});		// TOPIC CHANGE
+		$("#dialogStep").on("change", ()=>{ 	dd.step=$("#dialogStep").val();			dd.changed=true; Draw();});		// STEP CHANGE
+		$("#dialogStudent").on("change", ()=>{	dd.student=$("#dialogStudent").val();	dd.changed=true; Draw(); });	// STUDENT CHANGE
+	
 		Draw();																						// Draw dynamic data
 		
 		function Draw()	{																			// DRAW DYNAMIC DATA
 			let str="";
-			$("#dialogType").text(dd ? dd.type.toUpperCase() : "Import a dialog file");				// Set type label
-			$("#dialogText").val(dd.text ? dd.text : "");											// Set text
-			trace(dd)
+			dd.student=dd.student ? dd.student : "";													// Null	student
+			dd.step=dd.step ? dd.step : "";																// Step	
+			dd.topic=dd.topic ? dd.topic : "";															// Topic
+			$("#dialogType").text(dd.text ? dd.type.toUpperCase() : "Import a dialog file");			// Set type label
+			$("#dialogText").val(dd.text ? dd.text : "");												// Set text
+			$("#dialogTrain").css("display",((dd.trained != 1) || dd.changed) ? "inline-block" : "none" );	// Show button only if untrained or dd.changed
+			let myEntities=dd.entities ? dd.entities.split(",") : [];								// Get entities
+			let myTraits=dd.traits ? dd.traits.split(",") : [];										// Make get traits
+
 			$("#dialogIntent").val(dd.intent ? dd.intent : "None" );								// Set intent
 			$("#dialogStudent").val(dd.student ? dd.student : "None" );								// Set student
 			$("#dialogStep").val(dd.step ? dd.step : "");											// Set step
@@ -212,16 +227,18 @@ this.sessionId="RER-1";
 
 			$("[id^=entityDelete-]").on("click",(e)=>{												// ON DELETE ENTITY										
 				let id=e.target.id.substr(13);														// Get index
-				changed=true;																		// Set changed flag
+				dd.changed=true;																	// Set dd.changed flag
 				myEntities.splice(id,1);															// Remove entity
+				dd.entities=myEntities.toString();													// Set as a string
 				Sound("delete");																	// Sound
 				Draw();																				// Redraw();
 				});
 
 			$("[id^=traitDelete-]").on("click",(e)=>{												// ON DELETE ENTITY										
 				let id=e.target.id.substr(12);														// Get index
-				changed=true;																		// Set changed flag
+				dd.changed=true;																	// Set dd.changed flag
 				myTraits.splice(id,1);																// Remove entity
+				dd.traits=myTraits.toString();														// Set as a string
 				Sound("delete");																	// Sound
 				Draw();																				// Redraw;
 				});
@@ -229,7 +246,8 @@ this.sessionId="RER-1";
 			$("#dialogNewEntity").on("change", ()=>{												// ON ENTITY SELECTED
 				$("#dialogNewEntity").css("display","none")											// Hide select
 				myEntities.push($("#dialogNewEntity").val()+":"+entval.trim());						// Add entity
-				changed=true;																		// Set changed flag
+				dd.entities=myEntities.toString();													// Set as a string
+				dd.changed=true;																		// Set dd.changed flag
 				Sound("ding");																		// Sound
 				Draw();																				// Redraw
 				});
@@ -251,7 +269,8 @@ this.sessionId="RER-1";
 			$("#addTrait").on("click",(e)=>{														// ON ADD TRAIT										
 				let val=$("#dialogTraitVal").val();													// Get trait value
 				myTraits.push($("#dialogNewTrait").val()+":"+val);									// Add trait
-				changed=true;																		// Set changed flag
+				dd.traits=myTraits.toString();														// Set as a string
+				dd.changed=true;																		// Set dd.changed flag
 				Sound("ding");																		// Sound
 				$("#dialogTraitVal").empty();
 				Draw();																				// Redraw;
@@ -263,7 +282,11 @@ this.sessionId="RER-1";
 				$("#dialogNewEntity").css("display","block");										// Hide entity display
 				$("#dialogNewEntity").val("Choose entitity");										// Reset to top
 				});
+		
 			}
+
+
+
 	}
 
 	SettingsEditor()

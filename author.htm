@@ -61,7 +61,7 @@
 		<div id="settingsEditor" style="padding:0"></div>
 		<div id="jsGridData"></div>
 	</div>	
-	<input type="file" id="lz-tempFile" style="display:none">
+	<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
 	<div id="lz-tData" class="lz-bar">
 		<div style="float:right;margin-right:40px; pointer-events:all">
 			<div class="lz-bs"  id="lz-importData">Import CSV</div>
@@ -106,14 +106,8 @@
 			});
 		
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
-			if ((e.keyCode == 90) && !e.shiftKey && e.ctrlKey) 	{									// UNDO KEY (Ctrl+Z)  
-				if (app.curTable == "schedule")		app.sced.Undo();								// Schedule		
-				else if (app.curTable == "venue")	app.ven.Undo();									// Venue
-				}
-			if (((e.keyCode == 89) && e.ctrlKey) || ((e.keyCode == 90) && e.ctrlKey && e.shiftKey)){ // REDO KEY (Ctrl+Y / Shift+Ctrl+Z)
-				if (app.curTable == "schedule")		app.sced.Redo();								// Schedule		
-				else if (app.curTable == "venue")	app.ven.Redo();									// Venue
-				}
+			if (e.keyCode == 37) 	$("#dialogLeftArrow").trigger("click");							// Left arrow	
+			if (e.keyCode == 39) 	$("#dialogRightArrow").trigger("click");						// Right arrow	
 			if ((e.which == 84) && e.altKey && e.ctrlKey) {											// Test key (Ctrl+Alt+T)
 				}
 		});

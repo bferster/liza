@@ -54,7 +54,7 @@ INTENT,Provides concern & suggestion for student comprehension,430.3,Q1,,
 INTENT,Highlights a thinking strategy that students used,510.1,Q1,,
 INTENT,Prompts students to transfer,520.1,Q1,,
 INTENT,Prompts students to reflect,530.1,Q1,,
-RESPONSE,I just don't know,R100_2,Q1,,
+RESPONSE,I just don't know,100.2,Q1,,
 STUDENT,Farrah,F,,"ability:5, engagement:5","feral,ferel,farewell"
 STUDENT,Jazmine,F,,"ability:5, engagement:5","jasmine,jass,jazz,jasmina,jasmin"
 STUDENT,Chris,M,,"ability:5, engagement:5","cruise,crisp,chrissy"
@@ -62,8 +62,8 @@ STUDENT,Luis,M,,"ability:5, engagement:5","loey,looy,luis,louise,lewis"
 STUDENT,Oliver,M,,"ability:5, engagement:5",liver
 TRAIT,bye,,,TRUE,
 TRAIT,greetings,,,TRUE,
-TRAIT,phase,,,"0,1,2,3,4,5",
+TRAIT,step,,,"1,2,3,4,5,5,6,8,9,10",
 TRAIT,sentiment,,,"positive,neutral,negative",
 TRAIT,thanks,,,TRUE,
-TRAIT,topic,,,"1,2,3,4,5,6,7,8,9",
 TOPIC,"Question1,Question2",,,,
+STUDENT,All,,,,"class,group,everybody,everyone,u-haul,uhaul,you_all,you_guy,you_kids,y'all,guys"

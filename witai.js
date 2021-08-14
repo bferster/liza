@@ -20,7 +20,7 @@ class AI  {
 
 	AddRemark(item)
 	{
-		trace("TRAIN",item)
+//		trace("TRAIN",item)
 	}
 
 	ParseRemark(remark)
@@ -31,7 +31,7 @@ class AI  {
 	{
 
 		let i,o;
-return;	
+return;
 		this.SetStudents();																			// Add student data
 		for (i=0;i<app.sd.length;++i) {																// For each line
 			o=app.sd[i];																			// Point at it
@@ -59,6 +59,10 @@ return;
 
 	DeleteItem(type, tag, callback)																// DELETE ITEM FROM AI
 	{
+		if (tag.match(/\/wit/)) { 																	// Run callback
+			callback();														
+			return;
+			}
 		let url=`https://api.wit.ai/${type}/${tag}?v=20210806`;										// URL
 		fetch(url,{ method:"DELETE",																// Fetch/DELETE
 			  headers: { Authorization:'Bearer '+this.token, 'Content-Type':'application/json'},
