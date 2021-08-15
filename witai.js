@@ -31,8 +31,8 @@ class AI  {
 	{
 
 		let i,o;
-return;
 		this.SetStudents();																			// Add student data
+return;
 		for (i=0;i<app.sd.length;++i) {																// For each line
 			o=app.sd[i];																			// Point at it
 			if (o.type == "TRAIT")		 this.SetTrait(this.lut[o.text] ? this.lut[o.text] : o.text, o.traits);
@@ -45,8 +45,12 @@ return;
 
 	GetToken()																					// GET API TOKEN
 	{
-		const url="https://viseyes.org/liza/config/getwittoken.php";								// URL
-		$.ajax({ url:url }).done(res =>{ this.token=res; })											// Send to PHP and get token
+		let url=window.location.search.substring(1);												// Get query string
+		if (url && url.match(/t=/i)) {																// If token spec'd via &t=
+			return url.match(/t=(.*)/i)[1];															// Extract id
+			}
+		const url_="https://viseyes.org/liza/config/getwittoken.php";								// URL
+		$.ajax({ url:url_ }).done(res =>{ this.token=res; })										// Send to PHP and get token
 	}
 	
 	GetItem(type, tag, callback)																// GET ITEM FROM AI
@@ -59,12 +63,8 @@ return;
 
 	DeleteItem(type, tag, callback)																// DELETE ITEM FROM AI
 	{
-		if (tag.match(/\/wit/)) { 																	// Run callback
-			callback();														
-			return;
-			}
 		let url=`https://api.wit.ai/${type}/${tag}?v=20210806`;										// URL
-		fetch(url,{ method:"DELETE",																// Fetch/DELETE
+		fetch(url, { method:"DELETE",																// Fetch/DELETE
 			  headers: { Authorization:'Bearer '+this.token, 'Content-Type':'application/json'},
 			  })	
 	  	.then(res => res.json())
@@ -146,12 +146,7 @@ return;
 			  body: JSON.stringify(body)
 			  })	
 	  	.then(res => res.json())
-	  	.then(res =>{ if (callback) callback(); })
-	
-/*		const url="https://viseyes.org/liza/sendtowit.php?c="+type;									// URL
-		$.ajax({ url:url, method:'POST', data:body })												// Send to PHP
-		.done(res =>{trace(123,res); if (callback)  callback(); })									// Send return data to callback
-			*/
+	  	.then(res =>{ if (callback)  callback(); })
 }
 
 
