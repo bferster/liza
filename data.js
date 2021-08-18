@@ -26,35 +26,18 @@ class ARC  {
 		var _this=this;																					// Save context
 		let i,s=[];
 
-		fetch(app.gid)
-		.then(response => response.text())
-		.then(data => {
-			if (!data)	return;
-			s=data.replace(/\\r/g,"").split("\n");
-			for (i=0;i<s.length;++i)																	// For each line
-				s[i]=s[i].split("\t");
+		fetch(app.gid)																					// Load TSV file
+		.then(response => response.text())																// Get text
+		.then(data => {																					// Objectify
+			if (!data)	return;																			// Quit if no data
+			s=data.replace(/\\r/g,"").split("\n");														// Kill CRs
+			for (i=0;i<s.length;++i)	s[i]=s[i].split("\t");											// For each line, put intp array
 			InitFromJSON();
 			})
 
-/*		var str="https://spreadsheets.google.com/feeds/cells/"+id+"/1/public/values?alt=json";			// Make url
-		$.ajax( { url:str, dataType:'json'	})
-			.done((data)=>{	InitFromJSON(data.feed.entry); })				// Extract data								
-		.fail(()=>{ alert("Couldn't load Google Doc!\nMake sure that it is \"Published to web\" in Google"); })
-*/	
-		function InitFromJSON(cells) {																	// EXTRACT DATA
-			var goal="",step=0;
+		function InitFromJSON() {																		// EXTRACT DATA
+			let k,v,o,goal="",step=0;
 			_this.tree=[];																				// Clear tree
-			let j,k,v,col,row,con,o;
-			let n=4;																					// Number of fields
-/*			for (i=0;i<cells.length;++i) {																// For each cell
-				o=cells[i];																				// Point at it
-				col=o.gs$cell.col-1; 	row=o.gs$cell.row-1;											// Get cell coords
-				con=o.content.$t;																		// Get content
-				if (!con) 				continue;														// Skip blank cells
-				if (!s[row])			s[row]=new Array(n).fill("");			 					    // Add new row if not there already
-				if (col < n)			s[row][col]=con;												// Add cell to array
-				}
-*/
 			for (i=1;i<s.length;++i) {																	// For each line
 				v=s[i];																					// Point at fields
 				if (!v) 								continue;										// Skip blanks
