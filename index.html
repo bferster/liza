@@ -225,17 +225,11 @@ class App  {
 		this.curStudent=0;																			// Currently active student
 		this.gettingEntities=0;																		// Flag when waiting for entities from AI
 		this.hinting=0;																				// Whether to give hints to instructor
-		this.horseshoe=false;																		// Horseshoe seating?
+		this.horseshoe=true;																		// Horseshoe seating?
 		this.curClock=0;																			// Current clock time
-
-		this.gid="1JUEWVr25tktaON17Vi3VREvHpEy54Lz4Ou9NIIBYsRE";									// Default ARC tree spreadshet
+		this.gid="RER-1.tsv"																		// Default RER spreadsheet
 		var url=window.location.search.substring(1);						   						// Get query string
-		if (url && url.match(/rer/i)) {																// If params
-			this.horseshoe=true;																	// Horsehow seating
-			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
-			else					this.gid="1keSF_cB0Y0I6q8l6c06q9MZgu6lILo1hvh8LkXRenm8"			// Default RER spreadsheet
-			}
-		else if (url && !url.match(/real/i)) {														// If params
+		if (url && !url.match(/real/i)) {															// If params
 			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
 			else					this.gid=url;													// Default spreadsheet
 			}
