@@ -1,10 +1,6 @@
 const functions = require("firebase-functions");
-const admin = require('firebase-admin');
-admin.initializeApp();
 const dialogflow = require("dialogflow");
 const uuid = require("uuid");
-
-https://firebase.google.com/docs/functions/write-firebase-functions
 
 	exports.helloWorld = functions.https.onRequest((request, response) => {
 		functions.logger.info("Hello logs!", {structuredData: true});
@@ -24,7 +20,7 @@ https://firebase.google.com/docs/functions/write-firebase-functions
 		 session: sessionPath,
 		 queryInput: {
 		   text: {
-			 text: "Chris. How about you, why don't you read your story",
+			 text: "Chris. How about you. Why don't you read your story",
 			 languageCode: "en-US"
 		   	}
 		 }
