@@ -18,11 +18,6 @@
 
 
 		$("#inp").on("change",()=>{ GetWit($("#inp").val()); });
-		let url="http://www.lizasim:com:3003?q=phrase";
-	
-		fetch(url,{ method:"GET" })	
-				.then(res => res.json())
-				.then(res => console.log(res))
 	
 	
 		function GetWit(q) 
