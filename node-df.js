@@ -10,13 +10,14 @@
 	const projectId ="jokes-68aad";
 	
 	const sessionClient = new dialogflow.SessionsClient({ 									// Create a new session
-		keyFilename: "../config/jokes-68aad-e0c6be454763.json"								// Token path
+		keyFilename: "../config/dfkey.json"													// Token path
 		});
 	const sessionPath=sessionClient.sessionPath("jokes-68aad", "123456789");				// Session path
 
+
 	app.get('/', (req, res) => {
 		if (req.query.q)	GetIntent(req.query.q);											// If looking for intent
-		if (req.query.t)	Train(req.query.t);												// If training
+		if (req.query.t)	Train([],req.query.t);											// If training
 
 		async function GetIntent(text) {													// DETECT INTENT
 			const responses=await sessionClient.detectIntent( {								// Send request and log result
@@ -27,25 +28,27 @@
 			res.send(JSON.stringify(responses[0].queryResult));								// Return result
 			}
 
-		function Train(trainingPhrasesParts, intentName) {									// CREATE INTENT
-			const intentsClient = new dialogflow.IntentsClient();							// Instantiates the Intent Client
+		async function Train(trainingPhrasesParts, intentName) {							// CREATE INTENT
+
+trainingPhrasesParts=["But each one of you did a fabulous job reading and looking at all the information and taking it in."];
+
+			const intentsClient=new dialogflow.IntentsClient();								// Instantiates the Intent Client
 
 			async function createIntent() {  												// Construct request
 				const trainingPhrases=[];													// Holds training phrases
 				const agentPath=intentsClient.projectAgentPath(projectId); 					// The path to identify the agent that owns the created intent.
 				trainingPhrasesParts.forEach(trainingPhrasesPart => {						// Got each one
-    				const part = { text: trainingPhrasesPart  };
+    				const part={ text: trainingPhrasesPart  };								// Define part
 					const trainingPhrase = { type: 'EXAMPLE', parts: [part]	};				// Create a new training phrase for each provided part.
  			    	trainingPhrases.push(trainingPhrase);									// Add to list of traing phrases to send to DF
   					});
 
-  				const intent = { displayName: intentName, trainingPhrases: trainingPhrases,	messages: []	};
+  				const intent={ displayName: intentName, trainingPhrases: trainingPhrases,	messages: []	};
   			  	const createIntentRequest = {  parent: agentPath,   intent: intent  };		// Make request
-  				const [response] = await intentsClient.createIntent(createIntentRequest);	// Send it
+ 				const [response] = await intentsClient.createIntent(createIntentRequest);	// Send it
   				console.log(`Intent ${response.name} created`);
 				}				
-		
-		createIntent();																	// Crreat intent
+			createIntent();																	// Crreat intent
 		}
 
 	})	//  Express
@@ -56,9 +59,12 @@
 
 	node node-df.js
 
+	localhost:3003?t=test1
+	
 	http://www.lizasim:com:3003?q=phrase
 	http://www.lizasim.com:3003?t=intent     (phrases in body)
 
+	https://console.cloud.google.com/iam-admin/privacy?project=jokes-68aad
 
 **************************************************************************************************/
 

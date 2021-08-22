@@ -1,8 +1,0 @@
-{
-    "name": "address",
-    "entities": [
-        "wit$agenda_entry:agenda_entry",
-        "wit_date_time:wit_date_time",
-        "wit_location:wit_location"
-    ]
-}

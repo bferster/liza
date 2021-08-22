@@ -1,8 +1,0 @@
-{
-    "name": "wit_sentiment",
-    "values": [
-        "negative",
-        "neutral",
-        "positive"
-    ]
-}
