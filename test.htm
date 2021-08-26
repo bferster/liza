@@ -16,58 +16,27 @@
 	
 	<script>
 
+var myHeaders = new Headers({
+	"Content-type": "text/plain",
+});
 
-		$("#inp").on("change",()=>{ GetWit($("#inp").val()); });
-	
-	
-		function GetWit(q) 
-		{
-			const url="https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/session-id:detectIntent"
-			let body={ 
-				"query_input": {
-					"text": {
-					"text": "Chris you are a bad guy",
-					"language_code": "en-US"
-					}
-				}
-				}
-  			fetch(url,{ method:"POST",
-						headers: { Authorization:'Bearer '+SERVER_TOKEN, 'Content-Type':'application/json'}, 
-						body: JSON.stringify(body)
-						})	
-				.then(res => res.json())
+
+			const url = 'http://localhost:5005/model/parse';
+				fetch(url, { method: 'POST',
+							 headers: myHeaders,
+							 body: "{text:'Hello'}"})
+  				.then(res => { console.log(res); res.json()})
 				.then(res => console.log(res))
 
+				
+
+
+
+//	$("#inp").on("change",()=>{ GetWit($("#inp").val()); });
+	
+	
 
 	
-	return;
-
-	
-	
-					
-
-/*			const uri = 'https://api.wit.ai/message?&q=' + q;
-				fetch(uri, {headers: {Authorization: 'Bearer ' + CLIENT_TOKEN}})
-				.then(res => res.json())
-				.then(res => ShowIntents(res))
-*/
-
-
-			}
-
-		function ShowIntents(res)
-		{
-			let i,k;str=""
-			for (let i=0;i<res.intents.length;++i)
-				str=res.intents[i].name.replace(/liza_/,"").toUpperCase()+"="+Math.floor(res.intents[i].confidence*100)+"% &nbsp;";
-			for (k in res.traits)
-				str+=k.replace(/wit\$/,"")+"="+Math.floor(res.traits[k][0].confidence*100)+"% &nbsp;";
-				$("#outp").html(str);
-			console.log(res)
-		}
-
-
-
 
 	</script>
 	</body>
