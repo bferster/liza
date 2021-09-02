@@ -13,11 +13,13 @@
 		.co-splash 	{ 	position:absolute; width:100%; top:0; left:0; text-align:center; margin-top:15%; display:none; font-size:12px; }
 		.co-chat	{	position:absolute; width:320px; height:480px; background-color:#fff; border-radius:12px;
 						border:1px solid #666; padding:12px; text-align:center; font-size:14px; box-shadow:2px 2px 4px #999; }
-		.co-textR 	{	background-color:#dddddd; border-radius:16px; border-top-left-radius:0;    
-						padding:4px 16px; width:-moz-fit-content; width:fit-content; max-width: 66%; margin:8px 8px; clear:both; float:left;  text-align:left; }
-		.co-textS 	{	background-color:#0099ff; border-radius:16px;  border-bottom-right-radius:0;
-						padding:4px 16px; width:-moz-fit-content; width:fit-content; max-width: 66%; margin:0 8px; clear:both; float:right; text-align:right; color:#fff; }
-		.co-is 		{	border-radius:16px; padding:0 8px; width:250px; height: 24px; border:1px solid #999; font-size: 13px; }
+		.co-textR 	{	background-color:#ddd; border-radius:8px; border-top-left-radius:0; margin:0 8px;     
+						padding:4px 8px; width:-moz-fit-content; width:fit-content; max-width: 66%; clear:both; float:left; text-align:left; }
+		.co-textRA 	{	clear:both; float:left; margin:-8px 0 0 8px; width:0; height:0; border-bottom:8px solid #dddddd; border-right:12px solid transparent; margin-left:8px; }
+		.co-textS 	{	background-color:#0099ff; border-radius:8px; border-bottom-right-radius:0;
+						padding:4px 8px; width:-moz-fit-content; width:fit-content; max-width: 66%; margin:8px 8px 0 0; clear:both; float:right; text-align:right; color:#fff; }
+		.co-textSA 	{	clear:both; float:right; margin-right:8px; width:0; height:0; border-top:8px solid #0099ff; border-left:12px solid transparent; }
+		.co-is 		{	border-radius:8px; padding:0 8px; width:250px; height: 24px; border:1px solid #999; font-size: 13px; }
 		.co-logon 	{	border-radius:16px; padding:0 8px; width:200px; height: 24px; border:1px solid #999; font-size: 13px; text-align:center; }
 		.co-confirm {	position: absolute;  width: 300px; padding: 16px; left: calc(50% - 300px); top: calc(50% - 150px); user-select: none;	
 						border-radius: 8px; background-color: #fff; border: 1px solid #999; }
@@ -55,7 +57,7 @@ class Chat {
 			$("#co-chat").remove();                                                                 // Close chat if open
 			let str=`<div id='co-chat' class='co-chat' style='left:calc(50% - 172px);top:200px'>
 				<img src="img/lizalogo64.png"><br>
-				<div id="co-textDiv" style="height:376px;overflow-x:hidden;overflow-y:auto;margin-top:8px;border:1px solid #999;border-radius:8px;padding:12px 4px"></div>														
+				<div id="co-textDiv" style="height:392px;overflow-x:hidden;overflow-y:auto;margin-top:8px;border:1px solid #999;border-radius:8px;padding:4px 4px"></div>														
 				<div style="position:absolute;top:466px;left:12px">
 					<input id="co-revText" placeholder="Type here or speak" class='co-is' style='width:274px;height:24px;outline:none;'>			
 					<img id='co-talkBut'src='img/talkbut.png' style='vertical-align:-3px;margin-left:-22px;width:16px;;cursor:pointer'>
@@ -65,41 +67,42 @@ class Chat {
 			$("body").append(str.replace(/\t|\n|\r/g,""));												// Add chatbox
 			
 			$("#co-revText").focus();																	// Focus on input
-
-//					$("#co-textDiv").append(`<div class="co-text${this.chats[i].dir ? "S" : "R"}">${s}</div><br>`);	// Add message
-				
 			$("#co-textDiv").scrollTop(10000);															// Scroll to bottom
 			$("#co-talkBut").on("click", ()=>{this.Listen("")});										// Start STT
-			
 			$("#co-revText").on("change",   ()=>{ sendChat(); });										// ON TEXT ENTER
 			$("#co-revTextBut").on("click", ()=>{ sendChat(); });										// ON SEND CLICK 
 
 			function sendChat(msg) {																	// TEXT CHATTING
 				let s=msg ? msg : $("#co-revText").val();												// Get text fron msg or textbox
 				if (s) {																				// If something there
-					$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");						// Add to display 
+					$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");						// Add to triangle 
+					$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
-					app.GetResponse(s);																	// Get response	
+					app.GetResponse(s,(o)=>{															// Send to AI
+						let res=`Intent is </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
+						$("#co-textDiv").append("<div class='co-textRA'></div>");						// Add triangler
+						$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");				// Add message
+						$("#co-textDiv").scrollTop(10000);												// Scroll to bottom
+						});
 					}
 				$("#co-revText").val("");																// Clear input
 				}	
 			}
 
-		GetResponse(msg)																				// GET RESPONSE FROM RASA
+		GetResponse(msg, callback)																	// GET RESPONSE FROM AI
 		{
-			let xhttp=new XMLHttpRequest();
-			xhttp.onreadystatechange = function() {
-				if (this.readyState == 4 && this.status == 200) {
-					let o=JSON.parse(this.response);
-					console.log(o)
-					let res=`Intent is </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
-					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
-					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
+			let xhttp=new XMLHttpRequest();																// Alloc hxmlhttp
+			xhttp.onreadystatechange = function() {														// ON STATE CHANGE
+				if (this.readyState == 4 && this.status == 200) {										// Valid response
+					let o=JSON.parse(this.response);													// Objectify
+					console.log(o);																		// Log
+					if (callback) callback(o);															// Run callback
+						return;																			// Quit
 					}
 				};
-			xhttp.open("POST", "https://lizasim.com:5005/model/parse");
-			xhttp.setRequestHeader("Content-Type", "application/json");
-			xhttp.send(JSON.stringify({text:msg}));
+			xhttp.open("POST", "https://lizasim.com:5005/model/parse");									// Set url
+			xhttp.setRequestHeader("Content-Type", "application/json");									// Set type
+			xhttp.send(JSON.stringify({text:msg}));														// Set paqyload
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
