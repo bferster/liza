@@ -11,7 +11,7 @@
 	</style>
 	<body>
 		<div style="width:50%;margin:0 auto">
-			<img src='lizalogo.png' style='width:25%;margin-left:40%'><br><br>
+			<img src='go/img/lizalogo.png' style='width:25%;margin-left:40%'><br><br>
 			<input type="text" style="width:100%;padding:2px 8px;font-size:16px;border-radius:6px" placeholder="Type remark to parse" id="inp"/>
 			<br><br>
 			<div id="outp"></div>
@@ -41,10 +41,10 @@
 				$("#outp").html(str);
 				console.log(this.response)
 				$("#inp").val("")	
-			}
+				}
 			};
 
-		xhttp.open("POST", "http://34.204.220.195:5005/model/parse");
+		xhttp.open("POST", "https://lizasim.com:5005/model/parse");
 		xhttp.setRequestHeader("Content-Type", "application/json");
 		xhttp.send(JSON.stringify({text:msg}));
 		}

@@ -1,0 +1,14 @@
+version: "2.0"
+
+session_config:
+  session_expiration_time: 0
+  carry_over_slots_to_new_session: true
+
+intents:
+  - greet
+  - bot_challenge
+  - r110
+  - r120
+  - r130
+  - r140
+  - r150
