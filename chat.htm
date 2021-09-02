@@ -43,6 +43,7 @@ class Chat {
 
 	constructor()   																			// CONSTRUCTOR
 	{
+		this.curWho="Luis";																			// Person being addressed
 		this.VoiceInit((s)=> { 																		// Init TTS/STT
 			$("[id^=co-revText]").each(function() { 												// For each input
 				let v=$(this).val();																// Get value of input																		
@@ -79,7 +80,7 @@ class Chat {
 					$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
 					app.GetResponse(s,(o)=>{															// Send to AI
-						let res=`Intent is </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
+						let res=`<b>${app.curWho.toUpperCase()}</b>: Intent was </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
 						$("#co-textDiv").append("<div class='co-textRA'></div>");						// Add triangler
 						$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");				// Add message
 						$("#co-textDiv").scrollTop(10000);												// Scroll to bottom
