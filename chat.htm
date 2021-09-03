@@ -6,6 +6,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="lib/papaparse.min.js"></script>
 	</head>
 	<style>
 		body 		{ 	font-family:Segoe UI,Verdana,Geneva,sans-serif; font-size:10px; padding:0px; box-sizing:content-box; margin:0;
@@ -43,6 +44,7 @@
 
 	</style>
 	<body>
+		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
 	<script>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +57,23 @@ class App {
 	{
 		this.curWho="Luis";																			// Person being addressed
 		this.chat=new Chat();																		// Alloc chat
+		this.csv=[];
 	}
+
+	ImportCSV(e)																				// IMPORT SESSION FROM CSV
+	{	
+		let i,k;
+		let file=e.target.files[0];																	// Point at file
+		if (!file) 	return;																			// Quit if bad
+		let reader=new FileReader();																// Init reader
+		reader.readAsText(file);																	// Read file
+		reader.onload=(e)=>{ 																		// When loaded
+			this.csv=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
+			for (i=0;i<this.csv.length;++i) 														// For each line
+				for (k in this.csv[i]) if (!k) delete this.csv[i][k];								// If empty field, delete it
+			Sound("ding");																			// Ding
+			};
+		}
 
 } // App lass closure
 
@@ -67,7 +85,6 @@ class Chat {
 
 	constructor()   																			// CONSTRUCTOR
 	{
-		this.curWho="Luis";																			// Person being addressed
 		this.VoiceInit((s)=> { 																		// Init TTS/STT
 			$("[id^=co-revText]").each(function() { 												// For each input
 				let v=$(this).val();																// Get value of input																		
@@ -75,6 +92,11 @@ class Chat {
 				$(this).val(v+s);																	// Set text
 				})
 			});				
+		}
+
+		AddLine(o)																				// ADD DATA LINE TO CHAT
+		{
+			this.SendChat(o.text)
 		}
 
 		Draw()																					// DRAW CHAT CLIENT
@@ -95,26 +117,28 @@ class Chat {
 			
 			$("#co-revText").focus();																	// Focus on input
 			$("#co-textDiv").scrollTop(10000);															// Scroll to bottom
-			$("#co-talkBut").on("click", ()=>{this.Listen("")});										// Start STT
-			$("#co-revText").on("change",   ()=>{ sendChat(); });										// ON TEXT ENTER
-			$("#co-revTextBut").on("click", ()=>{ sendChat(); });										// ON SEND CLICK 
-
-			function sendChat(msg) {																	// TEXT CHATTING
-				let s=msg ? msg : $("#co-revText").val();												// Get text fron msg or textbox
-				if (s) {																				// If something there
-					$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");						// Add to triangle 
-					$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
-					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
-					app.chat.GetResponse(s,(o)=>{														// Send to AI
-						let res=`<b>${app.curWho.toUpperCase()}</b>: Intent was </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
-						$("#co-textDiv").append("<div class='co-textRA'></div>");						// Add triangler
-						$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");				// Add message
-						$("#co-textDiv").scrollTop(10000);												// Scroll to bottom
-						});
-					}
-				$("#co-revText").val("");																// Clear input
-				}	
+			$("#co-talkBut").on("click",    ()=>{this.Listen("")});										// ON TALK
+			$("#co-revText").on("change",   ()=>{ this.SendChat(); });									// ON TEXT ENTER
+			$("#co-revTextBut").on("click", ()=>{ this.SendChat(); });									// ON SEND CLICK 
 			}
+
+		SendChat()																					// TEXT CHATTING
+		{
+			let s=$("#co-revText").val();																// Get text textbox
+			if (!s && app.csv) { s=app.csv[0].text;	app.csv.shift(); }									// Get text from input or csv file
+			if (s) {																					// If something there
+				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
+				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
+				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
+				app.chat.GetResponse(s,(o)=>{															// Send to AI
+					let res=`<b>${app.curWho.toUpperCase()}</b>: Intent was </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
+					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
+					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
+					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
+					});
+				}
+			$("#co-revText").val("");																// Clear input
+		}
 
 		GetResponse(msg, callback)																	// GET RESPONSE FROM AI
 		{
@@ -196,9 +220,31 @@ class Chat {
 	} // Chat class closure
 
 
-	let app=new App();
-	app.chat.Draw();
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// MAIN
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
+	let app=null;
+
+	$(document).ready(function() {								           							// ON PAGE LOADED
+		app=new App();                                      										// Alloc app
+		app.chat.Draw();																			// Draw chat ui
+	
+		$("#lz-importData").on("click",()=>{ $("#lz-tempFile").trigger("click"); });				// ON IMPORT
+		$("#lz-tempFile").on("change",(e)=>{														// ON FILE LOAD
+			app.ImportCSV(e);																		// Read file
+			$("lz-tempFile").val("");																// Clear value		
+			});
+		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
+			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
+				$("#lz-tempFile").trigger("click");
+				}
+			});
+
+
+
+		});
+	
 // HELPERS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
