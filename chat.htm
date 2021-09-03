@@ -11,9 +11,9 @@
 		body 		{ 	font-family:Segoe UI,Verdana,Geneva,sans-serif; font-size:10px; padding:0px; box-sizing:content-box; margin:0;
 						background-image:url("img/clouds.jpg");  background-repeat: no-repeat; background-attachment:fixed; background-size:100% 100%; } 
 		.co-splash 	{ 	position:absolute; width:100%; top:0; left:0; text-align:center; margin-top:15%; display:none; font-size:12px; }
-		.co-chat	{	position:absolute; width:320px; height:480px; background-color:#fff; border-radius:12px;
-						border:1px solid #666; padding:12px; text-align:center; font-size:14px; box-shadow:2px 2px 4px #999; }
-		.co-textR 	{	background-color:#ddd; border-radius:8px; border-top-left-radius:0; margin:0 8px;     
+		.co-chat	{	position:absolute; width:320px; height:480px; background-color:#f8f8f8; border-radius:12px; left:calc(50% - 172px); top:150px; 
+						border:1px solid #666; padding:12px; text-align:center; font-size:14px; box-shadow:4px 4px 8px #999; }
+		.co-textR 	{	background-color:#ddd; border-radius:8px; border-top-left-radius:0; margin:0 8px;   
 						padding:4px 8px; width:-moz-fit-content; width:fit-content; max-width: 66%; clear:both; float:left; text-align:left; }
 		.co-textRA 	{	clear:both; float:left; margin:-8px 0 0 8px; width:0; height:0; border-bottom:8px solid #dddddd; border-right:12px solid transparent; margin-left:8px; }
 		.co-textS 	{	background-color:#0099ff; border-radius:8px; border-bottom-right-radius:0;
@@ -35,9 +35,33 @@
 		body ::-webkit-scrollbar-track { background: transparent; }
 		body ::-webkit-scrollbar-thumb { border-radius:8px ;background:#a4baec }
 		body ::-webkit-scrollbar-thumb:hover { background: #a4baec }
+
+		@media only screen and (max-width:700px) {
+			.co-chat { 	width: calc(100% - 26px); height:calc(100vh - 26px); margin:0; top:0; left:0; 
+						border-radius:0; border: none; overflow:hidden; }
+			}
+
 	</style>
 	<body>
 	<script>
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// APP 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+class App {																																										
+
+	constructor()   																			// CONSTRUCTOR
+	{
+		this.curWho="Luis";																			// Person being addressed
+		this.chat=new Chat();																		// Alloc chat
+	}
+
+} // App lass closure
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// CHAT 
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Chat {																					
 
@@ -56,12 +80,14 @@ class Chat {
 		Draw()																					// DRAW CHAT CLIENT
 		{
 			$("#co-chat").remove();                                                                 // Close chat if open
-			let str=`<div id='co-chat' class='co-chat' style='left:calc(50% - 172px);top:200px'>
+			let str=`<div id='co-chat' class='co-chat'>
 				<img src="img/lizalogo64.png"><br>
-				<div id="co-textDiv" style="height:392px;overflow-x:hidden;overflow-y:auto;margin-top:8px;border:1px solid #999;border-radius:8px;padding:4px 4px"></div>														
-				<div style="position:absolute;top:466px;left:12px">
-					<input id="co-revText" placeholder="Type here or speak" class='co-is' style='width:274px;height:24px;outline:none;'>			
-					<img id='co-talkBut'src='img/talkbut.png' style='vertical-align:-3px;margin-left:-22px;width:16px;;cursor:pointer'>
+				<div id="co-textDiv" 
+				style="height:calc(100% - 88px);overflow-x:hidden;overflow-y:auto;background-color:#fff;
+				margin-top:8px;border:1px solid #999;border-radius:8px;padding:4px 4px"></div>														
+				<div style="position:absolute;top:calc(100% - 36px);width:100%;text-align:left">
+					<input id="co-revText" placeholder="Type here or speak" class='co-is' style='width:calc(100% - 70px);height:24px;outline:none;'>			
+					<img id='co-talkBut'src='img/talkbut.png' style='vertical-align:-3px;margin-left:-22px;width:16px;cursor:pointer'>
 					<img id='co-revTextBut'src='img/sendtext.png' style='vertical-align:-7px;margin-left:12px;cursor:pointer'>
 					</div>	
 				</div>`;
@@ -79,7 +105,7 @@ class Chat {
 					$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");						// Add to triangle 
 					$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
-					app.GetResponse(s,(o)=>{															// Send to AI
+					app.chat.GetResponse(s,(o)=>{														// Send to AI
 						let res=`<b>${app.curWho.toUpperCase()}</b>: Intent was </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
 						$("#co-textDiv").append("<div class='co-textRA'></div>");						// Add triangler
 						$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");				// Add message
@@ -167,10 +193,11 @@ class Chat {
 				} catch(e) { trace("TTS error",e) };													// On error
 		}
 
-	} // Class closure
+	} // Chat class closure
 
-	let app=new Chat();
-	app.Draw();
+
+	let app=new App();
+	app.chat.Draw();
 
 // HELPERS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
