@@ -55,10 +55,12 @@ class App {
 
 	constructor()   																			// CONSTRUCTOR
 	{
+		this.csv=[];																				// Holds loaded session
+		this.whoSyns=[];																			// Who synonmyms
 		this.curWho="Luis";																			// Person being addressed
 		this.chat=new Chat();																		// Alloc chat
-		this.csv=[];
-	}
+		this.SetWho();																				// Set who synonym array
+		}
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
 	{	
@@ -75,7 +77,40 @@ class App {
 			};
 		}
 
-} // App lass closure
+	SetWho()																					// SET WHO SYNONYMS ARRAY
+	{
+		let i,j,o,v=[];
+		this.whoSyns=[];																			// Clear array
+		v.push(["luis","louise","lewis","louis","louie","lou","lew"]);								// Luis
+		v.push(["chris","crisp","christ"]);															// Chris
+		v.push(["all","everybody","everyone","anybody","anyone","u-haul","uhaul","you all","guy","kid","y'all","class","group","children"]);   // All
+		v.push(["oliver","liver"]);																	// Oliver
+		v.push(["farrah","farah","ferel","feral","farrell"]);										// Farrah
+		v.push(["jazmin","jazz","jasmine","jasmina"]);												// Jazmin
+		for (i=0;i<v.length;++i) {																	// For each name
+			o=v[i];																					// Point at syns
+			for (j=0;j<o.length;++j) this.whoSyns[o[j]]=o[0];										// For each syn, add to array
+			}
+	}
+
+	GetWho(text)																				// SET WHO IS ADDRESSED
+	{
+		let i,who="";
+		let v=app.Tokenize(text);																	// Tokenize incoming text	
+		for (i=0;i<v.length;++i) 																	// For each word
+			if (typeof(app.whoSyns[v[i].toLowerCase()]) == "string")								// A valid string
+				who=app.whoSyns[v[i]];																// Set who
+		return who;																					// Return last who encountered
+	}
+
+	Tokenize(text) 																				// TOKENIZE TEXT
+	{
+		text=(" "+text).replace(/\{.*?\}/g,"");														// Remove text in braces
+		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");					// Keep only germane chars(alph, space, num, *-+/'%$)
+		return text.split(/ +/);																	// Return tokenized array
+	}
+
+} // App class closure
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // CHAT 
@@ -130,8 +165,10 @@ class Chat {
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
 				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
+				let who=app.GetWho(s);																	// Get who is being addressed
+				if (who) app.curWho=who;																// Set latrest person mentioned
 				app.chat.GetResponse(s,(o)=>{															// Send to AI
-					let res=`<b>${app.curWho.toUpperCase()}</b>: Intent was </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
+					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: Intent was </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
 					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
