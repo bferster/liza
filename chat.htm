@@ -60,7 +60,7 @@ class App {
 		this.whoSyns=[];																			// Who synonmyms
 		this.curWho="Luis";																			// Person being addressed
 		this.chat=new Chat();																		// Alloc chat
-		this.SetWho();																				// Set who synonym array
+		this.LoadConfig();																			// Load config file
 		}
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
@@ -80,20 +80,37 @@ class App {
 			};
 		}
 
-	SetWho()																					// SET WHO SYNONYMS ARRAY
+	LoadConfig()																				// LOAD CONFIG FILE
+		{	
+			fetch('assets/config.csv')																// Load file
+				.then(res => res.text())															// Get as text
+   				.then(res => {																		// Process																	
+			   		let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
+				   	this.SetWho(data);																// Set who array
+				   	this.SetKeywords(data);															// Set keywords array
+					});
+		}
+
+	SetWho(data)																				// SET WHO SYNONYMS ARRAY
 	{
-		let i,j,o,v=[];
+		let i,j,v,o;
 		this.whoSyns=[];																			// Clear array
-		v.push(["luis","louise","lewis","louis","louie","lou","lew"]);								// Luis
-		v.push(["chris","crisp","christ"]);															// Chris
-		v.push(["all","everybody","everyone","anybody","anyone","u-haul","uhaul","you all","guy","kid","y'all","class","group","children"]);   // All
-		v.push(["oliver","liver"]);																	// Oliver
-		v.push(["farrah","farah","ferel","feral","farrell"]);										// Farrah
-		v.push(["jazmin","jazz","jasmine","jasmina"]);												// Jazmin
-		for (i=0;i<v.length;++i) {																	// For each name
-			o=v[i];																					// Point at syns
-			for (j=0;j<o.length;++j) this.whoSyns[o[j]]=o[0];										// For each syn, add to array
+		for (i=0;i<data.length;++i) {																// For each line
+			o=data[i];																				// Point at line
+			if (o.type != "actor")	continue;														// Only actors	
+			v=o.text.split(",");																	// Array of synonyms
+			for (j=0;j<v.length;++j) this.whoSyns[v[j].toLowerCase()]=o.id;							// For each id, add to synonyms array
 			}
+	}
+
+	SetKeywords(data)																			// PROCESS KEYWORDS																	
+	{
+		let i,v,o;
+		for (i=0;i<data.length;++i) {																// For each line
+			o=data[i];																				// Point at line
+			if (o.type != "keywords")	continue;													// Only keywords	
+			v=o.text.split(",");																	// Array of synonyms
+		}
 	}
 
 	GetWho(text)																				// SET WHO IS ADDRESSED
@@ -151,7 +168,6 @@ class Chat {
 					<img id='co-revTextBut'src='img/sendtext.png' style='vertical-align:-7px;margin-left:12px;cursor:pointer'>
 					</div>	
 				</div>`;
-		
 			$("body").append(str.replace(/\t|\n|\r/g,""));												// Add chatbox
 			
 			$("#co-revText").focus();																	// Focus on input
