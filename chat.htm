@@ -26,8 +26,8 @@
 						border-radius: 8px; background-color: #fff; border: 1px solid #999; }
 		.co-alert	{	position:absolute; color:#fff; font-size:12px; text-align:center; cursor:pointer; padding:4px; top:8px; }
 		.co-is 		{	border-radius:16px; padding:0 8px; height: 24px; border:1px solid #999; font-size: 13px; }
-		.co-bs 		{	display:inline-block; border-radius:16px; padding:0 8px; border:1px solid #eee; font-size: 13px; 
-						cursor:pointer; z-index:2; padding-bottom:1px; color:#fff}
+		.co-bs 		{	display:inline-block; border-radius:16px; padding:0 8px; border:1px solid #999; font-size: 13px; 
+						cursor:pointer; z-index:2; padding-bottom:1px; color:#000}
 		.co-bsg		{	cursor: pointer; color:#fff; text-align: center; border-radius: 16px; display: inline-block; user-select: none;
 						font-size: 13px; background-color: #999; padding: 2px 8px 2px 8px; }
 		.co-popup 	{	position: absolute;  width:auto; padding:12px; left:40%; top:calc(50% - 50px); border-radius:8px; display: none;
@@ -45,6 +45,7 @@
 	</style>
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
+		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
 	<script>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,8 +72,10 @@ class App {
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			this.csv=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
-			for (i=0;i<this.csv.length;++i) 														// For each line
-				for (k in this.csv[i]) if (!k) delete this.csv[i][k];								// If empty field, delete it
+			for (i=0;i<this.csv.length;++i) {														// For each line
+				for (k in this.csv[i]) if (!k)  delete this.csv[i][k];								// If empty field, delete it
+				if (this.csv[i].actor != "Teacher")	this.csv.splice(i,1);							// Remove student responses
+				}
 			Sound("ding");																			// Ding
 			};
 		}
@@ -148,6 +151,7 @@ class Chat {
 					<img id='co-revTextBut'src='img/sendtext.png' style='vertical-align:-7px;margin-left:12px;cursor:pointer'>
 					</div>	
 				</div>`;
+		
 			$("body").append(str.replace(/\t|\n|\r/g,""));												// Add chatbox
 			
 			$("#co-revText").focus();																	// Focus on input
@@ -159,8 +163,13 @@ class Chat {
 
 		SendChat()																					// TEXT CHATTING
 		{
+			let origIntent="";
 			let s=$("#co-revText").val();																// Get text textbox
-			if (!s && app.csv) { s=app.csv[0].text;	app.csv.shift(); }									// Get text from input or csv file
+			if (!s && app.csv) { 																		// If getting from CSV file
+				s=app.csv[0].text;																		// Get text
+				origIntent=app.csv[0].code;																// Get original intent
+				app.csv.shift(); 																		// Next remark
+				}									
 			if (s) {																					// If something there
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
@@ -168,7 +177,10 @@ class Chat {
 				let who=app.GetWho(s);																	// Get who is being addressed
 				if (who) app.curWho=who;																// Set latrest person mentioned
 				app.chat.GetResponse(s,(o)=>{															// Send to AI
-					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: Intent was </b>${o.intent_ranking[0].name.substr(1)} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;
+					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
+					Intent </b>${o.intent_ranking[0].name.substr(1)} - 
+					${Math.round(o.intent_ranking[0].confidence*100)}%`;								// Main line
+					if (origIntent)	res+=` vs. <span style="color:#${(Math.floor(origIntent) == o.intent_ranking[0].name.substr(1)) ? "009900" : "990000"}">${origIntent}</span>`;
 					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
@@ -270,7 +282,7 @@ class Chat {
 		$("#lz-importData").on("click",()=>{ $("#lz-tempFile").trigger("click"); });				// ON IMPORT
 		$("#lz-tempFile").on("change",(e)=>{														// ON FILE LOAD
 			app.ImportCSV(e);																		// Read file
-			$("lz-tempFile").val("");																// Clear value		
+			$("#lz-tempFile").val("");																// Clear value		
 			});
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
