@@ -59,36 +59,51 @@ class App {
 		this.csv=[];																				// Holds loaded session
 		this.whoSyns=[];																			// Who synonmyms
 		this.curWho="Luis";																			// Person being addressed
+		this.curKeys=[];																			// Currently active keys
+		this.keywords=[];																			// Keywords
+		this.responses=[];																			// Responses
 		this.chat=new Chat();																		// Alloc chat
 		this.LoadConfig();																			// Load config file
 		}
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
 	{	
-		let i,k;
+		let i,k,o,v,intent="";
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			this.csv=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
+			this.responses=[];																		// Reset
 			for (i=0;i<this.csv.length;++i) {														// For each line
 				for (k in this.csv[i]) if (!k)  delete this.csv[i][k];								// If empty field, delete it
-				if (this.csv[i].actor != "Teacher")	this.csv.splice(i,1);							// Remove student responses
+				if (this.csv[i].actor != "Teacher") {												// A response
+					if (!this.responses[intent]) this.responses[intent]=[];							// Create response intent entry
+					o={text:this.csv[i].text.toLowerCase(), scene:this.csv[i].scene, keywords:[]};	// Create response
+					let v=app.Tokenize(o.text);														// Tokenize incoming text	
+					for (k=0;k<v.length;++k) 														// For each word
+						if (this.keywords.includes(v[k])) o.keywords.push(v[k]);					// Add to list					
+					this.responses[intent].push(o);													// Add response to response intent array
+					this.csv.splice(i,1);															// Remove it
+					}
+				else{																				// A remark
+					intent=Math.floor(this.csv[i].code);											// Save intent (whole number) for coding responses
+					}
 				}
 			Sound("ding");																			// Ding
 			};
 		}
 
 	LoadConfig()																				// LOAD CONFIG FILE
-		{	
-			fetch('assets/config.csv')																// Load file
-				.then(res => res.text())															// Get as text
-   				.then(res => {																		// Process																	
-			   		let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
-				   	this.SetWho(data);																// Set who array
-				   	this.SetKeywords(data);															// Set keywords array
-					});
+	{	
+		fetch('assets/config.csv')																	// Load file
+			.then(res => res.text())																// Get as text
+			.then(res => {																			// Process																	
+				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
+				this.SetWho(data);																	// Set who array
+				this.SetKeywords(data);																// Set keywords array
+				});
 		}
 
 	SetWho(data)																				// SET WHO SYNONYMS ARRAY
@@ -98,8 +113,8 @@ class App {
 		for (i=0;i<data.length;++i) {																// For each line
 			o=data[i];																				// Point at line
 			if (o.type != "actor")	continue;														// Only actors	
-			v=o.text.split(",");																	// Array of synonyms
-			for (j=0;j<v.length;++j) this.whoSyns[v[j].toLowerCase()]=o.id;							// For each id, add to synonyms array
+			v=o.text.toLowerCase().split(",");														// Array of synonyms
+			for (j=0;j<v.length;++j) this.whoSyns[v[j]]=o.id;										// For each id, add to synonyms array
 			}
 	}
 
@@ -109,17 +124,31 @@ class App {
 		for (i=0;i<data.length;++i) {																// For each line
 			o=data[i];																				// Point at line
 			if (o.type != "keywords")	continue;													// Only keywords	
-			v=o.text.split(",");																	// Array of synonyms
+			this.keywords=o.text.toLowerCase().split(",");											// Array of keywords
 		}
 	}
 
-	GetWho(text)																				// SET WHO IS ADDRESSED
+	ParseRemark(intent, text)																	// PARSE DATA FROM REMARK
 	{
-		let i,who="";
+		let i,j,s,o,who="";
+		let keys=[];																				// Clear current keys array
 		let v=app.Tokenize(text);																	// Tokenize incoming text	
-		for (i=0;i<v.length;++i) 																	// For each word
-			if (typeof(app.whoSyns[v[i].toLowerCase()]) == "string")								// A valid string
+		for (i=0;i<v.length;++i) {																	// For each word
+			if (this.keywords.includes(v[i])) keys.push(v[i]);										// Add toc urrent keys list					
+			if (typeof(app.whoSyns[v[i]]) == "string")												// A valid string
 				who=app.whoSyns[v[i]];																// Set who
+			}
+		v=this.responses[intent];																	// Point at responses to this intent
+		if (v && keys.length) {																		// If a valid intent and some keys in remark
+			for (i=0;i<v.length;++i) {																// For each response
+				s=0;																				// Reset count	
+				v[i].keyScore=0;																	// Reset key score
+				o=v[i].keywords;																	// Point at keywords
+				for (j=0;j<o.length;++j)															// For each key in response
+					if (keys.includes(o[j]))	++s;												// Add to count
+				v[i].keyScore=s/keys.length;														// Calc key score
+				}
+			}
 		return who;																					// Return last who encountered
 	}
 
@@ -127,7 +156,7 @@ class App {
 	{
 		text=(" "+text).replace(/\{.*?\}/g,"");														// Remove text in braces
 		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");					// Keep only germane chars(alph, space, num, *-+/'%$)
-		return text.split(/ +/);																	// Return tokenized array
+		return text.toLowerCase().split(/ +/);														// Return tokenized lowercase array
 	}
 
 } // App class closure
@@ -190,12 +219,12 @@ class Chat {
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
 				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
-				let who=app.GetWho(s);																	// Get who is being addressed
-				if (who) app.curWho=who;																// Set latrest person mentioned
 				app.chat.GetResponse(s,(o)=>{															// Send to AI
+					let intent=o.intent_ranking[0].name.substr(1);										// Get intent
+					let who=app.ParseRemark(intent,s);													// Parse remark for data
+					if (who) app.curWho=who;															// Set latrest person mentioned
 					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
-					Intent </b>${o.intent_ranking[0].name.substr(1)} - 
-					${Math.round(o.intent_ranking[0].confidence*100)}%`;								// Main line
+					Intent </b>${intent} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;			// Main line
 					if (origIntent)	res+=` vs. <span style="color:#${(Math.floor(origIntent) == o.intent_ranking[0].name.substr(1)) ? "009900" : "990000"}">${origIntent}</span>`;
 					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
@@ -211,7 +240,7 @@ class Chat {
 			xhttp.onreadystatechange = function() {														// ON STATE CHANGE
 				if (this.readyState == 4 && this.status == 200) {										// Valid response
 					let o=JSON.parse(this.response);													// Objectify
-					console.log(o);																		// Log
+					trace(o);																			// Log
 					if (callback) callback(o);															// Run callback
 						return;																			// Quit
 					}
