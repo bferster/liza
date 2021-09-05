@@ -75,21 +75,9 @@ class App {
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			this.csv=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
-			this.responses=[];																		// Reset
 			for (i=0;i<this.csv.length;++i) {														// For each line
 				for (k in this.csv[i]) if (!k)  delete this.csv[i][k];								// If empty field, delete it
-				if (this.csv[i].actor != "Teacher") {												// A response
-					if (!this.responses[intent]) this.responses[intent]=[];							// Create response intent entry
-					o={text:this.csv[i].text.toLowerCase(), scene:this.csv[i].scene, keywords:[]};	// Create response
-					let v=app.Tokenize(o.text);														// Tokenize incoming text	
-					for (k=0;k<v.length;++k) 														// For each word
-						if (this.keywords.includes(v[k])) o.keywords.push(v[k]);					// Add to list					
-					this.responses[intent].push(o);													// Add response to response intent array
-					this.csv.splice(i,1);															// Remove it
-					}
-				else{																				// A remark
-					intent=Math.floor(this.csv[i].code);											// Save intent (whole number) for coding responses
-					}
+				if (this.csv[i].actor != "Teacher") this.csv.splice(i,1);							// Remove responses
 				}
 			Sound("ding");																			// Ding
 			};
@@ -99,12 +87,28 @@ class App {
 	{	
 		fetch('assets/config.csv')																	// Load file
 			.then(res => res.text())																// Get as text
-			.then(res => {																			// Process																	
+			.then(res =>{																			// Process																	
 				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
 				this.SetWho(data);																	// Set who array
 				this.SetKeywords(data);																// Set keywords array
 				});
-		}
+	
+		let i,k,o,v,intent;
+		fetch('assets/100-responses.csv')															// Load file
+			.then(res => res.text())																// Get as text
+			.then(res =>{																			// Process																	
+				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
+				for (i=0;i<data.length;++i) {														// For each response
+					intent="r"+Math.floor(data[i].intent);											// Maken intent
+					if (!this.responses[intent]) this.responses[intent]=[];							// Create response intent entry
+						o={text:data[i].text.toLowerCase(), turn:data[i].turn, keywords:[]};		// Create response
+						let v=app.Tokenize(o.text);													// Tokenize incoming text	
+						for (k=0;k<v.length;++k) 													// For each word
+							if (this.keywords.includes(v[k])) o.keywords.push(v[k]);				// Add to list					
+						this.responses[intent].push(o);												// Add response to response intent array
+					}
+				});
+			}
 
 	SetWho(data)																				// SET WHO SYNONYMS ARRAY
 	{
@@ -138,17 +142,19 @@ class App {
 			if (typeof(app.whoSyns[v[i]]) == "string")												// A valid string
 				who=app.whoSyns[v[i]];																// Set who
 			}
-		v=this.responses[intent];																	// Point at responses to this intent
+		v=this.responses["r"+intent];																// Point at responses to this intent
+
 		if (v && keys.length) {																		// If a valid intent and some keys in remark
 			for (i=0;i<v.length;++i) {																// For each response
-				s=0;																				// Reset count	
+					s=0;																				// Reset count	
 				v[i].keyScore=0;																	// Reset key score
 				o=v[i].keywords;																	// Point at keywords
 				for (j=0;j<o.length;++j)															// For each key in response
 					if (keys.includes(o[j]))	++s;												// Add to count
 				v[i].keyScore=s/keys.length;														// Calc key score
 				}
-			}
+			v.sort((a, b) => a.keyScore < b.keyScore);												// Sort by key score
+		}
 		return who;																					// Return last who encountered
 	}
 
@@ -240,7 +246,7 @@ class Chat {
 			xhttp.onreadystatechange = function() {														// ON STATE CHANGE
 				if (this.readyState == 4 && this.status == 200) {										// Valid response
 					let o=JSON.parse(this.response);													// Objectify
-					trace(o);																			// Log
+//					trace(o);																			// Log
 					if (callback) callback(o);															// Run callback
 						return;																			// Quit
 					}
