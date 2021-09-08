@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Data parser</title>
+		<title>dataParser</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -19,7 +19,7 @@
 	<body>
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/lizalogo.png" style="width:25%">
-			<span style="font-size:24px;vertical-align:12px"><b> dataparser</b></span>
+			<span style="font-size:24px;vertical-align:12px"><b> dataParser</b></span>
 			<hr>
 			Scene: <select class="co-is" id="lz-scene">
 				<option>All</option><option>0</option><option>1</option>><option>2</option>
@@ -111,37 +111,45 @@
 	}		
 
 	
-	function MakeNlu()																		// CREATE NLU.YML FILE
+	function MakeNlu()																			// CREATE NLU.YML FILE
 	{
-		let i,k,o;
+		let i,k,o,base;
 		let str="version: \"2.0\"\n\nnlu:\n";
 		let series=$("#lz-series").val();															// Series to use
 		let scene=$("#lz-scene").val();																// Sceene to use
 		let num=$("#lz-num").val();																	// Number to use
 		let dots=$("#lz-dots").prop("checked");														// Sub intents?
-		if (dots && !k.match(/\./)) return;														// Skip wholes if doing dots
 
-		num=1;
 		for (k in intents) {																		// For each one
-trace(111,k,str)	
-		if (series == "All") 									str+=addIntent(k);				// Adding them all
-			else if (series == Math.floor(k.substr(1)/100)*100)		str+=addIntent(k);				// Adding individually from a series
+			if (series == "All") {																	// Adding them all
+				if (!dots && k.match(/\./)) continue;												// Skip decimals
+				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
+				if (dots) base=k.substr(1);															// Top entry - whole
+				else 	  base=Math.floor(k.substr(1));												// Top decimal
+				str+="- intent: "+base+"\n  examples: |\n";											// Add header
+				str+=addIntent("r"+base);															// Add items
+				}
+			else if (series == Math.floor(k.substr(1)/100)*100)	{									// Adding individually from a series
+				if (!dots && k.match(/\./)) continue;												// Skip decimals
+				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
+				if (dots) base=k.substr(1);															// Top entry - whole
+				else 	  base=Math.floor(k.substr(1));												// Top decimal
+				str+="- intent: "+base+"\n  examples: |\n";											// Add header
+				str+=addIntent("r"+base);															// Add items
+				}
 			}
-//		trace(str)
-		return str;																					// Return file
+		SaveTextAsFile("nlu.yml",str);																// Write file
+		Sound("ding");																				// Sound	
+		return str;																					// Return data
 
-		function addIntent(key) {																	// ADD INTENT TO NLU
-			let n=0;
-			let s="";
-			if (!k.match(/\./)) return;																// Skip wholes
-			if (dots) 	s+="- intent: "+key+"\n  examples: |\n";									// Add header for each one
-			else 		s+="- intent: "+key.substr(0,4)+"\n  examples: |\n";						// Only for whole numbers
-			for (i=0;i<intents[key].length;++i) {													// For each one
-				if (n > num)	break;
-				o=rawData[intents[key][i]].text;													// Get text
+		function addIntent(k) {																		// ADD INTENT TO NLU
+			let i,o,n=0,s="";
+			for (i=0;i<intents[k].length;++i) {														// For each one
+				n++;																				// Advance count
+				if (n > num)	break;																// Only so many
+				o=rawData[intents[k][i]].text;														// Get text
 				o=o.replace(/luis|farrah|chris|jazmin|oliver/i,"STUDENT");							// Put in students	
 				s+="        - "+o+"\n";																// Add remark
-				n++;
 			}
 			return s;																				// Return intents group
 			}
@@ -176,7 +184,25 @@ trace(111,k,str)
 			snd.play();																					// Play it
 			}
 		}
-		
+
+	function SaveTextAsFile(file, contents)															// SAVE TEXT TO LOCAL FILE
+	{
+		if (file.charAt(0) == "*") {																	// If asking
+			GetTextBox("Type file name","", file.substr(1), (s)=>{ SaveTextAsFile(s, contents); });		// Ask for name
+			return;																						// Quit
+			}
+		var textFileAsBlob=new Blob([contents], {type:'text/plain'});
+		var downloadLink=document.createElement("a");
+		downloadLink.download=file;
+		downloadLink.innerHTML="Download File";
+		downloadLink.href=window.URL.createObjectURL(textFileAsBlob);
+	    downloadLink.onclick=()=>{ downloadLink.remove(); };
+		downloadLink.style.display="none";
+		downloadLink.id="tdll";
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+	}
+
 </script>
 </body>
 </html>
