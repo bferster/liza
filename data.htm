@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Data parser</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="lib/papaparse.min.js"></script>
+		<script src="nlp.js"></script>
+	</head>
+	<style>
+		body { 	font-family:Segoe UI,Verdana,Geneva,sans-serif;font-size:16px; margin:20px; }
+		.co-is 		{	border-radius:16px; padding:0 8px; height: 24px; border:1px solid #999; font-size: 13px; text-align:center; }
+		.co-bs 		{	display:inline-block; border-radius:16px; padding:0 16px; border:1px solid #999; font-size: 13px; 
+						cursor:pointer; z-index:2; padding-bottom:1px; color:#000; background-color: #eee; font-weight:600; }
+		.co-bsg		{	cursor: pointer; color:#fff; text-align: center; border-radius: 16px; display: inline-block; user-select: none;
+						font-size: 13px; background-color: #999; padding: 2px 8px 2px 8px; }
+	</style>
+	<body>
+		<div style="width:66%;margin:0 auto;text-align:center">
+			<img src="img/lizalogo.png" style="width:25%">
+			<span style="font-size:24px;vertical-align:12px"><b> dataparser</b></span>
+			<hr>
+			Scene: <select class="co-is" id="lz-scene">
+				<option>All</option><option>0</option><option>1</option>><option>2</option>
+				</select>
+			&nbsp &nbsp; Series: <select class="co-is" id="lz-series">
+				<option>100</option><option>200</option><option>300</option>
+				<option>400</option><option>400</option><option>All</option>
+			</select>
+			&nbsp &nbsp; Use decimals? <input type="checkbox" id="lz-dots"/>
+			&nbsp &nbsp; Number per series: <input type="input" class="co-is" style="width:40px" value="200" id="lz-num"/>
+			&nbsp &nbsp; Teacher id: <input type="input" class="co-is" style="width:40px" value="67" id="lz-teacher"/>
+			<hr><p>
+				<div class="co-bs" id="lz-makeNlu">Make nlu.yml</div>
+				&nbsp &nbsp &nbsp; <div class="co-bs" id="lz-makeResonse">Make response</div>
+				&nbsp &nbsp &nbsp; <div class="co-bs" id="lz-makeSession">Make session</div>
+			</p>
+			<hr>
+			<p id="outp" style="text-align:left"></p>
+		</div>
+	
+<script>
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// APP 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	let rawData=[], intents=[];
+
+	$(document).ready(function() {								           						// ON PAGE LOADED
+		LoadRawData('assets/rawData.csv');															// Load raw data file
+
+		$("#lz-makeNlu").on("click",()=>{ MakeNlu()} );												// ON MAKE NLU
+		$("#lz-makeResponse").on("click",()=>{ MakeResponse()} );									// ON MAKE RESPONSE
+		$("#lz-makeSession").on("click",()=>{ MakeSession()} );										// ON MAKE SESSION
+		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
+			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
+				}
+			});
+	});
+
+	function LoadRawData(file)																	// LOAD RAW DATA CSV
+	{
+		fetch(file)																					// Load file
+			.then(res => res.text())																// Get as text
+			.then(res =>{																			// Process																	
+				rawData=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
+				ParseData();																		// Parse data and show stats
+				trace(rawData)
+				});
+	}
+
+	function ParseData()																		//PARSE DATA AND SHOW DATA STATS
+	{
+		let i,o;
+		let nRemarks=0, nResponses=0; 
+		for (i=0;i<rawData.length;++i) {															// For each entry
+			o=rawData[i];																			// Point at line
+			if (o.actor == "Teacher") {																// A remark
+				++nRemarks;																			// Add to count											
+				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
+				if (!intents["r"+o.intent]) intents["r"+o.intent]=[];								// Create full holder
+				intents["r"+Math.floor(o.intent)].push(i);											// Add base index
+				intents["r"+o.intent].push(i);														// Add full
+				}
+			else ++nResponses;																		// Add response
+			}
+		
+		let str=`<table>
+		<tr><td><b>Number of remarks</b>:</td><td>${nRemarks}</td></tr>
+		<tr><td><b>Number of responses</b>: &nbsp; </td><td>${nResponses}</td></tr>`
+		str+=getIntents()+"</table>";																// Get number of intents
+		$("#outp").html(str.replace(/\t|\n|\r/g,""));												// Show stats
+
+		function getIntents() {																		// GET INTENTS
+			let i,j,s="";
+			for (i=0;i<1000;i+=10) 																	// For each intent
+				if (intents["r"+i]) 																// If it exists	
+					s+=`<tr><td><b>Intent ${i}</b>:</td><td>${intents["r"+i].length}</td><td>${getSubIntents(i)}</td></tr>`;
+			return s;																				// Return intent line
+			}
+
+		function getSubIntents(base) {																// GET NUMBER OF SUB INTENTS
+			let i,s="( &nbsp;";
+			for (i=1;i<10;++i) 																		// For for subs
+				if (intents["r"+base+"."+i]) 														// If it exists	
+					s+=i+"="+intents["r"+base+"."+i].length+" &nbsp;";								// Add to string
+			return s+")";																			// Return subs
+			}
+	}		
+
+	
+	function MakeNlu()																		// CREATE NLU.YML FILE
+	{
+		let i,k,o;
+		let str="version: \"2.0\"\n\nnlu:\n";
+		let series=$("#lz-series").val();															// Series to use
+		let scene=$("#lz-scene").val();																// Sceene to use
+		let num=$("#lz-num").val();																	// Number to use
+		let dots=$("#lz-dots").prop("checked");														// Sub intents?
+		if (dots && !k.match(/\./)) return;														// Skip wholes if doing dots
+
+		num=1;
+		for (k in intents) {																		// For each one
+trace(111,k,str)	
+		if (series == "All") 									str+=addIntent(k);				// Adding them all
+			else if (series == Math.floor(k.substr(1)/100)*100)		str+=addIntent(k);				// Adding individually from a series
+			}
+//		trace(str)
+		return str;																					// Return file
+
+		function addIntent(key) {																	// ADD INTENT TO NLU
+			let n=0;
+			let s="";
+			if (!k.match(/\./)) return;																// Skip wholes
+			if (dots) 	s+="- intent: "+key+"\n  examples: |\n";									// Add header for each one
+			else 		s+="- intent: "+key.substr(0,4)+"\n  examples: |\n";						// Only for whole numbers
+			for (i=0;i<intents[key].length;++i) {													// For each one
+				if (n > num)	break;
+				o=rawData[intents[key][i]].text;													// Get text
+				o=o.replace(/luis|farrah|chris|jazmin|oliver/i,"STUDENT");							// Put in students	
+				s+="        - "+o+"\n";																// Add remark
+				n++;
+			}
+			return s;																				// Return intents group
+			}
+	}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// HRLPERS 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function trace(msg, p1, p2, p3, p4)																// CONSOLE 
+	{
+		if (p4 != undefined)
+			console.log(msg,p1,p2,p3,p4);
+		else if (p3 != undefined)
+			console.log(msg,p1,p2,p3);
+		else if (p2 != undefined)
+			console.log(msg,p1,p2);
+		else if (p1 != undefined)
+			console.log(msg,p1);
+		else
+			console.log(msg);
+	}
+
+	function Sound(sound, mute)																		// PLAY SOUND
+	{
+		var snd=new Audio();																			// Init audio object
+		if (sound.match(/\.mp3/i))		snd=new Audio(sound)											// If an MP3 file
+		else							snd=new Audio("img/"+sound+".mp3");								// Use built in mp3
+		if (!mute)	{																					// If not initing or muting	
+			snd.volume=100/100;																			// Set volume
+			snd.play();																					// Play it
+			}
+		}
+		
+</script>
+</body>
+</html>
+

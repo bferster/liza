@@ -7,6 +7,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="lib/papaparse.min.js"></script>
+		<script src="nlp.js"></script>
 	</head>
 	<style>
 		body 		{ 	font-family:Segoe UI,Verdana,Geneva,sans-serif; font-size:10px; padding:0px; box-sizing:content-box; margin:0;
@@ -64,6 +65,7 @@ class App {
 		this.responses=[];																			// Responses
 		this.chat=new Chat();																		// Alloc chat
 		this.LoadConfig();																			// Load config file
+		this.nlp=new NLP();																			// Load NLP
 		}
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
@@ -108,7 +110,7 @@ class App {
 						this.responses[intent].push(o);												// Add response to response intent array
 					}
 				});
-			}
+	}
 
 	SetWho(data)																				// SET WHO SYNONYMS ARRAY
 	{
@@ -146,7 +148,7 @@ class App {
 
 		if (v && keys.length) {																		// If a valid intent and some keys in remark
 			for (i=0;i<v.length;++i) {																// For each response
-					s=0;																				// Reset count	
+				s=0;																				// Reset count	
 				v[i].keyScore=0;																	// Reset key score
 				o=v[i].keywords;																	// Point at keywords
 				for (j=0;j<o.length;++j)															// For each key in response
@@ -166,6 +168,7 @@ class App {
 	}
 
 } // App class closure
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // CHAT 
@@ -337,7 +340,7 @@ class Chat {
 			});
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				$("#lz-tempFile").trigger("click");
+				trace(app.nlp.Compare("this is good", "forget eveything, good"));
 				}
 			});
 
