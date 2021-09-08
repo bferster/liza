@@ -110,7 +110,6 @@
 			}
 	}		
 
-	
 	function MakeNlu()																			// CREATE NLU.YML FILE
 	{
 		let i,k,o,base;
@@ -126,7 +125,7 @@
 				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
 				if (dots) base=k.substr(1);															// Top entry - whole
 				else 	  base=Math.floor(k.substr(1));												// Top decimal
-				str+="- intent: "+base+"\n  examples: |\n";											// Add header
+				str+="- intent: r"+base+"\n  examples: |\n";										// Add header
 				str+=addIntent("r"+base);															// Add items
 				}
 			else if (series == Math.floor(k.substr(1)/100)*100)	{									// Adding individually from a series
@@ -134,7 +133,7 @@
 				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
 				if (dots) base=k.substr(1);															// Top entry - whole
 				else 	  base=Math.floor(k.substr(1));												// Top decimal
-				str+="- intent: "+base+"\n  examples: |\n";											// Add header
+				str+="- intent: r"+base+"\n  examples: |\n";										// Add header
 				str+=addIntent("r"+base);															// Add items
 				}
 			}
