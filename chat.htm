@@ -79,7 +79,11 @@ class App {
 			this.csv=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
 			for (i=0;i<this.csv.length;++i) {														// For each line
 				for (k in this.csv[i]) if (!k)  delete this.csv[i][k];								// If empty field, delete it
-				if (this.csv[i].actor != "Teacher") this.csv.splice(i,1);							// Remove responses
+				if (this.csv[i].actor != "Teacher") {												// If a student response
+					if (i)	this.csv[i-1].response=this.csv[i].text;								// Add student response
+					this.csv.splice(i,1);															// Remove it
+					}
+				else this.csv[i].response="";														// No respomse for teacher remaks
 				}
 			Sound("ding");																			// Ding
 			};
@@ -217,11 +221,12 @@ class Chat {
 
 		SendChat()																					// TEXT CHATTING
 		{
-			let origIntent="";
+			let origIntent="",origResponse="";
 			let s=$("#co-revText").val();																// Get text textbox
 			if (!s && app.csv) { 																		// If getting from CSV file
 				s=app.csv[0].text;																		// Get text
 				origIntent=app.csv[0].code;																// Get original intent
+				origResponse=app.csv[0].response;														// Get original response
 				app.csv.shift(); 																		// Next remark
 				}									
 			if (s) {																					// If something there
@@ -234,7 +239,8 @@ class Chat {
 					if (who) app.curWho=who;															// Set latrest person mentioned
 					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
 					Intent </b>${intent} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;			// Main line
-					if (origIntent)	res+=` vs. <span style="color:#${(origIntent == o.intent_ranking[0].name.substr(1)) ? "009900" : "990000"}">${origIntent}</span>`;
+					if (origIntent)		res+=` vs. <span style="color:#${(origIntent == o.intent_ranking[0].name.substr(1)) ? "009900" : "990000"}">${origIntent}</span>`;
+					if (origResponse)	res+=" -><i>&quot;"+origResponse+"&quot;</i>";					// Add response
 					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
