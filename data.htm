@@ -129,7 +129,6 @@
 				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
 				if (dots) 					base=k.substr(1);										// Top entry - whole
 				else 	  					base=Math.floor(k.substr(1));							// Top decimal
-
 				str+="- intent: r"+base+"\n  examples: |\n";										// Add header
 				str+=addIntent("r"+base);															// Add items
 				}
@@ -149,12 +148,12 @@
 		function addIntent(k) {																		// ADD INTENT TO NLU
 			let i,o,n=0,s="",ss;
 			for (i=0;i<intents[k].length;++i) {														// For each one
-				n++;																				// Advance count
-				if (n > num)	break;																// Only so many
 				o=rawData[intents[k][i]];															// Point at item
 				if ((o.teacher-0 >= sa-0) && (o.teacher-0 < se-0)) continue;						// An excluded one
 				ss=o.text.replace(/luis|farrah|chris|jazmin|oliver/i,"STUDENT");					// Put in students	
 				s+="        - "+ss.trim()+"\n";														// Add remark
+				n++;																				// Advance count
+				if (n > num)	break;																// Only so many
 				}
 			return s;																				// Return intents group
 			}
