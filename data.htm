@@ -126,9 +126,9 @@
 			if (!k || (k == 0))				continue;												// Skip unecoded intents
 			if (series == "All") {																	// Adding them all
 				if (!dots && k.match(/\./)) continue;												// Skip decimals
-//				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
-				if (dots) base=k.substr(1);															// Top entry - whole
-				else 	  base=Math.floor(k.substr(1));												// Top decimal
+				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
+				if (dots) 					base=k.substr(1);										// Top entry - whole
+				else 	  					base=Math.floor(k.substr(1));							// Top decimal
 
 				str+="- intent: r"+base+"\n  examples: |\n";										// Add header
 				str+=addIntent("r"+base);															// Add items
@@ -154,8 +154,8 @@
 				o=rawData[intents[k][i]];															// Point at item
 				if ((o.teacher-0 >= sa-0) && (o.teacher-0 < se-0)) continue;						// An excluded one
 				ss=o.text.replace(/luis|farrah|chris|jazmin|oliver/i,"STUDENT");					// Put in students	
-				s+="        - "+ss+"\n";															// Add remark
-			}
+				s+="        - "+ss.trim()+"\n";														// Add remark
+				}
 			return s;																				// Return intents group
 			}
 	}
