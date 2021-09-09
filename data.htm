@@ -67,7 +67,6 @@
 			.then(res =>{																			// Process																	
 				rawData=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
 				ParseData();																		// Parse data and show stats
-				trace(rawData)
 				});
 	}
 
@@ -77,6 +76,7 @@
 		let nRemarks=0, nResponses=0; 
 		for (i=0;i<rawData.length;++i) {															// For each entry
 			o=rawData[i];																			// Point at line
+			if (!o.intent)	continue;
 			if (o.actor == "Teacher") {																// A remark
 				++nRemarks;																			// Add to count											
 				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
@@ -123,11 +123,13 @@
 		let dots=$("#lz-dots").prop("checked");														// Sub intents?
 
 		for (k in intents) {																		// For each one
+			if (!k || (k == 0))				continue;												// Skip unecoded intents
 			if (series == "All") {																	// Adding them all
 				if (!dots && k.match(/\./)) continue;												// Skip decimals
-				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
+//				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
 				if (dots) base=k.substr(1);															// Top entry - whole
 				else 	  base=Math.floor(k.substr(1));												// Top decimal
+
 				str+="- intent: r"+base+"\n  examples: |\n";										// Add header
 				str+=addIntent("r"+base);															// Add items
 				}
@@ -176,7 +178,7 @@
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-// HRLPERS 
+// HELPERS 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	function trace(msg, p1, p2, p3, p4)																// CONSOLE 

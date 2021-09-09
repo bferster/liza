@@ -59,13 +59,14 @@ class App {
 	{
 		this.csv=[];																				// Holds loaded session
 		this.whoSyns=[];																			// Who synonmyms
-		this.curWho="Luis";																			// Person being addressed
+		this.curWho="All";																			// Person being addressed
 		this.curKeys=[];																			// Currently active keys
 		this.keywords=[];																			// Keywords
 		this.responses=[];																			// Responses
 		this.chat=new Chat();																		// Alloc chat
 		this.LoadConfig();																			// Load config file
 		this.nlp=new NLP();																			// Load NLP
+		this.hasDots=true;																			// Trained with dots
 		}
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
@@ -91,6 +92,7 @@ class App {
 
 	LoadConfig()																				// LOAD CONFIG FILE
 	{	
+		let i,k,o,v,intent;
 		fetch('assets/config.csv')																	// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
@@ -99,7 +101,6 @@ class App {
 				this.SetKeywords(data);																// Set keywords array
 				});
 	
-		let i,k,o,v,intent;
 		fetch('assets/100-responses.csv')															// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
@@ -226,6 +227,7 @@ class Chat {
 			if (!s && app.csv) { 																		// If getting from CSV file
 				s=app.csv[0].text;																		// Get text
 				origIntent=app.csv[0].code;																// Get original intent
+				if (!app.dots) origIntent=Math.floor(origIntent);										// Just looking at whole numbes
 				origResponse=app.csv[0].response;														// Get original response
 				app.csv.shift(); 																		// Next remark
 				}									
@@ -234,19 +236,20 @@ class Chat {
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
 				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
 				app.chat.GetResponse(s,(o)=>{															// Send to AI
-					let intent=o.intent_ranking[0].name.substr(1);										// Get intent
+					let n=(o.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;							// Go to second choice
+					let intent=o.intent_ranking[n].name.substr(1);										// Get intent
 					let who=app.ParseRemark(intent,s);													// Parse remark for data
 					if (who) app.curWho=who;															// Set latrest person mentioned
 					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
-					Intent </b>${intent} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;			// Main line
-					if (origIntent)		res+=` vs. <span style="color:#${(origIntent == o.intent_ranking[0].name.substr(1)) ? "009900" : "990000"}">${origIntent}</span>`;
+					Intent </b>${intent} - ${Math.round(o.intent_ranking[n].confidence*100)}%`;			// Main line
+					if (origIntent)		res+=` vs. <span style="color:#${(origIntent == intent) ? "009900" : "990000"}">${origIntent}</span>`;
 					if (origResponse)	res+=" -><i>&quot;"+origResponse+"&quot;</i>";					// Add response
 					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
 					});
 				}
-			$("#co-revText").val("");																// Clear input
+			$("#co-revText").val("");																	// Clear input
 		}
 
 		GetResponse(msg, callback)																	// GET RESPONSE FROM AI
@@ -255,7 +258,9 @@ class Chat {
 			xhttp.onreadystatechange = function() {														// ON STATE CHANGE
 				if (this.readyState == 4 && this.status == 200) {										// Valid response
 					let o=JSON.parse(this.response);													// Objectify
-//					trace(o);																			// Log
+					if (o.intent.name[0] == "r")														// If our intent
+						app.dots=o.intent.name[4] == "." ? true : false;								// Set dots flag
+					trace(o);																			// Log
 					if (callback) callback(o);															// Run callback
 						return;																			// Quit
 					}
