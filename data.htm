@@ -25,15 +25,15 @@
 				<option>All</option><option>0</option><option>1</option>><option>2</option>
 				</select>
 			&nbsp &nbsp; Series: <select class="co-is" id="lz-series">
-				<option>100</option><option>200</option><option>300</option>
-				<option>400</option><option>400</option><option>All</option>
+				<option>All</option><option>100</option><option>200</option><option>
+				300</option><option>400</option><option>500</option>
 			</select>
-			&nbsp &nbsp; Use decimals? <input type="checkbox" id="lz-dots"/>
-			&nbsp &nbsp; Number per series: <input type="input" class="co-is" style="width:40px" value="200" id="lz-num"/>
-			&nbsp &nbsp; Teacher id: <input type="input" class="co-is" style="width:40px" value="67" id="lz-teacher"/>
+			&nbsp &nbsp; Use decimals? <input type="checkbox" checked id="lz-dots"/>
+			&nbsp &nbsp; Number per series: <input type="input" class="co-is" style="width:40px" value="500" id="lz-num"/>
+			&nbsp &nbsp; Exclude: <input type="input" class="co-is" style="width:40px" value="90-100" id="lz-session"/>
 			<hr><p>
-				<div class="co-bs" id="lz-makeNlu">Make nlu.yml</div>
-				&nbsp &nbsp &nbsp; <div class="co-bs" id="lz-makeResonse">Make response</div>
+				<div class="co-bs" id="lz-makeTrain">Make nlu.yml</div>
+				&nbsp &nbsp &nbsp; <div class="co-bs" id="lz-makeResponse">Make response</div>
 				&nbsp &nbsp &nbsp; <div class="co-bs" id="lz-makeSession">Make session</div>
 			</p>
 			<hr>
@@ -51,9 +51,9 @@
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadRawData('assets/rawData.csv');															// Load raw data file
 
-		$("#lz-makeNlu").on("click",()=>{ MakeNlu()} );												// ON MAKE NLU
-		$("#lz-makeResponse").on("click",()=>{ MakeResponse()} );									// ON MAKE RESPONSE
-		$("#lz-makeSession").on("click",()=>{ MakeSession()} );										// ON MAKE SESSION
+		$("#lz-makeTrain").on("click",()=>   { MakeTrain() } );										// ON MAKE TRAINING FILE
+		$("#lz-makeResponse").on("click",()=>{ MakeResponse() } );									// ON MAKE RESPONSE
+		$("#lz-makeSession").on("click", ()=>{ MakeSession() } );									// ON MAKE SESSION
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
 				}
@@ -110,12 +110,15 @@
 			}
 	}		
 
-	function MakeNlu()																			// CREATE NLU.YML FILE
+	function MakeTrain()																		// CREATE TRAINING YML FILE
 	{
 		let i,k,o,base;
 		let str="version: \"2.0\"\n\nnlu:\n";
 		let series=$("#lz-series").val();															// Series to use
-		let scene=$("#lz-scene").val();																// Sceene to use
+		let scene=$("#lz-scene").val();																// Scene to use
+		let session=$("#lz-session").val().split("-");												// Session to skip
+		let sa=session[0],se=session[1];															// Extract range
+		if (!se) se=sa+1;																			// Just one
 		let num=$("#lz-num").val();																	// Number to use
 		let dots=$("#lz-dots").prop("checked");														// Sub intents?
 
@@ -142,18 +145,35 @@
 		return str;																					// Return data
 
 		function addIntent(k) {																		// ADD INTENT TO NLU
-			let i,o,n=0,s="";
+			let i,o,n=0,s="",ss;
 			for (i=0;i<intents[k].length;++i) {														// For each one
 				n++;																				// Advance count
 				if (n > num)	break;																// Only so many
-				o=rawData[intents[k][i]].text;														// Get text
-				o=o.replace(/luis|farrah|chris|jazmin|oliver/i,"STUDENT");							// Put in students	
-				s+="        - "+o+"\n";																// Add remark
+				o=rawData[intents[k][i]];															// Point at item
+				if ((o.teacher-0 >= sa-0) && (o.teacher-0 < se-0)) continue;						// An excluded one
+				ss=o.text.replace(/luis|farrah|chris|jazmin|oliver/i,"STUDENT");					// Put in students	
+				s+="        - "+ss+"\n";															// Add remark
 			}
 			return s;																				// Return intents group
 			}
 	}
 
+	function MakeSession()																		// CREATE SESSION FILE
+	{
+		let i,o,session=[];
+		let fields=["scene","actor","code","text"];													// Field names
+		let teacher=$("#lz-session").val().split("-")[0];											// Teacher to add
+		for (i=0;i<rawData.length;++i) {															// For each line
+			o=rawData[i];																			// Point at it
+			if (o.teacher != teacher) 	continue;													// Skip if not right teacher
+			if (!o.intent)				continue;													// Skip if not coded																			
+			session.push({ scene:o.topic, actor:o.actor, code:o.intent, text:o.text });				// Add line 
+			}	
+		let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
+		SaveTextAsFile("session-"+teacher+".csv",str);												// Write file
+		Sound("ding");																				// Sound	
+		return str;																					// Return data
+	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HRLPERS 

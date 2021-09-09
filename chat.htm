@@ -234,7 +234,7 @@ class Chat {
 					if (who) app.curWho=who;															// Set latrest person mentioned
 					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
 					Intent </b>${intent} - ${Math.round(o.intent_ranking[0].confidence*100)}%`;			// Main line
-					if (origIntent)	res+=` vs. <span style="color:#${(Math.floor(origIntent) == o.intent_ranking[0].name.substr(1)) ? "009900" : "990000"}">${origIntent}</span>`;
+					if (origIntent)	res+=` vs. <span style="color:#${(origIntent == o.intent_ranking[0].name.substr(1)) ? "009900" : "990000"}">${origIntent}</span>`;
 					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
