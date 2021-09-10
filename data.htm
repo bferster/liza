@@ -89,7 +89,6 @@
 		for (i=0;i<rawData.length;++i) {															// For each entry
 			o=rawData[i];																			// Point at line
 			if (!o.intent)	continue;
-	
 			if (o.actor == "Teacher") {																// A remark
 				if (o.text.split(" ").length < 3)	continue;										// Skip short remarks
 				++nRemarks;																			// Add to count											
@@ -178,21 +177,43 @@
 			}
 	}
 
-	function MakeSession()																		// CREATE SESSION FILE
+	async function MakeSession()																// CREATE SESSION FILE
 	{
-		let i,o,session=[];
-		let fields=["scene","actor","code","text"];													// Field names
+		let i,o,r=0,session=[];
+		let fields=["scene","actor","code","calc","text"];											// Field names
 		let teacher=$("#lz-session").val().split("-")[0];											// Teacher to add
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if (o.teacher != teacher) 	continue;													// Skip if not right teacher
 			if (!o.intent)				continue;													// Skip if not coded																			
-			session.push({ scene:o.topic, actor:o.actor, code:o.intent, text:o.text });				// Add line 
+//			await GetResponse(o.text, (res)=>{														// Get intent
+//				let n=(res.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;						// Go to second choice
+//				let r=res.intent_ranking[n].name.substr(1);											// Get intent
+				session.push({ scene:o.topic, actor:o.actor, code:o.intent, calc:r, text:o.text });	// Add line 
+//				});
 			}	
 		let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
 		SaveTextAsFile("session-"+teacher+".csv",str);												// Write file
 		Sound("ding");																				// Sound	
 		return str;																					// Return data
+	}
+
+
+
+
+	function GetResponse(msg, callback)															// GET RESPONSE FROM AI
+	{
+		return new Promise(resolve => {
+			let xhttp=new XMLHttpRequest();																// Alloc hxmlhttp
+			xhttp.onreadystatechange = function() {														// ON STATE CHANGE
+				if (this.readyState == 4 && this.status == 200) 										// Valid response
+					callback(JSON.parse(this.response));												// Run callback
+				resolve('resolved');
+				};
+			xhttp.open("POST", "https://lizasim.com:5005/model/parse");									// Set url
+			xhttp.setRequestHeader("Content-Type", "application/json");									// Set type
+			xhttp.send(JSON.stringify({text:msg}));														// Set paqyload
+		});
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
