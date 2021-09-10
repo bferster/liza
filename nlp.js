@@ -7,6 +7,29 @@ class NLP {
 
 	constructor()   																				// CONSTRUCTOR
 	{
+		this.whoSyns=[];																				// Who synonmyms
+	}
+
+	SetWho(data)																					// SET WHO SYNONYMS ARRAY
+	{
+		let i,j,v,o;
+		this.whoSyns=[];																				// Clear array
+		for (i=0;i<data.length;++i) {																	// For each line
+			o=data[i];																					// Point at line
+			if (o.type != "actor")	continue;															// Only actors	
+			v=o.text.toLowerCase().split(",");															// Array of synonyms
+			for (j=0;j<v.length;++j) this.whoSyns[v[j]]=o.id;											// For each id, add to synonyms array
+			}
+	}
+	
+	GetWho(text)																					// GET WHO IN TEXT
+	{
+		let i,who="";
+		let v=this.Tokenize(text);																		// Tokenize	
+		for (i=0;i<v.length;++i) 																		// For each word																	
+			if (typeof(this.whoSyns[v[i]]) == "string") 												// A valid string
+				who=v[i]+":"+this.whoSyns[v[i]];														// Set who and trigger
+		return who;																						// Return last trigger:who 
 	}
 
 	Compare(textA, textB)																			// HOW SIMILAR TWO STRINGS ARE

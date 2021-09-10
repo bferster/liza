@@ -1,7 +1,7 @@
 type,id,text,data
 actor,luis,"luis,louise,lewis,louis,louie,lou,lew","sex=M,ability=.5"
 actor,chris,"chris,crisp,christ","sex=M,ability=.5"
-actor,all,"all,everybody,everyone,anybody,anyone,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=C,ability=.5"
+actor,class,"all,everybody,everyone,anybody,anyone,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=C,ability=.5"
 actor,oliver,"oliver,liver","sex=M,ability=.5"
 actor,farrah,"farrah,farah,ferel,feral,farrell","sex=F,ability=.5"
 actor,jazmin,"jazmin,jazz,jasmine,jasmina","sex=F,ability=.5"

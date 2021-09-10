@@ -25,3 +25,12 @@ intents:
   - r140.1
   - r150
   - r150.1
+
+entities:
+  - student
+   
+
+
+
+
+

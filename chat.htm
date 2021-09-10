@@ -58,8 +58,7 @@ class App {
 	constructor()   																			// CONSTRUCTOR
 	{
 		this.csv=[];																				// Holds loaded session
-		this.whoSyns=[];																			// Who synonmyms
-		this.curWho="All";																			// Person being addressed
+		this.curWho="Class";																		// Person being addressed
 		this.curKeys=[];																			// Currently active keys
 		this.keywords=[];																			// Keywords
 		this.responses=[];																			// Responses
@@ -97,7 +96,7 @@ class App {
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
 				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
-				this.SetWho(data);																	// Set who array
+				this.nlp.SetWho(data);																// Set who array
 				this.SetKeywords(data);																// Set keywords array
 				});
 	
@@ -117,18 +116,6 @@ class App {
 				});
 	}
 
-	SetWho(data)																				// SET WHO SYNONYMS ARRAY
-	{
-		let i,j,v,o;
-		this.whoSyns=[];																			// Clear array
-		for (i=0;i<data.length;++i) {																// For each line
-			o=data[i];																				// Point at line
-			if (o.type != "actor")	continue;														// Only actors	
-			v=o.text.toLowerCase().split(",");														// Array of synonyms
-			for (j=0;j<v.length;++j) this.whoSyns[v[j]]=o.id;										// For each id, add to synonyms array
-			}
-	}
-
 	SetKeywords(data)																			// PROCESS KEYWORDS																	
 	{
 		let i,v,o;
@@ -145,9 +132,9 @@ class App {
 		let keys=[];																				// Clear current keys array
 		let v=app.Tokenize(text);																	// Tokenize incoming text	
 		for (i=0;i<v.length;++i) {																	// For each word
-			if (this.keywords.includes(v[i])) keys.push(v[i]);										// Add toc urrent keys list					
-			if (typeof(app.whoSyns[v[i]]) == "string")												// A valid string
-				who=app.whoSyns[v[i]];																// Set who
+			if (this.keywords.includes(v[i])) keys.push(v[i]);										// Add to current keys list					
+			if (typeof(app.nlp.whoSyns[v[i]]) == "string")											// A valid string
+				who=app.nlp.whoSyns[v[i]];															// Set who
 			}
 		v=this.responses["r"+intent];																// Point at responses to this intent
 

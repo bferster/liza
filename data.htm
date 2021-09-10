@@ -47,10 +47,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	let rawData=[], intents=[];
+	let nlp=new NLP();																				// Alloc NLP class
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
-		LoadRawData('assets/rawData.csv');															// Load raw data file
-
+		LoadConfig();
 		$("#lz-makeTrain").on("click",()=>   { MakeTrain() } );										// ON MAKE TRAINING FILE
 		$("#lz-makeResponse").on("click",()=>{ MakeResponse() } );									// ON MAKE RESPONSE
 		$("#lz-makeSession").on("click", ()=>{ MakeSession() } );									// ON MAKE SESSION
@@ -60,6 +60,18 @@
 			});
 	});
 
+	function LoadConfig()																		// LOAD CONFIG FILE
+	{	
+		let i,k,o,v,intent;
+		fetch('assets/config.csv')																	// Load file
+			.then(res => res.text())																// Get as text
+			.then(res =>{																			// Process																	
+				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
+				nlp.SetWho(data);																	// Set student synonyms
+				LoadRawData('assets/rawData.csv');													// Load raw data file
+			});
+		}
+	
 	function LoadRawData(file)																	// LOAD RAW DATA CSV
 	{
 		fetch(file)																					// Load file
@@ -77,7 +89,9 @@
 		for (i=0;i<rawData.length;++i) {															// For each entry
 			o=rawData[i];																			// Point at line
 			if (!o.intent)	continue;
+	
 			if (o.actor == "Teacher") {																// A remark
+				if (o.text.split(" ").length < 3)	continue;										// Skip short remarks
 				++nRemarks;																			// Add to count											
 				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
 				if (!intents["r"+o.intent]) intents["r"+o.intent]=[];								// Create full holder
@@ -146,11 +160,16 @@
 		return str;																					// Return data
 
 		function addIntent(k) {																		// ADD INTENT TO NLU
-			let i,o,n=0,s="",ss;
+			let i,o,n=0,s="",re,ss,who;
 			for (i=0;i<intents[k].length;++i) {														// For each one
 				o=rawData[intents[k][i]];															// Point at item
 				if ((o.teacher-0 >= sa-0) && (o.teacher-0 < se-0)) continue;						// An excluded one
-				ss=o.text.replace(/luis|farrah|chris|jazmin|oliver/i,"STUDENT");					// Put in students	
+				ss=o.text;																			// Point at text
+				who=nlp.GetWho(o.text);																// Get who
+				if (who) {																			// Got one
+					re=new RegExp(`${who.split(":")[0]}`,"i");										// Make regex
+					ss=ss.replace(re,`[${who.split(":")[1]}](student)`);							// Encode entity
+					}
 				s+="        - "+ss.trim()+"\n";														// Add remark
 				n++;																				// Advance count
 				if (n > num)	break;																// Only so many
