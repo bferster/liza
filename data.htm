@@ -179,42 +179,42 @@
 
 	async function MakeSession()																// CREATE SESSION FILE
 	{
-		let i,o,r=0,session=[];
+		let i,o,session=[],texts=[];
 		let fields=["scene","actor","code","calc","text"];											// Field names
 		let teacher=$("#lz-session").val().split("-")[0];											// Teacher to add
-		for (i=0;i<rawData.length;++i) {															// For each line
+			for (i=0;i<rawData.length;++i) {														// For each line
 			o=rawData[i];																			// Point at it
 			if (o.teacher != teacher) 	continue;													// Skip if not right teacher
 			if (!o.intent)				continue;													// Skip if not coded																			
-//			await GetResponse(o.text, (res)=>{														// Get intent
-//				let n=(res.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;						// Go to second choice
-//				let r=res.intent_ranking[n].name.substr(1);											// Get intent
-				session.push({ scene:o.topic, actor:o.actor, code:o.intent, calc:r, text:o.text });	// Add line 
-//				});
-			}	
-		let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
-		SaveTextAsFile("session-"+teacher+".csv",str);												// Write file
-		Sound("ding");																				// Sound	
-		return str;																					// Return data
+			texts.push(o.text);																		// Add to array of texts
+			session.push({ scene:o.topic, actor:o.actor, code:o.intent, calc:0, text:o.text });		// Add line 
+			}
+		
+		const fetchAll=async(texts) => {															// GET ALL INTENTS AT ONCE
+  			let i,n;
+			const res   = await Promise.all(texts.map(t => GetResponse(t)));						// Ask for intents
+  			const jsons = await Promise.all(res.map(r => r.json()));								// Wait for them
+			for (i=0;i<jsons.length;++i) {															// For each line
+				n=(jsons[i].intent_ranking[0].name == "nlu_fallback") ? 1 : 0;						// Go to second choice
+				session[i].calc=jsons[i].intent_ranking[n].name.substr(1);							// Get intent
+				}
+			let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib
+			SaveTextAsFile("session-"+teacher+".csv",str);											// Write file
+			Sound("ding");																			// Sound
+			trace(session)	
+			}
+
+		fetchAll(texts);																			// Get all intents
 	}
 
-
-
-
-	function GetResponse(msg, callback)															// GET RESPONSE FROM AI
+	function GetResponse(msg)																	// GET RESPONSE FROM AI
 	{
-		return new Promise(resolve => {
-			let xhttp=new XMLHttpRequest();																// Alloc hxmlhttp
-			xhttp.onreadystatechange = function() {														// ON STATE CHANGE
-				if (this.readyState == 4 && this.status == 200) 										// Valid response
-					callback(JSON.parse(this.response));												// Run callback
-				resolve('resolved');
-				};
-			xhttp.open("POST", "https://lizasim.com:5005/model/parse");									// Set url
-			xhttp.setRequestHeader("Content-Type", "application/json");									// Set type
-			xhttp.send(JSON.stringify({text:msg}));														// Set paqyload
-		});
-	}
+		return fetch("https://lizasim.com:5005/model/parse", {										// Fetch data
+			method:"POST",
+			body: JSON.stringify({text:msg})		
+			})
+
+		}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS 
