@@ -47,6 +47,7 @@
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
 		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
+		&nbsp; &nbsp;<span id="lz-stats"></span>
 	<script>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,6 +72,7 @@ class App {
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
 	{	
 		let i,k,o,v,intent="";
+		let hundreds=0,tens=0,dots=0,n=0;															// Remarks counter
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
@@ -83,8 +85,18 @@ class App {
 					if (i)	this.csv[i-1].response=this.csv[i].text;								// Add student response
 					this.csv.splice(i,1);															// Remove it
 					}
-				else this.csv[i].response="";														// No respomse for teacher remaks
+				else{																				// Teacher remarks
+					++n;																			// Inc count
+					this.csv[i].response="";														// No respose for teacher remaks
+					if (this.csv[i].code == this.csv[i].calc)								 ++dots;		// Pure match
+					if (Math.floor(this.csv[i].code) == Math.floor(this.csv[i].calc))		 ++tens;		// Tens match
+					if (Math.floor(this.csv[i].code/100) == Math.floor(this.csv[i].calc/100)) ++hundreds;	// Hundreds match
+					}
 				}
+			let str=`100s=${Math.round((hundreds/n)*100)}% | 
+					10s=${Math.round((tens/n)*100)}% | 
+					all=${Math.round((dots/n)*100)}%`;
+			$("#lz-stats").html(str.replace(/\t|\n|\r/g,""));										// Show stats
 			Sound("ding");																			// Ding
 			};
 		}
