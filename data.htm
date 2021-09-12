@@ -166,8 +166,9 @@
 				ss=o.text;																			// Point at text
 				who=nlp.GetWho(o.text);																// Get who
 				if (who) {																			// Got one
-					re=new RegExp(`${who.split(":")[0]}`,"i");										// Make regex
+					re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");								// Make regex
 					ss=ss.replace(re,`[${who.split(":")[1]}](student)`);							// Encode entity
+//					ss=ss.replace(re,"STUDENT");													// Encode entity
 					}
 				s+="        - "+ss.trim()+"\n";														// Add remark
 				n++;																				// Advance count
