@@ -109,7 +109,6 @@ class NLP {
 		text=(" "+text).replace(/\{.*?\}/g,"");														// Remove text in braces
 		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");					// Keep only germane chars(alph, space, num, *-+/'%$)
 		text=text.replace(/\W(the|a|so|from|in|we|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
-		text=text.replace(/\W(the|a|so|from|in|we|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
 		return text.split(/ +/);																	// Tokenize
 		}
 

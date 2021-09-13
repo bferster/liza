@@ -46,7 +46,7 @@
 // APP 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	let rawData=[], intents=[];
+	let rawData=[], intents=[], responses=[], keyWords=[];
 	let nlp=new NLP();																				// Alloc NLP class
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
@@ -78,26 +78,35 @@
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
 				rawData=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
+				GetKeyWords();																		// Get keywords
 				ParseData();																		// Parse data and show stats
-				});
+			});
 	}
 
-	function ParseData()																		//PARSE DATA AND SHOW DATA STATS
+	function ParseData()																		// PARSE DATA AND SHOW DATA STATS
 	{
 		let i,o;
-		let nRemarks=0, nResponses=0; 
+		let nRemarks=0, nResponses=0; 																// Counts
+		let trigger=[];																				// Triggering teacher's remarks
 		for (i=0;i<rawData.length;++i) {															// For each entry
 			o=rawData[i];																			// Point at line
-			if (!o.intent)	continue;
+			if (!o.intent)	continue;																// Skip no intents
 			if (o.actor == "Teacher") {																// A remark
-				if (o.text.split(" ").length < 3)	continue;										// Skip short remarks
+				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
+				trigger+=o.text+" ";																// Add to response trigger text
 				++nRemarks;																			// Add to count											
 				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
 				if (!intents["r"+o.intent]) intents["r"+o.intent]=[];								// Create full holder
 				intents["r"+Math.floor(o.intent)].push(i);											// Add base index
 				intents["r"+o.intent].push(i);														// Add full
 				}
-			else ++nResponses;																		// Add response
+			else{																					// A student response
+				let keys=nlp.Tokenize(trigger).filter(value => keyWords.includes(value));			// Get keys mentioned
+				if (!responses["r"+o.intent]) responses["r"+o.intent]=[];							// Create holder
+				responses["r"+o.intent].push({ trigger:trigger, keys: keys, text: o.text, actor:o.actor, intent:o.intent });	// Add to list
+				trigger=[];																			// Reset trigger
+				++nResponses;																		// Add response
+				}
 			}
 		
 		let str=`<table>
@@ -122,6 +131,23 @@
 			return s+")";																			// Return subs
 			}
 	}		
+
+	function GetKeyWords()																		// GET UNIQUE LIST OF WORDS
+	{
+		let i,j,k,v;
+		keyWords=[];																				// Clear array
+		for (i=0;i<rawData.length;++i) {															// For each line
+			v=nlp.Tokenize(rawData[i].text);														// Tokenize line
+			for (j=0;j<v.length;++j) 																// For each word															
+				if (v[j].length > 3)																// If big enough	
+					keyWords.push(v[j]);															// Add to key word list	
+			}
+		keyWords=[... new Set(keyWords)];															// Make unique
+	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// OUTPUT 
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	function MakeTrain()																		// CREATE TRAINING YML FILE
 	{
@@ -202,10 +228,28 @@
 			let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib
 			SaveTextAsFile("session-"+teacher+".csv",str);											// Write file
 			Sound("ding");																			// Sound
-			trace(session)	
 			}
-
 		fetchAll(texts);																			// Get all intents
+	}
+
+	function MakeResponse()																		// MAKE RESPONSE FILE
+	{
+		let i,k,n,resp=[];
+		let fields=["intent","actor","keys","trigger","text"];										// Field names
+		let series=$("#lz-series").val();															// Series to use
+		let scene=$("#lz-scene").val();																// Scene to use
+		let num=$("#lz-num").val();																	// Number to use
+		for (k in responses) {
+			if ((series == "All") || (Math.floor(k.substr(1)/100)*100 == series)) {					// If one I want
+				n=0;																				// Reset counter
+				for (i=0;i<responses[k].length;++i)													// For each response
+					if (n++ < num)																	// Within count
+						resp.push(responses[k][i]);													// Add to file
+				}
+			}
+		let str=Papa.unparse(resp,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
+		SaveTextAsFile("responses-"+series+".csv",str);												// Write file
+		Sound("ding");																				// Sound
 	}
 
 	function GetResponse(msg)																	// GET RESPONSE FROM AI

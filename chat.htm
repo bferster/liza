@@ -88,8 +88,8 @@ class App {
 				else{																				// Teacher remarks
 					++n;																			// Inc count
 					this.csv[i].response="";														// No respose for teacher remaks
-					if (this.csv[i].code == this.csv[i].calc)								 ++dots;		// Pure match
-					if (Math.floor(this.csv[i].code) == Math.floor(this.csv[i].calc))		 ++tens;		// Tens match
+					if (this.csv[i].code == this.csv[i].calc)								  ++dots;		// Pure match
+					if (Math.floor(this.csv[i].code) == Math.floor(this.csv[i].calc))		  ++tens;		// Tens match
 					if (Math.floor(this.csv[i].code/100) == Math.floor(this.csv[i].calc/100)) ++hundreds;	// Hundreds match
 					}
 				}
