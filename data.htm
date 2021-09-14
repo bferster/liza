@@ -30,11 +30,12 @@
 			</select>
 			&nbsp &nbsp; Use decimals? <input type="checkbox" checked id="lz-dots"/>
 			&nbsp &nbsp; Number per series: <input type="input" class="co-is" style="width:40px" value="500" id="lz-num"/>
-			&nbsp &nbsp; Exclude: <input type="input" class="co-is" style="width:40px" value="90-100" id="lz-session"/>
+			&nbsp &nbsp; Range: <input type="input" class="co-is" style="width:40px" value="90-100" id="lz-session"/>
 			<hr><p>
 				<div class="co-bs" id="lz-makeTrain">Make nlu.yml</div>
-				&nbsp &nbsp &nbsp; <div class="co-bs" id="lz-makeResponse">Make response</div>
-				&nbsp &nbsp &nbsp; <div class="co-bs" id="lz-makeSession">Make session</div>
+				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeResponse">Make response</div>
+				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeSession">Make session</div>
+				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeStories">Make stories</div>
 			</p>
 			<hr>
 			<p id="outp" style="text-align:left"></p>
@@ -54,11 +55,12 @@
 		$("#lz-makeTrain").on("click",()=>   { MakeTrain() } );										// ON MAKE TRAINING FILE
 		$("#lz-makeResponse").on("click",()=>{ MakeResponse() } );									// ON MAKE RESPONSE
 		$("#lz-makeSession").on("click", ()=>{ MakeSession() } );									// ON MAKE SESSION
+		$("#lz-makeStories").on("click", ()=>{ MakeStories() } );									// ON MAKE STORIES
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
 				}
 			});
-	});
+		});
 
 	function LoadConfig()																		// LOAD CONFIG FILE
 	{	
@@ -193,8 +195,8 @@
 				who=nlp.GetWho(o.text);																// Get who
 				if (who) {																			// Got one
 					re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");								// Make regex
-					ss=ss.replace(re,`[${who.split(":")[1]}](student)`);							// Encode entity
-//					ss=ss.replace(re,"STUDENT");													// Encode entity
+//					ss=ss.replace(re,`[${who.split(":")[1]}](student)`);							// Encode entity
+					ss=ss.replace(re,"STUDENT");													// Encode entity
 					}
 				s+="        - "+ss.trim()+"\n";														// Add remark
 				n++;																				// Advance count
@@ -258,8 +260,57 @@
 			method:"POST",
 			body: JSON.stringify({text:msg})		
 			})
-
 		}
+
+	function MakeStories()																		// MAKE ALL FILES FOR STORIES
+	{
+		let ints=[],resps=[],sess=[];
+		let i,k,o,ss,re,who,id,sid;
+		let session=$("#lz-session").val().split("-");												// Session to skip
+		let start=session[0],end=session[1];														// Extract range
+		if (!end) end=start-0+1;																		// Just one
+		for (i=0;i<rawData.length;++i) {															// For each line
+			o=rawData[i];																			// Point at it
+			if (!o.intent)									continue;								// Skip if not coded																			
+			if ((o.teacher < start-0) || (o.teacher > end-0))	continue;								// Skip if not in set
+			id="r"+Math.floor(o.intent);															// Make intent id name										
+			sid="session-"+o.teacher;																// Session id
+			if (!sess[sid]) sess[sid]=[];															// Alloc session holder
+			if (!ints[id]) 					 ints[id]=[];											// Alloc intent holder
+			if (o.actor == "Teacher") {																// If remark
+				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
+				ss=o.text;																			// Point at text
+				who=nlp.GetWho(o.text);																// Get who
+				if (who) {																			// Got one
+					re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");								// Make regex
+					ss=ss.replace(re,"STUDENT");													// Encode entity
+					}
+				ints[id].push("        - "+ss.trim()+"\n");											// Add it
+				}
+			else{																					// Response
+				sess[sid].push("  - action: utter_r"+i+"\n");										// Add response to story
+				resps.push(`\n  utter_r${i}:\n  - text: "${o.text}"\n`);							// Add to domain file							
+				}
+			}
+	
+		let str="version: \"2.0\"\n\nnlu:\n";														// NLU header
+		for (k in ints)	{																			// For each intent
+			str+="- intent: "+k+"\n  examples: |\n";												// Add header
+			for (i=0;i<ints[k].length;++i) 	str+=ints[k][i];										// Add each remark in intent group
+			}
+		SaveTextAsFile("nlu.yml",str);																// Write file
+		str="version: \"2.0\"\n\nstories:\n";														// Stories header
+		for (k in sess)	{																			// For each intent
+			str+="\n- story: "+k+"\n  steps:\n";													// Add header
+			for (i=0;i<sess[k].length;++i) 	str+=sess[k][i];										// Add each remark in intent group
+			}
+		SaveTextAsFile("stories.yml",str);															// Write file
+		str="";																						// No header
+		for (i=0;i<resps.length;++i) 	str+=resps[i];												// Add each remark in intent group
+		SaveTextAsFile("responses.yml",str);														// Write file
+		Sound("ding");																				// Sound	
+	}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS 

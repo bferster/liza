@@ -275,6 +275,7 @@ class Chat {
 					}
 				};
 			xhttp.open("POST", "https://lizasim.com:5005/model/parse");									// Set url
+//			xhttp.open("POST", "http://localhost:5005/model/parse");									// Set url
 			xhttp.setRequestHeader("Content-Type", "application/json");									// Set type
 			xhttp.send(JSON.stringify({text:msg}));														// Set paqyload
 		}
@@ -359,8 +360,8 @@ class Chat {
 			$("#lz-tempFile").val("");																// Clear value		
 			});
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
-			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				trace(app.nlp.Compare("this is good", "forget eveything, good"));
+			if ((e.which == 84) && e.altKey && e.ctrlKey) {										// Test key (Ctrl+Alt+T)
+				GetTextBox("Remark", "Type remark", "", (s)=>{ app.GetRemark(s); } );
 				}
 			});
 
@@ -387,9 +388,9 @@ class Chat {
 	function GetTextBox(title, content, def, callback, x, y)										// GET TEXT LINE BOX
 	{
 		$("#confirmBoxDiv").remove();																	// Remove 
-		$("body").append("<div class='co-confirm' id='confirmBoxDiv' style='text-align:center'></div>");	// Add box								
+		$("body").append("<div class='co-confirm' id='confirmBoxDiv' style='text-align:center'></div>");// Add box								
 		if (x != undefined)		$("#confirmBoxDiv").css({ left:x+"px", top:y+"px" });					// Position if set
-		let str="<img src='img/logo.png' width='64'/><br>";												// Logo					
+		let str="<img src='img/lisalogo.png' width='64'/><br>";											// Logo					
 		str+="<p style='font-size:14px; color:#666'><b>"+title+"</b></p>";
 		str+="<p>"+content+"<p>";
 		str+="<p><input class='co-is' style='width:95%' type='text' id='co-revText' value='"+def+"'>";
