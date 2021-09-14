@@ -93,7 +93,7 @@
 		for (i=0;i<rawData.length;++i) {															// For each entry
 			o=rawData[i];																			// Point at line
 			if (!o.intent)	continue;																// Skip no intents
-			if (o.actor == "Teacher") {																// A remark
+			if (o.speaker == "Teacher") {															// A remark
 				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
 				trigger+=o.text+" ";																// Add to response trigger text
 				++nRemarks;																			// Add to count											
@@ -105,7 +105,7 @@
 			else{																					// A student response
 				let keys=nlp.Tokenize(trigger).filter(value => keyWords.includes(value));			// Get keys mentioned
 				if (!responses["r"+o.intent]) responses["r"+o.intent]=[];							// Create holder
-				responses["r"+o.intent].push({ trigger:trigger, keys: keys, text: o.text, actor:o.actor, intent:o.intent });	// Add to list
+				responses["r"+o.intent].push({ trigger:trigger, keys: keys, text: o.text, actor:o.speaker, intent:o.intent });	// Add to list
 				trigger=[];																			// Reset trigger
 				++nResponses;																		// Add response
 				}
@@ -190,7 +190,7 @@
 			let i,o,n=0,s="",re,ss,who;
 			for (i=0;i<intents[k].length;++i) {														// For each one
 				o=rawData[intents[k][i]];															// Point at item
-				if ((o.teacher-0 >= sa-0) && (o.teacher-0 < se-0)) continue;						// An excluded one
+				if ((o.rerid-0 >= sa-0) && (o.rerid-0 < se-0)) continue;							// An excluded one
 				ss=o.text;																			// Point at text
 				who=nlp.GetWho(o.text);																// Get who
 				if (who) {																			// Got one
@@ -213,10 +213,10 @@
 		let teacher=$("#lz-session").val().split("-")[0];											// Teacher to add
 			for (i=0;i<rawData.length;++i) {														// For each line
 			o=rawData[i];																			// Point at it
-			if (o.teacher != teacher) 	continue;													// Skip if not right teacher
+			if (o.rerid != teacher) 	continue;													// Skip if not right teacher
 			if (!o.intent)				continue;													// Skip if not coded																			
 			texts.push(o.text);																		// Add to array of texts
-			session.push({ scene:o.topic, actor:o.actor, code:o.intent, calc:0, text:o.text });		// Add line 
+			session.push({ scene:o.topic, actor:o.speaker, code:o.intent, calc:0, text:o.text });		// Add line 
 			}
 		
 		const fetchAll=async(texts) => {															// GET ALL INTENTS AT ONCE
@@ -264,20 +264,22 @@
 
 	function MakeStories()																		// MAKE ALL FILES FOR STORIES
 	{
-		let ints=[],resps=[],sess=[];
+		let ints=[],doms=[],sess=[];
 		let i,k,o,ss,re,who,id,sid;
 		let session=$("#lz-session").val().split("-");												// Session to skip
 		let start=session[0],end=session[1];														// Extract range
-		if (!end) end=start-0+1;																		// Just one
+		if (!end) end=start-0+1;																	// Just one
+		let dots=$("#lz-dots").prop("checked");														// Sub-intents?
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if (!o.intent)									continue;								// Skip if not coded																			
-			if ((o.teacher < start-0) || (o.teacher > end-0))	continue;								// Skip if not in set
-			id="r"+Math.floor(o.intent);															// Make intent id name										
-			sid="session-"+o.teacher;																// Session id
+			if ((o.rerid < start-0) || (o.rerid > end-0))	continue;								// Skip if not in set
+			if (dots) id="r"+o.intent;																// Make fuull intent id name
+			else	  id="r"+Math.floor(o.intent);													// Just the whole numbers					
+			sid="session-"+o.rerid;																	// Session id
 			if (!sess[sid]) sess[sid]=[];															// Alloc session holder
 			if (!ints[id]) 					 ints[id]=[];											// Alloc intent holder
-			if (o.actor == "Teacher") {																// If remark
+			if (o.speaker == "Teacher") {															// If remark
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
 				ss=o.text;																			// Point at text
 				who=nlp.GetWho(o.text);																// Get who
@@ -289,7 +291,7 @@
 				}
 			else{																					// Response
 				sess[sid].push("  - action: utter_r"+i+"\n");										// Add response to story
-				resps.push(`\n  utter_r${i}:\n  - text: "${o.text}"\n`);							// Add to domain file							
+				doms.push(`\n  utter_r${i}:\n  - text: "${o.text.trim()}"\n`);						// Add to domain file							
 				}
 			}
 	
@@ -305,9 +307,12 @@
 			for (i=0;i<sess[k].length;++i) 	str+=sess[k][i];										// Add each remark in intent group
 			}
 		SaveTextAsFile("stories.yml",str);															// Write file
-		str="";																						// No header
-		for (i=0;i<resps.length;++i) 	str+=resps[i];												// Add each remark in intent group
-		SaveTextAsFile("responses.yml",str);														// Write file
+		str="version: \"2.0\"\n\nsession_config:\n";												// Stories header
+		str+="  session_expiration_time: 60\n  carry_over_slots_to_new_session: true\n\nintents:\n";
+		for (k in ints)	str+="  - "+k+"\n";															// Add intent
+		str+="\nresponses:\n";																		// Responses header	
+		for (i=0;i<doms.length;++i) 	str+=doms[i];												// Add each remark in intent group
+		SaveTextAsFile("domain.yml",str);															// Write file
 		Sound("ding");																				// Sound	
 	}
 
