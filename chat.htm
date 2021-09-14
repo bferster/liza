@@ -171,6 +171,16 @@ class App {
 		return text.toLowerCase().split(/ +/);														// Return tokenized lowercase array
 	}
 
+	GetRemark(msg)																				// GET REMARK FROM AI
+	{
+		fetch("http://localhost:5005/webhooks/rest/webhook", {										// Fetch data
+			method:"POST",
+			body: JSON.stringify({sender:"bill", message:msg})		
+			})
+ 		.then(response => response.json())
+  		.then(data => console.log(data));		
+		}
+
 } // App class closure
 
 
