@@ -214,9 +214,8 @@
 			for (i=0;i<rawData.length;++i) {														// For each line
 			o=rawData[i];																			// Point at it
 			if (o.rerid != teacher) 	continue;													// Skip if not right teacher
-			if (!o.intent)				continue;													// Skip if not coded																			
 			texts.push(o.text);																		// Add to array of texts
-			session.push({ scene:o.topic, actor:o.speaker, code:o.intent, calc:0, text:o.text });		// Add line 
+			session.push({ scene:o.topic, actor:o.speaker, code:o.intent, calc:0, text:o.text });	// Add line 
 			}
 		
 		const fetchAll=async(texts) => {															// GET ALL INTENTS AT ONCE
@@ -257,28 +256,28 @@
 	function GetResponse(msg)																	// GET RESPONSE FROM AI
 	{
 		return fetch("https://lizasim.com:5005/model/parse", {										// Fetch data
-			method:"POST",
+//		return fetch("http://localhost:5005/model/parse", {										// Fetch data
+			method:"POST",	
 			body: JSON.stringify({text:msg})		
 			})
 		}
 
 	function MakeStories()																		// MAKE ALL FILES FOR STORIES
 	{
-		let ints=[],doms=[],sess=[];
-		let i,k,o,ss,re,who,id,sid;
+		let ints=[],doms=[],sess=[],dupes=[],last="";
+		let i,jk,o,c,ss,re,who,id,sid;
 		let session=$("#lz-session").val().split("-");												// Session to skip
 		let start=session[0],end=session[1];														// Extract range
 		if (!end) end=start-0+1;																	// Just one
 		let dots=$("#lz-dots").prop("checked");														// Sub-intents?
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
-			if (!o.intent)									continue;								// Skip if not coded																			
 			if ((o.rerid < start-0) || (o.rerid > end-0))	continue;								// Skip if not in set
 			if (dots) id="r"+o.intent;																// Make fuull intent id name
 			else	  id="r"+Math.floor(o.intent);													// Just the whole numbers					
 			sid="session-"+o.rerid;																	// Session id
 			if (!sess[sid]) sess[sid]=[];															// Alloc session holder
-			if (!ints[id]) 					 ints[id]=[];											// Alloc intent holder
+			if (!ints[id])  ints[id]=[];															// Alloc intent holder
 			if (o.speaker == "Teacher") {															// If remark
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
 				ss=o.text;																			// Point at text
@@ -294,23 +293,42 @@
 				doms.push(`\n  utter_r${i}:\n  - text: "${o.text.trim()}"\n`);						// Add to domain file							
 				}
 			}
-	
+
 		let str="version: \"2.0\"\n\nnlu:\n";														// NLU header
+		str+="- intent: bot_challenge\n  examples: |\n    - are you a bot?\n    - are you a human?\n    - am I talking to a bot?\n    - am I talking to a human?\n";
 		for (k in ints)	{																			// For each intent
 			str+="- intent: "+k+"\n  examples: |\n";												// Add header
+			ints[k]=[... new Set(ints[k])];															// Make unique
 			for (i=0;i<ints[k].length;++i) 	str+=ints[k][i];										// Add each remark in intent group
 			}
 		SaveTextAsFile("nlu.yml",str);																// Write file
 		str="version: \"2.0\"\n\nstories:\n";														// Stories header
-		for (k in sess)	{																			// For each intent
-			str+="\n- story: "+k+"\n  steps:\n";													// Add header
-			for (i=0;i<sess[k].length;++i) 	str+=sess[k][i];										// Add each remark in intent group
+		for (k in sess)	{																			// For each session
+			c=0;																					// Reswt chunk counter
+			for (i=0;i<sess[k].length;++i) {														// For each event in session	
+				if (!(c%8)) str+="\n- story: "+k+"-"+c+"\n  steps:\n",c++;							// Add header
+				if (sess[k][i].match(/intent/)) {													// First intent
+					dupes=[];																		// Clear dupe storage
+					for (j=0;j<8;++j) {																// Look for last intent
+						if (sess[k][i+j] && !sess[k][i+j].match(/intent/)) break;					// Quit on action
+						if (sess[k][i+j])															// If valid
+							dupes.push({t:sess[k][i+j],i:sess[k][i+j].substr(13,5)});				// Add to dupe storage
+						}
+					dupes.sort((a,b)=>{ return b.i-a.i });											// Sort by biggest
+					str+=dupes[0] ? dupes[0].t : sess[k][i];										// Add intent
+					i+=j;																			// Skip ahead
+					if (sess[k][i]) str+=sess[k][i];												// Add action
+					++c;																			// Add to count
+					}
+				}
 			}
 		SaveTextAsFile("stories.yml",str);															// Write file
 		str="version: \"2.0\"\n\nsession_config:\n";												// Stories header
 		str+="  session_expiration_time: 60\n  carry_over_slots_to_new_session: true\n\nintents:\n";
+		str+="  - bot_challenge\n";																	// Add challenge
 		for (k in ints)	str+="  - "+k+"\n";															// Add intent
 		str+="\nresponses:\n";																		// Responses header	
+		str+=`  utter_iamabot:\n  - text: "I am a bot, powered by LIZA."\n`;						// Bot response
 		for (i=0;i<doms.length;++i) 	str+=doms[i];												// Add each remark in intent group
 		SaveTextAsFile("domain.yml",str);															// Write file
 		Sound("ding");																				// Sound	
