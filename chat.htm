@@ -235,7 +235,7 @@ class Chat {
 			let s=$("#co-revText").val();																// Get text textbox
 			if (!s && app.csv) { 																		// If getting from CSV file
 				s=app.csv[0].text;																		// Get text
-				origIntent=app.csv[0].code;																// Get original intent
+				origIntent=app.csv[0].code ? app.csv[0].code : "not coded";								// Get original intent
 				if (!app.dots) origIntent=Math.floor(origIntent);										// Just looking at whole numbes
 				origResponse=app.csv[0].response;														// Get original response
 				app.csv.shift(); 																		// Next remark
@@ -252,7 +252,7 @@ class Chat {
 					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
 					Intent </b>${intent} - ${Math.round(o.intent_ranking[n].confidence*100)}%`;			// Main line
 					if (origIntent)		res+=` vs. <span style="color:#${(origIntent == intent) ? "009900" : "990000"}">${origIntent}</span>`;
-					if (origResponse)	res+=" -><i>&quot;"+origResponse+"&quot;</i>";					// Add response
+//					if (origResponse)	res+=" -><i>&quot;"+origResponse+"&quot;</i>";					// Add response
 					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom

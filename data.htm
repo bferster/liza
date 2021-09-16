@@ -48,6 +48,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	let rawData=[], intents=[], responses=[], keyWords=[];
+	let witToken=GetWitToken();
 	let nlp=new NLP();																				// Alloc NLP class
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
@@ -276,8 +277,8 @@
 			if (dots) id="r"+o.intent;																// Make fuull intent id name
 			else	  id="r"+Math.floor(o.intent);													// Just the whole numbers					
 			sid="session-"+o.rerid;																	// Session id
-			if (!sess[sid]) sess[sid]=[];															// Alloc session holder
-			if (!ints[id])  ints[id]=[];															// Alloc intent holder
+			if (!sess[sid]) 			  sess[sid]=[];												// Alloc session holder
+			if (!ints[id] && (id != "r")) ints[id]=[];												// Alloc intent holder
 			if (o.speaker == "Teacher") {															// If remark
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
 				ss=o.text;																			// Point at text
@@ -286,7 +287,7 @@
 					re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");								// Make regex
 					ss=ss.replace(re,"STUDENT");													// Encode entity
 					}
-				ints[id].push("        - "+ss.trim()+"\n");											// Add it
+				if (o.intent)	ints[id].push("        - "+ss.trim()+"\n");							// Add it, id coded
 				}
 			else{																					// Response
 				sess[sid].push("  - action: utter_r"+i+"\n");										// Add response to story
@@ -332,6 +333,31 @@
 		for (i=0;i<doms.length;++i) 	str+=doms[i];												// Add each remark in intent group
 		SaveTextAsFile("domain.yml",str);															// Write file
 		Sound("ding");																				// Sound	
+	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// WIT
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function WitCommand(type, body, callback)
+	{
+		const url="https://api.wit.ai/"+type+"?v=20210806"
+		fetch(url,{ method:"POST",
+			  headers: { Authorization:'Bearer '+witToken, 'Content-Type':'application/json'}, 
+			  body: JSON.stringify(body)
+			  })	
+	  	.then(res => res.json())
+	  	.then(res =>{ if (callback)  callback(); })
+	}
+
+	function GetWitToken()																			// GET API TOKEN
+	{
+		let url=window.location.search.substring(1);													// Get query string
+		if (url && url.match(/t=/i)) {																	// If token spec'd via &t=
+			return url.match(/t=(.*)/i)[1];																// Extract id
+			}
+		const url_="https://viseyes.org/liza/config/getwittoken.php";									// URL
+		$.ajax({ url:url_ }).done(res =>{ witToken=res; })												// Send to PHP and get token
 	}
 
 
