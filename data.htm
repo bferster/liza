@@ -30,7 +30,7 @@
 			</select>
 			&nbsp &nbsp; Use decimals? <input type="checkbox" checked id="lz-dots"/>
 			&nbsp &nbsp; Number per series: <input type="input" class="co-is" style="width:40px" value="500" id="lz-num"/>
-			&nbsp &nbsp; Range: <input type="input" class="co-is" style="width:40px" value="90-100" id="lz-session"/>
+			&nbsp &nbsp; Exclude: <input type="input" class="co-is" style="width:40px" value="90-100" id="lz-session"/>
 			<hr><p>
 				<div class="co-bs" id="lz-makeTrain">Make nlu.yml</div>
 				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeResponse">Make response</div>
@@ -53,13 +53,14 @@
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();
-		$("#lz-makeTrain").on("click",()=>   { MakeTrain() } );										// ON MAKE TRAINING FILE
-		$("#lz-makeResponse").on("click",()=>{ MakeResponse() } );									// ON MAKE RESPONSE
-		$("#lz-makeSession").on("click", ()=>{ MakeSession() } );									// ON MAKE SESSION
-		$("#lz-makeStories").on("click", ()=>{ MakeStories() } );									// ON MAKE STORIES
+		$("#lz-makeTrain").on("click",()=>   { MakeStories(1);    } );								// ON MAKE TRAINING FILE
+		$("#lz-makeResponse").on("click",()=>{ MakeStories(8);    } );								// ON MAKE RESPONSE
+		$("#lz-makeSession").on("click", ()=>{ MakeSession();     } );								// ON MAKE SESSION
+		$("#lz-makeStories").on("click", ()=>{ MakeStories(1|2|4) } );								// ON MAKE ALL 3 FILES
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				}
+				ChooseKeywords();	
+			}
 			});
 		});
 
@@ -104,10 +105,6 @@
 				intents["r"+o.intent].push(i);														// Add full
 				}
 			else{																					// A student response
-				let keys=nlp.Tokenize(trigger).filter(value => keyWords.includes(value));			// Get keys mentioned
-				if (!responses["r"+o.intent]) responses["r"+o.intent]=[];							// Create holder
-				responses["r"+o.intent].push({ trigger:trigger, keys: keys, text: o.text, actor:o.speaker, intent:o.intent });	// Add to list
-				trigger=[];																			// Reset trigger
 				++nResponses;																		// Add response
 				}
 			}
@@ -142,7 +139,7 @@
 		for (i=0;i<rawData.length;++i) {															// For each line
 			v=nlp.Tokenize(rawData[i].text);														// Tokenize line
 			for (j=0;j<v.length;++j) 																// For each word															
-				if (v[j].length > 3)																// If big enough	
+				if (v[j].length > 4)																// If big enough	
 					keyWords.push(v[j]);															// Add to key word list	
 			}
 		keyWords=[... new Set(keyWords)];															// Make unique
@@ -151,61 +148,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
-	function MakeTrain()																		// CREATE TRAINING YML FILE
-	{
-		let i,k,o,base;
-		let str="version: \"2.0\"\n\nnlu:\n";
-		let series=$("#lz-series").val();															// Series to use
-		let scene=$("#lz-scene").val();																// Scene to use
-		let session=$("#lz-session").val().split("-");												// Session to skip
-		let sa=session[0],se=session[1];															// Extract range
-		if (!se) se=sa+1;																			// Just one
-		let num=$("#lz-num").val();																	// Number to use
-		let dots=$("#lz-dots").prop("checked");														// Sub intents?
-
-		for (k in intents) {																		// For each one
-			if (!k || (k == 0))				continue;												// Skip unecoded intents
-			if (series == "All") {																	// Adding them all
-				if (!dots && k.match(/\./)) continue;												// Skip decimals
-				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
-				if (dots) 					base=k.substr(1);										// Top entry - whole
-				else 	  					base=Math.floor(k.substr(1));							// Top decimal
-				str+="- intent: r"+base+"\n  examples: |\n";										// Add header
-				str+=addIntent("r"+base);															// Add items
-				}
-			else if (series == Math.floor(k.substr(1)/100)*100)	{									// Adding individually from a series
-				if (!dots && k.match(/\./)) continue;												// Skip decimals
-				if (dots && !k.match(/\./)) continue;												// Skip whole numbers
-				if (dots) base=k.substr(1);															// Top entry - whole
-				else 	  base=Math.floor(k.substr(1));												// Top decimal
-				str+="- intent: r"+base+"\n  examples: |\n";										// Add header
-				str+=addIntent("r"+base);															// Add items
-				}
-			}
-		SaveTextAsFile("nlu.yml",str);																// Write file
-		Sound("ding");																				// Sound	
-		return str;																					// Return data
-
-		function addIntent(k) {																		// ADD INTENT TO NLU
-			let i,o,n=0,s="",re,ss,who;
-			for (i=0;i<intents[k].length;++i) {														// For each one
-				o=rawData[intents[k][i]];															// Point at item
-				if ((o.rerid-0 >= sa-0) && (o.rerid-0 < se-0)) continue;							// An excluded one
-				ss=o.text;																			// Point at text
-				who=nlp.GetWho(o.text);																// Get who
-				if (who) {																			// Got one
-					re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");								// Make regex
-//					ss=ss.replace(re,`[${who.split(":")[1]}](student)`);							// Encode entity
-					ss=ss.replace(re,"STUDENT");													// Encode entity
-					}
-				s+="        - "+ss.trim()+"\n";														// Add remark
-				n++;																				// Advance count
-				if (n > num)	break;																// Only so many
-				}
-			return s;																				// Return intents group
-			}
-	}
 
 	async function MakeSession()																// CREATE SESSION FILE
 	{
@@ -234,26 +176,6 @@
 		fetchAll(texts);																			// Get all intents
 	}
 
-	function MakeResponse()																		// MAKE RESPONSE FILE
-	{
-		let i,k,n,resp=[];
-		let fields=["intent","actor","keys","trigger","text"];										// Field names
-		let series=$("#lz-series").val();															// Series to use
-		let scene=$("#lz-scene").val();																// Scene to use
-		let num=$("#lz-num").val();																	// Number to use
-		for (k in responses) {
-			if ((series == "All") || (Math.floor(k.substr(1)/100)*100 == series)) {					// If one I want
-				n=0;																				// Reset counter
-				for (i=0;i<responses[k].length;++i)													// For each response
-					if (n++ < num)																	// Within count
-						resp.push(responses[k][i]);													// Add to file
-				}
-			}
-		let str=Papa.unparse(resp,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
-		SaveTextAsFile("responses-"+series+".csv",str);												// Write file
-		Sound("ding");																				// Sound
-	}
-
 	function GetResponse(msg)																	// GET RESPONSE FROM AI
 	{
 		return fetch("https://lizasim.com:5005/model/parse", {										// Fetch data
@@ -263,9 +185,10 @@
 			})
 		}
 
-	function MakeStories()																		// MAKE ALL FILES FOR STORIES
+	function MakeStories(mask)																	// MAKE ALL FILES
 	{
-		let ints=[],doms=[],sess=[],dupes=[],last="";
+		let ints=[],doms=[],sess=[],dupes=[];
+		let rType,keys=[],resps=[];
 		let i,jk,o,c,ss,re,who,id,sid;
 		let session=$("#lz-session").val().split("-");												// Session to skip
 		let start=session[0],end=session[1];														// Extract range
@@ -273,25 +196,29 @@
 		let dots=$("#lz-dots").prop("checked");														// Sub-intents?
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
-			if ((o.rerid < start-0) || (o.rerid > end-0))	continue;								// Skip if not in set
+			if ((o.rerid >= start-0) && (o.rerid < end-0))	continue;								// Skip if exclused
+			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
 			if (dots) id="r"+o.intent;																// Make fuull intent id name
 			else	  id="r"+Math.floor(o.intent);													// Just the whole numbers					
 			sid="session-"+o.rerid;																	// Session id
 			if (!sess[sid]) 			  sess[sid]=[];												// Alloc session holder
 			if (!ints[id] && (id != "r")) ints[id]=[];												// Alloc intent holder
 			if (o.speaker == "Teacher") {															// If remark
-				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
+				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
+				if (id != "r")	sess[sid].push("  - intent: "+id+"\n");								// Add intent to story
 				ss=o.text;																			// Point at text
 				who=nlp.GetWho(o.text);																// Get who
 				if (who) {																			// Got one
 					re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");								// Make regex
 					ss=ss.replace(re,"STUDENT");													// Encode entity
 					}
-				if (o.intent)	ints[id].push("        - "+ss.trim()+"\n");							// Add it, id coded
+				if (o.intent)	ints[id].push("        - "+ss.trim().replace(/:/g,"")+"\n");		// Add it, id coded
 				}
 			else{																					// Response
-				sess[sid].push("  - action: utter_r"+i+"\n");										// Add response to story
-				doms.push(`\n  utter_r${i}:\n  - text: "${o.text.trim()}"\n`);						// Add to domain file							
+				rType="agree";
+				if (id != "r") resps.push( { intent:id,text: o.text.trim().replace(/:|"/g,""),keys:keys,type:rType,turn:Math.floor(i/2),speaker:who.split(":")[1] });
+				if (id != "r") sess[sid].push("  - action: utter_r"+i+"\n");						// Add response to story
+				doms.push(`\n  utter_r${i}:\n  - text: "${o.text.trim().replace(/:|"/g,"")}"\n`);	// Add to domain file							
 				}
 			}
 
@@ -302,7 +229,8 @@
 			ints[k]=[... new Set(ints[k])];															// Make unique
 			for (i=0;i<ints[k].length;++i) 	str+=ints[k][i];										// Add each remark in intent group
 			}
-		SaveTextAsFile("nlu.yml",str);																// Write file
+		if (mask&1) SaveTextAsFile("nlu.yml",str);													// Write file
+
 		str="version: \"2.0\"\n\nstories:\n";														// Stories header
 		for (k in sess)	{																			// For each session
 			c=0;																					// Reswt chunk counter
@@ -323,16 +251,55 @@
 					}
 				}
 			}
-		SaveTextAsFile("stories.yml",str);															// Write file
-		str="version: \"2.0\"\n\nsession_config:\n";												// Stories header
+		if (mask&2) SaveTextAsFile("stories.yml",str);												// Write file
+
+		str="version: \"2.0\"\n\nsession_config:\n";												// Domain header
 		str+="  session_expiration_time: 60\n  carry_over_slots_to_new_session: true\n\nintents:\n";
 		str+="  - bot_challenge\n";																	// Add challenge
 		for (k in ints)	str+="  - "+k+"\n";															// Add intent
 		str+="\nresponses:\n";																		// Responses header	
 		str+=`  utter_iamabot:\n  - text: "I am a bot, powered by LIZA."\n`;						// Bot response
 		for (i=0;i<doms.length;++i) 	str+=doms[i];												// Add each remark in intent group
-		SaveTextAsFile("domain.yml",str);															// Write file
-		Sound("ding");																				// Sound	
+		if (mask&4) SaveTextAsFile("domain.yml",str);												// Write file
+
+		let fields=["intent","speaker","type","turn","keys","text"];								// Field names
+		str=Papa.unparse(resps,{ header:true, skipEmptyLines:true, columns:fields });				// Make CSV using lib
+		if (mask&8) SaveTextAsFile("responses.csv",str);											// Write file
+		Sound("ding");																				// Sound
+	}
+
+	function ChooseKeywords()
+	{
+		let i=0,str="";
+		$("#outp").html(0+". "+keyWords[0]);														// Show 
+
+		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
+			trace(e.which)
+			if (e.which == 37)	{																	// Left arrow
+				i=Math.max(i-1,0);																	// Back
+				$("#outp").html(i+". <b>"+keyWords[i]+"</b><br><br>"+str);							// Show 
+				}
+			if (e.which == 39)	{																	// Right arrow
+				i=Math.min(i+1,keyWords.length-1);													// Forward
+				$("#outp").html(i+". <b>"+keyWords[i]+"</b><br><br>"+str);							// Show 
+				}
+			if (e.which == 13)	{																	// Right arrow
+				str+=keyWords[i]+", ";
+				$("#outp").html(i+". <b>"+keyWords[i]+"</b><br><br>"+str);							// Show 
+				++i;
+				Sound("click")
+				}
+			if (e.which == 8)	{																	// Back
+				let v=str.split(", ");																// Get as  array
+				v.pop();																			// Remove last
+				v.pop();																			// Remove last
+				v=[... new Set(v)];																	// Make unique
+				str=v.toString();																	// To string
+				str=str.replace(/,/g,", ")+", ";													// Add spaces
+				$("#outp").html(i+". <b>"+keyWords[i]+"</b><br><br>"+str);							// Show 
+				Sound("delete")
+				}
+			});
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
