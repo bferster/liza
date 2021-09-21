@@ -270,6 +270,25 @@
 		str=Papa.unparse(resps,{ header:true, skipEmptyLines:true, columns:fields });				// Make CSV using lib
 		if (mask&8) SaveTextAsFile("responses.csv",str);											// Write file
 		Sound("ding");																				// Sound
+
+		
+		for (k in ints)	{																			// For each intent
+			if (k == "r90") continue
+			str="[\n";
+			ints[k]=[... new Set(ints[k])];															// Make unique
+			for (i=0;i<Math.min(ints[k].length,num);++i) { 											// Add each remark in intent group
+				ss=ints[k][i].slice(10,-1);
+				ss=ss.replace(/"/g,"");
+				ss=ss.replace(/'/g,"\\u0027");
+				str+=`{ "data": [{ "text": "${ss}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
+				}
+			str=str.slice(0,-2)+"\n]";
+			SaveTextAsFile(k.substr(1)+"_usersays_en.json",str);													// Write file
+return;			
+		}
+
+
+
 	}
 
 	function ChooseKeywords()
