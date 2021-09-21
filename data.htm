@@ -15,6 +15,8 @@
 						cursor:pointer; z-index:2; padding-bottom:1px; color:#000; background-color: #eee; font-weight:600; }
 		.co-bsg		{	cursor: pointer; color:#fff; text-align: center; border-radius: 16px; display: inline-block; user-select: none;
 						font-size: 13px; background-color: #999; padding: 2px 8px 2px 8px; }
+		.lz-confirm {	position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
+						border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; }
 	</style>
 	<body>
 		<div style="width:66%;margin:0 auto;text-align:center">
@@ -48,7 +50,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	let rawData=[], intents=[], responses=[], keyWords=[];
-	let witToken=GetWitToken();
 	let nlp=new NLP();																				// Alloc NLP class
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
@@ -59,7 +60,7 @@
 		$("#lz-makeStories").on("click", ()=>{ MakeStories(1|2|4) } );								// ON MAKE ALL 3 FILES
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				ChooseKeywords();	
+				GetTextBox("Type intent","","",(s)=>{ WitTrainIntent(s); });	
 			}
 			});
 		});
@@ -194,6 +195,8 @@
 		let start=session[0],end=session[1];														// Extract range
 		if (!end) end=start-0+1;																	// Just one
 		let dots=$("#lz-dots").prop("checked");														// Sub-intents?
+		let num=$("#lz-num").val();																	// Max per intent
+
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if ((o.rerid >= start-0) && (o.rerid < end-0))	continue;								// Skip if exclused
@@ -212,7 +215,8 @@
 					re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");								// Make regex
 					ss=ss.replace(re,"STUDENT");													// Encode entity
 					}
-				if (o.intent)	ints[id].push("        - "+ss.trim().replace(/:/g,"")+"\n");		// Add it, id coded
+				if (o.intent && (ints[id].length < num)) 											// If under limit and coded
+					ints[id].push("        - "+ss.trim().replace(/:/g,"")+"\n");					// Add it,
 				}
 			else{																					// Response
 				rType="agree";
@@ -306,26 +310,28 @@
 // WIT
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	function WitCommand(type, body, callback)
+	function WitTrainIntent(intent)
 	{
-		const url="https://api.wit.ai/"+type+"?v=20210806"
-		fetch(url,{ method:"POST",
-			  headers: { Authorization:'Bearer '+witToken, 'Content-Type':'application/json'}, 
-			  body: JSON.stringify(body)
-			  })	
-	  	.then(res => res.json())
-	  	.then(res =>{ if (callback)  callback(); })
+		let i;
+		let n=Math.min(intents[intent].length,199);
+		for (i=0;i<n;++i)  WitTrain(intent, rawData[i].text)
 	}
 
-	function GetWitToken()																			// GET API TOKEN
+	function WitTrain(intent, remark)															// SEND REMARK TO WIT
 	{
-		let url=window.location.search.substring(1);													// Get query string
-		if (url && url.match(/t=/i)) {																	// If token spec'd via &t=
-			return url.match(/t=(.*)/i)[1];																// Extract id
-			}
-		const url_="https://viseyes.org/liza/config/getwittoken.php";									// URL
-		$.ajax({ url:url_ }).done(res =>{ witToken=res; })												// Send to PHP and get token
+		const url="https://api.wit.ai/utterances?v=20210922";										// URL
+		let token="57CTW-X-CFRZYAIGCB-X-PHA6E5QT4-X-FG3IOR6O".replace(/-X-/g,"");					// Get token
+		intent=intent.replace(/\./,"_");															// Modify intent to suitb Wit
+		let body=[{ text:remark, intent:intent, entities:[], traits: [] }];							// Make body
+		trace(body)
+		fetch(url,{ method:"POST",
+			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
+			  body: JSON.stringify(body)
+			  })	
+	  	.then(res => res.json()).then(res =>{ trace(res); })
 	}
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -374,6 +380,24 @@
 		document.body.appendChild(downloadLink);
 		downloadLink.click();
 	}
+
+	function GetTextBox(title, content, def, callback)											// GET TEXT LINE BOX
+	{
+		$("#confirmBoxDiv").remove();																	// Remove 
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add box								
+		var str="<img src='img/lizalogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
+		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
+		str+="<p>"+content+"<p>";
+		str+="<p><input class='lz-is' style='width:75%' type='text' id='gtBoxTt' value='"+def+"'></p>";
+		str+="<div id='dialogOK' class='lz-bs'>OK</div>";
+		str+="<div id='dialogCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
+		$("#confirmBoxDiv").html(str);																	// Add to div
+		$("#gtBoxTt").focus();																			// Focus on button
+		$("#gtBoxTt").on("change", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ONE ENTER
+		$("#dialogOK").on("click", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ON OK 
+		$("#dialogCancel").on("click", function() {	$("#confirmBoxDiv").remove(); });								// ON CANCEL
+		}
+
 
 </script>
 </body>
