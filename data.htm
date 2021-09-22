@@ -271,9 +271,8 @@
 		if (mask&8) SaveTextAsFile("responses.csv",str);											// Write file
 		Sound("ding");																				// Sound
 
-		
+/*		
 		for (k in ints)	{																			// For each intent
-			if (k == "r90") continue
 			str="[\n";
 			ints[k]=[... new Set(ints[k])];															// Make unique
 			for (i=0;i<Math.min(ints[k].length,num);++i) { 											// Add each remark in intent group
@@ -283,11 +282,11 @@
 				str+=`{ "data": [{ "text": "${ss}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
 				}
 			str=str.slice(0,-2)+"\n]";
+			if (k.substr(1) > 200)
 			SaveTextAsFile(k.substr(1)+"_usersays_en.json",str);													// Write file
-return;			
 		}
 
-
+*/
 
 	}
 
