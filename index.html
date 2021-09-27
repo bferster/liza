@@ -18,6 +18,7 @@
 	<script src="blackboard.js"></script>
 	<script src="voice.js"></script>
 	<script src="time.js"></script>
+	<script src="feedback.js"></script>
 	
 	<style>
 		 body { 			font-family:Verdana,Geneva,sans-serif;font-size:13px; box-sizing:border-box; 
@@ -88,6 +89,12 @@
 		.lz-playerslider{ 	background:#ccc; height:1px; width:80px; border:none; display:inline-block;
 							margin-left:6px;
 							}
+		.lz-feedbar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 256px);
+							background-color:#aaa; border-radius: 12px 12px 0 0; height:218px;  }
+		.lz-feedback { 		position:flex; flex-direction: row; width:calc(100% - 16px); height:208px; margin: 8px; 
+							background-color:#fff; border-radius:8px; color:#333; }
+		.lz-chartbar { 		height:16px; background-color:#86d698; }
+
 		.lz-playerslider.ui-slider .ui-slider-handle {
 							height:0px; width:0px; margin-top:7px; cursor:pointer; background:none;
 							border-left: 5px solid transparent; border-right: 5px solid transparent;
@@ -240,6 +247,7 @@ class App  {
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.rev=new Review();																		// Make new reviewer		
 		this.tim=new Timeline();																	// Make timeline	
+		this.fb=new Feedback();																		// Teacher feedback	
 		this.LoadProject(this.gid);																	// Load project file
 		this.Draw();																				// Start 
 
@@ -250,6 +258,7 @@ class App  {
 		$("#talkBut").on("click", ()=> { this.voice.Listen(); });									// On talk button click, start listening
 		$("#helpBut").on("click", ()=> { this.ShowHelp(); });										// On help button click, show help
 		$("#writeBut").on("click", ()=> { 															// On BB button clck
+			$("#lz-feedbar").remove();																// Remove feedback panel
 			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
 			$("#blackboardDiv").css("top",h+"px");													// Set top
 			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show

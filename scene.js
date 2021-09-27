@@ -59,6 +59,8 @@ class Scene {
 		this.container.appendChild(this.renderer.domElement);										// Add to div
 		this.AddRoom();																				// Add room walls
 		this.AddBlackboards();																		// Add blackboards
+		this.raycaster=new THREE.Raycaster(); 														// Alloc raycaster
+		this.mouse=new THREE.Vector2(); 															// Alloc click holder
 	}
 
 	AddLights()																					// ADD LIGHTS
@@ -200,6 +202,7 @@ class Scene {
 			object.scale.x=object.scale.y=object.scale.z=o.s;										// Scale 
 			object.position.x=loc.x;	object.position.z=loc.y;	object.position.y=loc.z;		// Position
 			object.rotation.z=loc.r*Math.PI/180;													// Rotation
+			object.name=o.id;																		// Set name
 			if (o.sex) object.position.z-=12,object.ozp-=12;
 			_this.scene.add(object);																// Add model to scene
 		}
@@ -487,5 +490,23 @@ class Scene {
 		pos.y=-(pos.y*h)+h;																			// Y
 		return pos;																					// Return pos
 	}
+
+	GetModelPos(x,y)																			// GET SCREEN POS OF 3D OBJECT
+	{	
+		this.mouse.x=(x/ this.renderer.domElement.clientWidth)*2-1;									// Get x 0-1
+		this.mouse.y=-(y/this.renderer.domElement.clientHeight)*2+1;								// Y
+		this.raycaster.setFromCamera(this.mouse,this.camera);										// Cast ray
+		let intersects=this.raycaster.intersectObjects(app.sc.scene.children,true);					// Get intersect		
+		return intersects[0] ? intersects[0] : "";													// Return id
+	}
+
+	GetObjectFromId(id)																			// GET OBJECT FROM UUID	
+	{
+		let i;
+		for (i=0;i<app.sc.scene.children.length;++i)												// For each object
+			if (app.sc.scene.children[i].uuid == id)												// A match
+				return(app.sc.scene.children[i]);													// Return object
+		return null;																				// No match
+	}		
 
 }  // SCENE CLOSURE

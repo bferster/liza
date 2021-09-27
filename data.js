@@ -328,7 +328,6 @@ class ARC  {
 
 	GetEntities(text)																				// EXTRACT ENTITIES
 	{
-trace(1,text);
 		var i,j,k,r,es,ks;
 		var s="",ents=[];
 		var _this=this;																					// Save contex	
@@ -345,7 +344,6 @@ trace(1,text);
 		var nw=words.length-1;																			// Number of words-1
 		words[0]=words[0].replace(/s$/,"");																// Remove final s from first word
 		words[0]=words[0].replace(/ing$/,"");															// Remove gerunds
-		trace(2,words)
 		for (i=0;i<nw;++i) {																			// For each word
 			if (!isNaN(words[i])) {																		// If a number
 				ents.push({ e:"number", k:words[i], v:words[i] });										// Add to match list 
