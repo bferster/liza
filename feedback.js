@@ -61,7 +61,7 @@ class Feedback {
 			
 			$("#lz-dlg").remove();
 			let str=`<div id="lz-dlg" style="position:absolute;top:${p.top+24}px;left:${p.left-4}px">
-			<div class='lz-textRA'></div><div class="lz-textR">What is two plus two?</div>
+			<div class='lz-textRA'></div><div class="lz-textR">OK ${this.curStudent}, what is two plus two?</div>
 			<div class="lz-textS">Five, of course!</div>
 			</div>`;
 			$("body").append(str.replace(/\t|\n|\r/g,""))
