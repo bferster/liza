@@ -57,7 +57,7 @@
 							font-size: 14px; text-align:center; display: none;
 							}
 		.lz-bubble {		position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top:80px; width:200px;
-							border-radius: 100px; background-color: #d7ebff; border: 1px solid #999; 
+							border-radius: 100px; background-color: #d7ebff; border: 1px solid rgb(206, 112, 112); 
 							font-size: 16px; text-align:center; display: none;
 							}
 		.lz-timebar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 128px);
@@ -65,12 +65,12 @@
 							}
 		.lz-timeback { 		position:absolute;width:calc(100% - 32px); height:68px; left:0; top:0; background-color:#fff; border-radius:8px; margin:16px 16px 0 16px;
 							}
-		.lz-timeslider {	background:#ccc; height:3px; border:none; display:inline-block; width: calc(100% - 206px); margin-top:8px; margin-left:8px; top:40px; left:32px;
+		.lz-timeslider {	position:absolute;background:#ccc; height:3px; border:none; display:inline-block; width:calc(100% - 353px); top:190px; left:305px; 
 							}
 		.lz-timeslider.ui-slider .ui-slider-handle { 
-							height:30px; width:8px; margin-top:-8px; background:#009900; border:none; cursor:pointer;
+							height:30px; width:8px; margin-top:-8px; background:#27ae60; border:none; cursor:pointer; 
 							}
-		.lz-slidertime { 	position:absolute; width:50px; text-align:center; color:#999; font-size:10px; top:69px;
+		.lz-slidertime { 	position:absolute; color:#999; font-size:10px; top:197px;
 							}
 		.lz-timeEventS { 	position:absolute; width:8px; height:8px; border-radius:8px; color:#ccc; top:56px;
 							}
@@ -89,11 +89,22 @@
 		.lz-playerslider{ 	background:#ccc; height:1px; width:80px; border:none; display:inline-block;
 							margin-left:6px;
 							}
-		.lz-feedbar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 256px);
-							background-color:#aaa; border-radius: 12px 12px 0 0; height:218px;  }
-		.lz-feedback { 		position:flex; flex-direction: row; width:calc(100% - 16px); height:208px; margin: 8px; 
-							background-color:#fff; border-radius:8px; color:#333; }
-		.lz-chartbar { 		height:16px; background-color:#86d698; }
+		.lz-feedbar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 256px); user-select:none;
+							background-color:#aaa; border-radius: 12px 12px 0 0; height:218px;  
+							}
+		.lz-feedback { 		display:flex; flex-direction: row; width:calc(100% - 16px); height:208px; margin: 8px; 
+							background-color:#fff; border-radius:8px; color:#333; 
+							}
+		.lz-chartbar { 		height:16px; background-color:#86d698; 
+							}
+		.lz-textR 	{		background-color:#0099ff; border-radius:8px; border-top-left-radius:0; margin:0 8px;   
+							padding:4px 8px; width:-moz-fit-content; width:fit-content; max-width: 66%; clear:both; float:left; text-align:left; 
+							}
+		.lz-textRA 	{		clear:both; float:left; margin:-8px 0 0 8px; width:0; height:0; border-bottom:8px solid #0099ff; border-right:12px solid transparent; margin-left:8px; 
+							}
+		.lz-textS 	{		background-color:#999; border-radius:8px; padding:4px 8px; width:-moz-fit-content; width:fit-content; 
+							max-width: 66%; margin-top:2px; clear:both; float:right; text-align:right; color:#fff; 
+							}
 
 		.lz-playerslider.ui-slider .ui-slider-handle {
 							height:0px; width:0px; margin-top:7px; cursor:pointer; background:none;
