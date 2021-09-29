@@ -578,6 +578,27 @@ class App  {
 		$(container).append(str);																		// Add icon to container
 	}
 
+	function SlideUp(x, y, title, content)															// SLIDE UP PANEL
+	{
+		if ($("#lz-slideUp").length) {																	// If already up, bring it down
+			$("#lz-slideUp").hide("slide",{ direction:"down", complete: ()=>{ $("#lz-slideUp").remove(); } }); // Slide down
+			return;																						// Quit																					
+			}
+		let str=`<div id="lz-slideUp" class="lz-dialog" 
+		style="background-color:#ccc;width:324px;overflow:hidden;display:none;padding:8px;left:${x}px">
+		&nbsp;<img src="img/lizalogo.png" style="vertical-align:-6px;width:64px">
+		<span style="font-size:18px;margin-left:8px;padding-bottom:30p">${title}</span>
+		<img src="img/closedot.gif"' style="float:right" onclick='$("#lz-slideUp").remove()'>	
+		<div style="height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px">
+		${content}</div>`;
+		$("body").append(str);																			// Add to body
+		let h=window.innerHeight-$("#lz-slideUp").height()-70-y;										// Calc top
+		$("#lz-slideUp").css("top",h+"px");																// Set top
+		$("#lz-slideUp").show("slide",{ direction:"down" });											// Slide up
+		$("#lz-slideUp").draggable();																	// Make it draggable on desktop
+		$("#lz-slideUp").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } ); // Don't move orbiter
+	}
+
 	function PopUp(msg, time, div)																	// TIMED POPUP
 	{
 		var str="";

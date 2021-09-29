@@ -40,7 +40,7 @@ class Feedback {
 				<tr><td>Use of evidence</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Flexible thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Curious thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
-				<tr><td colspan='2'><p class="lz-bs" id="lz-v${this.curStudent}">View ${this.curStudent}'s text</p></td></tr>
+				<tr><td colspan='2'><p class="lz-bs" id="lz-v${this.curStudent}" onclick="app.fb.ShowText()">View ${this.curStudent}'s text</p></td></tr>
 				</table>
 			</div>
 			<div style="flex-grow:6">
@@ -95,11 +95,12 @@ class Feedback {
 	DrawMoves()																					// DRAW MOVES CHART
 	{
 		let x,y=31,i,str="",ys=[];
-		let wid=$(window).width()-320;																// Size of graph
+		let labs=["Think","Correct","Value","Ask","Task"];
+		let wid=$(window).width()-360;																// Size of graph
 		for (i=0;i<5;++i) {																			// For each grid line
-			str+=`<text x="0" y="${y+4}" fill="#ccc">${(5-i)*100}</text>						
+			str+=`<text x="0" y="${y+4}" fill="#999">${(5-i)*100}</text>						
 			<line x1="32" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:1"/>
-			<text x="${wid+5}" y="${y+4}" fill="#ccc">${(5-i)*100}</text>`;							// Draw it
+			<text x="${wid+10}" y="${y+4}" fill="#999">${labs[i]}</text>`;							// Draw it
 			y+=31;																					// Next line down
 			}
 		str+=`<polyline style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" points="`;
@@ -113,13 +114,12 @@ class Feedback {
 			x=Math.floor(Math.random()*15)
 			str+=`<circle id="lzDot-${i}" cx="${x*40+35}" cy="${ys[x]}" r="6" fill="#ce7070" cursor="pointer"/>`
 			}
-		
-		
 		return str
 		}	
 
-		ShowText(student)
+		ShowText()
 		{
+			SlideUp(24,34,this.curStudent+"'s text",`This space will show ${this.curStudent}'s written answer to the prompt for reference.`)
 		}
 
 }	// Class closure
