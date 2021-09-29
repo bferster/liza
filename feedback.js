@@ -10,6 +10,9 @@ class Feedback {
 		this.curStudent="";																			// No one selected yet
 		this.curTime=0;																				// Current time in session 0-1000
 		this.maxTime=3*60*1000;																		// Time in session in ms
+		this.curStart=0;																			// Start in msecs
+		this.startPlay;																				// When play started in msecs
+		this.interval=null;																			// Timer
 	}
 
 	OnClick(e) 																					// ON SCREEN CLICK
@@ -17,6 +20,7 @@ class Feedback {
 		if (e.target.localName != "canvas")	return;													// React only to canvas hits
 		this.curStudent="";																			// No one selected yet
 		$("#lz-feedbar").remove();																	// Remove old one
+		clearInterval(this.interval);																// Clear timer
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point
 		if (o.object.name == "body") {																// If a student
 			app.fb.curStudent=o.object.parent.name;													// Set name
@@ -47,9 +51,10 @@ class Feedback {
 				<svg width="100%" height="100%">${this.DrawMoves()}</svg>
 			</div>
 		</div>
-		<div id='sliderTime' class='lz-slidertime'></div>
-		<div id='timeSlider' class='lz-timeslider'></div>
-		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 37px);top:184px;width:18px;cursor:pointer">`;
+		<div id="sliderLine" class="lz-sliderline"></div>
+		<div id="sliderTime" class="lz-slidertime"></div>
+		<div id="timeSlider" class="lz-timeslider"></div>
+		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 62px);top:184px;width:18px;cursor:pointer">`;
 	
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
@@ -65,38 +70,42 @@ class Feedback {
 			<div class="lz-textS">Five, of course!</div>
 			</div>`;
 			$("body").append(str.replace(/\t|\n|\r/g,""))
-
-		
 		});
 
 		$("#timeSlider").slider({																	// Init timeslider
-		    max: 1000,																				// Max time in seconds
+		    max: this.maxTime,																		// Max time in seconds
 			create: function(event,ui) {															// On create
 				var x=$(this).offset().left-8;														// Start
-				showNow(0,x);																		// Show time																	
 				},
 		   slide: function (event,ui) {																// On slide
 			   	let x=$($(this).children('.ui-slider-handle')).offset().left;						// Get pos       			
-			    _this.curPct=ui.value;																// Set current position in session
-				showNow(ui.value,x);																// Show time																	
+				_this.ShowNow(ui.value,x);															// Show time																	
 				}
 		   });
-	
-		function showNow(pct,x) {																	// SHOW CURRENT TIME
-			let now=_this.maxTime*(pct/1000);														// Current time
-			var min=Math.floor(now/60000);															// Mins
-			var sec=Math.floor(now/1000)%60;														// Secs
-			if (sec < 10)	sec="0"+sec;															// Add leading 0
-			$("#sliderTime").html(min+":"+sec);														// Show value
-			$("#sliderTime").css("left",x+14+"px")													// Position text
-			}
+
+	   $("#playerButton").click(()=> {																// ON PLAY CLICK
+			Sound("click");																			// Click sound							
+			this.Play();																			// Play	
+			});
 	}
 	
+	ShowNow(time, x) 																			// SHOW CURRENT TIME
+	{	
+		this.curTime=time;																			// Set current position in session
+		var min=Math.floor(time/60000);																// Mins
+		var sec=Math.floor(time/1000)%60;															// Secs
+		if (sec < 10) sec="0"+sec;																	// Add leading 0
+		$("#sliderTime").html(min+":"+sec);															// Show value
+		$("#sliderLine").css("left",x+2+"px")														// Position line
+		$("#sliderTime").css("left",x-8+"px")														// Position text
+	}
+
 	DrawMoves()																					// DRAW MOVES CHART
 	{
 		let x,y=31,i,str="",ys=[];
 		let labs=["Think","Correct","Value","Ask","Task"];
-		let wid=$(window).width()-360;																// Size of graph
+		let wid=$(window).width()-350;																// Size of graph
+		clearInterval(this.interval);																// Clear timer
 		for (i=0;i<5;++i) {																			// For each grid line
 			str+=`<text x="0" y="${y+4}" fill="#999">${(5-i)*100}</text>						
 			<line x1="32" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:1"/>
@@ -112,7 +121,7 @@ class Feedback {
 		str+=`"/>`;
 		for (i=0;i<4;++i) {
 			x=Math.floor(Math.random()*15)
-			str+=`<circle id="lzDot-${i}" cx="${x*40+35}" cy="${ys[x]}" r="6" fill="#ce7070" cursor="pointer"/>`
+			str+=`<circle id="lzDot-${i}" cx="${x*40+45}" cy="${ys[x]}" r="6" fill="#ce7070" cursor="pointer"/>`
 			}
 		return str
 		}	
@@ -121,5 +130,35 @@ class Feedback {
 		{
 			SlideUp(24,34,this.curStudent+"'s text",`This space will show ${this.curStudent}'s written answer to the prompt for reference.`)
 		}
+
+		Play() 																						// PLAY/STOP TIMELINE ANIMATION
+		{
+			clearInterval(this.interval);																// Clear timer
+			if ($("#playerButton").prop("src").match(/pausebut/)) 										// If playing, stop
+				$("#playerButton").prop("src","img/playbut.png");										// Show play button
+			else{																						// If not playing, start
+				$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
+				this.startPlay=new Date().getTime();													// Set start in sseconds
+				let off=(this.curTime-this.curStart)/this.maxTime;			 							// Get offset from start
+				this.interval=setInterval(()=> {														// Start timer
+					let now=new Date().getTime();														// Get time
+					let pct=(now-this.startPlay)/this.maxTime; 											// Get percentage
+					pct+=off;																			// Add starting offset
+					if (this.curTime > this.maxTime) pct=99;											// Past end point, force quit
+					if (pct >= 1) {																		// If done
+						this.Play();																	// Stop playing
+						this.curStart=this.curTime=0;													// Reset
+						}													
+					else{																				// If playing
+						this.curTime=pct*this.maxTime+this.curStart;									// New time							
+						$("#timeSlider").slider("option","value",this.curTime);							// Trigger slider
+						var x=$($("#timeSlider").children('.ui-slider-handle')).offset().left;			// Get pos       		
+						this.ShowNow(this.curTime,x);													// Show time
+						}
+					}
+				,10);																					// ~5fps
+			}
+		}
+	
 
 }	// Class closure
