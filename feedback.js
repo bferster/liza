@@ -8,8 +8,7 @@ class Feedback {
 	{
 		document.addEventListener( 'mousedown', this.OnClick, false );
 		this.curStudent="";																			// No one selected yet
-		this.curTime=0;																				// Current time in session 0-1000
-		this.maxTime=3*60*1000;																		// Time in session in ms
+		this.curTime=0;																				// Current time in session in ms
 		this.curStart=0;																			// Start in msecs
 		this.startPlay;																				// When play started in msecs
 		this.interval=null;																			// Timer
@@ -46,7 +45,7 @@ class Feedback {
 				</table>
 			</div>
 			<div style="flex-grow:6">
-				<svg width="100%" height="100%">${this.DrawMoves()}</svg>
+				<svg width="100%" height="100%">${this.DrawMovesGraph()}</svg>
 			</div>
 		</div>
 		<div id="sliderLine" class="lz-sliderline"></div>
@@ -59,23 +58,24 @@ class Feedback {
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 	
 		$("[id^=lzDot-]").on("mouseover",(e)=>{ 													// Show chat if over
-				let id=e.target.id.substr(6);
-				let p=$("#lzDot-"+id).position()
-				$("#lz-dlg").remove();
-				let str=`<div id="lz-dlg" style="position:absolute;top:${p.top+24}px;left:${p.left-4}px">
-				<div class='lz-textRA'></div><div class="lz-textR">OK ${this.curStudent}, what is two plus two?</div>
-				<div class="lz-textS">Five, of course!</div>
-				</div>`;
-				$("body").append(str.replace(/\t|\n|\r/g,""))
+			let id=e.target.id.substr(6);
+			let p=$("#lzDot-"+id).position()
+			let o=app.se.data[id];																	// Point at element
+			$("#lz-dlg").remove();																	// Clear exiting
+			let str=`<div id="lz-dlg" style="position:absolute;top:${p.top-12}px;left:${p.left+6}px">
+			<div class="lz-textR">${o.actor+": "+o.text}</div><br><div class='lz-textRA'></div>
+			</div>`;
+			$("body").append(str.replace(/\t|\n|\r/g,""));											// Add chat
+			$("#lz-dlg").css("top",p.top-$("#lz-dlg").height()+"px");								// Position atop dot
 			});
 		$("[id^=lzDot-]").on("mouseout",(e)=>{ 	$("#lz-dlg").remove(); });							// Clear chat if out
 	  	
 		$("#playerButton").click(()=> {	this.Play(); });											// On play click
 
 		$("#timeSlider").slider({																	// Init timeslider
-		    max: this.maxTime,																		// Max time in seconds
-			create: ()=> {	this.ShowNow(this.curTime); },											// On create
-		   	slide: (event,ui)=>{																	// On slide
+		    max: app.se.maxTime,																	// Max time in seconds
+			create:()=> {	this.ShowNow(this.curTime); },											// On create
+		   	slide:(event,ui)=>{																		// On slide
 				if ($("#playerButton").prop("src").match(/pausebut/)) this.Play();					// Stop playing, if playing
 			   	this.ShowNow(ui.value);																// Show time																	
 				}
@@ -95,10 +95,10 @@ class Feedback {
 		$("#sliderTime").css("left",x-9+"px")														// Position text
 	}
 
-	DrawMoves()																					// DRAW MOVES CHART
+	DrawMovesGraph()																			// DRAW MOVES GRAPH
 	{
-		let x,y=31,i,str="",ys=[];
-		let labs=["Think","Correct","Value","Ask","Task"];
+		let i,o,x,col,y=31,str="";
+		let labs=["Think","Correct","Value","Ask","Task"];											// 100s labels
 		let wid=$(window).width()-350;																// Size of graph
 		clearInterval(this.interval);																// Clear timer
 		for (i=0;i<5;++i) {																			// For each grid line
@@ -108,18 +108,27 @@ class Feedback {
 			y+=31;																					// Next line down
 			}
 		str+=`<polyline style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" points="`;
-		for (i=0;i<15;i++) ys.push((Math.round(Math.random()*4)+1)*31);
-		for (i=0;i<30;i+=2) {
-			str+=i*20+35+","+ys[i/2]+" ";
-			str+=(i+1)*20+35+","+ys[i/2]+" ";
+		y=1;
+		for (i=0;i<app.se.data.length;i++) {														// For each event
+			o=app.se.data[i];																		// Point at it
+			x=getPixFromTime(o.time);																// Get x pos
+			if (o.actor == "Teacher") y=5-Math.max(Math.floor(o.code/100),1);						// If a teacher, get y 5-1
+			str+=x+","+(y*31+31)+" ";																// Add point
 			}
 		str+=`"/>`;
-		for (i=0;i<4;++i) {
-			x=Math.floor(Math.random()*15)
-			str+=`<circle id="lzDot-${i}" cx="${x*40+45}" cy="${ys[x]}" r="6" fill="#ce7070" cursor="pointer"/>`
+		y=1;
+		for (i=0;i<app.se.data.length;i++) {														// For each event
+			o=app.se.data[i];																		// Point at it
+			x=getPixFromTime(o.time);																// Get x pos
+			if (o.actor == "Teacher")  y=5-Math.max(Math.floor(o.code/100),1);						// If a teacher, get y 5-1
+			col=(o.actor == this.curStudent) ? "#ce7070" : "#ccc";									// Set dot color
+			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
 			}
 		return str
-		}	
+	
+		function getPixFromTime(time) {	return time/app.se.maxTime*(wid-37)+32;	}
+	
+	}	
 
 		ShowText()
 		{
@@ -128,6 +137,8 @@ class Feedback {
 
 		Play() 																						// PLAY/STOP TIMELINE ANIMATION
 		{
+	
+//			app.curStudent=1;	app.voice.Talk("hello")
 			clearInterval(this.interval);																// Clear timer
 			if ($("#playerButton").prop("src").match(/pausebut/)) 										// If playing, stop
 				$("#playerButton").prop("src","img/playbut.png");										// Show play button
@@ -135,18 +146,18 @@ class Feedback {
 				Sound("click");																			// Click sound							
 				$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
 				this.startPlay=new Date().getTime();													// Set start in sseconds
-				let off=(this.curTime-this.curStart)/this.maxTime;			 							// Get offset from start
+				let off=(this.curTime-this.curStart)/app.se.maxTime;			 						// Get offset from start
 				this.interval=setInterval(()=> {														// Start timer
 					let now=new Date().getTime();														// Get time
-					let pct=(now-this.startPlay)/this.maxTime; 											// Get percentage
+					let pct=(now-this.startPlay)/app.se.maxTime; 										// Get percentage
 					pct+=off;																			// Add starting offset
-					if (this.curTime > this.maxTime) pct=99;											// Past end point, force quit
+					if (this.curTime > app.se.maxTime) pct=99;											// Past end point, force quit
 					if (pct >= 1) {																		// If done
 						this.Play();																	// Stop playing
 						this.curStart=this.curTime=0;													// Reset
 						}													
 					else{																				// If playing
-						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there
+						this.ShowNow(pct*app.se.maxTime+this.curStart);									// Go there
 						}	
 					}
 				,10);																					// ~5fps

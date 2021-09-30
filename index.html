@@ -13,7 +13,9 @@
 	<script src="lib/wgl/ColladaLoader.js"></script>
 	<script src="lib/wgl/OrbitControls.js"></script>
 	<script src="lib/wgl/OutlineEffect.js"></script>
-	<script src="data.js"></script>
+	<script src="lib/papaparse.min.js"></script>
+	<script src="session.js"></script>
+\	<script src="data.js"></script>
 	<script src="scene.js"></script>
 	<script src="blackboard.js"></script>
 	<script src="voice.js"></script>
@@ -99,15 +101,11 @@
 							}
 		.lz-chartbar { 		height:16px; background-color:#86d698; 
 							}
-		.lz-textR 	{		background-color:#0099ff; border-radius:8px; border-top-left-radius:0; margin:0 8px;   
-							padding:4px 8px; width:-moz-fit-content; width:fit-content; max-width: 66%; clear:both; float:left; text-align:left; 
+		.lz-textR 	{		float:left; background-color:#0099ff; border-radius:8px; border-bottom-left-radius:0;   
+							padding:4px 8px; width:-moz-fit-content; width:fit-content; max-width:300px;
 							}
-		.lz-textRA 	{		clear:both; float:left; margin:-8px 0 0 8px; width:0; height:0; border-bottom:8px solid #0099ff; border-right:12px solid transparent; margin-left:8px; 
+		.lz-textRA 	{		float:left; width:0; height:0; border-top:8px solid #0099ff; border-right:12px solid transparent;
 							}
-		.lz-textS 	{		background-color:#999; border-radius:8px; padding:4px 8px; width:-moz-fit-content; width:fit-content; 
-							max-width: 66%; clear:both; float:right; text-align:right; color:#fff; 
-							}
-
 		.lz-playerslider.ui-slider .ui-slider-handle {
 							height:0px; width:0px; margin-top:7px; cursor:pointer; background:none;
 							border-left: 5px solid transparent; border-right: 5px solid transparent;
@@ -255,6 +253,7 @@ class App  {
 			}
 
 		this.arc=new ARC();																			// Make new ARC tree		
+		this.se=new Session();																		// Session data	
 		this.bb=new Blackboard();																	// Make blackboard		
 		this.sc=new Scene("mainDiv");																// Make new scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT

@@ -152,14 +152,17 @@
 
 	async function MakeSession()																// CREATE SESSION FILE
 	{
-		let i,o,session=[],texts=[];
-		let fields=["scene","actor","code","calc","text"];											// Field names
+		let i,t,o,session=[],texts=[],startTime=0;
+		let fields=["scene","actor","code","time","text","calc"];									// Field names
 		let teacher=$("#lz-session").val().split("-")[0];											// Teacher to add
-			for (i=0;i<rawData.length;++i) {														// For each line
+
+		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if (o.rerid != teacher) 	continue;													// Skip if not right teacher
+			if (!startTime)				startTime=TimecodeToSeconds(o.timestamp);					// Set 1st time
 			texts.push(o.text);																		// Add to array of texts
-			session.push({ scene:o.topic, actor:o.speaker, code:o.intent, calc:0, text:o.text });	// Add line 
+			t=TimecodeToSeconds(o.timestamp)-startTime;												// Get event time
+			session.push({ scene:o.topic, actor:o.speaker, code:o.intent, time:t,text:o.text,calc:0 });	// Add line 
 			}
 		
 		const fetchAll=async(texts) => {															// GET ALL INTENTS AT ONCE
@@ -185,6 +188,7 @@
 			body: JSON.stringify({text:msg})		
 			})
 		}
+
 
 	function MakeStories(mask)																	// MAKE ALL FILES
 	{
@@ -417,6 +421,16 @@
 		$("#dialogCancel").on("click", function() {	$("#confirmBoxDiv").remove(); });								// ON CANCEL
 		}
 
+	function TimecodeToSeconds(timecode) 														// CONVERT TIMECODE TO MILLISECONDS
+	{
+		let t=0;
+		let v=timecode.match(/(\d*):(\d*):(\d*)\.*(\d*)/);											// Parse
+//		t+=v[1]*60*60*1000;																			// Get hours
+		t+=v[2]*60*1000;																			// Get mins
+		t+=v[3]*1000;																				// Get secs
+		if (v[4]) t+=v[4]/1000;																		// Ms
+		return t;																					// Return time in ms
+	}
 
 </script>
 </body>
