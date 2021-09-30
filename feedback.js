@@ -30,11 +30,9 @@ class Feedback {
 
 	Draw()																						// DRAW FEEDBACK PANEL
 	{
-		let _this=this;																				// Context
 		$("#lz-feedbar").remove();																	// Remove old one
 		var str=`<div id="lz-feedbar" class="lz-feedbar"> 
-		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;"
-			 onclick='$("#lz-feedbar").remove()'>
+		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-feedbar").remove()'>
 		<div class='lz-feedback'>
 			<div style="width:250px;margin:4px 0 0 16px;"> 
 				<b style="font-family:Chalk;font-size:48px">${this.curStudent}</b>
@@ -57,47 +55,44 @@ class Feedback {
 		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 62px);top:184px;width:18px;cursor:pointer">`;
 	
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
+
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 	
-		$("[id^=lzDot-]").on("mouseout",(e)=>{ 	$("#lz-dlg").remove(); });							// Clear move
-		$("[id^=lzDot-]").on("mouseover",(e)=>{ 
-			let id=e.target.id.substr(6);
-			let p=$("#lzDot-"+id).position()
-			
-			$("#lz-dlg").remove();
-			let str=`<div id="lz-dlg" style="position:absolute;top:${p.top+24}px;left:${p.left-4}px">
-			<div class='lz-textRA'></div><div class="lz-textR">OK ${this.curStudent}, what is two plus two?</div>
-			<div class="lz-textS">Five, of course!</div>
-			</div>`;
-			$("body").append(str.replace(/\t|\n|\r/g,""))
-		});
+		$("[id^=lzDot-]").on("mouseover",(e)=>{ 													// Show chat if over
+				let id=e.target.id.substr(6);
+				let p=$("#lzDot-"+id).position()
+				$("#lz-dlg").remove();
+				let str=`<div id="lz-dlg" style="position:absolute;top:${p.top+24}px;left:${p.left-4}px">
+				<div class='lz-textRA'></div><div class="lz-textR">OK ${this.curStudent}, what is two plus two?</div>
+				<div class="lz-textS">Five, of course!</div>
+				</div>`;
+				$("body").append(str.replace(/\t|\n|\r/g,""))
+			});
+		$("[id^=lzDot-]").on("mouseout",(e)=>{ 	$("#lz-dlg").remove(); });							// Clear chat if out
+	  	
+		$("#playerButton").click(()=> {	this.Play(); });											// On play click
 
 		$("#timeSlider").slider({																	// Init timeslider
 		    max: this.maxTime,																		// Max time in seconds
-			create: function(event,ui) {															// On create
-				var x=$(this).offset().left-8;														// Start
-				},
-		   slide: function (event,ui) {																// On slide
-			   	let x=$($(this).children('.ui-slider-handle')).offset().left;						// Get pos       			
-				_this.ShowNow(ui.value,x);															// Show time																	
+			create: ()=> {	this.ShowNow(this.curTime); },											// On create
+		   	slide: (event,ui)=>{																	// On slide
+				if ($("#playerButton").prop("src").match(/pausebut/)) this.Play();					// Stop playing, if playing
+			   	this.ShowNow(ui.value);																// Show time																	
 				}
-		   });
-
-	   $("#playerButton").click(()=> {																// ON PLAY CLICK
-			Sound("click");																			// Click sound							
-			this.Play();																			// Play	
-			});
+		   	});
 	}
 	
-	ShowNow(time, x) 																			// SHOW CURRENT TIME
+	ShowNow(time) 																				// SHOW CURRENT TIME
 	{	
 		this.curTime=time;																			// Set current position in session
-		var min=Math.floor(time/60000);																// Mins
-		var sec=Math.floor(time/1000)%60;															// Secs
+		let min=Math.floor(time/60000);																// Mins
+		let sec=Math.floor(time/1000)%60;															// Secs
 		if (sec < 10) sec="0"+sec;																	// Add leading 0
+		$("#timeSlider").slider("option","value",time);												// Trigger slider
+		let x=$($("#timeSlider").children('.ui-slider-handle')).offset().left;						// Get pos       		
 		$("#sliderTime").html(min+":"+sec);															// Show value
 		$("#sliderLine").css("left",x+2+"px")														// Position line
-		$("#sliderTime").css("left",x-8+"px")														// Position text
+		$("#sliderTime").css("left",x-9+"px")														// Position text
 	}
 
 	DrawMoves()																					// DRAW MOVES CHART
@@ -137,6 +132,7 @@ class Feedback {
 			if ($("#playerButton").prop("src").match(/pausebut/)) 										// If playing, stop
 				$("#playerButton").prop("src","img/playbut.png");										// Show play button
 			else{																						// If not playing, start
+				Sound("click");																			// Click sound							
 				$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
 				this.startPlay=new Date().getTime();													// Set start in sseconds
 				let off=(this.curTime-this.curStart)/this.maxTime;			 							// Get offset from start
@@ -150,11 +146,8 @@ class Feedback {
 						this.curStart=this.curTime=0;													// Reset
 						}													
 					else{																				// If playing
-						this.curTime=pct*this.maxTime+this.curStart;									// New time							
-						$("#timeSlider").slider("option","value",this.curTime);							// Trigger slider
-						var x=$($("#timeSlider").children('.ui-slider-handle')).offset().left;			// Get pos       		
-						this.ShowNow(this.curTime,x);													// Show time
-						}
+						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there
+						}	
 					}
 				,10);																					// ~5fps
 			}
