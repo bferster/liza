@@ -433,8 +433,10 @@ class Scene {
 			}
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
-		if ((app.voice.talking == 1) && (app.curStudent >= 0))										// If student talking
-			app.sc.SetBone(app.students[app.curStudent].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);		// Animate mouth
+		if ((app.voice.talking == 1) && (app.curStudent >= 0))	{									// If student talking
+			app.sc.SetBone(app.students[app.curStudent].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);	// Animate mouth
+//			app.sc.SetBone(app.students[app.curStudent].id,"spine",0,0,Math.cos((app.sc.aniTimer+20)/15*Math.PI)*.4+.8*.00001);	// Spine
+			}
 		for (i=0;i<app.students.length;++i)															// For each student
 			if (app.students[i].fidget)	{															// If fidgeting
 				app.sc.SetBone(app.students[i].id,"thighR",-78,Math.cos(app.sc.aniTimer/15*Math.PI)*1+1*.0001,0);		// LegR
