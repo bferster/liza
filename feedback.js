@@ -12,23 +12,28 @@ class Feedback {
 		this.curStart=0;																			// Start in msecs
 		this.startPlay;																				// When play started in msecs
 		this.interval=null;																			// Timer
+		this.data=null;																				// Pointer to session data to show
+		this.maxTime=0;																				// TRT of session
+		this.curMove=-1;																			// Current move
 	}
 
 	OnClick(e) 																					// ON SCREEN CLICK
 	{
 		if (e.target.localName != "canvas")	return;													// React only to canvas hits
 		this.curStudent="";																			// No one selected yet
+		clearInterval(app.fb.interval);																// Clear timer
 		$("#lz-feedbar").remove();																	// Remove old one
-		clearInterval(this.interval);																// Clear timer
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point
 		if (o.object.name == "body") {																// If a student
 			app.fb.curStudent=o.object.parent.name;													// Set name
-			app.fb.Draw();																			// Show feedback
+			app.fb.Draw(app.se.data);																// Show feedback
 		}
 	}
 
-	Draw()																						// DRAW FEEDBACK PANEL
+	Draw(data)																					// DRAW FEEDBACK PANEL
 	{
+		this.data=data;																				// Point at data to display
+		this.maxTime=this.data[this.data.length-1].time;											// Get TRT	
 		$("#lz-feedbar").remove();																	// Remove old one
 		var str=`<div id="lz-feedbar" class="lz-feedbar"> 
 		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-feedbar").remove()'>
@@ -39,7 +44,7 @@ class Feedback {
 				<tr><td>Academic Language &nbsp;</td><td style="width:100px"><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Prior knowledge</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Use of evidence</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
-				<tr><td>Flexible thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
+				<tr><td>Careful thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Curious thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td colspan='2'><p class="lz-bs" id="lz-v${this.curStudent}" onclick="app.fb.ShowText()">View ${this.curStudent}'s text</p></td></tr>
 				</table>
@@ -58,13 +63,16 @@ class Feedback {
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 	
 		$("[id^=lzDot-]").on("mouseover",(e)=>{ 													// Show chat if over
+			let col;
 			let id=e.target.id.substr(6);
 			let p=$("#lzDot-"+id).position()
-			let o=app.se.data[id];																	// Point at element
+			let o=this.data[id];																	// Point at element
 			$("#lz-dlg").remove();																	// Clear exiting
+			if (o.actor == "Teacher") col="#0099ffc";													// Teacher color
+			else					  col=app.actors[o.actor].color;								// Student color
 			let str=`<div id="lz-dlg" style="position:absolute;top:${p.top-12}px;left:${p.left+6}px">
-			<div class="lz-textR">${o.actor+": "+o.text}</div><br><div class='lz-textRA'></div>
-			</div>`;
+				<div class="lz-textR" style="background-color:${col}">${o.actor+": "+o.text}</div><br>
+				<div class="lz-textRA" style="border-top-color:${col}"></div></div>`;
 			$("body").append(str.replace(/\t|\n|\r/g,""));											// Add chat
 			$("#lz-dlg").css("top",p.top-$("#lz-dlg").height()+"px");								// Position atop dot
 			});
@@ -73,7 +81,7 @@ class Feedback {
 		$("#playerButton").click(()=> {	this.Play(); });											// On play click
 
 		$("#timeSlider").slider({																	// Init timeslider
-		    max: app.se.maxTime,																	// Max time in seconds
+		    max: this.maxTime,																		// Max time in seconds
 			create:()=> {	this.ShowNow(this.curTime); },											// On create
 		   	slide:(event,ui)=>{																		// On slide
 				if ($("#playerButton").prop("src").match(/pausebut/)) this.Play();					// Stop playing, if playing
@@ -98,37 +106,38 @@ class Feedback {
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
 	{
 		let i,o,x,col,y=31,str="";
-		let labs=["Think","Correct","Value","Ask","Task"];											// 100s labels
+		let labs=["Think","Correct","Value","Ask","General"];										// Labels
 		let wid=$(window).width()-350;																// Size of graph
 		clearInterval(this.interval);																// Clear timer
+		const getPixFromTime=(time)=>{ return time/this.maxTime*(wid-67)+62; };						// CONVERT TIME TO PIXELS
+
 		for (i=0;i<5;++i) {																			// For each grid line
-			str+=`<text x="0" y="${y+4}" fill="#999">${(5-i)*100}</text>						
-			<line x1="32" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:1"/>
-			<text x="${wid+10}" y="${y+4}" fill="#999">${labs[i]}</text>`;							// Draw it
+			str+=`<text x="0" y="${y+4}" fill="#999">${labs[i]}</text>						
+			<line x1="59" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:1"/>
+			<text x="${wid+10}" y="${y+4}" fill="#999">${(5-i)*100}</text>`;						// Draw it
 			y+=31;																					// Next line down
 			}
 		str+=`<polyline style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" points="`;
 		y=1;
-		for (i=0;i<app.se.data.length;i++) {														// For each event
-			o=app.se.data[i];																		// Point at it
+		for (i=0;i<this.data.length;i++) {															// For each event
+			o=this.data[i];																			// Point at it
 			x=getPixFromTime(o.time);																// Get x pos
 			if (o.actor == "Teacher") y=5-Math.max(Math.floor(o.code/100),1);						// If a teacher, get y 5-1
 			str+=x+","+(y*31+31)+" ";																// Add point
 			}
 		str+=`"/>`;
 		y=1;
-		for (i=0;i<app.se.data.length;i++) {														// For each event
-			o=app.se.data[i];																		// Point at it
+		for (i=0;i<this.data.length;i++) {															// For each event
+			o=this.data[i];																			// Point at it
 			x=getPixFromTime(o.time);																// Get x pos
-			if (o.actor == "Teacher")  y=5-Math.max(Math.floor(o.code/100),1);						// If a teacher, get y 5-1
-			col=(o.actor == this.curStudent) ? "#ce7070" : "#ccc";									// Set dot color
+			col="#ccc";																				// Teacher is gray
+			if (o.actor == "Teacher")   y=5-Math.max(Math.floor(o.code/100),1);						// If a teacher, get y 5-1
+			else						col=app.actors[o.actor].color;								// Get shirt color
 			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
 			}
-		return str
-	
-		function getPixFromTime(time) {	return time/app.se.maxTime*(wid-37)+32;	}
-	
-	}	
+		
+		return str;																					// Return graph markup
+		}	
 
 		ShowText()
 		{
@@ -137,8 +146,6 @@ class Feedback {
 
 		Play() 																						// PLAY/STOP TIMELINE ANIMATION
 		{
-	
-//			app.curStudent=1;	app.voice.Talk("hello")
 			clearInterval(this.interval);																// Clear timer
 			if ($("#playerButton").prop("src").match(/pausebut/)) 										// If playing, stop
 				$("#playerButton").prop("src","img/playbut.png");										// Show play button
@@ -146,18 +153,29 @@ class Feedback {
 				Sound("click");																			// Click sound							
 				$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
 				this.startPlay=new Date().getTime();													// Set start in sseconds
-				let off=(this.curTime-this.curStart)/app.se.maxTime;			 						// Get offset from start
+				let off=(this.curTime-this.curStart)/this.maxTime;			 							// Get offset from start
 				this.interval=setInterval(()=> {														// Start timer
-					let now=new Date().getTime();														// Get time
-					let pct=(now-this.startPlay)/app.se.maxTime; 										// Get percentage
+					let i,move=0,who="";																// Active move
+					let now=new Date().getTime()-this.startPlay;										// Get time 0-maxtime
+					let pct=now/this.maxTime; 															// Get percentage
 					pct+=off;																			// Add starting offset
-					if (this.curTime > app.se.maxTime) pct=99;											// Past end point, force quit
+					if (this.curTime > this.maxTime) pct=99;											// Past end point, force quit
 					if (pct >= 1) {																		// If done
 						this.Play();																	// Stop playing
 						this.curStart=this.curTime=0;													// Reset
 						}													
 					else{																				// If playing
-						this.ShowNow(pct*app.se.maxTime+this.curStart);									// Go there
+						now=pct*this.maxTime+this.curStart;												// Start point
+						for (i=0;i<this.data.length;i++) 												// For each event
+							if (this.data[i].time-0 <= now)												// Past now
+								move=i;																	// Set current move 
+						if (move != this.curMove) {
+							if (this.data[move].actor == "Teacher")	who="instructor";					// Teacher's voice
+							else	who=app.actors[this.data[move].actor].seat;							// Student voice
+							app.voice.Talk(this.data[move].text,who);									// Speak
+							this.curMove=move;															// Set current move
+							}
+						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there
 						}	
 					}
 				,10);																					// ~5fps

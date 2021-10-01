@@ -11,7 +11,6 @@ class Voice {
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		this.listening=false;																			// Flag if listening
 		this.talkStartTime=0;																			// Time started talking
-		this.secsPerChar=63.3333;																		// Mseconds per char
 		try {																							// Try
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
 			var mac=(navigator.platform == "MacIntel");													// A mac?
@@ -74,7 +73,7 @@ class Voice {
 		if (v && v.length)																				// If any
 			for (i=0;i<v.length;++i)																	// For each symbol found
 				text=text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),s[v[i]]); 	// Convert to sounds
-				return text;																					// Return converted text
+		return text;																					// Return converted text
 	}
 
 	Talk(text, who)																					// SAY SOMETHING
