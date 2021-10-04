@@ -77,7 +77,14 @@ class Feedback {
 			$("#lz-dlg").css("top",p.top-$("#lz-dlg").height()+"px");								// Position atop dot
 			});
 		$("[id^=lzDot-]").on("mouseout",(e)=>{ 	$("#lz-dlg").remove(); });							// Clear chat if out
-	  	
+	
+		$("[id^=lzDot-]").on("click",(e)=>{ 														// CLICK ON DOT TO SPEAK
+			let who,id=e.target.id.substr(6);
+			if (this.data[id].actor == "Teacher")	who="instructor";								// Teacher's voice
+			else	who=app.actors[this.data[id].actor].seat;										// Student voice
+			app.voice.Talk(this.data[id].text,who);													// Speak
+		});
+		
 		$("#playerButton").click(()=> {	this.Play(); });											// On play click
 
 		$("#timeSlider").slider({																	// Init timeslider

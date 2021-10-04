@@ -73,7 +73,7 @@
 			.then(res =>{																			// Process																	
 				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
 				nlp.SetWho(data);																	// Set student synonyms
-				LoadRawData('assets/rawData.csv');													// Load raw data file
+				LoadRawData('assets/rawData2.csv');													// Load raw data file
 			});
 		}
 	
@@ -207,12 +207,13 @@
 			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
 			if (dots) id="r"+o.intent;																// Make fuull intent id name
 			else	  id="r"+Math.floor(o.intent);													// Just the whole numbers					
+id=Math.floor(o.intent/100)*100;
 			sid="session-"+o.rerid;																	// Session id
 			if (!sess[sid]) 			  sess[sid]=[];												// Alloc session holder
 			if (!ints[id] && (id != "r")) ints[id]=[];												// Alloc intent holder
 			if (o.speaker == "Teacher") {															// If remark
 				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
-				if (id != "r")	sess[sid].push("  - intent: "+id+"\n");								// Add intent to story
+				if (id != "r")	sess[sid].push("  - intent: "+id+"\n");							// Add intent to story
 				ss=o.text;																			// Point at text
 				who=nlp.GetWho(o.text);																// Get who
 				if (who) {																			// Got one
@@ -233,7 +234,7 @@
 		let str="version: \"2.0\"\n\nnlu:\n";														// NLU header
 		str+="- intent: bot_challenge\n  examples: |\n    - are you a bot?\n    - are you a human?\n    - am I talking to a bot?\n    - am I talking to a human?\n";
 		for (k in ints)	{																			// For each intent
-			str+="- intent: "+k+"\n  examples: |\n";												// Add header
+			str+="- intent: r"+k+"\n  examples: |\n";												// Add header
 			ints[k]=[... new Set(ints[k])];															// Make unique
 			for (i=0;i<ints[k].length;++i) 	str+=ints[k][i];										// Add each remark in intent group
 			}
@@ -274,11 +275,36 @@
 		str=Papa.unparse(resps,{ header:true, skipEmptyLines:true, columns:fields });				// Make CSV using lib
 		if (mask&8) SaveTextAsFile("responses.csv",str);											// Write file
 		Sound("ding");																				// Sound
-
-/*		
-		for (k in ints)	{																			// For each intent
+/*
+		ints=[]; ints["r100"]=[]; ints["r200"]=[]; ints["r300"]=[];	ints["r400"]=[]; ints["r500"]=[];
+		for (i=0;i<rawData.length;++i) {															// For each line
+			o=rawData[i];																			// Point at it
+			if (o.intent < 100)								continue;								// Skip if under-coded
+			if ((o.rerid >= start-0) && (o.rerid < end-0))	continue;								// Skip if exclused
+			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
+			if (o.speaker == "Teacher")  ints["r"+Math.floor(o.intent/100)*100].push(o.text);		// Add to group
+			}
+		for (k in ints) {
 			str="[\n";
-			if (k.substr(1) < 150) continue;
+			ints[k]=[... new Set(ints[k])];															// Make unique
+			for (i=0;i<Math.min(ints[k].length,num);++i) { 											// Add each remark in intent group
+				ss=ints[k][i].replace(/"/g,"");														// Escape quotes
+				ss=ss.replace(/'/g,"\\u0027");
+				who=nlp.GetWho(ss);																	// Get who
+				if (who) {																			// Got one
+					re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");								// Make regex
+					ss=ss.replace(re,"STUDENT");													// Encode entity
+					}
+				str+=`{ "data": [{ "text": "${ss}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
+				}
+			str=str.slice(0,-2)+"\n]";																// Close array
+			SaveTextAsFile(k.substr(1)+"_usersays_en.json",str);									// Write file
+			trace(ints)
+			}
+*/
+		
+/*		for (k in ints)	{																			// For each intent
+			str="[\n";
 			ints[k]=[... new Set(ints[k])];															// Make unique
 			for (i=0;i<Math.min(ints[k].length,num);++i) { 											// Add each remark in intent group
 				ss=ints[k][i].slice(10,-1);
@@ -287,11 +313,10 @@
 				str+=`{ "data": [{ "text": "${ss}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
 				}
 			str=str.slice(0,-2)+"\n]";
-			if (k.substr(1) > 200)
-			SaveTextAsFile(k.substr(1)+"_usersays_en.json",str);													// Write file
+			SaveTextAsFile(k+"_usersays_en.json",str);												// Write file
 		}
-
 */
+
 
 	}
 
@@ -354,9 +379,27 @@
 	  	.then(res => res.json()).then(res =>{ trace(res); })
 	}
 */
+/*
+// 107292363236-rc8802iosnbgk2unvd5uf4b010rmlkn5.apps.googleusercontent.com
+
+POST https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/123456789:detectIntent
 
 
+{
+  "queryParams": {
+    "sentimentAnalysisRequestConfig": {
+      "analyzeQueryTextSentiment": true
+    }
+  },
+  "queryInput": {
+    "text": {
+      "text": "please reserve an amazing meeting room for six people",
+      "languageCode": "en-US"
+    }
+  }
+}
 
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS 
 /////////////////////////////////////////////////////////////////////////////////////////////////
