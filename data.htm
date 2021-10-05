@@ -73,7 +73,7 @@
 			.then(res =>{																			// Process																	
 				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
 				nlp.SetWho(data);																	// Set student synonyms
-				LoadRawData('assets/rawData2.csv');													// Load raw data file
+				LoadRawData('assets/rawData3.csv');													// Load raw data file
 			});
 		}
 	
@@ -466,6 +466,7 @@ POST https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/123
 
 	function TimecodeToSeconds(timecode) 														// CONVERT TIMECODE TO MILLISECONDS
 	{
+		if (!timecode)	return 0;
 		let t=0;
 		let v=timecode.match(/(\d*):(\d*):(\d*)\.*(\d*)/);											// Parse
 //		t+=v[1]*60*60*1000;																			// Get hours

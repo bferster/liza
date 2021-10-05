@@ -208,9 +208,9 @@ var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 			}
 
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
-		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
+		$(window).on("keydown",(e)=> {																// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				trace(app.arc.CosineSimilarity(2,2))
+				app.ws.send("1|"+app.role+"|ACT|"+app.role+"|standUp");	
 				}
 
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
@@ -231,6 +231,7 @@ class App  {
 	constructor(id)   																			// CONSTRUCTOR
 	{
 		app=this;
+		this.role="Teacher";																		// User's role in simulation
 		this.poses=[];																				// Holds poses
 		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
@@ -246,12 +247,7 @@ class App  {
 		this.horseshoe=true;																		// Horseshoe seating?
 		this.curClock=0;																			// Current clock time
 		this.gid="RER-1.tsv"																		// Default RER spreadsheet
-		var url=window.location.search.substring(1);						   						// Get query string
-		if (url && !url.match(/real/i)) {															// If params
-			if (url.match(/gid=/i)) this.gid=url.split("&")[0].substr(4);							// If params have a 'gid=' tag, use it
-			else					this.gid=url;													// Default spreadsheet
-			}
-
+		this.InitSocketServer();																	// Init socket server
 		this.arc=new ARC();																			// Make new ARC tree		
 		this.se=new Session();																		// Session data	
 		this.bb=new Blackboard();																	// Make blackboard		
@@ -262,6 +258,11 @@ class App  {
 		this.fb=new Feedback();																		// Teacher feedback	
 		this.LoadProject(this.gid);																	// Load project file
 		this.Draw();																				// Start 
+
+		let v=window.location.search.substring(1).split("&");						   				// Get query string
+		for (let i=0;i<v.length;++i) {
+			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
+			}
 
 		if ((!this.voice.hasRecognition) && (!isMobile))											// This platform doesn't have voice recognition
 			$("#talkBut").hide(),$("#talkInput").show();											// Show input	
@@ -299,6 +300,50 @@ class App  {
 			});															
 	}
 
+	InitSocketServer()																			// INIT SOCKET SERVER
+	{
+		this.retryWS=false;																			// Reconnecting to web socket
+		this.meetingId=1;
+		this.secs=0;																				// Time
+		if (window.location.host == "localhost") this.ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
+		else									 this.ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
+		this.ws.onmessage=(e)=>{ this.SocketIn(e); };												// ON INCOMING MESSAGE
+		this.ws.onclose=()=>   { console.log('disconnected'); this.ws=null; this.retryWS=true; Sound("delete") };		// ON CLOSE
+		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
+		this.ws.onopen=()=> { 																		// ON OPEN
+			console.log('connected'); 																// Showconnected
+			this.ws.send("1|"+this.role+"|INIT");													// Init																	
+			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
+			++this.secs;																			// Another second 
+			if (this.retryWS) {																		// If reconnecting to websocket
+				if (window.location.host == "localhost") this.ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
+				else									 this.ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
+				this.ws.onmessage=(e)=>{ this.SocketIn(e); };										// ON INCOMING MESSAGE
+				this.ws.onclose=()=>   { this.retryWS=true; console.log('disconnected'); };			// ON CLOSE
+				this.ws.onopen=()=>    { console.log('re-connected'); };							// ON OPEN  
+				this.retryWS=false;																	// Not retrying	
+				}
+			},1000)
+		}
+	}
+
+	SocketIn(event)																				// A WEBSOCKET MESSAGE
+	{
+		// 1|Luis|TALK|Luis|Hello
+		// 1|Luis|ACT|Luis|standup
+
+		if (!event.data)			 	return;														// Quit if no data
+		let v=event.data.split("|");																// Get params
+		if (v[0] != this.meetingId)		return;														// Quit if wrong session
+		if (v[2] == "TALK") {																		// TALK
+			let who=(v[3] == "Teacher") ? "instructor" : this.actors[v[3]].seat;					// Set voice number
+			app.voice.Talk(v[4],who);																// Speak
+			}
+		else if (v[2] == "ACT") {																	// ACT
+			app.sc.StartAnimation(v[3],app.seqs[v[4]]);												// Start animating
+			}
+		}
+		
 	LoadProject(id)																				// LOAD PROJECT DATA
 	{
 		this.arc.Load(id, ()=>{																		// Load from Google doc

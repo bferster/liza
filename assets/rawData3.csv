@@ -1,0 +1,394 @@
+rerid,speaker,intent,text
+1,Teacher,110.1,"Okay, let me let me talk with STUDENT for just a moment and I'll come back to you."
+1,Teacher,110.1,"Okay, STUDENT. Let's hold on just a second. Keep your thoughts, just for a moment. Let's, STUDENT, let's go back to each for just a minute. Tell me about your answer."
+1,Teacher,110.1,There you go.
+1,Teacher,110.1,Gotcha. Okay. Thank you for clarifying that.
+1,Teacher,110.1,"Okay, that is the name of the small machine."
+1,Teacher,110.1,There you go. Very good. That is correct. So that is the answer that we're looking for. STUDENT. Thank you.
+1,Teacher,110.1,"There you go. There's something small that they're looking at, it is the water. Good job."
+1,Teacher,110.1,"Correct. I would, I would agree with that. "
+1,Teacher,110.1,That's a good answer. 
+1,Teacher,110.1,I think you're correct. Absolutely. Great job.
+1,Teacher,110.1,Absolutely. Thank you for sharing now
+1,Teacher,110.1,Phenomenal. That's good. That's good. I'm proud of you
+1,Teacher,110.1,"You're close, but not quite there."
+1,Teacher,110.1,You're almost there.
+2,Teacher,110.1,"Oh good. Good job. Great job. All of you guys, I appreciate all of you guys volunteered to read, and you've all done a very good job. "
+2,Teacher,110.1,"STUDENT, you said."
+1,Teacher,110.1,"Teacher: Okay so STUDENT, you said in one of your responses that scientists found craters full of water on the moon."
+1,Teacher,110.2,"Well, it definitely helped them because you know in space there's not a lot of oxygen. So, you have to have those tanks to help you breathe. So that was one equipment that they did use. [Text does not discuss tanks or humans going to the moon.]"
+1,Teacher,110.2,"You guys said they use a scientific tool called a microscope, which answers the question. Right? [The lunar orbiter is the correct answer.]"
+1,Teacher,110.2,"Okay, so that could be one use of water."
+1,Teacher,110.2,"I didn't say your answer was wrong."""
+2,Teacher,110.2,"Your answer is not wrong, it's right, and there's another piece of equipment too."
+1,Teacher,110.3,So always remember that you have a lot of experience.
+1,Teacher,110.3,"Yeah, that's great. That's a great connection. How neat that you've been to NASA before I love that."
+1,Teacher,110.3,"Yeah, well, we always have a good background knowledge of space. And that's really cool that you're interested in it."
+1,Teacher,110.3,"I bet STUDENT could confirm that about his dad probably has told him too, right STUDENT?"
+1,Teacher,110.3,"Well, that's awesome. So maybe you can help us teach others since you know."
+1,Teacher,110.3,"I'm sure they do, and I bet that STUDENT could probably tell you more and you can share that information together."
+2,Teacher,110.3,"Well you know what, because you do know a lot and that means you can help the rest of us out that don't know as much as you."
+3,Teacher,110.3,"Good. So sometimes if you already know something, I think we can always learn more about it. Or maybe you could see if your classmates, maybe they don't know it, and they need your help."
+1,Teacher,110.4,So the machine was the Lunar Orbiter. So why don't you go ahead and circle that and then I'm going to come back to you in just a moment.
+2,Teacher,110.4,Mhmm. It's the lunar orbiter that they sent to look for the water.
+1,Teacher,110.4,It is very heavy. Going back to your first statement so transporting it would be something that we would have to do.
+1,Teacher,120.1,Is that all they used?
+1,Teacher,120.1,Does that seem right to everyone?
+1,Teacher,120.1,Good. Okay. So I want you to read over that for a minute and see if anything sticks out that is believable is it convincing that water is a valuable resource. Okay. So take a minute to do that.
+1,Teacher,120.1,"Teacher: Yeah, and STUDENT, you also hit on that to do you have a question or a comment you wanted to add"
+1,Teacher,120.2,"All right, so STUDENT , the question was what equipment did scientists use to discover water on the moon?"
+1,Teacher,120.2,We're trying to figure out what equipment did scientists use to discover the water on the moon?
+1,Teacher,120.2,Does it say anything about the equipment that they used?
+1,Teacher,120.2," Oh, no, no, it talks about the craters not the equipment"
+2,Teacher,120.2,So we need to find the equipment that they used
+2,Teacher,120.3,"So, can one of you, would one of you like to volunteer to read the first paragraph?"
+1,Teacher,120.3,"Okay. Would you like STUDENT , would you like to read the second paragraph?"
+1,Teacher,120.3,"So, if you all would look at paragraph two, it has a two labeled."
+1,Teacher,120.3,"Okay, so everybody look at your paper. Let's look at paragraph two. STUDENT, can you just read that for me again?"
+1,Teacher,120.3,Will you read it one more time for me?
+1,Teacher,120.3,"So um, STUDENT  or STUDENT, are any of you ready to dig deeper in the text and tell me another answer?"
+1,Teacher,120.3,Look again at the text and see if you can find a better answer.
+1,Teacher,120.3,"And STUDENT , can you please read the question again?"
+1,Teacher,120.3,"And again, STUDENT, what was the question?"
+1,Teacher,120.3,"STUDENT, take a look at the question for me."
+1,Teacher,120.3,"Paragraph two, I'm going to read and I want you to follow along. It says, NASA sent a small machine called a lunar Lunar Orbiter to investigate this lunar orbiter land at the moon South Pole and look for ice deposits in a large polar crater. OK, now I'm going to stop there."
+1,Teacher,120.4,STUDENT . Would you remind me of your answer again?
+1,Teacher,120.4,"STUDENT, what are you thinking about the question?"
+2,Teacher,120.4,"Okay, so what is your answer to the discussion question?"
+2,Teacher,120.4,Okay. Does anyone want to raise their hand and tell me what they think the action word is?
+1,Teacher,130.1,So a scientific tool called the microscope is a correct answer for looking at the water. 
+1,Teacher,130.1,You've got a piece of it. 
+2,Teacher,130.1,They used the lunar orbiter and the microscope to find the craters full of water.
+2,Teacher,130.1,You're both partially right.They used a small machine  to investigate craters and a microscopeto look closely at the water.
+1,Teacher,130.2,"I wonder, maybe STUDENT can help us out because I sent him on this mission to find this answer."
+1,Teacher,130.2,"STUDENT, I want you to find the name of the machine for us."
+1,Teacher,130.2,"STUDENT , can you explain what discover means?"
+1,Teacher,130.2,"She said a microscope is used to see things that are really small. Why do you think the scientists would need to use the microscope to see the water? Yes, STUDENT?"
+1,Teacher,130.2,"Right, so that's why I was looking at STUDENT's answer. And she said, NASA sent a small machine. And what else could she have put instead of just a small machine?"
+1,Teacher,130.2,Would anyone else like to build on his response?
+1,Teacher,130.2,"Right, you find something. Do you agree with that everybody?"
+1,Teacher,130.2,"Very good, STUDENT. Does everybody else agree with her answer?"
+1,Teacher,130.2,"STUDENT , would you agree with what STUDENT said?"
+1,Teacher,130.2,Or did anyone else find anything different?
+2,Teacher,130.2,With a partner read the text again and see if you can find the answer.
+2,Teacher,130.2,Work in small groups to compare your answers.
+1,Teacher,130.3,"So, they wouldn't exactly be using their tanks and their masks to find the water on the moon. That's just part of their work uniform and protective clothing."
+1,Teacher,130.3,"In the first sentence, it actually says that NASA sent a small machine called a lunar orbiter to investigate. This lunar orbiter looks for ice deposits in a large polar crater. So, this is the machine that actually went and explored."
+1,Teacher,130.3,They didn't really use a microscope to find the water. The water was located underneath the ground.
+1,Teacher,130.3,"So, to make our answer better, we could say NASA sent a small machine called a lunar orbiter."
+1,Teacher,130.3,"Discover is when we find it. So we have to find it first. And we're going to use the Lunar Orbiter to find it before we can look at it. So, do you understand how we could improve your answer?"
+2,Teacher,130.3,"Okay. Well, if we look back in the number three it says, that means that the moon is still drier than the driest desert on Earth. The water they found is microscopic. So the water is very small."
+2,Teacher,130.3,"But I do think based on paragraph five, whenever it talks about using the oxygen in the hydrogen and breaking it up to use it for a different things. I think that is very valuable."
+1,Teacher,140.1,"STUDENT , you went to NASA? How was that?"
+1,Teacher,140.1,"That's really good. Well, it sounds exciting. Did you enjoy yourself and NASA?"
+1,Teacher,140.1,"STUDENT, so what do you know about space?"
+1,Teacher,140.1,Did you like using the microscope in science class?
+2,Teacher,140.1,"Okay. When you deposit something, how much do you deposit? Do you have to deposit a really large piece of something or smaller pieces? [The conversation then leads to talking about deposits in a bank, but no explicit connection to ice deposits.]"
+2,Teacher,140.1,"Now we're not scientist and we're not astronauts and there's some things that we do know. But right now, you every one of your student at school, right. So what's an equipment you have right now. Thats helping you with your work, STUDENT ."
+1,Teacher,150.1,That make sense?
+1,Teacher,150.1,Does anyone else have questions?
+1,Teacher,150.1,You guys see that?
+1,Teacher,150.1,Does that make a little bit more sense?
+1,Teacher,150.1,Is there anything else I can do to clear this up for you guys?
+1,Teacher,150.1,"Can you give me a thumbs up if you agree. A thumbs in the middle. If you're not quite sure, or thumbs down if you disagree."
+1,Teacher,150.1,"STUDENT, what else do you think?"
+1,Teacher,150.1,That make sense?
+1,Teacher,150.1,Does anyone else have questions?
+1,Teacher,150.1,You guys see that?
+1,Teacher,150.1,Does that make a little bit more sense?
+1,Teacher,150.1,Is there anything else I can do to clear this up for you guys?
+1,Teacher,150.1,"Can you give me a thumbs up if you agree. A thumbs in the middle. If you're not quite sure, or thumbs down if you disagree."
+1,Teacher,150.1,"STUDENT, what else do you think?"
+1,Teacher,150.1,"Teacher: That'd be a great strategy to use STUDENT, do you agree with STUDENT  strategy. Is that something you could use too?"
+1,Teacher,150.1,So then that is why sometimes when we're looking at questions we got to be really careful because sometimes they'll try to trick you.
+1,Teacher,150.1,"Right, it can be a little confusing if you don't read over it carefully. Huh."
+1,Teacher,150.1," But can you look back in the reading and can you tell me what it says about that because I think if we use our brain just for a little bit and we read that reading, you're going to have all those same answers about the water too."
+1,Teacher,150.1,"Okay, well, we're just going to work on making sure we have the best answer for the question."
+1,Teacher,150.1,"Well, STUDENT. That's great. That's you feel like you know everything that there is to know about space, but there is always more that we can learn and maybe by listening to our friend'sfriends answer is we can learn even more."
+2,Teacher,150.1,"Well, guess what we're going to learn some new things today. You might find something that you didn't know."
+2,Teacher,150.1,"Yeah, well, we always have a good background knowledge of space. And that's really cool that you're interested in it, but we can always learn new names for machinery and things like that. So that's why we read this passage together in hopes that you would learn more."
+2,Teacher,150.1,The small group purpose is to dig a little deeper and get a better understanding of the texts that we're reading.
+2,Teacher,150.1,There are a couple other of your friends that are needing a little bit help with the guidance of where to find their answers.
+1,Teacher,210.1,"Well, it's expensive to send people to the moon all of the time. So, sometimes NASA sends machines to do the exploring in space."
+2,Teacher,210.1,"Part of the reason scientists are so interested in finding water on other planets is because we living things need water to survive. If we can find water on other planets, it could mean that life, like plants or animals, once lived there. It could even mean that humans have a chance of surviving there."
+1,Teacher,210.2,"Yeah, that's a good point that you do need oxygen tanks whenever you're in outer space, but we're talking about the different pieces of equipment that you need to be able to see what's on the moon."
+1,Teacher,210.2,Right. So the question is asking us what type of equipment that the scientists used to discover the water on the moon. So what type of equipment did they have to have in order-- if it was there to find water?
+1,Teacher,210.2,"What equipment did scientists use to discover water on the moon?  That would be your question. So that question didn't ask anything about what they found, just what they used to find it."
+1,Teacher,210.2,"Exactly right. So, was the question I asked you, what did they used to look at it, or what do they use to find it?"
+1,Teacher,210.2,"So, we need to find the equipment that they used."
+1,Teacher,210.2,Do you know what the word convincing means?
+1,Teacher,210.2,"You're right. Equipment and tools, the equipment is another word for a tool. So, when we have something that's the same word for a tool, we would call it a synonym. So, they're synonyms of each other."
+2,Teacher,210.2,"Alright. Is there anybody who wants to share the answer with us? What is, what does the word equipment mean?"
+2,Teacher,210.2,"So, we are looking for the one that was used to discover, or to find. So, can you think of, can you see another equipment that was mentioned in the passage, apart from the microscope?"
+2,Teacher,210.2,"We're trying to discover it. We're not trying to look at it, STUDENT , did you have something to tell me [ does more than repeats the student response - adds explanation]"
+1,Teacher,210.2,So you have to find the water before you can look at it right. Does anyone know what discover means?
+1,Teacher,210.3,"There's still something missing in your answer. Remember, that NASA can't always send astronauts to space and may need to send machines sometimes."
+1,Teacher,210.3,"Well, yeah. What else could you have put in your answer instead of just saying a small machine?"
+1,Teacher,210.3,"How could you have made that more in depth, answered it more in depth?"
+1,Teacher,210.3,But a small machine--that could be anything. Couldn't it?
+1,Teacher,210.3,"So I see that we have. Let's look at back at some of our answers. So I see that we looked at our question what equipment and scientists used to discover water on the moon. So I see we have our answers are a microscope, A small machine, and then we have some other equipment. Which answer makes the most sense as to what would be found on the moon STUDENT ?"
+2,Teacher,210.3,"Oh, that would be interesting. But do they have. Do they have oxygen on the moon outside of what's in the water?"
+2,Teacher,210.3,"As a, as the teacher, you know, if you want to put yourself in my position a little bit when I see response like that. It's hard for me to know what you meant."
+2,Teacher,210.3,"STUDENT, did you find any evidence when you were looking to answer that different question?"
+1,Teacher,210.4,"As it says in paragraph two, the machine was called a lunar orbiter. So a scientific tool called the microscope can be used to look at the water, but not for the scientists to actually discover water on the moon."
+1,Teacher,210.4,This paragraph tells us that the moon is drier than a desert. That means that there's even less water on the moon than on deserts on Earth.
+1,Teacher,210.4,"The text states that the deposits are microscopic, which tells us that the ice is so small you can't see it without special equipment like a microscope."
+1,Teacher,210.4," So, STUDENT , can you go down to paragraph six and paragraph six. It talks about maybe the amount of time that it would take and kind of like what it would look like before we were able to get water on the moon or from the moon."
+1,Teacher,210.4,Let's look back in the text and see if we can find the answer to our question.
+1,Teacher,210.4,"Okay, that's what polar craters mean. Polar means the poles, the North and the South. So what is the main idea of this section? What is, for informational texts, what is the main idea? What is the target they want you to know?"
+1,Teacher,210.4,So according to that. Do we think that people were actually on the moon at that time? Or did they just send that machine called the lunar Lunar Orbiter?
+1,Teacher,210.4,So where did they find the water?
+1,Teacher,210.4,"There you go. Okay, so STUDENT, where were they finding this water?"
+1,Teacher,210.4,Why do you think a scientist would need a microscope to see the water?
+1,Teacher,210.4,And we were looking at paragraph two moments ago to specifically answer that question. So what was the name of the small machine that NASA sent to investigate?
+1,Teacher,210.4,That's right. What  word that starts with an lunar what?
+1,Teacher,210.4,So do you think the Lunar Orbiter was able to see the ice deposits or how do you think the lunar orbiter was able to find the ice deposits?
+1,Teacher,210.4,"Yes, that is what they sent. And STUDENT , what did they investigate when they got there?"
+1,Teacher,210.4,"Um, so does anybody remember what the name of that machine was called?"
+1,Teacher,210.4,"STUDENT, do you remember the name?"
+1,Teacher,210.4,"Well, let's think about it this way, STUDENT, could you look very closely at the water molecules without the microscope?"
+1,Teacher,210.4,Let's stop for a second. And what did that first paragraph tell us? Do you know?
+1,Teacher,210.4,Okay. Can someone paraphrase that paragraph for me?
+1,Teacher,210.4,"Let's go back to paragraph two, once more. It does say NASA sent a small machine called a lunar orbiter to investigate. What do you think the word investigate means?"
+1,Teacher,210.4,"If you're going to investigate something what-- STUDENT, what do you think?"
+1,Teacher,210.4,Do you think that the moon is wet? Or did the text say that the moon is very dry?
+1,Teacher,210.4,Can you find the paragraph where the microscope is used?
+1,Teacher,210.4,"Um, so, STUDENT, can you give me another example of equipment, maybe something from that article that we just read that you know that NASA is using in space?"
+1,Teacher,210.4,"And I noticed STUDENT said that NASA sent a small machine. So STUDENT, can you look back in the text and recall what was the name of that small machine that NASA sent?"
+2,Teacher,210.4,Can you find any other kinds of equipment in the text?
+2,Teacher,210.4,it's like -have you all seen frost in the wintertime or in the fall? Have you seen frost on your mom's car windows or the grass? Frost is a thin layer of ice - imagine particles similar to bits of frost. So the Lunar Orbiter found tiny ice deposits in craters on the moon. 
+1,Teacher,220.1,We're just talking about how we found the answers and what we can use to help us find answers when we when we have questions like this
+1,Teacher,220.1,Today we're going to think through how to use the text when we're responding to questions like this one - we can't just rely on our background knowledge. 
+1,Teacher,220.1,I'm going to show you guys how to find important words in the question that will direct us to the answer we need.
+1,Teacher,230.1,"So, you say a small machine. What specific small machine do you think you were talking about there?"
+1,Teacher,230.1,"All right, you mentioned oxygen tanks. Why did you mention oxygen tanks?"
+1,Teacher,230.1,Why do you say that?
+2,Teacher,230.1,Can you tell me more?
+2,Teacher,230.1,And how did you gather that information?
+2,Teacher,230.1,"STUDENT, you mentioned a scientist likes to use a lot of equipment. Right?"
+1,Teacher,230.1,How did you know that water's heavy?
+1,Teacher,230.1,"Okay, that's very interesting. So, you know, just like your answer said, and it said, water can be split into two parts hydrogen and oxygen. Is that something that your dad needs a lot of as an astronaut?"
+1,Teacher,230.1,Okay so water being able to be split into two parts. Do you think that that is part of what makes it valuable to NASA and people maybe like your father?
+1,Teacher,230.2,All right. Where in the text did you see that?
+1,Teacher,230.2,What did you read in the text that led you to that answer?
+1,Teacher,230.2,What paragraph did you look at to find your answer?
+1,Teacher,230.2,"Did you find that in paragraph two, the one we just read?"
+1,Teacher,230.2,"And what makes you think that way. STUDENT  based on our passage, what makes you think that the evidence is not convincing."
+1,Teacher,230.3,"So, STUDENT , you're saying that the microscope discovered water on the moon? Is that right?"
+1,Teacher,230.3,"STUDENT, you think that the microscope was the tool that was used to discover water on the moon, but STUDENT, you say it was the small machine. Am I understanding this correctly?"
+1,Teacher,230.3,"Okay, STUDENT  and STUDENT both agree that it was the microscope. Right?"
+1,Teacher,230.3,"So what I'm hearing is, there were craters full of water on the moon?"
+1,Teacher,230.3,"Did you tell me that our plants need water to survive, is that correct?"
+1,Teacher,230.3,"Now, STUDENT , and STUDENT you guys mentioned that during our discussion that the technology might not be ready for that yet but however there are some possibilities that we can use water."
+1,Teacher,230.3,"So I noticed that, um, several of you, STUDENT , STUDENT, and STUDENT you all answered the question by saying yes or no at the beginning."
+2,Teacher,230.3,It is very heavy. Going back to your first statement so transporting it would be something that we would have to do.
+2,Teacher,230.3,Also you pointed out that it would take them a while to make that plan.
+2,Teacher,230.3,It is very heavy. Going back to your first statement so transporting it would be something that we would have to do.
+1,Teacher,310.1,"I love that you cited where you found it in the text, paragraph 2."
+1,Teacher,310.1,"That's very good. I like how STUDENT was able to tell me exactly where she found her answer and STUDENT  and STUDENT that's more of what I would be looking for when you try to respond. Again, I like how she's very specific. She used the passage that we provided to find her answer. She didn't just use her background knowledge, she made sure to go back and find something in the text."
+1,Teacher,310.1,You used your background knowledge about buried treasures to answer my question
+1,Teacher,310.1,"Yes, I agree. And I like how you told me specific things from the paragraph to help support your answer."
+1,Teacher,310.1,That's a good question. [The question is actually a good question]
+2,Teacher,310.1,I see how you got to that answer. 
+2,Teacher,310.1,I see what you're thinking! 
+1,Teacher,410.1,"It seems that there is a misunderstanding about the question here. You are interpreting the question to mean that scientists went to the moon with equipment, but the question is only asking what equipment was used to discover water on the moon. It isn�t telling us that scientists went."
+2,Teacher,410.1,"So your answer could be improved with a little bit of clarity. If we were more, a little more specific, I should say. So you say a small machine, what specific small machine do you think you were talking about there?"
+2,Teacher,410.2,"But for this one, the answer wasn't quite there because we needed to focus more on that equipment than what the equipment was finding."
+1,Teacher,410.2,"Well, you didn't say the type of equipment that they used to discover water, you said that they sent a small machine and they did send a small machine, but there's a certain type of equipment that they use to find the water."
+1,Teacher,410.3,"True, scientists found ice deposits, but there is a piece missing. The text does not say that the ice deposits were large. It uses a specific word to describe the size of the ice deposits"
+1,Teacher,420.1,"When we're answering these questions, we really read, and we really try to figure out what does this question want from me?"
+2,Teacher,420.1,"Before we reread the text, I want you to tell me what the key words are in the question because these keywords are going to be the focus of your reading."
+2,Teacher,420.1,Find the verb or action word in the question and underline the action word
+1,Teacher,420.2,"So, by saying the name of the machine instead of saying a small machine you allow whoever reads that response to know exactly what you're talking about. So, please add in the name of the machine to your response. [Strategy and action step]"
+1,Teacher,420.2,"As far as what type of equipment scientists used to discover the water on the moon, it has a specific name. So, it's always very important to read everything in the question and text before answering the question. [Thinking strategy]"
+1,Teacher,420.2,"A question relates to the passage. So, when it says equipment in the question, what we want to do is to find the equipment that was mentioned in the passage. [Strategy]"
+2,Teacher,420.2,So next time. How about we try. We'll start with either a strong either yes or no and then like you did just now will back it up with some evidence. Does that sound good?
+2,Teacher,420.2,So the next time you're answering your question. What's something you can do when you're answering besides just saying no.
+1,Teacher,420.3,"To use context clues, you look at the text around a word or phrase to understand what that word or phrase means. "
+1,Teacher,420.3,"Okay, STUDENT , I would like you to look back over the passage, and I would like for you to underline where the word scientists appear and what they're using to find the water."
+1,Teacher,420.3,"So, let's take a step back and see what sort of equipment we see mentioned specifically in paragraph two."
+2,Teacher,420.3,"Look at paragraph two, to see if there was a special machine that they brought to investigate the water on the moon."
+2,Teacher,420.3,Now let's let's go a little further back on our texts and see if we can maybe go a little deeper into how they originally discovered it. Okay. Would you like to maybe give it another go.
+1,Teacher,430.1,"STUDENT , you successfully identified a type of equipment from the passage, but your answer does not match one of the key words in the question which is discover."
+1,Teacher,430.1," By looking for words in the text similar to discover, such as 'investigate,' you could find a better answer that suits the whole question instead of just part of it."
+1,Teacher,430.1,"I am concerned that the question is asking - What equipment -so, I would expect to hear the name of the equipment that scientists used to discover water on the moon in your response. "
+2,Teacher,430.1,I would recommend rereading the text looking for the specific name of the equipment used to discover or find the water. 
+2,Teacher,430.1,Can you tell me what you heard was my concern with your current response and suggestion for your next step?
+1,Teacher,430.2,"STUDENT says that NASA sent a small machine. And that was right too. But that was not enough for that question. They sent a small machine, but you have to look for a better word to answer that question."
+1,Teacher,430.2,"And, STUDENT, NASA sent out a small machine, but we need to be specific. I would love it if you could tell me a little bit more about what that machine is. I'm looking for the specific name and it starts with the letter L, if that's helpful. You can look back in your reading for that."
+1,Teacher,430.2,"That's very good. That's very good. So right both a small machine and a lunar orbiter would be correct. But if I was only reading the answers to this specific question, I might not have the context and know that So by saying lunar orbiter instead of a small machine you allow whoever reads that response to know exactly what you're talking about."
+2,Teacher,430.2,"So what you just did there where you explained it further and how you said yes it could be used for that. You just gave that to me verbally, but as far as your actual response to the question where you just told me about how it can be split into hydrogen and oxygen. Do you think that maybe next time, next time when we respond to a question like that, we can bake in some of what you just said. But we can put it on text in the response."
+2,Teacher,430.3,"Scientists can use a microscope to look closely at water, but they had to use a more specific tool to look for the water first. To find what that tool was, let's go back to the text. I want you to highlight words that are equipment. Then read what it says about how scientists used that equipment."
+12,Teacher,430.3,"Let's outline the sequence of events described in this text. First - what happened (student replies), Then ____. And then ______. So ___________. What was discovered on the moon? How was the water discovered? What was the name of the equipment that scientists used to discover water on the moon?"
+1,Teacher,530.1,How could you sum-up three actions that you took to improve your response?
+1,Teacher,530.1,What are the qualities of a high quality response to a question that is specifically asking about information that is in a text?     
+1,Teacher,530.1,So how can we approach that question a little differently now that you've looked at it?
+1,Teacher,530.1,About our keyword discover and you were thinking about how that was changing your thinking. Can you go back to that? 
+1,Teacher,530.1,How is that keyword discover changing what you were originally thinking?
+1,Teacher,530.1,And how did you find that instead of small machine it was the Lunar Orbiter. What did you do to make that change?
+1,Teacher,530.1,"Okay, so who can tell me what they did to correct their answer? So how did you go about correcting your answer?"
+1,Teacher,530.1,"So now that we have talked about this, how has this changed your thinking?"
+1,Teacher,530.1,"How did your thinking change there, what did you do differently?"
+1,Teacher,530.1,"OK, so now that I have given you guys some feedback, I want you to think about how you started out thinking.  Then, how that changed."
+1,Teacher,530.1,So why did you need to add more to your answer for to describe with lunar orbiter did?
+1,Teacher,530.1, So can you tell me how your answer changed from the beginning?
+1,Teacher,530.1,"So what would you with our discussion today, what would you say your answer would be, and how would it change?"
+1,Teacher,530.1,Do you see any ways that your mind is kind of changing? Are you thinking differently now that you're hearing from your other friends and your group?
+1,Teacher,530.1,So we're gonna take a minute to turn around to your partner next to you and you're going to talk about what are your takeaway from the revision process.
+1,Teacher,530.1,"So you can say something like, I started out thinking that we needed a microscope microscope was my answer for the question right now. I think it's the lunar orbiter because blank."
+1,Teacher,530.1,Does anyone else want to share maybe they're thinking on what they thought that was the right answer? But now what they know is the right answer?
+1,Teacher,530.1,Great. Does anyone else want to share their answers and maybe how their answers have changed?
+1,Teacher,530.1,Does anyone else want to share their thinking about what they had for their first answer and how it could have changed after rereading?
+1,Teacher,530.1,"Okay um so when you're thinking about your original answer and your new answer, what do you think the difference is between those answers?"
+1,Teacher,530.1,"Yes, so that use the Lunar orbiter so STUDENT what on what exactly made you come to that conclusion that new answer that you have?"
+1,Teacher,530.1,i'm wondering how do you feel like that compares to your first answer? what was different about those two?
+1,Teacher,530.1,"Okay, so what was different about that answer versus your first response?"
+1,Teacher,530.1,STUDENT. what about you? how did your answer change when you were able to revise it?
+1,Teacher,530.1,mm hmm so let's just think about as a team. like What did we do together? what do we do together to figure out what the name of that tool was called? STUDENT.
+1,Teacher,530.1,"So, as we proceed with this discussion, I would want you to observe how you're thinking changes as we move along the discussion is okay."
+1,Teacher,530.1,OK so STUDENT do you want to share your new thinking? What has changed in your thinking?
+1,Teacher,530.1,Great so STUDENT now that you're participating already. Would you mind telling me what you're thinking was when you went back to try to revise your response?
+1,Teacher,530.1,Is there anything else? Did anyone do anything different when they were revising their answer?
+1,Teacher,530.1,"First you're going to answer ""I started out thinking blank"" then you're going to answer, ""and now I think blank because blank"". Go ahead and take 30 seconds to answer those questions."
+1,Teacher,530.1,What made you change your thinking on that?
+1,Teacher,530.1,"And then, after you're finished i'm curious if you could share, about how you're thinking has changed from your original answer to the second answer that you that you wrote?"
+1,Teacher,530.1,So how can I ask you a question? How did you get from your first answer to your second answer? How did your thinking change?
+2,Teacher,530.1,What was what was different and how other than just writing more? 
+2,Teacher,530.1,What do you think your thought process was in shifting your answer?
+2,Teacher,530.1,"Thank you. Okay, so STUDENT do you feel like you've changed your your process for working through text and questions?"
+2,Teacher,530.1,"Before our conversation I thought that the answer was This or I didn't know the answer, or I was still confused, or just before our conversation, this is what I thought, and then, after the conversation that we just had now, I think. "
+2,Teacher,530.1,"Whatever you think it's okay, if your response hasn't changed. It's okay if it has changed. I'm just curious what you all are thinking. So take a moment, before our conversation I thought this and after our conversation I thought this."
+1,Teacher,520.1,Do you feel like you could try this strategy next time you encounter a tricky question like this?
+1,Teacher,520.1,"Next time you have a similar question, what would you do first?"
+1,Teacher,520.1,If you are not sure what the question is asking or if you want to check your understanding of the question - then what can you do?
+1,Teacher,520.1,To make sure that you understand a text - what can you do?
+1,Teacher,520.1,"So, next time you have to answer a question that requires information from the text, please remember to make sure you understand the question first before you start trying to find an answer."
+1,Teacher,520.1,"Thank you. Okay, so STUDENT do you feel like you've changed your your process for working through text and questions?"
+1,Teacher,520.1,"Whatever you think it's okay, if your response hasn't changed. It's okay if it has changed. I'm just curious what you all are thinking. So take a moment, before our conversation I thought this and after our conversation I thought this."
+1,Teacher,520.1,I think what we all need to take away is that when we're answering reading comprehension questions we really need to focus on going back and reading the article in detail and maybe highlighting the text or annotating the text so that we can really understand in detail what we're learning  and why we're learning it.
+1,Teacher,520.1,"Okay, so from reading the text today and using our tools by going back and rereading the text and circling important information, how can this broaden your understanding in the future of any topic that we discuss whether it's space or farming?"
+1,Teacher,520.1,How can you use your knowledge of restating the question in our next lesson? 
+1,Teacher,520.1,"So when we're answering questions like this again, what's something that we need to make sure we do when we're answering the question?"
+1,Teacher,520.1,"So next time you have a question, you can underline your keywords to help you be more specific."
+1,Teacher,520.1,"So now that you've figured out the full answer, what will you do next time when you're looking back in the text?"
+1,Teacher,520.1,"Alright so next time, go back and look in the story to find your answer."
+1,Teacher,520.1,"So next time you are answering a question like this, how do you think you can make your answer better?"
+1,Teacher,520.1,"And how you will apply what you learned in your next task? So I'm gonna give you guys a couple minutes to think about it, and then we will go around in the circle answering."
+1,Teacher,520.1,"So we can start with STUDENT and just to repeat, I want you to state how you started out thinking, how the strategy you used changed based on the feedback I gave, and what you will do next time to make sure you are fully answering the question."
+1,Teacher,520.1,"We're just going to go around. STUDENT, what do you think first? You're going to say what strategy you used, and how you will build on to it for your next assignment or task."
+1,Teacher,520.1,"And last but not least, STUDENT. What about you? What do you think? What strategy did you use and how will you take that to either build on or change it in the future?"
+1,Teacher,520.1,"Right so next time you get a question on a text, are you going to use your background knowledge and not read the text at all or are you going to read the text and then use your background knowledge?"
+1,Teacher,520.1,"Right, so what are a few things we can do next time when you're not quite sure if your answers are all the way there yet?"
+1,Teacher,520.1,"Right, so you went back and read. So what do you want to do next time a teacher asks you for a little bit more information?"
+1,Teacher,520.1,I'm wondering what you'll do next time you get a question like this to arrive at an answer like this? What's something that you can do next time when you get a question like this?
+1,Teacher,520.1,And I'm hearing that you have an idea of how you can repeat this answer in the future. I think it might be great if you write down this process in a notebook.
+1,Teacher,520.1,"That's right. That's excellent. So now when we go forward and we're answering comprehension questions, you can use STUDENT's amazing example where we restate the question and we're sure to use all of the evidence from the text."
+1,Teacher,520.1,"Okay, so next time that you see a question like this that's asking about a text, what are you going to do?"
+1,Teacher,520.1,"Next time you see this kind of question, please be as specific as you can to answer the question, okay?"
+1,Teacher,520.1,"So every single time that we're using information from a text in order to answer a discussion question, we want to make sure that we're referencing back to the text, even though we might know a lot about the subject reading already."
+1,Teacher,520.1,"Or even thinking beyond today, what are some tools that we can use for future texts like these?"
+1,Teacher,520.1,"Yes, so when we're thinking about answering questions like these later in the future, I think that what you said about details is very important."
+1,Teacher,520.1,So what do you think you would do next time you get a question like this?
+1,Teacher,520.1,What do you think will stick with you for the next time you're answering a similar question?
+1,Teacher,520.1,"How, what did you learn right? What did you take away from this process of making inferences and making connections? What did you learn about that you might be able to apply the next time you encounter a question like this?"
+1,Teacher,520.1,"So next time you see a question asking about a text, what will you do?"
+1,Teacher,520.1,"so I suggest that the next time you have a question like this, you read through the text and look for those key specific words that might help you have a more rounded out answer."
+2,Teacher,520.1,"Now that we figured out the full answer, what could you do next time so that you don't have to do so much revising?"
+2,Teacher,520.1,"Okay, what could you do next time you get a question like this?"
+2,Teacher,520.1,What do you think you could do going forward to make sure that we are looking for what the question is asking?
+2,Teacher,520.1,"STUDENT, as we talked about earlier in the day, maybe in the future you can use specifying techniques in your responses."
+2,Teacher,520.1,"So the next time when you're answering these kinds of questions, be sure to look for your information, or your answer, in the text."
+1,Teacher,510.1,A good strategy to help you find the best answer for comprehension questions is to look for the subject and the actions in the text that have the same meaning as those in the question. Let's try that by looking for synonyms for an action word - discover.
+1,Teacher,510.1,I heard you thinking in intellectually careful ways today.
+1,Teacher,510.1,Savannah just identified the main idea by...
+1,Teacher,510.1,"STUDENT just showed us how to use context clues. First, he"
+1,Teacher,510.1,"Can somebody tell me, and I want to see your hands raised, what does it mean to find evidence?"
+1,Teacher,510.1,"When we're talking about evidence, we're thinking about what words do I see in this text or reading that help me answer this question."
+1,Teacher,510.1,"We might look for cue words or leading words, like called, like you notice how called is before that, so that's a great example of a word that we might that we might use."
+1,Teacher,510.1,"Alright, STUDENT, can you explain to me what evidence is?"
+1,Teacher,510.1,"When we're looking for evidence, we need to find certain specific things that are in that text that will help us."
+1,Teacher,510.1,You want to look in the story for where you can find these answers.
+1,Teacher,510.1,"The next time you're reading a tough question, it can help you to look for the action words in the question because that's going to help you know specifically what you're looking for."
+1,Teacher,510.1,When we read the text and we read the question we need to correlate or we need to put them together to see what they're actually asking.
+1,Teacher,510.1,"Then you go look at your question and you look at what it's really asking you, and then you read it again."
+1,Teacher,510.1,"If you want to be good at something, you keep doing it over and over and over."
+1,Teacher,510.1,Remember when we looked at our question? We found a keyword.
+1,Teacher,510.1,Keyword to help us and to answer the question.
+1,Teacher,510.1,Always find and identify a keyword. So you really understand what you're looking for and go back in the text.
+1,Teacher,510.1,She used the passage that we provided to find her answer. She didn't just use her background knowledge. She made sure to go back and find something in the text.
+1,Teacher,510.1,"Make sure when you're reading the passage, you take a holiday. You highlight important facts when you go to your question. "
+1,Teacher,510.1,You highlight important words in your question. So you can go back and you can try to find that in the passage.
+1,Teacher,510.1,So you see how if you did remember that it was a small machine and I like how you went back and reread your text to figure out what that machine was actually called.
+1,Teacher,510.1,"Sometimes we can read things, but not quite absorb everything. So it's always a good idea to go back and reread your text, underline important information and details that can help you answer questions about it afterwards, and keep that knowledge with you."
+1,Teacher,510.1,Now one of the strategies that we were going to use today is to look at some key words that we have in our question. 
+1,Teacher,510.1,"For restating a question you listen carefully for the words being used, such as in our question."
+1,Teacher,510.1,To answer the question using the race method you restate the question.
+1,Teacher,510.1,We look really closely at those key words in our question.
+1,Teacher,510.1,"Remember when we are reading our question we have to look really closely at those key words, those words that we need to look for in our text."
+1,Teacher,510.1,Remember when we are looking at our question we always have to look for those important words.
+1,Teacher,510.1,Then we have to look in our text for the same words so that we can try to find our answer.
+1,Teacher,510.1,Often when we read it will tell us a sequence. It will tell us what happened first and then what happens next. So it's important when we are answering our questions to look to see if we have gone in the order that is in the story.
+1,Teacher,510.1,"We don't want to just say we agree. It's good to agree with people, but it's also good to know why we we think something."
+1,Teacher,510.1,"When we're given questions we'd like to find answers that are very specific because the more specific they are, the more sense that they make later on."
+1,Teacher,510.1,I think we've all kind of learned a lesson when we're reading the information we have to pay attention to it and not just assume.
+1,Teacher,510.1,"Does that make sense? We know we all know, different things about space, but we also need to make sure that we're really reading the information that we're being given."
+1,Teacher,510.1,We looked very closely at our text. We looked for those key words.
+1,Teacher,510.1,"But what we need to do is definitely go through your passage and then highlight important details. You always want to highlight your headings, or your sub headings."
+1,Teacher,510.1,"Because those are a lot of key details in there that could give you some really good text evidence. So that's what you need to do, you want to find details that go along with your question and could possibly support your answer."
+1,Teacher,510.1,Maybe like a chronological timeline of events in a text. So if you broke down the text and circled like what happened first and then what happened. And then what happened. You might be able to find a more suitable answer to the question.
+1,Teacher,510.1,"You built off your answer. I appreciate how you build your answer. We got more specific. We narrowed down to that core of knowledge, we're looking for. And then we said, Okay, this is, this is what that machine was. And this is what it was doing."
+1,Teacher,510.1,"Okay, again, so. And much like with STUDENT earlier, we're just, we're trying to look at that question. And we're specifically boiling it down to just its core components."
+1,Teacher,510.1,"Sometimes it takes a little bit of work to get everything together. And it's called summarizing, so we want to be able to put together the words and come up with the best answer."
+1,Teacher,510.1,"So I really like to do is the race format. So we're going to restate the question, we're going to answer the question, we're going to cite evidence, and then we're going to explain that evidence."
+1,Teacher,510.1,"So for example, when I read, what equipment did scientists use to discover water on the moon. I try to think to myself, I try to restate the question into an answer and then fill in the blank spots that the questions asking."
+1,Teacher,510.1,"So for example, I might say, the equipment that the scientist used to discover on the moon would be and then leave that answer blank. And then we could go back in the text to determine what exactly what equipment. "
+1,Teacher,510.1,But I think next time we need to use the strategy of looking at keywords and be really specific.
+1,Teacher,510.1,"So, that is why it's very important to highlight those keywords. So you can give the best answer."
+1,Teacher,510.1,"See, sometimes it's okay to go back and reread to find the answer."
+1,Teacher,510.1,"Yes, that is exactly what I would like. And that goes for everyone, not just STUDENT. So when you're answering these questions, try to use what you already know, as well as specific information from what we're reading."
+1,Teacher,510.1,"Great job, that's a good strategy finding those key clues and keywords to help you find your answer."
+1,Teacher,510.1,"You told me before that what you did was you read, you noticed that the word water was in the question, so you scanned through and you looked for things that related with water."
+1,Teacher,510.1,"Great. So I really liked that response because you explained yourself really well. You said that you read the question, you saw what the question was asking for, and then you found it and explained why. So that was a really great response."
+1,Teacher,510.1,"Definitely use your imagination, I really like how you visualize the situation before giving your answer. That's a really good strategy to answering questions."
+1,Teacher,510.1,"Yes, that was a perfect response you used direct language from the text, used specific vocab, and you provided reasoning. It was very specific. That was a perfect response. Good job."
+1,Teacher,510.1,"So to find evidence. We need to use those quotes from the text and I like that. STUDENT quoted. And she said, paragraph three, so we could all look at our texts and find where she was reading."
+1,Teacher,510.1,"I like that you're connecting your background knowledge to help you. It's great that you're using your notes to help you further understand this text, that's an excellent strategy that good readers use."
+1,Teacher,510.1,Then you provided reasoning which is you can't survive without water. It's very important to backup your answers with reasoning.
+1,Teacher,510.1,I'm hearing that you read the text for details and evidence to help support your thinking.
+1,Teacher,510.1,You're connecting the details to another part of the text to explain how it could be valuable.
+1,Teacher,510.1,"STUDENT, you are using your background knowledge of a definition of orbiter to be able to apply your answer."
+1,Teacher,510.1,"So when we're answering comprehension questions like this, we really need to dig into the text and make sure we're using all the information."
+1,Teacher,510.1,I am going to give you some sentence starters and this is going to help us really solidify our learning and reading strategies.
+1,Teacher,510.1,So you think about the thinking and thinking strategy that you use when you are reading a text and answering a question.
+1,Teacher,510.1,"So, why did you change your answer to what STUDENT also wrote? What were you thinking?"
+1,Teacher,510.1,She's going back to the text and finding that specific piece of evidence that was used to discover water on the moon.
+1,Teacher,510.1,"So this is a really good thing that you were just able to do so when you were rereading, you're able to see where you found your answer. And you were able to find another part that you could add to it."
+1,Teacher,510.1,"That's an excellent strategy, to be looking at the text and pulling out those keywords."
+1,Teacher,510.1,And I think that that's an excellent strategy for anyone to think about when we're reading a text is to think.
+1,Teacher,510.1,When you're trying to answer this question just to try to locate these key words in the paragraph.
+1,Teacher,510.1,"When we read, we want to make sure that we're backing up what we're saying with information from the text."
+1,Teacher,510.1,"So that's great that's a great segue. So what I wanted to ask you guys, next because you just gave specific evidence of what the question said. And you analyze that and picked an answer, based off that specifically. So that's a great process."
+1,Teacher,510.1,So when we're not drawing on our prior knowledge these things can be complex and reviewing them a couple times is important.
+1,Teacher,510.1,"It's important for you to look back at the passage to try and determine what the best answer to the question is, it's always helpful to circle key words in the question."
+1,Teacher,510.1,"I mean you're 100% right and using that background knowledge, but when we answer questions, especially questions about a text, we always want to make sure that our answers on have evidence that are found directly from the text."
+1,Teacher,510.1,"What i'm going to suggest to all of you, is when you start, the first thing you do before you start reading is to actually look closely at the question."
+1,Teacher,510.1,So I guess the other strategy that you're going to want to use is to is to think about the question that they're asking and then you're trying to make some connections between the concepts that you're reading.
+1,Teacher,510.1,"That can help you make some inferences. you want to read a little bit more closely, for the meaning of the the material before it."
+1,Teacher,510.1,"Yeah, so this is a really important skill for scientists. We need to be able to look at a text and use quotes or information from the text to support our answers."
+1,Teacher,510.1,Okay so looking for evidence in the text and circling that evidence is a great strategy to make sure that we're answering the question completely.
+1,Teacher,510.1,"So we're going to be thinking about what strategies we use to revise our answers and how we can use those strategies, the next time we come across a question like this."
+1,Teacher,510.1,I love that you are looking for keywords that's a really strong reading technique.
+1,Teacher,510.1,I think that a little bit of specificity and putting a little bit of effort up top may have to save you the trouble of having to revise it several times.
+1,Teacher,510.1,"I sort of noticed that, through talking with STUDENT, I mean, that you also added some specificity to your answer, do you think that helped you get a more full response?"
+1,Teacher,510.1,"I think that's totally a great strategy for you, I think, if you see the question provide your answer just look over your answer one more time and then make sure it answers matches the question and you'll be good to go."
+1,Teacher,510.1,"Fantastic, so I really appreciate something STUDENT just did, he took little parts of the world to lunar orbit to draw a conclusion from that so we're really looking for small details here."
+1,Teacher,510.1,"The question when we're looking for an answer it's important to think about those keywords and it can also be helpful to create our sentence, but I wouldn't say that it necessarily has to be in your response."
+1,Teacher,510.1,"I think it's nice, though, when we read a text, if we can scan the text for specific pieces of equipment, then that way when we write our answers out if I ever asked you can you tell me what paragraph you found that in, you'd be able to point to that exact part of the text."
+1,Teacher,510.1,"So I think STUDENT you did just that, when you just re read that beginning of paragraph two."
+1,Teacher,510.1,"Yeah, exactly. You could specify the small machine and that's a strategy you can use in response questions."
+1,Teacher,510.1,"Well, in this case, adding a name would be sufficient, but I i'm talking more about a strategy of specifying your responses, instead of just like adding a name into it."
+2,Teacher,510.1,"But your strategy is absolutely right, you locate the keywords in the question and you find them in the text."
+2,Teacher,510.1,"Um, yeah. So, um, unfortunately, we have to go to lunch. But before we went to lunch. I just wanted to thank you for working with us. Like sometimes"
+2,Teacher,510.1,"Um, well, you asked us to look closely for the equipment. Right. And like look at what was using to discover the thing"
+2,Teacher,510.1,"Um, well, I'm looking at it and um I think it says, like okay, NASA sent this whole machine called a lunar orbiter to investigate. This lunar orbiter looks for ice deposits in a large polar creator. These ice deposits are very small."
+2,Teacher,510.1,"Um, so. Okay, so that's really interesting. So like the arm so like the key, the key word would be like what, what, like equipment like equipment. Is that a keyword?"
