@@ -46,7 +46,7 @@ class Scene {
 		if (this.cartoonScene) 	this.scene.background=new THREE.Color(0xffffff);					// White background
 		this.manager=new THREE.LoadingManager();													// Loading manager
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
-		this.AddCamera(0,150,500,.4);																// Add camera
+		this.AddCamera(0,150,500);																// Add camera
 		this.controls.addEventListener('end',(e)=> {												// On control change
 			app.arc.Add( {o:'O',																	// Add to record
 				xr:this.camera.rotation.x, yr:this.camera.rotation.y, zr:this.camera.rotation.z,	// Rotation
@@ -74,10 +74,12 @@ class Scene {
 
 	Resize()																					// RESIZE 3D SPACE
 	{
-		this.camera.aspect=window.innerWidth/window.innerHeight;									// Set aspect
+		let h=$("#mainDiv").height();																// Get container height
+		let w=$("#mainDiv").width();																// Width
+		this.camera.aspect=w/h;																		// Set aspect
 		this.camera.updateProjectionMatrix();														// Reset matrix
-		if (this.scene && this.scene.outliner) 	this.outliner.setSize(window.innerWidth,window.innerHeight-3);	// Reset render size		
-		else if (this.scene)					this.renderer.setSize(window.innerWidth,window.innerHeight-3);	
+		if (this.scene && this.scene.outliner) 	this.outliner.setSize(w,h-3);						// Reset render size		
+		else if (this.scene)					this.renderer.setSize(w,h-3);	
 	}
 
 	AddCamera(x, y, z)																			// ADD CAMERA

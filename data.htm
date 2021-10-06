@@ -73,7 +73,7 @@
 			.then(res =>{																			// Process																	
 				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
 				nlp.SetWho(data);																	// Set student synonyms
-				LoadRawData('assets/rawData3.csv');													// Load raw data file
+				LoadRawData('assets/rawData.csv');													// Load raw data file
 			});
 		}
 	
@@ -231,6 +231,7 @@ id=Math.floor(o.intent/100)*100;
 				}
 			}
 
+	trace(doms)		
 		let str="version: \"2.0\"\n\nnlu:\n";														// NLU header
 		str+="- intent: bot_challenge\n  examples: |\n    - are you a bot?\n    - are you a human?\n    - am I talking to a bot?\n    - am I talking to a human?\n";
 		for (k in ints)	{																			// For each intent

@@ -29,7 +29,7 @@
 							}
 		.lz-about { 		position: relative; width:100%; max-width:800px; height:calc(100vh - 28px); margin: 12px auto; border:none; 
 							}
-		.lz-main { 			width:100%; height:100%; background-color: #ddd; display:none; text-align:center;
+		.lz-main { 			width:100%; height:100vh; background-color: #ddd; display:none; text-align:center;
 							}
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
@@ -54,6 +54,16 @@
 		.lz-bubble {		position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top:80px; width:200px;
 							border-radius: 100px; background-color: #d7ebff; border: 1px solid rgb(206, 112, 112); 
 							font-size: 16px; text-align:center; display: none;
+							}
+		.lz-rpback { 		position:absolute; width:29%; height:100vh; top:0; left:0; background-color:#aaa; text-align:center;
+							}
+		.lz-rpinner { 		display:flex; flex-wrap:wrap; width:calc(100% - 25px); 
+							user-select:none; text-align:center; background-color:#eee; padding:12px;
+							}
+		.lz-rplist { 		text-align:left; overflow-y:auto; width:calc(100% - 24px); height:calc(100vh - 285px); padding:16px;
+							border:1px solid #aaa; border-radius:8px; background-color:#fff;
+							}
+		.lz-rptitle {		width:100%; display:inline-block; font-size:24px; font-family:Chalk; text-align:center; font-weight:600;
 							}
 		.lz-timebar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 128px);
 							background-color:#aaa; border-radius: 12px 12px 0 0; height:90px; user-select:none;
@@ -102,7 +112,13 @@
 
 		 table {			border-spacing: 0px;  }
 
-		 @font-face {  		font-family: Chalk; src: url(img/Inkfree.ttf);   }
+		@font-face {  		font-family: Chalk; src: url(img/Inkfree.ttf);   }
+		
+		body ::-webkit-scrollbar { width: 9px; height:8px } 
+		body ::-webkit-scrollbar-track { background: transparent; }
+		body ::-webkit-scrollbar-thumb { border-radius:8px ;background:#a4baec }
+		body ::-webkit-scrollbar-thumb:hover { background: #a4baec }
+
 
 </style>
 </head>
@@ -186,7 +202,7 @@ var isMobile=false;																					// Flag for mobile devices
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",(e)=> {																// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				app.ws.send("1|"+app.role+"|ACT|"+app.role+"|standUp");	
+				app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+app.role+"|standUp");	
 				}
 
 			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
@@ -223,6 +239,7 @@ class App  {
 		this.horseshoe=true;																		// Horseshoe seating?
 		this.curClock=0;																			// Current clock time
 		this.gid="RER-1.tsv"																		// Default RER spreadsheet
+		this.sessionId="1";																			// Session id
 
 		this.InitSocketServer();																	// Init socket server
 		this.arc=new ARC();																			// Alloc ARC tree		
@@ -231,7 +248,7 @@ class App  {
 		this.sc=new Scene("mainDiv");																// Alloc new Scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
 		this.fb=new Feedback();																		// Alloc Feedback	
-		this.LoadProject(this.gid);																	// Load project file
+		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
 
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
@@ -277,7 +294,6 @@ class App  {
 	InitSocketServer()																			// INIT SOCKET SERVER
 	{
 		this.retryWS=false;																			// Reconnecting to web socket
-		this.meetingId=1;
 		this.secs=0;																				// Time
 		if (window.location.host == "localhost") this.ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
 		else									 this.ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
@@ -308,7 +324,8 @@ class App  {
 
 		if (!event.data)			 	return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
-		if (v[0] != this.meetingId)		return;														// Quit if wrong session
+	
+		if (v[0] != this.sessionId)		return;														// Quit if wrong session
 		if (v[2] == "TALK") {																		// TALK
 			let who=(v[3] == "Teacher") ? "instructor" : this.actors[v[3]].seat;					// Set voice number
 			app.voice.Talk(v[4],who);																// Speak
@@ -347,6 +364,7 @@ class App  {
 			for (i=0;i<this.students.length;i++) 													// For each student spec'd
 				this.roster[this.students[i].id]=i;													// Add to roster
 			this.LoadModels();										  								// Load 3D models
+			if (this.role != "Teacher")	this.rp.Draw();													// Show response menu if not teacher
 			});
 		this.poses["startUp"]="armL,-51,4,-44,armR,-51,-4,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-78,-8,0,thighR,-78,10,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-50,0,wristR,8,0,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";			this.poses["mouthClosed"]="mouth,0,0,0";

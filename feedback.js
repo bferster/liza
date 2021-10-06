@@ -190,3 +190,53 @@ class Feedback {
 		}
 	
 }	// Class closure
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RESPONSE PANEL
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class ResponsePanel  {																					
+
+	constructor()   																				// CONSTRUCTOR
+	{
+	}
+
+	Draw()																							// DRAW
+	{
+		let i,o;
+		let intent="Transfer";
+		let intentDesc="Prompts students to think about applying the strategies or knowledge learned in the lesson to future."
+		let remark="Do you feel like you could try this strategy next time you encounter a tricky question like this?";
+		$("#mainDiv").css("margin-left","15%");														// Shift right													
+		app.sc.Resize();																			// Resize renderer
+		app.sc.SetCamera(0,200,600,0,0,0);															// Reset camera	
+		$("#lz-rpback").remove();																	// Remove old one
+		var str=`<div id="lz-rpback" class="lz-rpback"> 
+			<div class="lz-rpinner"> 
+				<div style="width:calc(50% - 24px);border-right:1px solid #999;height:120px;padding:8px">
+					<div class="lz-rptitle">${intent}</div><p>${intentDesc}</p>	
+				</div>
+				<div style="width:calc(50% - 16px);height:120px;padding:8px">
+					<div class="lz-rptitle">said to ${app.role}</div><p>${remark}</p>
+				</div>
+				<div style="width:100%;margin:18px 0;text-align:center"><b>Choose a response</b></div>
+				<div id="lz-rplist" class="lz-rplist"></div>
+		</div>`;
+		
+		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
+		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
+		
+		str="";
+		for (i=0;i<app.se.responses[app.role].length;++i) {											// For each of a student's possible responses
+			o=app.se.responses[app.role][i];														// Point at it
+			str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:18px;cursor:pointer;vertical-align:-4px"> ${o.text}</p>`;
+			}
+		$("#lz-rplist").html(str);																	// Add responses
+		$("[id^=resp-]").on("click", (e)=>{ 														// ON PLAY CLICK
+			let id=e.target.id.substr(5);															// GET ID
+			app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+app.se.responses[app.role][id].text);	// PLAY
+			});
+	}
+
+
+} // ResponsePanel class closure
