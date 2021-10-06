@@ -189,5 +189,4 @@ class Feedback {
 			}
 		}
 	
-
 }	// Class closure

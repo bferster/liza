@@ -42,16 +42,15 @@ class ARC  {
 				v=s[i];																					// Point at fields
 				if (!v) 								continue;										// Skip blanks
 				if (!v[0] && !v[1] && !v[2] && !v[3]) 	continue;										// Skip blanks
-				if (v[1].match(/ov/i))  		 app.rev.overview=v[2];									// Overview
 				else if (v[1].match(/student/i)) app.students=v[2].split(",");							// Add student list
 				else if (v[1].match(/pic/i)) 	 app.bb.AddPic(v[2].split("|")[0],v[2].split("|")[1]);	// Add image or slide deck
 				else if (v[1].match(/^Q|W|A|I|S|C|P|E/i)) {												// New step
 					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
 					else						step++;													// New step
 					o={ con:[], rso:null, aso:null, cso:null }; 										// A new step object
-					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
-					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
-					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
+					v[1]=v[1].replace(/\+/g,1);														// + becomes 1
+					v[1]=v[1].replace(/\-/g,2);														// - becomes 2
+					v[1]=v[1].replace(/\?/g,3);												// ? becomes 3
 					o.move=v[1].substr(0,1);															// Instructional meta structure
 					o.rc=v[1].substr(1).trim();															// Add 
 					o.text=v[2].trim();																	// Add text
@@ -66,14 +65,14 @@ class ARC  {
 					}
 				else if (v[1].match(/^R/i)) { 															// Response
 					if ((v[1] == 'r') || (v[1] == 'R'))		v[1]="R+";									// Plain R become R+										
-					v[1]=v[1].replace(/\+/g,RIGHT);														// + becomes 1
-					v[1]=v[1].replace(/\-/g,WRONG);														// - becomes 2
-					v[1]=v[1].replace(/\?/g,INCOMPLETE);												// ? becomes 3
+					v[1]=v[1].replace(/\+/g,1);														// + becomes 1
+					v[1]=v[1].replace(/\-/g,2);														// - becomes 2
+					v[1]=v[1].replace(/\?/g,3);												// ? becomes 3
 					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add responses
 					}
 				else{ 																					// Response?
 					if (v[2])																			// If some text
-						o.res.push({ rc:""+RIGHT, text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add response
+						o.res.push({ rc:""+1, text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add response
 					}
 				}
 			_this.Extract();																			// Extract keywords and entities
@@ -102,7 +101,7 @@ class ARC  {
 	Extract()																						// EXTRACT KEYWORDS AND ENTITIES FROM STEP
 	{
 		var i,j,o,v,val,ks=[];
-		v=(app.rev.overview+" ").match(/\(.+?\)/g);											 			// Get array of key words (keyword)
+//		v=(app.rev.overview+" ").match(/\(.+?\)/g);											 			// Get array of key words (keyword)
 		if (v) {																						// If any keys
 			for (i=0;i<v.length;++i)																	// For each one
 				ks.push(v[i].substr(1,v[i].length-2));													// Add to ks array
@@ -255,9 +254,9 @@ class ARC  {
 				text="No response";																		// Save response
 				}
 			else if (app.hinting) 		i=i;															// Showing hints	
-			else if (r == RIGHT) 		Prompt("Right answer");											// Show prompt
-			else if (r == WRONG) 		Prompt("Wrong answer");
-			else if (r == INCOMPLETE) 	Prompt("Incomplete answer");
+			else if (r == 1) 		Prompt("Right answer");											// Show prompt
+			else if (r == 2) 		Prompt("Wrong answer");
+			else if (r == 3) 		Prompt("Incomplete answer");
 			
 			app.arc.Add({ o:'R', text:text, who:r ? app.curStudent : null, r:r });						// Add to record
 			rc=app.arc.resChain;																		// Get response chain

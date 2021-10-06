@@ -15,11 +15,10 @@
 	<script src="lib/wgl/OutlineEffect.js"></script>
 	<script src="lib/papaparse.min.js"></script>
 	<script src="session.js"></script>
-\	<script src="data.js"></script>
+	<script src="data.js"></script>
 	<script src="scene.js"></script>
 	<script src="blackboard.js"></script>
 	<script src="voice.js"></script>
-	<script src="time.js"></script>
 	<script src="feedback.js"></script>
 	
 	<style>
@@ -40,14 +39,8 @@
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							padding:16px; border-radius: 16px; width: 600px;
 							}
-		.lz-blackboard {	position: absolute; left:16px; top: calc(100vh - 336px); width: 550px; height: 256px;  display:none;
-							background-color: #999; border: 1px solid #999;	padding:12px; border-radius: 8px; 
-							}
-		.lz-textS {			background-color:#ddd; border-radius:16px; padding:2px 8px; width:fit-content;
-		 					max-width: 66%; margin:5px 0; clear:both;
-							}
-		.lz-textR {			background-color:#0099ff; border-radius:16px; padding: 2px 8px; width:fit-content;
-							max-width: 66%; float:right; color:#fff;
+		.lz-blackboard {	position: absolute; left:calc(100vw - 588px); top:calc(100vh - 336px); width:550px; height:256px;display:none;
+							background-color:#999; border:1px solid #999; padding:12px; border-radius:8px; 
 							}
 		.lz-canvas {		position: absolute; left:50px; top: 12px; width: 512px; height:256px; border-radius: 4px;
 							}
@@ -75,20 +68,6 @@
 		.lz-sliderline { 	position:absolute; background-color:#333; top:28px; width:1px; height:144px; opacity:.25;
 							}
 		.lz-slidertime { 	position:absolute; color:#27ae60; font-size:10px; top:14px;
-							}
-		.lz-timeEventS { 	position:absolute; width:8px; height:8px; border-radius:8px; color:#ccc; top:56px;
-							}
-		.lz-timeEventI { 	position:absolute; width:20px; text-align:center; color:#3255c0; font-weight:bold; font-size:12px; top:31px;
-							}
-		.lz-ticks { 		position:absolute; width:2px; height:40px; background-color:#ccc; top:34px;
-							}
-		.lz-tickLab { 		position:absolute; width:20px; top:20px; font-size:9px; text-align:center;
-							}
-		.lz-timeplayer { 	position:absolute; color:#999; margin-left:18px; margin-right:18px; width:123px;
-							}
-		.lz-speedControl { 	position:absolute; left: calc(100% - 140px); top:39px;
-							}
-		.lz-playerspeed { 	position:absolute; width:40px;  text-align:center; font-size:9px; color:#999;
 							}
 		.lz-playerslider{ 	background:#ccc; height:1px; width:80px; border:none; display:inline-block;
 							margin-left:6px;
@@ -151,12 +130,10 @@
 	<div id="controllerDiv" class="lz-controller">
 		<img id="talkBut" src="img/talkbut.png" title="Click to talk" style="cursor:pointer">
 		<input id="talkInput" type='text' class="lz-is" style="vertical-align:8px;display:none" placeholder="Talk by typing here">
-		<img id="writeBut" src="img/drawbut.gif" title="Draw on blackboard" style="cursor:pointer;margin-left:24px">
 		<span id='promptSpan' class='lz-prompt'></span>
-
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
-		<img id="reviewBut" src="img/scriptbut.gif" title="Lesson map" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="writeBut" src="img/drawbut.gif" title="Lesson map" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="slideBut" src="img/nextslide.gif" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="muteBut" src="img/unmutebut.png" title="Sounds" style="cursor:pointer;margin-right:16px;float:right">
 		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">StageTools &copy;2021</div>
@@ -182,7 +159,6 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost")) lo
 
 var app=null;																						// Holds app
 var isMobile=false;																					// Flag for mobile devices
-var NONE=0,RIGHT=1,WRONG=2,INCOMPLETE=3;															// Response defines
 
 	$(window).resize(function() {                                         						// ON WINDOW RESIZE
 		app.sc.Resize();																			// Resize 3D system
@@ -247,15 +223,14 @@ class App  {
 		this.horseshoe=true;																		// Horseshoe seating?
 		this.curClock=0;																			// Current clock time
 		this.gid="RER-1.tsv"																		// Default RER spreadsheet
+
 		this.InitSocketServer();																	// Init socket server
-		this.arc=new ARC();																			// Make new ARC tree		
+		this.arc=new ARC();																			// Alloc ARC tree		
 		this.se=new Session();																		// Session data	
-		this.bb=new Blackboard();																	// Make blackboard		
-		this.sc=new Scene("mainDiv");																// Make new scene		
+		this.bb=new Blackboard();																	// Alloc Blackboard (must be before Scene)	
+		this.sc=new Scene("mainDiv");																// Alloc new Scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
-		this.rev=new Review();																		// Make new reviewer		
-		this.tim=new Timeline();																	// Make timeline	
-		this.fb=new Feedback();																		// Teacher feedback	
+		this.fb=new Feedback();																		// Alloc Feedback	
 		this.LoadProject(this.gid);																	// Load project file
 		this.Draw();																				// Start 
 
@@ -267,7 +242,6 @@ class App  {
 		if ((!this.voice.hasRecognition) && (!isMobile))											// This platform doesn't have voice recognition
 			$("#talkBut").hide(),$("#talkInput").show();											// Show input	
 		$("#settingsBut").on("click", ()=> { this.Settings();  });									// On settings button click	
-		$("#reviewBut").on("click", ()=> { this.rev.Reviewer();  });								// On review button click	
 		$("#talkBut").on("click", ()=> { this.voice.Listen(); });									// On talk button click, start listening
 		$("#helpBut").on("click", ()=> { this.ShowHelp(); });										// On help button click, show help
 		$("#writeBut").on("click", ()=> { 															// On BB button clck

@@ -10,24 +10,26 @@
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SOCKET SERVER  
-npm install https
-npm install fs
-npm install os
-npm install ws
-node socketserver.js
 
-npm install forever
-cd ~/htdocs | forever stopall | forever start socketserver.js
+	npm install https
+	npm install fs
+	npm install os
+	npm install ws
+	node socketserver.js
 
+	npm install forever
+	cd ~/htdocs | forever stopall | forever start socketserver.js | forever logs | sudo cat /home/bitnami/.forever/<id>.log
+	open port:8080
 
-ID|SENDER|OP|DATA_0 ... DATA_N
------------------------------------------------
-1|Luis|TALK|Luis|Hello, I am Luis
-1|Luis|ACT|Luis|standUp
+	ID|SENDER|OP|DATA-0 ... DATA-N
+	------------------------------
+	1|Luis|INIT
+	1|Luis|TALK|Luis|Hello, I am Luis
+	1|Luis|ACT|Luis|standUp
+	1|Luis|GET
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-	let actors=["luis","jazmin","farrah","oliver","chris"];										// Holds available roles
 	let webSocketServer;																		// Holds socket server	
 	if (!local) {																				// If on web
 		const server = https.createServer({														// Create an https server
@@ -45,7 +47,6 @@ ID|SENDER|OP|DATA_0 ... DATA_N
 		d=new Date(d.getTime()+(-3600000*4));													// Get UTC-5 time	
 		let str=d.toLocaleDateString()+" -- "+d.toLocaleTimeString()+" -> "+ req.socket.remoteAddress.substr(7);
 		console.log(`Connect: (${webSocketServer.clients.size}) ${str}`);						// Log connect
-		webSocket.myId="";																		// No id yet
 		webSocket.on('message', (msg) => {														// ON MESSAGE
 			if (!msg)	return;																	// Quit if no message
 			message=msg.toString();																// Get as string
@@ -53,12 +54,11 @@ ID|SENDER|OP|DATA_0 ... DATA_N
 			let v=message.split("|");															// Get params
 			if (v[2] == "INIT") { 																// No id 
 				webSocket.meetingId=v[0];														// Set meeting id
-				webSocket.myId=v[1]; 															// Set sender
 				str=v[0]+" "+v[1]+" -> "+req.socket.remoteAddress.substr(7);					// Add id, and IP
-				console.log("Client: "+str);													// Log client
+				console.log("Meeting: "+str);													// Log client
 				}
-			if (v[2] == "TALK") 	Broadcast(message);											// Broadcast to everyone connected
-			else if (v[2] == "ACT") Broadcast(message);											// Broadcast 
+			if (v[2] == "TALK") 	Broadcast(v[0], message);									// Broadcast to everyone connected
+			else if (v[2] == "ACT") Broadcast(v[0], message);									// Broadcast 
 			});
 		} catch(e) { console.log(e) }
 	});
@@ -74,10 +74,9 @@ ID|SENDER|OP|DATA_0 ... DATA_N
 		} catch(e) { console.log(e) }
 	}
 
-	function Broadcast(msg)																	// BROADCAST DATA TO ALL CLIENTS 
+	function Broadcast(meetingId, msg)														// BROADCAST DATA TO ALL CLIENTS 
 	{
 		try{
-			let meetingId=msg.split("|")[0];													// Get meeting ID										
 			webSocketServer.clients.forEach((client)=>{											// For each client
 				if (client.meetingId == meetingId) 												// In this meeting
 					if (client.readyState === WebSocket.OPEN) client.send(msg);					// Send to client
