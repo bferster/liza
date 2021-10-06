@@ -219,24 +219,39 @@ class ResponsePanel  {
 				<div style="width:calc(50% - 16px);height:120px;padding:8px">
 					<div class="lz-rptitle">said to ${app.role}</div><p>${remark}</p>
 				</div>
-				<div style="width:100%;margin:18px 0;text-align:center"><b>Choose a response</b></div>
+				<div style="width:100%;margin:18px 0;text-align:center"><b>Choose a response:</b></div>
+				<span id="lztab-0" class="lz-rptab">LANGUAGE</span>
+				<span id="lztab-1" class="lz-rptab">EVIDENCE</span> 
+				<span id="lztab-2" class="lz-rptab">THINKING</span> 
+				<span id="lztab-3" class="lz-rptab">DISRUPTION</span> 
 				<div id="lz-rplist" class="lz-rplist"></div>
 		</div>`;
 		
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
-		
-		str="";
-		for (i=0;i<app.se.responses[app.role].length;++i) {											// For each of a student's possible responses
-			o=app.se.responses[app.role][i];														// Point at it
-			str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:18px;cursor:pointer;vertical-align:-4px"> ${o.text}</p>`;
-			}
-		$("#lz-rplist").html(str);																	// Add responses
+	
 		$("[id^=resp-]").on("click", (e)=>{ 														// ON PLAY CLICK
-			let id=e.target.id.substr(5);															// GET ID
+			let id=e.target.id.substr(5);															// Get id
 			app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+app.se.responses[app.role][id].text);	// PLAY
 			});
-	}
+		$("[id^=lztab-]").on("click", (e)=>{ 														// ON TAB CLICK
+			let id=e.target.id.substr(6);															// Get id
+			$("[id^=lztab-]").css({"font-weight":"200","color":"#aaa"});							// Revert
+			$("#lztab-"+id).css({"font-weight":"700","color":"#333;"});								// Highlight
+			fillList(id);																			// Fill list
+			});
+		$("#lztab-0").trigger("click");																// Fill list
+
+		function fillList(tab) {																	// FILL RESPONSE LISY
+			let o,i,str="";
+			let n=Math.floor(app.se.responses[app.role].length/4);									// Number to fill
+			for (i=tab*n;i<tab*n+n;++i) {															// For each of a student's possible responses
+				o=app.se.responses[app.role][i];													// Point at it
+				str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:18px;cursor:pointer;vertical-align:-4px"> ${o.text}</p>`;
+				}
+			$("#lz-rplist").html(str);																// Add responses
+			}
+		}
 
 
 } // ResponsePanel class closure
