@@ -236,7 +236,7 @@ class ResponsePanel  {
 			});
 		$("[id^=lztab-]").on("click", (e)=>{ 														// ON TAB CLICK
 			let id=e.target.id.substr(6);															// Get id
-			$("[id^=lztab-]").css({"font-weight":"200","color":"#aaa"});							// Revert
+			$("[id^=lztab-]").css({"font-weight":"200","color":"#999"});							// Revert
 			$("#lztab-"+id).css({"font-weight":"700","color":"#333;"});								// Highlight
 			fillList(id);																			// Fill list
 			});
