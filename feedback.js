@@ -203,7 +203,6 @@ class ResponsePanel  {
 
 	Draw()																							// DRAW
 	{
-		let i,o;
 		let intent="Transfer";
 		let intentDesc="Prompts students to think about applying the strategies or knowledge learned in the lesson to future."
 		let remark="Do you feel like you could try this strategy next time you encounter a tricky question like this?";
@@ -225,31 +224,72 @@ class ResponsePanel  {
 				<span id="lztab-2" class="lz-rptab">THINKING</span> 
 				<span id="lztab-3" class="lz-rptab">DISRUPTION</span> 
 				<div id="lz-rplist" class="lz-rplist"></div>
-		</div>`;
-		
+		</div>
+		<div style="margin:8px 12px;text-align:left">
+			<select id="lzSeqs" class="lz-is" style="width:auto"></select>
+			<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none"></select>
+			</div>`;
+
+
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
+		addSeqs();																					// Add possible moves to select
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 	
-		$("[id^=resp-]").on("click", (e)=>{ 														// ON PLAY CLICK
-			let id=e.target.id.substr(5);															// Get id
-			app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+app.se.responses[app.role][id].text);	// PLAY
-			});
+		
 		$("[id^=lztab-]").on("click", (e)=>{ 														// ON TAB CLICK
 			let id=e.target.id.substr(6);															// Get id
-			$("[id^=lztab-]").css({"font-weight":"200","color":"#999"});							// Revert
-			$("#lztab-"+id).css({"font-weight":"700","color":"#333;"});								// Highlight
+			$("[id^=lztab-]").css({"font-weight":"200","color":"#666"});							// Revert
+			$("#lztab-"+id).css({"font-weight":"700","color":"#333"});								// Highlight
 			fillList(id);																			// Fill list
 			});
-		$("#lztab-0").trigger("click");																// Fill list
+		
+		$("#lztab-0").trigger("click");																// Fill list (must be after handler)
+			if (window.location.search.match(/role=coach/i)) addRoles();							// Add sudent roles if coach
 
-		function fillList(tab) {																	// FILL RESPONSE LISY
+		$("#lzSeqs").on("change", ()=>  {															// RUN SEQUENCE
+			if (app.role == "Coach") return;														// Not in coach role
+			app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
+			$("#lzSeqs").prop("selectedIndex",0);													// Reset pulldowns
+			});
+
+		$("#lzActs").on("change", ()=>  {															// CHANGE ROLE
+			if (!$("#lzActs").prop("selectedIndex"))	return;										// Skip 1st one
+			app.role=$("#lzActs").val();															// Set new role
+			this.Draw();																			// Redraw															
+			});
+	
+		function fillList(tab) {																	// FILL RESPONSE LIST
 			let o,i,str="";
+			if (app.role == "Coach") return;														// Not in coach role
 			let n=Math.floor(app.se.responses[app.role].length/4);									// Number to fill
 			for (i=tab*n;i<tab*n+n;++i) {															// For each of a student's possible responses
 				o=app.se.responses[app.role][i];													// Point at it
 				str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:18px;cursor:pointer;vertical-align:-4px"> ${o.text}</p>`;
 				}
 			$("#lz-rplist").html(str);																// Add responses
+
+			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
+				let id=e.target.id.substr(5);														// Get id
+				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+app.se.responses[app.role][id].text);	// PLAY
+				});
+		}
+
+		function addSeqs() {																		// FILL SEQS PULLDOWN
+			var v=[];
+			$("#lzSeqs").empty();																	// Clear select
+			$("#lzSeqs").append("<option>Animate student</option>");								// Add choose
+			for (var p in app.seqs) 			v.push(p);											// Add sequence to array
+			v.sort();																				// Sort bones
+			for (var i=0;i<v.length;++i) 	$("#lzSeqs").append("<option>"+v[i]+"</option>");		// Add option
+			}
+
+		function addRoles() {																		// FILL ROLES PULLDOWN
+			$("#lzActs").css("display","block");
+			$("#lzActs").empty();																	// Clear select
+			$("#lzActs").append("<option>Choose role to play</option>");							// Add choose
+			for (var i=0;i<app.students.length;++i) $("#lzActs").append("<option>"+app.students[i].id+"</option>");	// Add option
+			$("#lzActs").append("<option>Teacher</option>");										// Add teacher
+			$("#lzActs").append("<option>Coach</option>");											// Add coach
 			}
 		}
 
