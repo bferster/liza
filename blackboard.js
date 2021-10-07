@@ -141,7 +141,6 @@ class Blackboard  {
 		imageObj.label=label;																			// Set label
 		imageObj.side=(side == undefined) ? this.curSide : side;										// Set curSide if playing back slides
 		imageObj.snum=(slideNum == undefined) ? 0 :	slideNum;											// Set curSlide id playing back slides
-		if (record)	app.arc.Add({ o:'P', p:label, s:imageObj.side, n:imageObj.snum }); 					// Add to record
 
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.maxSlides=Math.floor(imageObj.height/256);											// Get max number of slides

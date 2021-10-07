@@ -46,12 +46,7 @@ class Scene {
 		if (this.cartoonScene) 	this.scene.background=new THREE.Color(0xffffff);					// White background
 		this.manager=new THREE.LoadingManager();													// Loading manager
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
-		this.AddCamera(0,150,500);																// Add camera
-		this.controls.addEventListener('end',(e)=> {												// On control change
-			app.arc.Add( {o:'O',																	// Add to record
-				xr:this.camera.rotation.x, yr:this.camera.rotation.y, zr:this.camera.rotation.z,	// Rotation
-				x:this.camera.position.x,  y:this.camera.position.y,  z:this.camera.position.z});	// Position
-				});
+		this.AddCamera(0,150,500);																	// Add camera
 		this.renderer=new THREE.WebGLRenderer({ antialias: true });									// Init renderer
 		this.renderer.setPixelRatio(window.devicePixelRatio);										// Set ratio
 		this.AddLights();																			// Add lights

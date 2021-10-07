@@ -14,7 +14,6 @@
 	<script src="lib/wgl/OrbitControls.js"></script>
 	<script src="lib/wgl/OutlineEffect.js"></script>
 	<script src="lib/papaparse.min.js"></script>
-	<script src="session.js"></script>
 	<script src="data.js"></script>
 	<script src="scene.js"></script>
 	<script src="blackboard.js"></script>
@@ -232,7 +231,7 @@ class App  {
 		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
-		this.students=["Liza","Freddy","Sara","Robert"];											// Holds students	
+		this.students=[];																			// Holds students	
 		this.roster=[];																				// Associative array of student numbers by na,e
 		this.startTime=new Date().getTime();														// Session start time
 		this.pickingStudent="";																		// Flag for picking student
@@ -354,7 +353,7 @@ class App  {
 		
 	LoadProject(id)																				// LOAD PROJECT DATA
 	{
-		this.arc.Load(id, ()=>{																		// Load from Google doc
+		this.se.Load(id, ()=>{																		// Load from TSV
 			var i,v;
 			var tex=this.sc.cartoonScene ? 0xffffff : 0xcccccc;										// Desks cartoon or real				
 			for (i=0;i<10;++i)																		// For each desk
@@ -530,7 +529,6 @@ class App  {
 		str+="<table>";
 		str+="<tr><td>Show hinting?</td><td><input type='checkbox' id='setHint'"+(this.hinting ? " checked" : "")+"></td></tr>" ;																			
 		str+="<tr><td>Pose editor</td><td><div id='setPose'class='lz-bs'>Set</div></td></tr>";
-//		str+="&nbsp;&nbsp;&nbsp;Demos&nbsp;"+=MakeSelect("setDemo",false,["Choose","Default","Polygons","Liquids","Behavior"])+"</td></tr>";																			
 		str+="</table><br>";																			
 		str+="</div>";
 		$("body").append(str);																		// Add to body

@@ -1,7 +1,80 @@
-// ARC / RECORD
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SESSION
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Session  {																					
+
+	constructor()   																				// CONSTRUCTOR
+	{
+		this.data=[];																					// Holds session data
+		this.config=[];																					// Holds config data
+		this.responses=[];																				// Holds student responses
+		this.LoadConfig();																				// Load config file
+		this.meetingId="1";																				// Session id
+	}
+
+	Load(id, callback) 																				// LOAD DOC FROM GOOGLE DRIVE
+	{
+		fetch(app.gid)																					// Load TSV file
+		.then(response => response.text())																// Get text
+		.then(data => {																					// Objectify
+			if (!data)	return;																			// Quit if no data
+			app.arc.InitFromJSON(data,callback);														// **** ARC LEGACY ****
+			})
+	}
+	
+	LoadConfig()																					// LOAD CONFIG FILE
+	{	
+		fetch('assets/config.csv')																		// Load file
+			.then(res =>  res.text())																	// Get as text
+			.then(res =>{ 																				
+				let i,o,n=0;
+				app.actors=[];
+				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
+				app.students=[];
+				for (i=0;i<data.length;++i) {															// For each line
+					o=data[i];																			// Point at it
+					if (o.type == "actor") {															// If an actor
+						app.actors[o.id]={};															// Creat student object
+						app.actors[o.id].sex=o.data.match(/sex=(.+?)\W/)[1];							// Get sex
+						app.actors[o.id].syns=o.text.split(",");										// Get synonyms
+						app.actors[o.id].color=o.data.match(/color=(.+?)\W/)[1];						// Get color
+						app.actors[o.id].seat=n++;														// Seat	assignment
+						if (o.id != "Class") app.students.push(o.id);									// Add student names
+						}
+					}})	
+			.then(res =>{ this.LoadSession("assets/session-67.csv"); })									// Load sample session	
+			.then(res =>{ this.LoadResponses("assets/responses.csv"); });								// Load responses
+	}
+
+	LoadSession(fileName)																			// LOAD SESSION FILE
+	{	
+		return fetch(fileName)																			// Load file
+			.then(res =>  res.text())																	// Get as text
+			.then(res =>{ this.data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;});		// Parse CSV using papa lib
+	}
+	
+	LoadResponses(fileName)																			// LOAD RESPONSE FILE
+	{	
+		let i,o;
+		return fetch(fileName)																			// Load file
+			.then(res =>  res.text())																	// Get as text
+			.then(res =>{ 																				// On loaded
+				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
+				this.responses=[];																		// Clear array
+				for (i=0;i<data.length;++i) {															// For each line
+					o=data[i];																			// Point at item
+					if (!this.responses[o.speaker])	this.responses[o.speaker]=[];						// Alloc new array
+					this.responses[o.speaker].push({ text:o.text, intent:o.intent, keys:o.keys});		// Add line to speaker											
+					}
+				app.LoadProject(app.gid);																// Load project file
+			});		
+	}
+
+} // Session class closure
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// STEP
+// ARC
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ARC  {																					
@@ -21,71 +94,59 @@ class ARC  {
 		this.SetEntities();																				// Set entity list
 	}
 
-	Load(id, callback) 																				// LOAD DOC FROM GOOGLE DRIVE
+	InitFromJSON(data, callback) 																	// EXTRACT DATA
 	{
-		var _this=this;																					// Save context
 		let i,s=[];
-
-		fetch(app.gid)																					// Load TSV file
-		.then(response => response.text())																// Get text
-		.then(data => {																					// Objectify
-			if (!data)	return;																			// Quit if no data
-			s=data.replace(/\\r/g,"").split("\n");														// Kill CRs
-			for (i=0;i<s.length;++i)	s[i]=s[i].split("\t");											// For each line, put intp array
-			InitFromJSON();
-			})
-
-		function InitFromJSON() {																		// EXTRACT DATA
-			let k,v,o,goal="",step=0;
-			_this.tree=[];																				// Clear tree
-			for (i=1;i<s.length;++i) {																	// For each line
-				v=s[i];																					// Point at fields
-				if (!v) 								continue;										// Skip blanks
-				if (!v[0] && !v[1] && !v[2] && !v[3]) 	continue;										// Skip blanks
-				else if (v[1].match(/student/i)) app.students=v[2].split(",");							// Add student list
-				else if (v[1].match(/pic/i)) 	 app.bb.AddPic(v[2].split("|")[0],v[2].split("|")[1]);	// Add image or slide deck
-				else if (v[1].match(/^Q|W|A|I|S|C|P|E/i)) {												// New step
-					if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
-					else						step++;													// New step
-					o={ con:[], rso:null, aso:null, cso:null }; 										// A new step object
-					v[1]=v[1].replace(/\+/g,1);														// + becomes 1
-					v[1]=v[1].replace(/\-/g,2);														// - becomes 2
-					v[1]=v[1].replace(/\?/g,3);												// ? becomes 3
-					o.move=v[1].substr(0,1);															// Instructional meta structure
-					o.rc=v[1].substr(1).trim();															// Add 
-					o.text=v[2].trim();																	// Add text
-					o.res=[];																			// Responses array										
-					o.goal=goal;																		// Set goal
-					o.line=i;																			// Set line
-					o.step=step;																		// Set step
-					o.hint=v[3] ? v[3].trim() : "";														// Set hint
-					k=v[2].match(/\{S(.*?)\}/);		if (k)	o.slide=k[1]-1;								// If {slide} spec'd
-					k=v[2].match(/\{F(.*?)\}/);		if (k)	o.from=k[1];								// If {from} step spec'd
-					_this.tree.push(o);																	// Add step to tree
-					}
-				else if (v[1].match(/^R/i)) { 															// Response
-					if ((v[1] == 'r') || (v[1] == 'R'))		v[1]="R+";									// Plain R become R+										
-					v[1]=v[1].replace(/\+/g,1);														// + becomes 1
-					v[1]=v[1].replace(/\-/g,2);														// - becomes 2
-					v[1]=v[1].replace(/\?/g,3);												// ? becomes 3
-					o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add responses
-					}
-				else{ 																					// Response?
-					if (v[2])																			// If some text
-						o.res.push({ rc:""+1, text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add response
-					}
+		s=data.replace(/\\r/g,"").split("\n");														// Kill CRs
+		for (i=0;i<s.length;++i)	s[i]=s[i].split("\t");											// For each line, put intp array
+	
+		let k,v,o,goal="",step=0;
+		this.tree=[];																				// Clear tree
+		for (i=1;i<s.length;++i) {																	// For each line
+			v=s[i];																					// Point at fields
+			if (!v) 								continue;										// Skip blanks
+			if (!v[0] && !v[1] && !v[2] && !v[3]) 	continue;										// Skip blanks
+			else if (v[1].match(/pic/i)) 	 app.bb.AddPic(v[2].split("|")[0],v[2].split("|")[1]);	// Add image or slide deck
+			else if (v[1].match(/^Q|W|A|I|S|C|P|E/i)) {												// New step
+				if (v[0] && isNaN(v[0])) 	goal=v[0].toUpperCase().trim(),step=0; 					// Whole new goal
+				else						step++;													// New step
+				o={ con:[], rso:null, aso:null, cso:null }; 										// A new step object
+				v[1]=v[1].replace(/\+/g,1);															// + becomes 1
+				v[1]=v[1].replace(/\-/g,2);															// - becomes 2
+				v[1]=v[1].replace(/\?/g,3);															// ? becomes 3
+				o.move=v[1].substr(0,1);															// Instructional meta structure
+				o.rc=v[1].substr(1).trim();															// Add 
+				o.text=v[2].trim();																	// Add text
+				o.res=[];																			// Responses array										
+				o.goal=goal;																		// Set goal
+				o.line=i;																			// Set line
+				o.step=step;																		// Set step
+				o.hint=v[3] ? v[3].trim() : "";														// Set hint
+				k=v[2].match(/\{S(.*?)\}/);		if (k)	o.slide=k[1]-1;								// If {slide} spec'd
+				k=v[2].match(/\{F(.*?)\}/);		if (k)	o.from=k[1];								// If {from} step spec'd
+				this.tree.push(o);																// Add step to tree
 				}
-			_this.Extract();																			// Extract keywords and entities
-			if (callback)	callback();																	// Run callback
-		};									
-
+			else if (v[1].match(/^R/i)) { 															// Response
+				if ((v[1] == 'r') || (v[1] == 'R'))		v[1]="R+";									// Plain R become R+										
+				v[1]=v[1].replace(/\+/g,1);															// + becomes 1
+				v[1]=v[1].replace(/\-/g,2);															// - becomes 2
+				v[1]=v[1].replace(/\?/g,3);															// ? becomes 3
+				o.res.push({ rc: v[1].substr(1).trim(), text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add responses
+				}
+			else{ 																					// Response?
+				if (v[2])																			// If some text
+					o.res.push({ rc:""+1, text:v[2].trim(), cons:v[3] ? v[3] : "",line:i });	// Add response
+				}
+			}
+		this.Extract();																			// Extract keywords and entities
+		if (callback)	callback();																	// Run callback
 	}
-
+	
 	Add(event)																						// ADD EVENT TO RECORD
 	{
 		if (!event.t)	event.t=new Date().getTime();													// Capture time, if not already done
 		this.record.push(event);																		// Add to array																	
-		if ((event.o == "R") && (event.r != NONE))  this.resChain=event.r+this.resChain;				// If an actual response, add to top of response chain
+		if ((event.o == "R") && (event.r != 0))  this.resChain=event.r+this.resChain;					// If an actual response, add to top of response chain
 		if (event.o == "S")	 		this.lastActLine=event.l;											// Save last action line number												
 		else if (event.o == "R")	this.lastResLine=event.l;											// Response											
 	}
@@ -248,13 +309,13 @@ class ARC  {
 		else{																							// A single student responding
 			r=this.MarkovFindResponse(step,app.curStudent);												// Get, compute, and save right response to step
 			o=this.tree[step];																			// Point at step
-			if (r == NONE) 	{																			// No response
+			if (r == 0) 	{																			// No response
 				Prompt(app.students[app.curStudent].id+" didn't repond to you!",5);						// Show prompt
 				Sound("delete");																		// Delete sound
 				text="No response";																		// Save response
 				}
 			else if (app.hinting) 		i=i;															// Showing hints	
-			else if (r == 1) 		Prompt("Right answer");											// Show prompt
+			else if (r == 1) 		Prompt("Right answer");												// Show prompt
 			else if (r == 2) 		Prompt("Wrong answer");
 			else if (r == 3) 		Prompt("Incomplete answer");
 			
