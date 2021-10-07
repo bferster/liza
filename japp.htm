@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Jitsi</title>
+	<meta charset="utf-8" />
+	<script src='https://meet.jit.si/external_api.js'></script>
+	<style>
+		body { 	font-family:Segoe UI,Verdana,Geneva,sans-serif; padding:0; margin:0; overflow:hidden }
+	</style>
+
+</head>
+<body>
+<script>
+
+	let v=window.location.search.substring(1).split("&");
+	let domain='meet.jit.si';
+	const options = {
+		roomName: v[0],
+		width: "100%",height:window.innerHeight,
+		interfaceConfigOverwrite:{ "TOOLBAR_BUTTONS": [
+        							'microphone', 'camera', 'desktop', 'fullscreen',
+        							'settings', 'raisehand', 'select-background',
+        							'videoquality', 'filmstrip', 'tileview' ],
+									"VIDEO_QUALITY_LABEL_DISABLED": true,
+									"SHOW_CHROME_EXTENSION_BANNER": false,
+									"DISABLE_JOIN_LEAVE_NOTIFICATIONS": true
+									},
+		configOverwrite: {  enableInsecureRoomNameWarning: false, prejoinPageEnabled: false,  
+							disableDeepLinking:true 
+							},
+		parentNode: document.querySelector('body'),
+		};
+
+	if (v[2] && v[2].match(/host|panel|admin/i)) {
+		options.interfaceConfigOverwrite["TOOLBAR_BUTTONS"].push("mute-everyone");
+		options.interfaceConfigOverwrite["TOOLBAR_BUTTONS"].push("security");
+		}
+	const api = new JitsiMeetExternalAPI(domain, options);
+	api.executeCommand('displayName',v[1] ? v[1] : "");
+	window.addEventListener("unload",  ()=>{ api.dispose();	});
+
+	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
+	{
+		if (p4 != undefined)
+			console.log(msg,p1,p2,p3,p4);
+		else if (p3 != undefined)
+			console.log(msg,p1,p2,p3);
+		else if (p2 != undefined)
+			console.log(msg,p1,p2);
+		else if (p1 != undefined)
+			console.log(msg,p1);
+		else
+			console.log(msg);
+	}
+
+
+</script>
+</body>
+</html>
+

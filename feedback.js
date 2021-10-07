@@ -230,11 +230,9 @@ class ResponsePanel  {
 			<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none"></select>
 			</div>`;
 
-
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		addSeqs();																					// Add possible moves to select
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
-	
 		
 		$("[id^=lztab-]").on("click", (e)=>{ 														// ON TAB CLICK
 			let id=e.target.id.substr(6);															// Get id

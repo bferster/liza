@@ -151,9 +151,9 @@
 		<span id='promptSpan' class='lz-prompt'></span>
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
-		<img id="writeBut" src="img/drawbut.gif" title="Lesson map" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="slideBut" src="img/nextslide.gif" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
-		<img id="muteBut" src="img/unmutebut.png" title="Sounds" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="writeBut" src="img/drawbut.gif" title="Lesson map" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="videoBut" src="img/zoom.png" title="Video chat" style="cursor:pointer;margin-right:16px;float:right;display:none">
 		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">StageTools &copy;2021</div>
 	</div>
 	<div id='blackboardDiv' class='lz-blackboard'>
@@ -194,11 +194,13 @@ var isMobile=false;																					// Flag for mobile devices
 				$("#splashDiv").fadeOut();															// Fade out splash
 				$("#mainDiv").fadeIn(2000);															// Fade in main
 				$("#controllerDiv").fadeIn(2000);													// Fade in controller
+				if (window.location.search.match(/role=/i))	$("#videoBut").fadeIn(2000);			// Video chat button
 				})
 			}
 		else{																						// Debug
 			$("#mainDiv").fadeIn(0);																// Load fast
 			$("#controllerDiv").fadeIn(0);															// Controller too
+			if (window.location.search.match(/role=/i))	$("#videoBut").fadeIn(0);					// Video chat button
 			}
 
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
@@ -284,12 +286,26 @@ class App  {
 				$("#talkBut").show(),$("#talkInput").hide();										// Show mic button
 				}); 
 	
+		$("#videoBut").on("click", ()=> { this.VideoChat();	}); 									// ON VIDEO CHAT CLICK
+	
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$("body").on("keydown", (e)=> {																// On key hit
 			if ((e.target == document.body) && (e.keyCode == 32) && this.voice.hasRecognition)		// Spacebar in body
 				 app.voice.Listen();																// Start listening	
 			});															
+	}
+
+	VideoChat()																					// OPEN VIDEO CHAT
+	{
+		$("#lz-videoChat").remove(); 																// Remove old one
+		let link="japp.htm?LizaChat~Session~"+app.sessionId+"&"+app.role;							// Make link
+		let str=`<div id="lz-videoChat" style="position:absolute;background-color:#999;
+		width:50%;height:${$(window).width()*.5625/2}px;top:120px;left:25%">
+		<img style="cursor:pointer;float:right;margin:4px;width:12px;pointer-events:auto" src="img/closedot.png"
+		onclick='$("#lz-videoChat").remove()'>
+		<iframe style="width:100%;height:100%" src="${link}" allow=camera;microphone;autoplay frameborder="0" allowfullscreen></iframe>`;
+		$("body").append(str.replace(/\t|\n|\r/g,""));											// Add it
 	}
 
 	InitSocketServer()																			// INIT SOCKET SERVER
