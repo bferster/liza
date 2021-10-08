@@ -68,8 +68,8 @@ class Feedback {
 			let p=$("#lzDot-"+id).position()
 			let o=this.data[id];																	// Point at element
 			$("#lz-dlg").remove();																	// Clear exiting
-			if (o.actor == "Teacher") col="#0099ffc";													// Teacher color
-			else					  col=app.actors[o.actor].color;								// Student color
+			if (o.actor == "Teacher") col="#0099ffc";												// Teacher color
+			else					  col=app.students.find(x => x.id == o.actor).color;			// Student color
 			let str=`<div id="lz-dlg" style="position:absolute;top:${p.top-12}px;left:${p.left+6}px">
 				<div class="lz-textR" style="background-color:${col}">${o.actor+": "+o.text}</div><br>
 				<div class="lz-textRA" style="border-top-color:${col}"></div></div>`;
@@ -81,7 +81,7 @@ class Feedback {
 		$("[id^=lzDot-]").on("click",(e)=>{ 														// CLICK ON DOT TO SPEAK
 			let who,id=e.target.id.substr(6);
 			if (this.data[id].actor == "Teacher")	who="instructor";								// Teacher's voice
-			else	who=app.actors[this.data[id].actor].seat;										// Student voice
+			else	who=app.students.find(x => x.id == this.data[id].actor).seat;					// Student voice
 			app.voice.Talk(this.data[id].text,who);													// Speak
 		});
 		
@@ -139,7 +139,7 @@ class Feedback {
 			x=getPixFromTime(o.time);																// Get x pos
 			col="#ccc";																				// Teacher is gray
 			if (o.actor == "Teacher")   y=5-Math.max(Math.floor(o.code/100),1);						// If a teacher, get y 5-1
-			else						col=app.actors[o.actor].color;								// Get shirt color
+			else						col=app.students.find(x => x.id == o.actor).color;			// Get shirt color
 			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
 			}
 		
@@ -178,7 +178,7 @@ class Feedback {
 								move=i;																	// Set current move 
 						if (move != this.curMove) {
 							if (this.data[move].actor == "Teacher")	who="instructor";					// Teacher's voice
-							else	who=app.actors[this.data[move].actor].seat;							// Student voice
+							else	who=app.students.find(x => x.id == this.data[move].actor).seat;		// Student voice
 							app.voice.Talk(this.data[move].text,who);									// Speak
 							this.curMove=move;															// Set current move
 							}
@@ -270,7 +270,7 @@ class ResponsePanel  {
 				let id=e.target.id.substr(5);														// Get id
 				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+app.se.responses[app.role][id].text);	// PLAY
 				});
-		}
+			}
 
 		function addSeqs() {																		// FILL SEQS PULLDOWN
 			var v=[];
