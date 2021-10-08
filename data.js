@@ -7,7 +7,6 @@ class Session  {
 	constructor()   																				// CONSTRUCTOR
 	{
 		this.data=[];																					// Holds session data
-		this.config=[];																					// Holds config data
 		this.responses=[];																				// Holds student responses
 		this.LoadConfig();																				// Load config file
 		this.meetingId="1";																				// Session id
@@ -28,23 +27,27 @@ class Session  {
 		fetch('assets/config.csv')																		// Load file
 			.then(res =>  res.text())																	// Get as text
 			.then(res =>{ 																				
-				let i,o,n=0;
-				app.actors=[];
-				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
-				app.students=[];
-				for (i=0;i<data.length;++i) {															// For each line
-					o=data[i];																			// Point at it
-					if (o.type == "actor") {															// If an actor
-						app.actors[o.id]={};															// Creat student object
-						app.actors[o.id].sex=o.data.match(/sex=(.+?)\W/)[1];							// Get sex
-						app.actors[o.id].syns=o.text.split(",");										// Get synonyms
-						app.actors[o.id].color=o.data.match(/color=(.+?)\W/)[1];						// Get color
-						app.actors[o.id].seat=n++;														// Seat	assignment
-						if (o.id != "Class") app.students.push(o.id);									// Add student names
-						}
-					}})	
+				let i;
+				app.students=[]
+				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 						// Parse CSV using papa lib
+				for (i=0;i<d.length;++i) {																// For each line
+					if (d[i].type == "student") this.AddStudent(d[i]);									// If a student, add
+					}
+			})	
 			.then(res =>{ this.LoadSession("assets/session-67.csv"); })									// Load sample session	
 			.then(res =>{ this.LoadResponses("assets/responses.csv"); });								// Load responses
+	}
+
+
+	AddStudent(d)																					// ADD STUDENT TO DATA
+	{
+		let seatNum=app.students.length;																// Get seat
+		let o={ fidget:0, s:15, seat:seatNum, src:"assets/body.dae" };									// Basic info
+		o.id=d.id;																						// Name
+		o.sex=d.data.match(/sex=(.+?)\W/)[1];															// Get sex
+		o.color=d.data.match(/color=(.+?)\W/)[1];														// Get color
+		o.tex="assets/"+o.id.toLowerCase()+"skin.png";													// Set skin
+		app.students.push(o);																			// Add to array
 	}
 
 	LoadSession(fileName)																			// LOAD SESSION FILE
@@ -67,7 +70,7 @@ class Session  {
 					if (!this.responses[o.speaker])	this.responses[o.speaker]=[];						// Alloc new array
 					this.responses[o.speaker].push({ text:o.text, intent:o.intent, keys:o.keys});		// Add line to speaker											
 					}
-				app.LoadProject(app.gid);																// Load project file
+				app.InitClassroom();																		// Init classroom
 			});		
 	}
 
