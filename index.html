@@ -14,7 +14,7 @@
 	<script src="lib/wgl/OrbitControls.js"></script>
 	<script src="lib/wgl/OutlineEffect.js"></script>
 	<script src="lib/papaparse.min.js"></script>
-	<script src="data.js"></script>
+	<script src="nlp.js"></script>
 	<script src="scene.js"></script>
 	<script src="blackboard.js"></script>
 	<script src="voice.js"></script>
@@ -207,16 +207,9 @@ var isMobile=false;																					// Flag for mobile devices
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
 				app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+app.role+"|standUp");	
 				}
-
-			if ((e.which == 65) && e.altKey && e.ctrlKey)											// Test key (Ctrl+Alt+A)
-				GetTextBox("Type text to speak","","",(s)=>{ app.voice.Talk(s) });
-			else if ((e.which == 71) && e.altKey) {													// Show spreadsheet (Alt+G)
-				window.open("https://docs.google.com/spreadsheets/d/"+app.gid,"_blank");			// Show it	
-				}
 			});
 	});	
  
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // APP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,21 +225,16 @@ class App  {
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
-		this.roster=[];																				// Associative array of student numbers by na,e
 		this.startTime=new Date().getTime();														// Session start time
 		this.pickingStudent="";																		// Flag for picking student
-		this.curGoal="";																			// Current goal in focus
-		this.curStudent=0;																			// Currently active student
-		this.gettingEntities=0;																		// Flag when waiting for entities from AI
-		this.hinting=0;																				// Whether to give hints to instructor
-		this.horseshoe=true;																		// Horseshoe seating?
 		this.curClock=0;																			// Current clock time
-		this.gid="RER-1.tsv"																		// Default RER spreadsheet
 		this.sessionId="1";																			// Session id
-
+		this.responses=[];																			// Holds student responses
+		this.sessionData=[];																		// Holds session data
+		
+		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
-		this.arc=new ARC();																			// Alloc ARC tree		
-		this.se=new Session();																		// Session data	
+		this.LoadFiles();																			// Load config and other files
 		this.bb=new Blackboard();																	// Alloc Blackboard (must be before Scene)	
 		this.sc=new Scene("mainDiv");																// Alloc new Scene		
 		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
@@ -255,11 +243,11 @@ class App  {
 		this.Draw();																				// Start 
 
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
-		for (let i=0;i<v.length;++i) {
+		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
 			}
-		if ((!this.voice.hasRecognition) && (!isMobile))											// This platform doesn't have voice recognition
-			$("#talkBut").hide(),$("#talkInput").show();											// Show input	
+		if (!this.voice.hasRecognition)	$("#talkBut").hide(),$("#talkInput").show();				// This platform doesn't have voice recognition
+
 		$("#settingsBut").on("click", ()=> { this.Settings();  });									// On settings button click	
 		$("#talkBut").on("click", ()=> { this.voice.Listen(); });									// On talk button click, start listening
 		$("#helpBut").on("click", ()=> { this.ShowHelp(); });										// On help button click, show help
@@ -269,7 +257,6 @@ class App  {
 			$("#blackboardDiv").css("top",h+"px");													// Set top
 			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
-			app.arc.Add({ o:'B', m:m }); 															// Add to record
 			}); 
 		$("#slideBut").on("click", (e)=> { 															// On BB button clck
 			if (e.shiftKey)	this.bb.ShowSlide(-1);													// Last slide
@@ -335,22 +322,65 @@ class App  {
 
 	SocketIn(event)																				// A WEBSOCKET MESSAGE
 	{
-		// 1|Luis|TALK|Luis|Hello
-		// 1|Luis|ACT|Luis|standup
-
 		if (!event.data)			 	return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
-	
 		if (v[0] != this.sessionId)		return;														// Quit if wrong session
-		if (v[2] == "TALK") {																		// TALK
-			let who=(v[3] == "Teacher") ? "instructor" : app.students.find(x => x.id == v[3]).seat;	// Set voice number
-			app.voice.Talk(v[4],who);																// Speak
-			}
-		else if (v[2] == "ACT") {																	// ACT
-			app.sc.StartAnimation(v[3],app.seqs[v[4]]);												// Start animating
-			}
-		}
-		
+		if (v[2] == "TALK") 	 		app.voice.Talk(v[4],v[3]);									// TALK
+		else if (v[2] == "ACT")  		app.sc.StartAnimation(v[3],app.seqs[v[4]]);					// ACT
+	}
+
+	LoadFiles()																					// LOAD CONFIG FILE
+	{	
+		fetch('assets/config.csv')																		// Load file
+			.then(res =>  res.text())																	// Get as text
+			.then(res =>{ 																				
+				let i;
+				this.students=[]
+				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 						// Parse CSV using papa lib
+				for (i=0;i<d.length;++i) {																// For each line
+					if (d[i].type == "student") this.AddStudent(d[i]);									// Add student,
+					if (d[i].type == "syns")	app.nlp.AddSyns(d[i].id,d[i].data.split(","));			// Add synonyms
+					}
+			})	
+			.then(res =>{ this.LoadSession("assets/session-67.csv"); })									// Load sample session	
+			.then(res =>{ this.LoadResponses("assets/responses.csv"); });								// Load responses
+	}
+
+	AddStudent(d)																					// ADD STUDENT TO DATA
+	{
+		let seatNum=this.students.length;																// Get seat
+		let o={ fidget:0, s:15, seat:seatNum, src:"assets/body.dae" };									// Basic info
+		o.id=d.id;																						// Name
+		o.sex=d.data.match(/sex=(.+?)\W/)[1];															// Get sex
+		o.color=d.data.match(/color=(.+?)\W/)[1];														// Get color
+		o.tex="assets/"+o.id.toLowerCase()+"skin.png";													// Set skin
+		this.students.push(o);																			// Add to array
+	}
+
+	LoadSession(fileName)																			// LOAD SESSION FILE
+	{	
+		return fetch(fileName)																			// Load file
+			.then(res =>  res.text())																	// Get as text
+			.then(res =>{ this.sessionData=Papa.parse(res, { header:true, skipEmptyLines:true }).data;}); // Parse CSV using papa lib
+	}
+	
+	LoadResponses(fileName)																			// LOAD RESPONSE FILE
+	{	
+		let i,o;
+		return fetch(fileName)																			// Load file
+			.then(res =>  res.text())																	// Get as text
+			.then(res =>{ 																				// On loaded
+				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
+				this.responses=[];																		// Clear array
+				for (i=0;i<data.length;++i) {															// For each line
+					o=data[i];																			// Point at item
+					if (!this.responses[o.speaker])	this.responses[o.speaker]=[];						// Alloc new array
+					this.responses[o.speaker].push({ text:o.text, intent:o.intent, keys:o.keys});		// Add line to speaker											
+					}
+				this.InitClassroom();																		// Init classroom
+			});		
+	}
+	
 	InitClassroom()																			// INIT CLASSROOM
 	{
 		let i;
@@ -383,8 +413,6 @@ class App  {
 
 		for (i=0;i<10;++i)																		// For each desk
 			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:"0xcccccc"} );	// Add desk
-		for (i=0;i<this.students.length;i++) 													// For each student spec'd
-			this.roster[this.students[i].id]=i;													// Add to roster
 		this.LoadModels();										  								// Load 3D models
 		if (this.role != "Teacher")	this.rp.Draw();												// Show response menu if not teacher
 	}
@@ -424,45 +452,22 @@ class App  {
 
 	OnPhrase(text) 																			// ON PHRASE UTTERED
 	{
-		var o=app.arc.GetEntities(text);														// Get entities
-		var score=0;
-		if (o.match(/response:agree/i) && o.match(/who:youAll/i)) app.curStudent=-2;			// Looking for nods from whole class
-		else if (o.match(/who:wholeClass/i)) 			app.curStudent=-1;						// Whole class
-		else if (o.match(/who:Liza/i)) 					app.curStudent=app.roster["Liza"];		// Set current student
-		else if (o.match(/who:Freddy/i)) 				app.curStudent=app.roster["Freddy"];
-		else if (o.match(/who:Robert/i)) 				app.curStudent=app.roster["Robert"];
-		else if (o.match(/who:Sara/i)) 					app.curStudent=app.roster["Sara"];
-		else if (o.match(/who:Oliver/i)) 				app.curStudent=app.roster["Oliver"];
-		else if (o.match(/who:Luis/i)) 					app.curStudent=app.roster["Luis"];
-		else if (o.match(/who:Chris/i)) 				app.curStudent=app.roster["Chris"];
-		else if (o.match(/who:Jazmin/i)) 				app.curStudent=app.roster["Jazmin"];
-		else if (o.match(/who:Farrah/i)) 				app.curStudent=app.roster["Farrah"];
-		else if (o.match(/who:Mihyun/i)) 				app.curStudent=app.roster["Mihyun"];
-		if (o.match(/action:/i) && text.match(/please/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an please + action mentioned, do it
+		app.curStudent=app.nlp.GetWho(text)[1];													// Get current student
+		trace(text,app.curStudent)
+//		if (o.match(/action:/i) && text.match(/please/i)) 	app.DoAction((o+" ").match(/action:(.+?) /i)[1]);	// If an please + action mentioned, do it
 	
 		if (app.pickingStudent) {																// If students have their hands up
-			app.curStudent=Math.max(app.curStudent);											// Default to 1st if still talking to class
 			app.DoAction("sit",true);															// Hands down
-			app.arc.DeliverResponse(app.pickingStudent);										// Deliver response
 			app.pickingStudent="";																// Clear flag
 			Prompt("");																			// Clear prompt
 			return;	
 			}
-
-		app.arc.FindClosestStep(text,o);														// Match closest step to text
-		score=app.arc.tree[app.arc.curStep].score;												// Get match score			
-		app.arc.Add({ o:'S', t:app.voice.talkStartTime, text:text, move:app.arc.tree[app.arc.curStep].move, step:app.arc.curStep, score:score, line:app.arc.tree[app.arc.curStep].line  });	// Add to record at time of STT listening
-		if (score > app.arc.threshold) {														// If past threshold
-			var s=app.arc.DeliverResponse(app.arc.curStep).replace(/\{.*?\}/g,"");				// Deliver response without braced tags
-			if (s)	$("#revTextDiv").append("<div class='lz-textR'>"+s+"</div>");				// Add to texting display display, if texting
-			}
-		trace(">> "+text+"\n",app.arc.stepData.score.toFixed(2)+app.arc.stepData.flags,app.arc.tree[app.arc.curStep].text.substr(0,20)+" "+app.arc.stepData.entities,app.arc.stepData);
-		}
+	}
 		
 	DoAction(act, all)																		// PERFORM ACTION
 	{
 		var i;
-		if ((app.curStudent < 0) || all) 														// If the whole class
+		if ((app.curStudent) || all) 															// If the whole class
 			for (i=0;i<this.students.length;++i)												// For each student
 				animateIt(i);																	// Animate them									
 		else																					// Just one
@@ -506,7 +511,6 @@ class App  {
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>settings</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#settingsEditor\").remove();'><br><br>";
 		str+="<table>";
-		str+="<tr><td>Show hinting?</td><td><input type='checkbox' id='setHint'"+(this.hinting ? " checked" : "")+"></td></tr>" ;																			
 		str+="<tr><td>Pose editor</td><td><div id='setPose'class='lz-bs'>Set</div></td></tr>";
 		str+="</table><br>";																			
 		str+="</div>";
@@ -516,7 +520,6 @@ class App  {
 
 		$("#settingsEditor").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$("#settingsEditor").show("slide",{ direction:"down"});										// Bring up	
-		$("#setHint").on("click", function() { app.hinting=$(this).prop("checked") ? 1 : 0 });		// Toggle hint flag
 		$("#setPose").on("click", ()=> {$("#settingsEditor").remove(); this.sc.PoseEditor(); });	// Show pose editor
 		$("#setDemo").on("change", function() {
 			var ids=["1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU", "1ez3sEcWaNk9QgoRRGn5BOQYj541wBcrx8Es2ClJMmbU",

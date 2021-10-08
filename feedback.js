@@ -7,7 +7,6 @@ class Feedback {
 	constructor()																				// CONSTRUCTOR
 	{
 		document.addEventListener( 'mousedown', this.OnClick, false );
-		this.curStudent="";																			// No one selected yet
 		this.curTime=0;																				// Current time in session in ms
 		this.curStart=0;																			// Start in msecs
 		this.startPlay;																				// When play started in msecs
@@ -20,33 +19,33 @@ class Feedback {
 	OnClick(e) 																					// ON SCREEN CLICK
 	{
 		if (e.target.localName != "canvas")	return;													// React only to canvas hits
-		this.curStudent="";																			// No one selected yet
+		app.curStudent="";																			// No one selected yet
 		clearInterval(app.fb.interval);																// Clear timer
 		$("#lz-feedbar").remove();																	// Remove old one
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point
 		if (o.object.name == "body") {																// If a student
-			app.fb.curStudent=o.object.parent.name;													// Set name
-			app.fb.Draw(app.se.data);																// Show feedback
+			app.curStudent=o.object.parent.name;													// Set name
+			app.fb.Draw(app.sessionData);															// Show feedback
 		}
 	}
 
 	Draw(data)																					// DRAW FEEDBACK PANEL
 	{
 		this.data=data;																				// Point at data to display
-		this.maxTime=this.data[this.data.length-1].time;											// Get TRT	
+		this.maxTime=this.data[data.length-1].time;													// Get TRT	
 		$("#lz-feedbar").remove();																	// Remove old one
 		var str=`<div id="lz-feedbar" class="lz-feedbar"> 
 		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-feedbar").remove()'>
 		<div class='lz-feedback'>
 			<div style="width:250px;margin:4px 0 0 16px;"> 
-				<b style="font-family:Chalk;font-size:48px">${this.curStudent}</b>
+				<b style="font-family:Chalk;font-size:48px">${app.curStudent}</b>
 				<table style="font-family:Segoe UI,Verdana,Geneva,sans-serif;font-size:13px">
 				<tr><td>Academic Language &nbsp;</td><td style="width:100px"><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Prior knowledge</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Use of evidence</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Careful thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
 				<tr><td>Curious thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
-				<tr><td colspan='2'><p class="lz-bs" id="lz-v${this.curStudent}" onclick="app.fb.ShowText()">View ${this.curStudent}'s text</p></td></tr>
+				<tr><td colspan='2'><p class="lz-bs" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</p></td></tr>
 				</table>
 			</div>
 			<div style="flex-grow:6">
@@ -79,10 +78,8 @@ class Feedback {
 		$("[id^=lzDot-]").on("mouseout",(e)=>{ 	$("#lz-dlg").remove(); });							// Clear chat if out
 	
 		$("[id^=lzDot-]").on("click",(e)=>{ 														// CLICK ON DOT TO SPEAK
-			let who,id=e.target.id.substr(6);
-			if (this.data[id].actor == "Teacher")	who="instructor";								// Teacher's voice
-			else	who=app.students.find(x => x.id == this.data[id].actor).seat;					// Student voice
-			app.voice.Talk(this.data[id].text,who);													// Speak
+			let id=e.target.id.substr(6);															// Get id
+			app.voice.Talk(this.data[id].text,this.data[id].actor);									// Speak
 		});
 		
 		$("#playerButton").click(()=> {	this.Play(); });											// On play click
@@ -148,7 +145,7 @@ class Feedback {
 
 		ShowText()
 		{
-			SlideUp(24,34,this.curStudent+"'s text",`This space will show ${this.curStudent}'s written answer to the prompt for reference.`)
+			SlideUp(24,34,app.curStudent+"'s text",`This space will show ${app.curStudent}'s written answer to the prompt for reference.`)
 		}
 
 		Play() 																						// PLAY/STOP TIMELINE ANIMATION
@@ -176,9 +173,9 @@ class Feedback {
 						for (i=0;i<this.data.length;i++) 												// For each event
 							if (this.data[i].time-0 <= now)												// Past now
 								move=i;																	// Set current move 
-						if (move != this.curMove) {
-							if (this.data[move].actor == "Teacher")	who="instructor";					// Teacher's voice
-							else	who=app.students.find(x => x.id == this.data[move].actor).seat;		// Student voice
+						if (move != this.curMove) {														// A new move
+							if (this.data[move].actor == "Teacher")	who="Teacher";						// Teacher's voice
+							else									who=this.data[move].actor;			// Student voice
 							app.voice.Talk(this.data[move].text,who);									// Speak
 							this.curMove=move;															// Set current move
 							}
@@ -259,16 +256,16 @@ class ResponsePanel  {
 		function fillList(tab) {																	// FILL RESPONSE LIST
 			let o,i,str="";
 			if (app.role == "Coach") return;														// Not in coach role
-			let n=Math.floor(app.se.responses[app.role].length/4);									// Number to fill
+			let n=Math.floor(app.responses[app.role].length/4);										// Number to fill
 			for (i=tab*n;i<tab*n+n;++i) {															// For each of a student's possible responses
-				o=app.se.responses[app.role][i];													// Point at it
+				o=app.responses[app.role][i];														// Point at it
 				str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:18px;cursor:pointer;vertical-align:-4px"> ${o.text}</p>`;
 				}
 			$("#lz-rplist").html(str);																// Add responses
 
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+app.se.responses[app.role][id].text);	// PLAY
+				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+app.responses[app.role][id].text);	// PLAY
 				});
 			}
 

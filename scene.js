@@ -10,8 +10,7 @@ class Scene {
 					 { x:-120, y:100,  z:0, r:-10 }, { x:-120, y:-100, z:0, r:0 },
 					 { x:   0, y:-100, z:0, r:0 },   { x: 120, y:-100, z:0, r:30  } ];
 
-		if (app.horseshoe)																			// Horseshoe seating
-					 this.seats=[ { x: 200, y:110,  z:0, r:-25 },													
+	 	this.seats=[ { x: 200, y:110,  z:0, r:-25 },												// Horseshoe seating												
 			   		 { x: 100, y:70,   z:0, r:-15 },				
 					 { x:0,    y:50,   z:0, r:0 },
 					 { x:-100, y:75,   z:0, r:15 },
@@ -243,6 +242,7 @@ class Scene {
 			$("#poseEditor").hide("slide",{ direction:"down", complete: ()=>{ $("#poseEditor").remove(); } }); // Slide down
 			return;																					// Quit																					
 			}
+		let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;			// Get seat number
 		var str="<div id='poseEditor' class='lz-dialog' style='display:none'>";
 		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();'><br><br>";
@@ -261,7 +261,7 @@ class Scene {
 	
 		str+="</table><br>";																			
 		str+="Sequence:&nbsp;"+MakeSelect("beSeqs",false,[]);																			
-		str+="&nbsp;&nbsp;&nbsp;Fidget?&nbsp;<td><input type='checkbox' id='beFidget'"+(app.students[app.curStudent].fidget ? " checked" : "")+">" ;																			
+		str+="&nbsp;&nbsp;&nbsp;Fidget?&nbsp;<td><input type='checkbox' id='beFidget'"+(app.students[snum].fidget ? " checked" : "")+">" ;																			
 		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
 		str+="</div>";
 
@@ -283,11 +283,10 @@ class Scene {
 		$("#beYval").on("change",  function(e) { $("#beYaxis").val(this.value); moveBone(); } );	// Y	
 		$("#beZaxis").on("input",  function(e) { $("#beZval").val(this.value); moveBone(); } );		// Z
 		$("#beZval").on("change",  function(e) { $("#beZaxis").val(this.value); moveBone(); } );	// Z
-		$("#beFidget").on("click", function(e) { app.students[app.curStudent].fidget=$(this).prop("checked") ? 1 : 0 });		// Toggle fidget flag
+		$("#beFidget").on("click", function(e) { app.students[snum].fidget=$(this).prop("checked") ? 1 : 0 });		// Toggle fidget flag
 	
 		$("#beModel").on("change", function(e) { 													// Change model
-			for (var i=0;i<app.students.length;++i) 
-				if ($(this).val() == app.students[i].id)	app.curStudent=i;						// Make it current student	
+			app.curStudent=$(this).val();															// Make it current student	
 			});
 		
 		$("#bePose").on("change", function(e) { 													// Add new pose
@@ -332,12 +331,13 @@ class Scene {
 
 		function addModels() {																		// FILL MODELS PULLDOWN
 			var i, v=[];
+			let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
 			$("#beModel").empty();																	// Clear select
 			$("#beModel").append("<option>Choose student</option>");								// Add choose
 			for (i=0;i<app.students.length;++i)	v.push(app.students[i].id);							// Get all students
 			v.sort();																				// Sort 
 			for (i=0;i<v.length;++i) 	$("#beModel").append("<option>"+v[i]+"</option>");			// Add option
-			$("#beModel").val(app.students[app.curStudent].id);										// Current student
+			$("#beModel").val(app.students[snum].id);												// Current student
 		}
 
 		function addBones() {																		// FILL BONES PULLDOWN
@@ -430,9 +430,9 @@ class Scene {
 			}
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
-		if ((app.voice.talking == 1) && (app.curStudent >= 0))	{									// If student talking
-			app.sc.SetBone(app.students[app.curStudent].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0);	// Animate mouth
-//			app.sc.SetBone(app.students[app.curStudent].id,"spine",0,0,Math.cos((app.sc.aniTimer+20)/15*Math.PI)*.4+.8*.00001);	// Spine
+		let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;			// Get seat number
+		if ((app.voice.talking == 1) && (snum >= 0))	{											// If student talking
+			app.sc.SetBone(app.students[snum].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0); // Animate mouth
 			}
 		for (i=0;i<app.students.length;++i)															// For each student
 			if (app.students[i].fidget)	{															// If fidgeting

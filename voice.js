@@ -33,8 +33,9 @@ class Voice {
 
 			this.tts.onend=()=> { 																		// ON TALKING END
 				this.talking=0;  																		// Stop talking animation
-				if (app.curStudent >= 0)																// A valid student
-					app.sc.SetBone(app.students[app.curStudent],"mouth",0,0,0); 						// Neutral mouth 
+				let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
+				if (app.curStudent)																		// A valid student
+					app.sc.SetBone(app.students[snum],"mouth",0,0,0); 									// Neutral mouth 
 				};	
 
 			} catch(e) { trace("TTS error",e) };														// On error
@@ -83,35 +84,19 @@ class Voice {
 			if (who == "instructor")	return;															// No need if instructor
 			var x=window.innerWidth/2;																	// Screen width
 			if (who != null) app.curStudent=who;														// Set specific student				
-			if (app.curStudent >= 0) 																	// If only one student
-				x=app.sc.GetScreenPos(app.sc.models[app.students[app.curStudent].id].model).x;			// Put over them, based on 3D -> 2D projection
-			Bubble(text,5,x-100,80);																	// Show bubble
 			return;
 			}
 		try{																							// Try
 			speechSynthesis.cancel();																	// Clear current speech queue			
-			if ((who == undefined) && (app.curStudent >= 0)) who=app.students[app.curStudent].sex;		// Set sex based on current student
-			else if ((who == undefined) && (app.curStudent < 0)) who="choral";							// It's choral or group
-			else if (who != "instructor")	app.curStudent=who,who=app.students[app.curStudent].sex;	// Set current student
-			if (who == "instructor") 		this.tts.voice=this.voices[this.instructorVoice];			// Instructor's  voice
-			else if (who == "male")			this.tts.voice=this.voices[this.maleVoice];					// Set male voice
-			else 							this.tts.voice=this.voices[this.femaleVoice];				// Set female voice
-			if (who != "instructor") 		this.talking=1;												// Trigger mouth animation if a student
+			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice
+			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex
+			if (who == "male")			this.tts.voice=this.voices[this.maleVoice];						// Set male voice
+			else 						this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
+			if (who != "Teacher") 		this.talking=1;													// Trigger mouth animation if a student
 			this.tts.text=text;																			// Set text
 			speechSynthesis.speak(this.tts);															// Speak
 			}
 		catch(e) { trace("Speech error",e) };															// Catch
 	}
-
-	AddGrammarList(heading, dictionary)																// ADD WORDS TO GRAMMAR LIST
-	{
-		var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;							// Browser compatibility
-		if (dictionary)																					// If new words to add
-			this.dictionary.splice(0,0,dictionary);														// Add to array
-		var speechRecognitionList=new SpeechGrammarList();												// Alloc grammar list
-		var grammar="#JSGF V1.0; grammar dict; public <"+heading+"> = " + this.dictionary.join(" | ")+" ;";	// Make grammar list
-		speechRecognitionList.addFromString(grammar,1);													// Add to grammar list
-		this.recognition.grammars=speechRecognitionList;												// Add to STT
-		}
 
 }  // VOICE CLOSURE
