@@ -13,17 +13,16 @@ class NLP {
 	AddSyns(word, syns)																				// SET SYNONYMS ARRAY
 	{
 		let i;
-		if (!this.syns[word])	this.syns[word]=[];														// A new one
-		for (i=0;i<syns.length;++i) this.syns[word].push(syns[i])										// Add each synonym
+		for (i=0;i<syns.length;++i) this.syns[syns[i]]=word;												// Add it
 	}
 	
 	GetWho(text)																					// GET WHO IN TEXT
 	{
-		let i,who=":";
+		let k,who=":";
 		let v=this.Tokenize(text);																		// Tokenize	
-		for (i=0;i<v.length;++i) 																		// For each word																	
-			if (typeof(this.syns[v[i]]) == "string") 													// A valid string
-				who=v[i]+":"+this.syns[v[i]];															// Set who and trigger
+		for (k in v) 																					// For each word
+			if (typeof(this.syns[v[k]]) == "string") 													// A valid string
+				who=k+":"+v[k];																			// Set who and trigger
 		return who;																						// Return last trigger:who 
 	}
 
