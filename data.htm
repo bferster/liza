@@ -200,20 +200,32 @@
 		if (!end) end=start-0+1;																	// Just one
 		let dots=$("#lz-dots").prop("checked");														// Sub-intents?
 		let num=$("#lz-num").val();																	// Max per intent
+		let hundreds=true;																			// Only 100 level events
 
+		ints["bot_challenge"]=[]; 
+		ints["bot_challenge"].push("    - are you a bot?\n"); ints["bot_challenge"].push("    - are you human?\n")
+		ints["bot_challenge"].push("    - am I talking to a bot?\n"); ints["bot_challenge"].push("    - am I talking to a human?\n")
+		ints["addition"]=[]; 
+		ints["addition"].push("    - what is 2+2?\n"); ints["addition"].push("    - can you add two numbers?\n")
+		ints["howru"]=[]; 
+		ints["howru"].push("    - how are you?\n"); ints["howru"].push("    - how are you doing?\n")
+		ints["why"]=[]; 
+		ints["why"].push("    - why do you say that?\n"); ints["why"].push("    - how did you know?\n")
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if ((o.rerid >= start-0) && (o.rerid < end-0))	continue;								// Skip if exclused
 			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
-			if (dots) id="r"+o.intent;																// Make fuull intent id name
-			else	  id="r"+Math.floor(o.intent);													// Just the whole numbers					
-id=Math.floor(o.intent/100)*100;
+			if (dots) 		id=o.intent;															// Make full intent id name
+			else	  		id=Math.floor(o.intent);												// Just the whole numbers					
+			if (hundreds)	id=Math.floor(o.intent/100)*100;										// Cap at 100s
 			sid="session-"+o.rerid;																	// Session id
-			if (!sess[sid]) 			  sess[sid]=[];												// Alloc session holder
-			if (!ints[id] && (id != "r")) ints[id]=[];												// Alloc intent holder
+			if (!sess[sid]) 			  		sess[sid]=[];										// Alloc session holder
 			if (o.speaker == "Teacher") {															// If remark
 				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
-				if (id != "r")	sess[sid].push("  - intent: "+id+"\n");							// Add intent to story
+				if (id < 100)	continue;															// Skip if uncoded
+				id="r"+id;																			// Prefix id
+				if (!ints[id]) ints[id]=[];															// Alloc intent holder
+				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
 				ss=o.text;																			// Point at text
 				who=nlp.GetWho(o.text);																// Get who
 				if (who) {																			// Got one
@@ -221,27 +233,33 @@ id=Math.floor(o.intent/100)*100;
 					ss=ss.replace(re,"STUDENT");													// Encode entity
 					}
 				if (o.intent && (ints[id].length < num)) 											// If under limit and coded
-					ints[id].push("        - "+ss.trim().replace(/:/g,"")+"\n");					// Add it,
+					ints[id].push("    - "+ss.trim().replace(/:/g,"")+"\n");						// Add it,
 				}
 			else{																					// Response
 				rType="agree";
-				if (id != "r") resps.push( { intent:id,text: o.text.trim().replace(/:|"/g,""),keys:keys,type:rType,turn:Math.floor(i/2),speaker:who.split(":")[1] });
-				if (id != "r") sess[sid].push("  - action: utter_r"+i+"\n");						// Add response to story
-				doms.push(`\n  utter_r${i}:\n  - text: "${o.text.trim().replace(/:|"/g,"")}"\n`);	// Add to domain file							
+				if (isNaN(id)) {																	// Ignore numbered responses for now
+					resps.push( { intent:id,text: o.text.trim().replace(/:|"/g,""),keys:keys,type:rType,turn:Math.floor(i/2),speaker:who.split(":")[1] });
+					sess[sid].push("  - action: utter_r"+i+"\n");									// Add response to story
+					doms.push(`\n  utter_r${i}:\n  - text: "${o.text.trim().replace(/:|"/g,"")}"\n`);	// Add to domain file
 				}
 			}
+		}
 
-	trace(doms)		
 		let str="version: \"2.0\"\n\nnlu:\n";														// NLU header
-		str+="- intent: bot_challenge\n  examples: |\n    - are you a bot?\n    - are you a human?\n    - am I talking to a bot?\n    - am I talking to a human?\n";
 		for (k in ints)	{																			// For each intent
-			str+="- intent: r"+k+"\n  examples: |\n";												// Add header
+			str+="- intent: "+k+"\n  examples: |\n";												// Add header
 			ints[k]=[... new Set(ints[k])];															// Make unique
 			for (i=0;i<ints[k].length;++i) 	str+=ints[k][i];										// Add each remark in intent group
 			}
 		if (mask&1) SaveTextAsFile("nlu.yml",str);													// Write file
 
-		str="version: \"2.0\"\n\nstories:\n";														// Stories header
+		str="version: \"2.0\"\n\nstories:\n\n";														// STORIES header
+		str+="- story: addition\n  steps:\n";														// Add story header
+		str+="  - intent: addition\n  - action: utter_addition\n  - intent: why\n\  - action: utter_why\n\n";	// Add steps											
+		str+="- story: time\n  steps:\n";														
+		str+="  - intent: time\n  - action: time\n  - intent: why\n\  - action: utter_why\n\n";											
+		if (mask&2) SaveTextAsFile("stories.yml",str);												// Write file
+
 		for (k in sess)	{																			// For each session
 			c=0;																					// Reswt chunk counter
 			for (i=0;i<sess[k].length;++i) {														// For each event in session	
@@ -261,14 +279,23 @@ id=Math.floor(o.intent/100)*100;
 					}
 				}
 			}
-		if (mask&2) SaveTextAsFile("stories.yml",str);												// Write file
 
 		str="version: \"2.0\"\n\nsession_config:\n";												// Domain header
 		str+="  session_expiration_time: 60\n  carry_over_slots_to_new_session: true\n\nintents:\n";
-		str+="  - bot_challenge\n";																	// Add challenge
 		for (k in ints)	str+="  - "+k+"\n";															// Add intent
 		str+="\nresponses:\n";																		// Responses header	
 		str+=`  utter_iamabot:\n  - text: "I am a bot, powered by LIZA."\n`;						// Bot response
+		str+=`  utter_addition:\n  - text: "The answer is 4."\n`;						
+		str+=`  - text: "Would you believe 22?"\n`;						
+		str+=`  - text: "I really don't care"\n`;						
+		str+=`  - text: "Would you believe 5?"\n`;
+		str+=`  utter_time:\n  - text: "Now is the time for all good men to come to the aid of their country."\n`;						
+		str+=`  - text: "Time to get going."\n`;						
+		str+=`  - text: "The time is now."\n`;						
+		str+=`  - text: "I don't know, but thanks for asking."\n`;						
+		str+=`  utter_why:\n  - text: "Because I know this stuff"\n`;
+		str+=`  - text: "I just guessed"\n`;
+
 		for (i=0;i<doms.length;++i) 	str+=doms[i];												// Add each remark in intent group
 		if (mask&4) SaveTextAsFile("domain.yml",str);												// Write file
 

@@ -6,6 +6,9 @@ session_config:
 
 intents:
   - bot_challenge
+  - addition
+  - time
+  - howareyou
   - r100
   - r200
   - r300
