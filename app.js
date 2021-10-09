@@ -159,12 +159,12 @@ class App  {
 		if (data.intent.name == "addition") {
 			r=["The answer is 4, of course", "Would you believe 22?"]; 
 			i=Math.round(Math.random()*r.length);
-			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.role+"|"+r[i]);					// Send response
+			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|"+r[i]);			// Send response
 			}
 		else if (data.intent.name == "why") {
 			r=["I added them on my fingers", "Because I know how to add"]; 
 			i=Math.round(Math.random()*r.length);
-			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.role+"|"+r[i]);					// Send response
+			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|"+r[i]);			// Send response
 			}
 		}
 
