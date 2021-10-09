@@ -1,13 +1,31 @@
-type,id,data
-student,Jazmin,"sex=female,ability=.5,color=#076290,"
-student,Chris,"sex=male,ability=.5,color=#b1233c,"
-student,Luis,"sex=male,ability=.5,color=#e26d33,"
-student,Farrah,"sex=female,ability=.5,color=#9b4286,"
-student,Oliver,"sex=male,ability=.5,color=#734325,"
-syns,Class,"all,everybody,everyone,anybody,anyone,u-haul,uhaul,you all,guys,kids,y'all,class,group,children"
-syns,Jazmin,"jazmin,jazz,jasmine,jasmina"
-syns,Chris,"chris,crisp,christ"
-syns,Luis,"luis,louise,lewis,louis,louie,lou,lew"
-syns,Farrah,"farrah,farah,ferel,feral,farrell"
-syns,Oliver,"oliver,liver"
-keywords,,"NASA,Wildcats,prompt,text,scientific,tool,microscope,water,moon,machine,machinery,scientist,lunar, orbiter,paragraph,oxygen,tanks,masks,suits,ice,deposits,sentences,lunch"
+type,id,text,data
+student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,ability=.5,color=#076290,"
+student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
+student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,ability=.5,color=#e26d33,"
+student,Farrah,"farrah,farah,ferel,feral,farrell","sex=female,ability=.5,color=#9b4286,"
+student,Oliver,"oliver,liver","sex=male,ability=.5,color=#734325,"
+student,Class,"all,everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
+action,firstSlide,"begin slide,start slide",
+action,nextSlide,"advance side,next side,nextSlide slide",
+action,lastSlide,"back side,back slide,last slide, last side,previous slide,previous side",
+action,nextSlide,"next side,next slide,advance slide,advance side",
+action,sleep,"sleep,snooze",
+action,headCenter,"eyes front,head center",
+action,headRight,head right,
+action,headLeft,head left,
+action,headUp,"head up,raise head,raise your head",
+action,headDown,"head down,look down,lower head,lower your head",
+action,headRight,"head right,head to the right",
+action,fidgetStop,"stop fidget,stop squirm",
+action,fidget,fidget,
+action,armDown,"arm down,hand down,arms down,hands down",
+action,armUp,"arm up,hand up,arms up,hands up",
+action,nodYes,nod yes,
+action,nodNo,nod no,
+action,standUp,"stand,stand up,rise",
+action,sit,"setup,sit down,sit up,wake up",
+action,twistRight,"twist right,spin right,turn right",
+action,twistLeft,"twist left,spin left,turn left",
+action,write,"write,right,rite",
+action,wave,"wave",
+keywords,,"NASA,Wildcats,prompt,text,scientific,tool,microscope,water,moon,machine,machinery,scientist,lunar, orbiter,paragraph,oxygen,tanks,masks,suits,ice,deposits,sentences,lunch",

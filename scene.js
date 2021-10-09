@@ -396,8 +396,7 @@ class Scene {
 	AnimateScene()																				// CALLED EVERY FRAME BY ANIMATE FUNCTION
 	{
 		var i,j,pct,a;
-		var seq,bones,model,br,b;
-		var x,y,z;
+		var seq,model,br,b;
 		var now=new Date().getTime();																// Get current time in ms
 		for (i=0;i<app.animateData.length;++i)	{													// For each action
 			seq=app.animateData[i];																	// Point at action
@@ -430,8 +429,8 @@ class Scene {
 			}
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
-		let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;			// Get seat number
-		if ((app.voice.talking == 1) && (snum >= 0))	{											// If student talking
+		if (app.voice.talking == 1)	{																// If student talking
+			let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
 			app.sc.SetBone(app.students[snum].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0); // Animate mouth
 			}
 		for (i=0;i<app.students.length;++i)															// For each student
@@ -443,7 +442,7 @@ class Scene {
 		++app.sc.aniTimer;																			// Advance timer
 	}
 
-	StartAnimation(model, seqs)																	// QUEUE UP ACTION SEQUENCE
+	StartAnimation(modelName, seqs)																	// QUEUE UP ACTION SEQUENCE
 	{
 		var i,j,k,b,o,v;
 		var cbs=[],rad,bs;
@@ -451,8 +450,8 @@ class Scene {
 		seqs=seqs.split(",");																		// Get parts
 		var repeat=seqs[seqs.length-1];																// Last element is repeat
 		if (!seqs.length%2)	repeat=1;																// If omitted, do it one time
-		var modObj=this.models[model].model;														// Point at model object
-		var bones=this.models[model].bones;															// Point at bones array of model
+		var modObj=this.models[modelName].model;													// Point at model object
+		var bones=this.models[modelName].bones;														// Point at bones array of model
 		for (b in bones)	cbs[b]={ x:bones[b].rotation.x, y:bones[b].rotation.y, z:bones[b].rotation.z }; // Save rotation for each bone			
 		cbs["base"].x=modObj.position.x-modObj.oxp;													// Get X position from model for base bone
 		cbs["base"].z=modObj.position.z-modObj.ozp;													// Z
@@ -473,7 +472,7 @@ class Scene {
 					cbs[v[k]].z=o.ez=v[k+3]*rad+b.ozr;												// Z
 					bs.push(o);
 					}
-				app.animateData.push({ model:model, start:start, dur:seqs[j+1]*1000, bones:bs });	// Save animation data
+				app.animateData.push({ model:modelName, start:start, dur:seqs[j+1]*1000, bones:bs });	// Save animation data
 				start+=seqs[j+1]*1000;																// Start next member at end of last
 				}
 			}

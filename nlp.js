@@ -8,23 +8,41 @@ class NLP {
 	constructor()   																				// CONSTRUCTOR
 	{
 		this.syns=[];																					// Synonyms
+		this.whoSyns=[];																				// Who synonyms
+		this.actSyns=[];																				// Action synonyms
 	}
 
-	AddSyns(word, syns)																				// SET SYNONYMS ARRAY
+	AddSyns(type, word, syns)																		// SET SYNONYMS ARRAY
 	{
 		let i;
-		for (i=0;i<syns.length;++i) this.syns[syns[i]]=word;												// Add it
+		for (i=0;i<syns.length;++i) {																	// For each syn
+			if (type == "student")		this.whoSyns[syns[i]]=word;										// Add who
+			else if (type == "action")	this.actSyns[syns[i]]=word;										// Add actions
+			else						this.syns[syns[i]]=word;										// Add general synonym
+		}
 	}
 	
-	GetWho(text)																					// GET WHO IN TEXT
+	GetWho(text, both)																				// GET WHO IN TEXT
 	{
-		let k,who=":";
+		let i,who=both ? ":" : "";
 		let v=this.Tokenize(text);																		// Tokenize	
-		for (k in v) 																					// For each word
-			if (typeof(this.syns[v[k]]) == "string") 													// A valid string
-				who=k+":"+v[k];																			// Set who and trigger
+		for (i=0;i<v.length;++i) 																		// For each token
+			if (typeof(this.whoSyns[v[i]]) == "string") 												// A valid string
+				who=this.whoSyns[v[i]]+(both ? ":"+v[i] : "");											// Set canonical who[:trigger word]
 		return who;																						// Return last trigger:who 
 	}
+
+	GetAction(text)																					// GET ACTION FROM TEXT
+	{
+		let k,re;
+		if (!text)					return "";															// Quit if no text
+		if (!text.match(/please/i))	return "";															// Got to say please
+			for (k in this.actSyns)	{																		// For each action possible
+			re=new RegExp(k,"i");																		// Make regex
+			if (text.match(re))	return this.actSyns[k];													// Return action if found
+			}
+		return "";																						// Return action found
+		}
 
 	Compare(textA, textB)																			// HOW SIMILAR TWO STRINGS ARE
 	{
