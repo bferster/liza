@@ -80,10 +80,8 @@ class Voice {
 	Talk(text, who)																					// SAY SOMETHING
 	{
 		text=text.replace(/\{.*?\}/g,"");																// Remove any braced text
-		if (this.thoughtBubbles) {																		// Show thought bubbles instead of TTS
-			if (who == "instructor")	return;															// No need if instructor
-			var x=window.innerWidth/2;																	// Screen width
-			if (who != null) app.curStudent=who;														// Set specific student				
+		if (who == "Class") {																			// Show thought bubbles instead of TTS
+			Bubble(text);																				// Show
 			return;
 			}
 		try{																							// Try

@@ -14,12 +14,12 @@ class App  {
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
 		this.startTime=new Date().getTime();														// Session start time
-		this.pickingStudent="";																		// Flag for picking student
 		this.curClock=0;																			// Current clock time
 		this.sessionId="1";																			// Session id
 		this.responses=[];																			// Holds student responses
 		this.sessionData=[];																		// Holds session data
-		
+		this.curStudent="";																			// Currently active student
+
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
 		this.LoadFiles();																			// Load config and other files
@@ -91,7 +91,8 @@ class App  {
 					if (d[i].type == "student") this.AddStudent(d[i]);								// Add student
 					if (d[i].type == "action") 	app.nlp.AddSyns("action",d[i].id,d[i].text.split(",")); // Add action and its synonyms
 					}
-			})	
+				this.curStudent=app.students[0].id;													// Pick first student
+				})	
 			.then(res =>{ this.LoadSession("assets/session-67.csv"); })								// Load sample session	
 			.then(res =>{ this.LoadResponses("assets/responses.csv"); });							// Load responses
 	}
@@ -144,7 +145,8 @@ class App  {
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
-		app.curStudent=app.nlp.GetWho(text);														// Get current student
+		let stu=app.nlp.GetWho(text);																// Get student menitioned, if any
+		if (stu) app.curStudent=stu;																// Set new active student 
 		let act=app.nlp.GetAction(text);															// Set action
 		app.DoAction(act);																			// If a please + action mentioned, do it
 		app.GetIntent(text,(res)=>{ 																// Get intent from AI
@@ -154,24 +156,24 @@ class App  {
 		
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
-		let r=[],i;
+		let i,r=[];
 		trace(data)
 		if (data.intent.name == "addition") {
 			r=["The answer is 4, of course", "Would you believe 22?"]; 
-			i=Math.round(Math.random()*r.length);
+			i=Math.floor(Math.random()*r.length);
 			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|"+r[i]);			// Send response
 			}
 		else if (data.intent.name == "why") {
 			r=["I added them on my fingers", "Because I know how to add"]; 
-			i=Math.round(Math.random()*r.length);
+			i=Math.floor(Math.random()*r.length);
 			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|"+r[i]);			// Send response
 			}
-		}
+	}
 
 	DoAction(act)																				// PERFORM ACTION
 	{
 		let i;
-		if (!act)	return;																			// Quit if no act spec's
+		if (!act) return;																			// Quit if no act spec's
 		if (app.curStudent == "Class") 																// If the whole class
 			for (i=0;i<app.students.length;++i)														// For each student
 				animateIt(app.students[i].id);														// Animate them									
@@ -180,24 +182,27 @@ class App  {
 
 		function animateIt(student) {																// ANIMATE STUDENT
 			let seat=student ? app.students.find(x => x.id == student).seat : 0;					// Get seat number
-			if (act == "fidget")			app.students[seat].fidget=1;							// Route on action type									
-			else if (act == "fidgetStop")	app.students[seat].fidget=0;	
-			else if (act == "nextSlide")	app.bb.ShowSlide(1);	
-			else if (act == "lastSlide")	app.bb.ShowSlide(-1);	
-			else if (act == "firstSlide")	app.bb.ShowSlide(0,0);	
-			else app.sc.StartAnimation(student,app.seqs[act]);								
+			if (act == "fidget")			app.students[seat].fidget=1;							// Fidget								
+			else if (act == "fidgetStop")	app.students[seat].fidget=0;							// Off	
+			else if (act == "nextSlide")	app.bb.ShowSlide(1);									// Next slide
+			else if (act == "lastSlide")	app.bb.ShowSlide(-1);									// Last
+			else if (act == "firstSlide")	app.bb.ShowSlide(0,0);									// Restart
+			else 							app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+student+"|"+act); 	// Send response
 			}					
 	}
+
 	VideoChat()																					// OPEN VIDEO CHAT
 	{
 		$("#lz-videoChat").remove(); 																// Remove old one
 		let link="japp.htm?LizaChat~Session~"+app.sessionId+"&"+app.role;							// Make link
 		let str=`<div id="lz-videoChat" style="position:absolute;background-color:#999;
-		width:50%;height:${$(window).width()*.5625/2}px;top:120px;left:25%">
-		<img style="cursor:pointer;float:right;margin:4px;width:12px;pointer-events:auto" src="img/closedot.png"
-		onclick='$("#lz-videoChat").remove()'>
-		<iframe style="width:100%;height:100%" src="${link}" allow=camera;microphone;autoplay frameborder="0" allowfullscreen></iframe>`;
-		$("body").append(str.replace(/\t|\n|\r/g,""));											// Add it
+			width:50%;height:${$(window).width()*.5625/2}px;top:120px;left:25%">
+			<img style="cursor:pointer;float:right;margin:4px;width:12px;pointer-events:auto" src="img/closedot.png"
+			onclick='$("#lz-videoChat").remove()'>
+			<iframe style="width:100%;height:100%" src="${link}" 
+			allow=camera;microphone;autoplay frameborder="0" allowfullscreen>
+			</iframe>`;
+		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add it
 	}
 
 	InitSocketServer()																			// INIT SOCKET SERVER
@@ -257,7 +262,7 @@ class App  {
 		this.seqs["twistLeft"]="twistLeft,1";	this.seqs["twistRight"]="twistRight,1";
 
 		for (i=0;i<10;++i)																			// For each desk
-			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:0xcccccc} );	// Add desk
+			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:0xdddddd} );	// Add desk
 		this.LoadModels();										  									// Load 3D models
 		if (this.role != "Teacher")	this.rp.Draw();													// Show response menu if not teacher
 	}

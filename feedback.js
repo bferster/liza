@@ -19,7 +19,6 @@ class Feedback {
 	OnClick(e) 																					// ON SCREEN CLICK
 	{
 		if (e.target.localName != "canvas")	return;													// React only to canvas hits
-		app.curStudent="";																			// No one selected yet
 		clearInterval(app.fb.interval);																// Clear timer
 		$("#lz-feedbar").remove();																	// Remove old one
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point

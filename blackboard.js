@@ -28,7 +28,6 @@ class Blackboard  {
 		$("#BBClearBut").on("click", ()=> { app.bb.Clear(); });											// On clear button click
 		$("[id^=BB-]").on("click", function() { app.bb.ButtonRoute(this.id)	});							// On BB Drawing menu button click
 		$("#BBSideBut").on("click", ()=> { app.bb.SetSide(1-app.bb.curSide); });						// On side click, toggle
-
 		}
 
 	InitCanvas()																					// SET UP CANVASES
@@ -75,7 +74,6 @@ class Blackboard  {
 				this.startPosX=e.touches[0].clientX-$(this.curSideId).offset().left;					// Set start point X from touch event
 				this.startPosY=e.touches[0].clientY-$(this.curSideId).offset().top;						// Y		
 				}
-			app.arc.Add({ x:e.offsetX, y:e.offsetY, o:'M', s:this.curSide }); 							// Add to record
 			this.ctx[this.curSide].beginPath();
 			});
 
@@ -91,13 +89,11 @@ class Blackboard  {
 			this.ctx[this.curSide].lineTo(x,y);															// Set end point
 			this.ctx[this.curSide].stroke();															// Draw line
 			this.startPosX=x;	this.startPosY=y;														// Reset drawing start position to current position
-			app.arc.Add({ x:x, y:y, o: erase ? 'E' : 'D', s:this.curSide }); 							// Add to record
 			this.texMap[this.curSide].needsUpdate=true;													// Flag the tex map as needing updating
 			});
 			
 		$(this.curSideId).on("mouseup touchend", (e)=> { 												// ON MOUSE UP
 			this.paint=false; this.ctx[this.curSide].closePath(); 										// Close
-			app.arc.Add({ o:'U', s:this.curSide });	 													// Add to record
 			}); 
 	}
 
@@ -190,11 +186,9 @@ class Blackboard  {
 				this.ctx[this.curSide].fillRect(this.nextPosX,this.startPosY-this.fontHgt*.75,this.fontHgt,this.fontHgt);		// Clear last char
 				this.ctx[this.curSide].fillStyle="#fff";												// Text color
 				this.chars.pop();
-				app.arc.Add({ o:'X', x:this.nextPosX, y:this.startPosY, s:this.curSide });				// Add to record
 				return;																					// Quit	
 				}
 			if (e.keyCode < 32)	return;																	// No control chars																		
-			app.arc.Add({ x:Math.round(this.nextPosX), y:Math.round(this.startPosY), c:e.key, o:'T', s:this.curSide });	// Add to record
 			this.ctx[this.curSide].fillText(e.key, this.nextPosX,this.startPosY);						// Draw letter		
 			this.chars.push({ x:this.nextPosX, y:this.startPosY });										// Save char start												
 			this.nextPosX+=this.ctx[this.curSide].measureText(e.key).width;								// New start point to draw next letter					
@@ -207,7 +201,6 @@ class Blackboard  {
 		this.ctx[this.curSide].fillStyle=this.backCol;													// Color
 		this.ctx[this.curSide].fillRect(0,0,this.wid,this.hgt);											// Clear
 		this.texMap[this.curSide].needsUpdate=true;														// Flag the tex map as needing updating
-		app.arc.Add({ o:'X', s:this.curSide });															// Add to record
 	}
 	
 	SetSide(side)																					// CHANGE SIDE
