@@ -1,7 +1,0 @@
-version: "2.0"
-
-rules:
-- rule: imabot
-  steps:
-  - intent: bot_challenge
-  - action: utter_iamabot
