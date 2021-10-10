@@ -34,7 +34,7 @@ class App  {
 		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
 			}
-		if (!this.voice.hasRecognition)	$("#talkBut").hide(),$("#talkInput").show();				// This platform doesn't have voice recognition
+		if (!this.voice.hasRecognition)	$("#talkBut").hide();										// This platform doesn't have voice recognition
 
 		$("#settingsBut").on("click", ()=> { this.Settings();  });									// On settings button click	
 		$("#talkBut").on("click", ()=> { this.voice.Listen(); });									// On talk button click, start listening
