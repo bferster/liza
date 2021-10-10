@@ -26,7 +26,8 @@
 	1|Luis|INIT
 	1|Luis|TALK|Luis|Hello, I am Luis
 	1|Luis|ACT|Luis|standUp
-	1|Luis|GET
+	1|Luis|CHAT|All|on
+	1|Luis|VIDEO|All|on
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
@@ -57,8 +58,10 @@
 				str=v[0]+" "+v[1]+" -> "+req.socket.remoteAddress.substr(7);					// Add id, and IP
 				console.log("Meeting: "+str);													// Log client
 				}
-			if (v[2] == "TALK") 	Broadcast(v[0], message);									// Broadcast to everyone connected
-			else if (v[2] == "ACT") Broadcast(v[0], message);									// Broadcast 
+			if (v[2] == "TALK") 	  Broadcast(v[0], message);									// Broadcast TALK to everyone connected
+			else if (v[2] == "ACT")   Broadcast(v[0], message);									// ACT 
+			else if (v[2] == "CHAT")  Broadcast(v[0], message);									// CHAT
+			else if (v[2] == "VIDEO") Broadcast(v[0], message);									// VIDEO
 			});
 		} catch(e) { console.log(e) }
 	});

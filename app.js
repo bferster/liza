@@ -60,7 +60,7 @@ class App  {
 				$("#talkBut").show(),$("#talkInput").hide();										// Show mic button
 				}); 
 	
-		$("#videoBut").on("click", ()=> { this.VideoChat();	}); 									// ON VIDEO CHAT CLICK
+		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 	
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
@@ -77,6 +77,8 @@ class App  {
 		if (v[0] != this.sessionId)		return;														// Quit if wrong session
 		if (v[2] == "TALK") 	 		app.voice.Talk(v[4],v[3]);									// TALK
 		else if (v[2] == "ACT")  		app.sc.StartAnimation(v[3],app.seqs[v[4]]);					// ACT
+		else if (v[2] == "VIDEO")  		this.VideoChat();											// VIDEO
+		else if (v[2] == "CHAT")  		this.VideoChat();											// CHAT
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE

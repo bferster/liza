@@ -2,7 +2,7 @@ type,id,text,data
 student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,ability=.5,color=#076290,"
 student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
 student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,ability=.5,color=#e26d33,"
-student,Farrah,"farrah,farah,ferel,feral,farrell","sex=female,ability=.5,color=#9b4286,"
+student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara","sex=female,ability=.5,color=#9b4286,"
 student,Oliver,"oliver,liver","sex=male,ability=.5,color=#734325,"
 student,Class,"all,everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
 action,firstSlide,"begin slide,start slide",
@@ -20,8 +20,8 @@ action,fidgetStop,"stop fidget,stop squirm",
 action,fidget,fidget,
 action,armDown,"arm down,hand down,arms down,hands down",
 action,armUp,"arm up,hand up,arms up,hands up",
-action,nodYes,nod yes,
-action,nodNo,nod no,
+action,nodNo,"nod no,disagree",
+action,nodYes,"nod yes,agree",
 action,standUp,"stand,stand up,rise",
 action,sit,"setup,sit down,sit up,wake up",
 action,twistRight,"twist right,spin right,turn right",
