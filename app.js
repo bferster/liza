@@ -83,7 +83,7 @@ class App  {
 
 	LoadFiles()																					// LOAD CONFIG FILE
 	{	
-		fetch('assets/config.csv')																	// Load file
+		fetch('data/config.csv')																	// Load file
 			.then(res =>  res.text())																// Get as text
 			.then(res =>{ 																				
 				let i;
@@ -95,8 +95,8 @@ class App  {
 					}
 				this.curStudent=app.students[0].id;													// Pick first student
 				})	
-			.then(res =>{ this.LoadSession("assets/session-67.csv"); })								// Load sample session	
-			.then(res =>{ this.LoadResponses("assets/responses.csv"); });							// Load responses
+			.then(res =>{ this.LoadSession("data/session-67.csv"); })								// Load sample session	
+			.then(res =>{ this.LoadResponses("data/responses.csv"); });							// Load responses
 	}
 
 	AddStudent(d)																				// ADD STUDENT TO DATA
