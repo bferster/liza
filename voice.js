@@ -65,18 +65,6 @@ class Voice {
 		$("#talkBut").prop("src","img/intalkbut.png");													// Talking but
 	}
 
-	ReplacePhoneme(text)																			// REPLACE PHONETIC SYMBOL WITH SOUND
-	{
-		var i;
-		var s=this.phonemes;																			// Point at phoneme associative array																		
-		if (!text)	return "";																			// Quit if no text
-		var v=text.match(/\/.*?\//g);																	// Get symbols
-		if (v && v.length)																				// If any
-			for (i=0;i<v.length;++i)																	// For each symbol found
-				text=text.replace(RegExp(v[i].replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")),s[v[i]]); 	// Convert to sounds
-		return text;																					// Return converted text
-	}
-
 	Talk(text, who)																					// SAY SOMETHING
 	{
 		text=text.replace(/\{.*?\}/g,"");																// Remove any braced text

@@ -50,7 +50,7 @@ class App  {
 			if (e.shiftKey)	this.bb.ShowSlide(-1);													// Last slide
 			else			this.bb.ShowSlide(1);													// Next slide
 			}); 
-		$("#muteBut").on("click", ()=> { 															// On mute button clck
+		$("#muteBut").on("click", ()=> { 															// On mute button click
 			if (app.voice.thoughtBubbles) 	$("#muteBut").prop("src","img/unmutebut.png");			// If was muted, show unmute icon
 			else 							$("#muteBut").prop("src","img/mutebut.png");			// Mute icon
 			app.voice.thoughtBubbles=!app.voice.thoughtBubbles;										// Toggle flag
@@ -75,10 +75,13 @@ class App  {
 		if (!event.data)			 	return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
 		if (v[0] != this.sessionId)		return;														// Quit if wrong session
-		if (v[2] == "TALK") 	 		app.voice.Talk(v[4],v[3]);									// TALK
-		else if (v[2] == "ACT")  		app.sc.StartAnimation(v[3],app.seqs[v[4]]);					// ACT
-		else if (v[2] == "VIDEO")  		this.VideoChat();											// VIDEO
-		else if (v[2] == "CHAT")  		this.VideoChat();											// CHAT
+		if (v[2] == "TALK") {																		// TALK
+			if (this.role != v[3])  								app.voice.Talk(v[4],v[3]);		// Someone else talking
+		 	if ((v[3] == "Teacher") && (this.role != "Teacher"))	Bubble(v[4]);					// Teacher not talking to herself
+			}
+		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
+		else if (v[2] == "VIDEO")  	this.VideoChat();												// VIDEO
+		else if (v[2] == "CHAT")  	this.VideoChat();												// CHAT
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE
@@ -144,33 +147,35 @@ class App  {
  		.then(data => callback(data))
 		}
 
-
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
 		let stu=app.nlp.GetWho(text);																// Get student menitioned, if any
 		if (stu) app.curStudent=stu;																// Set new active student 
 		let act=app.nlp.GetAction(text);															// Set action
 		app.DoAction(act);																			// If a please + action mentioned, do it
+		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+text);							// Send remark
 		app.GetIntent(text,(res)=>{ 																// Get intent from AI
-			app.GenerateResponse(text,res);															// Generate response
+			let r=app.GenerateResponse(text,res);													// Generate response
+			trace(res,r)
 			});
 	}
 		
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
 		let i,r=[];
-		trace(data)
 		if (data.intent.name == "addition") {
 			r=["The answer is 4, of course", "Would you believe 22?"]; 
 			i=Math.floor(Math.random()*r.length);
 			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|"+r[i]);			// Send response
+			return r[i];
 			}
 		else if (data.intent.name == "why") {
 			r=["I added them on my fingers", "Because I know how to add"]; 
 			i=Math.floor(Math.random()*r.length);
 			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|"+r[i]);			// Send response
+			return r[i];
 			}
-	}
+		}
 
 	DoAction(act)																				// PERFORM ACTION
 	{
