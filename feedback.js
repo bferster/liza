@@ -214,15 +214,16 @@ class ResponsePanel  {
 				<div style="width:calc(50% - 16px);height:120px;padding:8px">
 					<div class="lz-rptitle">said to ${app.role}</div><p>${remark}</p>
 				</div>
-				<div style="width:100%;margin:18px 0;text-align:center"><b>Choose a response:</b></div>
+				<div style="width:100%;height:18px"></div>
 				<span id="lztab-0" class="lz-rptab">LANGUAGE</span>
 				<span id="lztab-1" class="lz-rptab">EVIDENCE</span> 
 				<span id="lztab-2" class="lz-rptab">THINKING</span> 
 				<span id="lztab-3" class="lz-rptab">DISRUPTION</span> 
 				<div id="lz-rplist" class="lz-rplist"></div>
 		</div>
-		<div style="margin:8px 12px;text-align:left">
-			<select id="lzSeqs" class="lz-is" style="width:auto"></select>
+		<div style="margin:8px 12px">
+			<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
+			<img id="lz-chatBut" src="img/sendtext.png" title="Message teacher" style="cursor:pointer">
 			<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none"></select>
 			</div>`;
 
@@ -230,7 +231,14 @@ class ResponsePanel  {
 		addSeqs();																					// Add possible moves to select
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		
-		$("[id^=lztab-]").on("click", (e)=>{ 														// ON TAB CLICK
+	
+		$("#lz-chatBut").on("click", ()=> {															// ON MESSAGE TEACHER
+			GetTextBox("Message teacher", "Type messge to send to teacher", "", (s)=>{				// Text box
+				app.ws.send(app.sessionId+"|"+app.role+"|CHAT|Teacher|"+s);							// Send message
+				});
+			});
+		
+		$("[id^=lztab-]").on("click", (e)=> { 														// ON TAB CLICK
 			let id=e.target.id.substr(6);															// Get id
 			$("[id^=lztab-]").css({"font-weight":"200","color":"#666"});							// Revert
 			$("#lztab-"+id).css({"font-weight":"700","color":"#333"});								// Highlight
@@ -240,13 +248,13 @@ class ResponsePanel  {
 		$("#lztab-0").trigger("click");																// Fill list (must be after handler)
 			if (window.location.search.match(/role=coach/i)) addRoles();							// Add sudent roles if coach
 
-		$("#lzSeqs").on("change", ()=>  {															// RUN SEQUENCE
+		$("#lzSeqs").on("change", ()=> {															// ON RUN SEQUENCE
 			if (app.role == "Coach") return;														// Not in coach role
 			app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
 			$("#lzSeqs").prop("selectedIndex",0);													// Reset pulldowns
 			});
 
-		$("#lzActs").on("change", ()=>  {															// CHANGE ROLE
+		$("#lzActs").on("change", ()=> {															// ON CHANGE ROLE
 			if (!$("#lzActs").prop("selectedIndex"))	return;										// Skip 1st one
 			app.role=$("#lzActs").val();															// Set new role
 			this.Draw();																			// Redraw															

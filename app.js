@@ -79,9 +79,9 @@ class App  {
 			if (this.role != v[3])  								app.voice.Talk(v[4],v[3]);		// Someone else talking
 		 	if ((v[3] == "Teacher") && (this.role != "Teacher"))	Bubble(v[4]);					// Teacher not talking to herself
 			}
+		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5); }		// CHAT
 		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
 		else if (v[2] == "VIDEO")  	this.VideoChat();												// VIDEO
-		else if (v[2] == "CHAT")  	this.VideoChat();												// CHAT
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE
