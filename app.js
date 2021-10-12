@@ -30,6 +30,7 @@ class App  {
 		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
 
+		this.multi=window.location.search.match(/role=/i) ? true : false;							// Multi-player mode
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
@@ -77,11 +78,18 @@ class App  {
 		if (v[0] != this.sessionId)		return;														// Quit if wrong session
 		if (v[2] == "TALK") {																		// TALK
 			if (this.role != v[3])  								app.voice.Talk(v[4],v[3]);		// Someone else talking
-		 	if ((v[3] == "Teacher") && (this.role != "Teacher"))	Bubble(v[4]);					// Teacher not talking to herself
+//		 	if ((v[3] == "Teacher") && (this.role != "Teacher"))	Bubble(v[4]);					// Teacher not talking to herself
 			}
 		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5); }		// CHAT
 		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
 		else if (v[2] == "VIDEO")  	this.VideoChat();												// VIDEO
+		else if (v[2] == "AUDIO")  	{																// AUDIO
+			fetch(v[4])
+			.then(res  =>  res.blob())																// Get as text
+			.then(blob =>{ 
+				new Audio(URL.createObjectURL(blob)).play(); 
+			} )																				
+		}	
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE

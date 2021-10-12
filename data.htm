@@ -51,6 +51,7 @@
 
 	let rawData=[], intents=[], responses=[], keyWords=[];
 	let nlp=new NLP();																				// Alloc NLP class
+	OAIGet();
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();
@@ -191,6 +192,29 @@
 			body: JSON.stringify({text:msg})		
 			})
 		}
+
+	function OAIGet(msg)																	// GET RESPONSE FROM AI
+	{
+		let body={
+		"prompt": "The following is a list of companies and the categories they fall into\n\nFacebook: Social media, Technology\nLinkedIn: Social media, Technology, Enterprise, Careers\nUber: Transportation, Technology, Marketplace\nUnilever: Conglomerate, Consumer Goods\nMcdonalds: Food, Fast Food, Logistics, Restaurants\nFedEx:",
+		"temperature": 0,
+		"max_tokens": 6,
+		"top_p": 1.0,
+		"frequency_penalty": 0.0,
+		"presence_penalty": 0.0,
+		"stop": ["\n"]
+		}
+
+		const url="https://api.openai.com/v1/engines/davinci/completions"
+		let token="sk-u4nGW65-X-gajLxEDQlh9OTT3BlbkF-X-JHp7xp1JaQ5HJT7Ca3pqs".replace(/-X-/g,"");	// Get token
+		fetch(url,{ method:"POST",
+			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
+			  body: JSON.stringify(body)
+			  })	
+	  	.then(res => res.json()).then(res =>{ trace(res); })
+	
+	}
+
 
 
 	function MakeStories(mask)																	// MAKE ALL FILES

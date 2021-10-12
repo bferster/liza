@@ -17,7 +17,60 @@
 			<br><br>
 			<div id="outp"></div>
 		</div>
+
 	
+
+		<a id="download">Download</a>
+		<button id="stop">Stop</button>
+
+		<script>
+		  const downloadLink = document.getElementById('download');
+		  const stopButton = document.getElementById('stop');
+		
+		  const handleSuccess = function(stream) {
+			const options = {mimeType: 'audio/webm'};
+			const mediaRecorder = new MediaRecorder(stream, options);
+		
+			mediaRecorder.addEventListener('dataavailable', function(e) {
+			 if (e.data.size > 0) {
+				 trace(e)
+			let a=[]
+						if (a.length < 1) a.push(e.data);
+//					new Audio(URL.createObjectURL(new Blob(a))).play();
+		  				}
+					   
+			});
+		
+			stopButton.addEventListener('click', function() {
+			  mediaRecorder.stop();
+				});
+		
+			mediaRecorder.start(1000);
+		  };
+		
+		  navigator.mediaDevices.getUserMedia({ audio:true, video:false })
+		  	.then(handleSuccess);
+		
+	
+
+
+
+
+function trace(msg, p1, p2, p3, p4)																// CONSOLE 
+{
+	if (p4 != undefined)
+		console.log(msg,p1,p2,p3,p4);
+	else if (p3 != undefined)
+		console.log(msg,p1,p2,p3);
+	else if (p2 != undefined)
+		console.log(msg,p1,p2);
+	else if (p1 != undefined)
+		console.log(msg,p1);
+	else
+		console.log(msg);
+}
+	</script>
+/*
 	<script>
 
 	function ParseMsg(msg)
@@ -53,6 +106,7 @@
 	$("#inp").on("change",()=>{ ParseMsg($("#inp").val()); });
 	
 	</script>
+	*/
 	</body>
 </html>
 

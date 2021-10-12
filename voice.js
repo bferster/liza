@@ -9,6 +9,7 @@ class Voice {
 		var _this=this;
 		this.hasRecognition=false;																		// Assume no STT
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
+		this.mediaRecorder=null;																		// Holds audio capture
 		this.listening=false;																			// Flag if listening
 		this.talkStartTime=0;																			// Time started talking
 		try {																							// Try
@@ -39,13 +40,18 @@ class Voice {
 				};	
 
 			} catch(e) { trace("TTS error",e) };														// On error
+		
 		try {																							// Try
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.recognition=new SpeechRecognition();													// Init STT
 			this.recognition.continuous=false;															// Continual recognition off
 			this.recognition.lang="en-US";																// US English
 			this.recognition.interimResults=true
-			this.recognition.onend=(e)=> { $("#talkBut").prop("src","img/talkbut.png"); this.listening=false; };	// On end, restore button
+			this.recognition.onend=(e)=> { 																// ON STT END
+				$("#talkBut").prop("src","img/talkbut.png"); 											// Restore button
+				this.listening=false; 																	// Set flag
+				if (this.mediaRecorder)	this.mediaRecorder.stop();										// Stop audio capture
+				};
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 
 			this.recognition.onresult=(e)=> { 															// On some speech recognized
@@ -55,13 +61,34 @@ class Voice {
 					}
 				};
 			} catch(e) { trace("Voice error",e) };														// On error
-	}
+	
+		try {/*																							// Try
+				navigator.mediaDevices.getUserMedia({ audio:true, video:false })						// Open RTC audio capture
+				.then((stream)=>{																		// On open
+					this.mediaRecorder=new MediaRecorder(stream, { mimeType:"audio/webm" });			// Open recorder
+					this.mediaRecorder.addEventListener('dataavailable', (e)=> {						// On data in from microphone
+						let reader = new FileReader();
+						reader.readAsDataURL(e.data); 
+						reader.onloadend=()=>{
+							app.ws.send(app.sessionId+"|"+app.role+"|AUDIO|Teacher|"+reader.result); 		// Send to server
+							}
+					});
+				});
+	
+			*/} catch(e) { trace("Audio capture error",e) };												// On error
+		}
 
 	Listen()																						// TURN ON SPEECH RECOGNITIOM
 	{
 		if (this.listening)	return;																		// Quit if already started
 		this.talkStartTime=new Date().getTime();														// Record start talk time
-		try { this.recognition.start(); this.listening=true; } catch(e) { trace("Voice error",e) };		// Start recognition
+		
+		try { 
+			this.recognition.start(); 																	// Start recognition
+			this.listening=true; 																		// We're listening
+			if (this.mediaRecorder)	this.mediaRecorder.start(1000);										// Start audio capture
+		} catch(e) { trace("Voice error",e) };															// On errir
+		
 		$("#talkBut").prop("src","img/intalkbut.png");													// Talking but
 	}
 
@@ -73,11 +100,12 @@ class Voice {
 			return;
 			}
 		try{																							// Try
+			trace(who)
 			speechSynthesis.cancel();																	// Clear current speech queue			
 			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice
 			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex
 			if (who == "male")			this.tts.voice=this.voices[this.maleVoice];						// Set male voice
-			else 						this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
+			else if (who == "female") 	this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
 			if (who != "Teacher") 		this.talking=1;													// Trigger mouth animation if a student
 			this.tts.text=text;																			// Set text
 			speechSynthesis.speak(this.tts);															// Speak

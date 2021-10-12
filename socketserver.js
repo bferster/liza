@@ -55,6 +55,7 @@
 			let v=message.split("|");															// Get params
 			if (v[2] == "INIT") { 																// No id 
 				webSocket.meetingId=v[0];														// Set meeting id
+				webSocket.senderId=v[1];														// Set sender id
 				str=v[0]+" "+v[1]+" -> "+req.socket.remoteAddress.substr(7);					// Add id, and IP
 				console.log("Meeting: "+str);													// Log client
 				}
@@ -62,6 +63,7 @@
 			else if (v[2] == "ACT")   Broadcast(v[0], message);									// ACT 
 			else if (v[2] == "CHAT")  Broadcast(v[0], message);									// CHAT
 			else if (v[2] == "VIDEO") Broadcast(v[0], message);									// VIDEO
+			else if (v[2] == "AUDIO") Broadcast(v[0], message,true);							// AUDIO
 			});
 		} catch(e) { console.log(e) }
 	});
@@ -84,7 +86,7 @@
 				if (client.meetingId == meetingId) 												// In this meeting
 					if (client.readyState === WebSocket.OPEN) client.send(msg);					// Send to client
 				});
-			trace("Broadcast",msg);																// Log truncated message												
+			trace("Broadcast",msg.substr(0,128));												// Log truncated message												
 		} catch(e) { console.log(e) }
 	}
 
