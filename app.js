@@ -39,7 +39,7 @@ class App  {
 
 		$("#settingsBut").on("click", ()=> { this.Settings();  });									// On settings button click	
 		$("#talkBut").on("click", ()=> { this.voice.Listen(); });									// On talk button click, start listening
-		$("#helpBut").on("click", ()=> { this.ShowHelp(); });										// On help button click, show help
+		$("#helpBut").on("click", ()=> { ShowHelp(); });											// On help button click, show help
 		$("#writeBut").on("click", ()=> { 															// On BB button clck
 			$("#lz-feedbar").remove();																// Remove feedback panel
 			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
@@ -324,24 +324,6 @@ class App  {
 			app.LoadProject(ids[this.selectedIndex]);												// Load project
 			$("#settingsEditor").remove(); 															// Kill settings
 			});
-	}
-
-	ShowHelp() 																					// SHOW HELP
-	{
-		if ($("#helpDiv").length) {																	// If already up, bring it down
-			$("#helpDiv").hide("slide",{ direction:"down", complete: ()=>{ $("#helpDiv").remove(); } }); // Slide down
-			return;																					// Quit																					
-			}
-		var h=window.innerHeight;
-		var str="<div id='helpDiv' class='lz-dialog'style='height:"+(h-106)+"px;overflow:hidden;display:none;;left:calc(100vw - 646px)'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
-		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
-		str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vTXAsMJ-YlQaNtT49RtKvEnT5v5Xzz-TKPyVlo2px-23vDt-4lZFB7JujSKyDXs38hiSMISQoulYXB5/pub?embedded=true' ";
-		str+="style='border: 1px solid #999;width:100%;height:"+(h-154)+"px' scrolling='yes'></iframe></div>";
-		$("body").append(str);																		// Add to body
-		$("#helpDiv").show("slide",{ direction:"down" });											// Slide up
-		if (!isMobile)	$("#helpDiv").draggable();													// Make it draggable on desktop
-		$("#helpDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );			// Don't move orbiter
 	}
 
 } // App class closure
