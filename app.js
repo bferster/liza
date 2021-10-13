@@ -190,13 +190,26 @@ class App  {
 		$("#lz-videoChat").remove(); 																// Remove old one
 		let link="japp.htm?LizaChat~Session~"+app.sessionId+"&"+app.role;							// Make link
 		let str=`<div id="lz-videoChat" style="position:absolute;background-color:#999;
-			width:50%;height:${$(window).width()*.5625/2}px;top:120px;left:25%">
-			<img style="cursor:pointer;float:right;margin:4px;width:12px;pointer-events:auto" src="img/closedot.png"
+			width:66%;height:${$(window).width()*.5625*.66}px;top:12%;left:17%">
+			<span id="co-ift"style="cursor:pointer;margin-left:4px;float:left;pointer-events:auto;color:#fff">Minimize window</span>
+			<img style="cursor:pointer;float:right;margin:4px;pointer-events:auto;width:12px" src="img/closedotw.gif"
 			onclick='$("#lz-videoChat").remove()'>
 			<iframe style="width:100%;height:100%" src="${link}" 
 			allow=camera;microphone;autoplay frameborder="0" allowfullscreen>
 			</iframe>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add it
+
+		$("#co-ift").on("click", ()=>{																// ON SMALLER BUT
+			let w=$(window).width()*.66,h=w*.5625;													// Default size
+			let x=17,y=12;
+			if ($("#co-ift").text() == "Minimize window")	{										// If reducing
+				w=$(window).width();	h=32;	x=0;  y=0;											// Small size
+				$("#co-ift").text("Maximize");														// Change title
+				}
+			else $("#co-ift").text("Minimize window");												// Restore title		
+			$("#lz-videoChat").css({width:w+"px", height:h+"px", left:x+"%",top:y+"%"});			// Set size
+			});	
+
 	}
 
 	InitSocketServer()																			// INIT SOCKET SERVER

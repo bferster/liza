@@ -152,7 +152,7 @@
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="slideBut" src="img/nextslide.gif" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="writeBut" src="img/drawbut.gif" title="Lesson map" style="cursor:pointer;margin-right:16px;float:right">
-		<img id="videoBut" src="img/zoom.png" title="Video chat" style="cursor:pointer;margin-right:16px;float:right;display:none">
+		<img id="videoBut" src="img/zoom.png" title="Video chat" style="cursor:pointer;margin-right:16px;float:right">
 		<div style="color:#eee;font-size:12px;float:right; margin: 4px 16px">StageTools &copy;2021</div>
 	</div>
 	<div id='blackboardDiv' class='lz-blackboard'>
@@ -193,13 +193,11 @@ var isMobile=false;																					// Flag for mobile devices
 				$("#splashDiv").fadeOut();															// Fade out splash
 				$("#mainDiv").fadeIn(2000);															// Fade in main
 				$("#controllerDiv").fadeIn(2000);													// Fade in controller
-				if (window.location.search.match(/role=/i))	$("#videoBut").fadeIn(2000);			// Video chat button
 				})
 			}
 		else{																						// Debug
 			$("#mainDiv").fadeIn(0);																// Load fast
 			$("#controllerDiv").fadeIn(0);															// Controller too
-			if (window.location.search.match(/role=/i))	$("#videoBut").fadeIn(0);					// Video chat button
 			}
 
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
