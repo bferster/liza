@@ -71,24 +71,6 @@ class App  {
 			});															
 	}
 
-	SocketIn(event)																				// A WEBSOCKET MESSAGE
-	{
-		if (!event.data)			 	return;														// Quit if no data
-		let v=event.data.split("|");																// Get params
-		if (v[0] != this.sessionId)		return;														// Quit if wrong session
-		if ((v[2] == "TALK") && (this.role != v[3])) app.voice.Talk(v[4],v[3]);						// TALK
-		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5); }		// CHAT
-		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
-		else if (v[2] == "VIDEO")  	this.VideoChat();												// VIDEO
-		else if (v[2] == "AUDIO")  	{																// AUDIO
-			fetch(v[4])
-			.then(res  =>  res.blob())																// Get as text
-			.then(blob =>{ 
-				new Audio(URL.createObjectURL(blob)).play(); 
-			} )																				
-		}	
-	}
-
 	LoadFiles()																					// LOAD CONFIG FILE
 	{	
 		fetch('data/config.csv')																	// Load file
@@ -241,6 +223,27 @@ class App  {
 				}
 			},1000)
 		}
+	}
+
+	SocketIn(event)																				// A WEBSOCKET MESSAGE
+	{
+		if (!event.data)			 return;														// Quit if no data
+		let v=event.data.split("|");																// Get params
+		if (v[0] != this.sessionId)	return;															// Quit if wrong session
+		if (v[2] == "TALK") {																		// TALK
+			if (this.role != v[3]) 	app.voice.Talk(v[4],v[3]);										// Not same as me				
+			else					Bubble(v[4]);													// Show text bubble instwad
+			}
+		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5); }		// CHAT
+		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
+		else if (v[2] == "VIDEO")  	this.VideoChat();												// VIDEO
+		else if (v[2] == "AUDIO")  	{																// AUDIO
+			fetch(v[4])
+			.then(res  =>{ res.blob() })															// Get as blob
+			.then(blob =>{ 
+				new Audio(URL.createObjectURL(blob)).play(); 
+			} )																				
+		}	
 	}
 
 	InitClassroom()																				// INIT CLASSROOM

@@ -55,15 +55,17 @@
 							border-radius: 100px; background-color: #d7ebff; border: 1px solid #999; 
 							font-size: 16px; text-align:center; display: none;
 							}
-		.lz-rpback { 		position:absolute; width:29%; height:100vh; top:0; left:0; background-color:#aaa; text-align:center;
+		.lz-rpback { 		position:absolute; width:29%; height:calc(100vh - 72px); top:12px; left:12px; padding:3px;
+							border-radius:8px; border:1px solid #999; background-color:#aaa; text-align:center;
 							}
-		.lz-rpinner { 		display:flex; flex-wrap:wrap; width:calc(100% - 25px); 
+		.lz-rpinner { 		display:flex; flex-wrap:wrap; width:calc(100% - 25px); border-radius:8px;
 							user-select:none; text-align:center; background-color:#eee; padding:12px;
 							}
-		.lz-rplist { 		text-align:left; overflow-y:auto; width:calc(100% - 24px); height:calc(100vh - 264px); padding:16px;
-							border:1px solid #aaa; border-radius:8px; background-color:#fff;
+		.lz-rplist { 		text-align:left; overflow-y:auto; width:calc(100% - 24px); max-height:calc(100vh - 312px); padding:0 16px;
+							border:1px solid #aaa; border-radius:8px; background-color:#fff; border-top-left-radius:0; border-top-right-radius:0; border-top:none;
 							}
-		.lz-rptab {			width:25%; cursor:pointer; font-size:11px;
+		.lz-rptab {			width:calc(25% - 4px); cursor:pointer; font-size:11px; background-color:#eee; padding:4px 0; border:1px solid #999;
+							border-radius:6px; margin-right: 2px; border-bottom-left-radius:0; border-bottom-right-radius:0; border-bottom:none; background-color:#fff; 
 							}
 		.lz-rptitle {		width:100%; display:inline-block; font-size:24px; font-family:Chalk; text-align:center; font-weight:600;
 							}

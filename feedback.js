@@ -208,23 +208,23 @@ class ResponsePanel  {
 		$("#lz-rpback").remove();																	// Remove old one
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
-				<div style="width:calc(50% - 24px);border-right:1px solid #999;height:120px;padding:8px">
+				<div style="width:calc(50% - 18px);border-right:1px solid #999;height:120px;padding:8px">
 					<div class="lz-rptitle">${intent}</div><p>${intentDesc}</p>	
 				</div>
-				<div style="width:calc(50% - 16px);height:120px;padding:8px">
+				<div style="width:calc(50% - 18px);height:120px;padding:8px">
 					<div class="lz-rptitle">said to ${app.role}</div><p>${remark}</p>
 				</div>
 				<div style="width:100%;height:18px"></div>
 				<span id="lztab-0" class="lz-rptab">LANGUAGE</span>
 				<span id="lztab-1" class="lz-rptab">EVIDENCE</span> 
 				<span id="lztab-2" class="lz-rptab">THINKING</span> 
-				<span id="lztab-3" class="lz-rptab">DISRUPTION</span> 
-				<div id="lz-rplist" class="lz-rplist"></div>
-		</div>
-		<div style="margin:8px 12px">
-			<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
-			<img id="lz-chatBut" src="img/sendtext.png" title="Message teacher" style="cursor:pointer">
-			<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none"></select>
+				<span id="lztab-3" class="lz-rptab" style="width:calc(25% - 4px)">DISRUPTION</span> 
+				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:100vh" : ""}"></div>
+				<div style="flex-grow:1;margin-top:12px">
+					<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
+					<img id="lz-chatBut" src="img/sendtext.png" title="Message teacher" style="cursor:pointer">
+					<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none"></select>
+				</div>
 			</div>`;
 
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
@@ -240,8 +240,8 @@ class ResponsePanel  {
 		
 		$("[id^=lztab-]").on("click", (e)=> { 														// ON TAB CLICK
 			let id=e.target.id.substr(6);															// Get id
-			$("[id^=lztab-]").css({"font-weight":"200","color":"#666"});							// Revert
-			$("#lztab-"+id).css({"font-weight":"700","color":"#333"});								// Highlight
+			$("[id^=lztab-]").css({"font-weight":"200","color":"#666","border-bottom":"1px solid #999"});	// Revert
+			$("#lztab-"+id).css({"font-weight":"700","color":"#333","border-bottom":"none"});		// Highlight
 			fillList(id);																			// Fill list
 			});
 		
@@ -290,7 +290,6 @@ class ResponsePanel  {
 			$("#lzActs").empty();																	// Clear select
 			$("#lzActs").append("<option>Choose role to play</option>");							// Add choose
 			for (var i=0;i<app.students.length;++i) $("#lzActs").append("<option>"+app.students[i].id+"</option>");	// Add option
-			$("#lzActs").append("<option>Teacher</option>");										// Add teacher
 			$("#lzActs").append("<option>Coach</option>");											// Add coach
 			}
 		}
