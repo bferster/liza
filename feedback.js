@@ -55,9 +55,9 @@ class Feedback {
 		<div id="sliderTime" class="lz-slidertime"></div>
 		<div id="timeSlider" class="lz-timeslider"></div>
 		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 62px);top:184px;width:18px;cursor:pointer">`;
-	
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 
+		if (isMobile) $("#lz-feedbar").css("top",window.innerHeight-256+"px");						// IOS issue
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 	
 		$("[id^=lzDot-]").on("mouseover",(e)=>{ 													// Show chat if over
@@ -229,6 +229,8 @@ class ResponsePanel  {
 
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		addSeqs();																					// Add possible moves to select
+		if (isMobile) $("#lz-rpback").height(window.innerHeight-70);								// IOS issue
+		if (isMobile) $("#lz-rplist").height(window.innerHeight-312);								// IOS issue
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		
 	
