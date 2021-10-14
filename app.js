@@ -34,6 +34,7 @@ class App  {
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
+			if (v[i] && v[i].match(/s=/)) this.sessionId=v[i].substr(2) 							// Get session	
 			}
 		if (!this.voice.hasRecognition)	$("#talkBut").hide();										// This platform doesn't have voice recognition
 
