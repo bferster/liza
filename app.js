@@ -224,7 +224,7 @@ class App  {
 		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
 		this.ws.onopen=()=> { 																		// ON OPEN
 			console.log('connected'); 																// Showconnected
-			this.ws.send("1|"+this.role+"|INIT");													// Init																	
+			this.ws.send(this.sessionId+"|"+this.role+"|INIT");										// Init																	
 			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
 			++this.secs;																			// Another second 
 			if (this.retryWS) {																		// If reconnecting to websocket
@@ -243,6 +243,7 @@ class App  {
 	{
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
+trace(v)
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[2] == "TALK") {																		// TALK
 			if (this.role != v[3]) 	app.voice.Talk(v[4],v[3]);										// Not same as me				

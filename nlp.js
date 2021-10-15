@@ -37,7 +37,7 @@ class NLP {
 		let k,re;
 		if (!text)					return "";															// Quit if no text
 		if (!text.match(/please/i))	return "";															// Got to say please
-			for (k in this.actSyns)	{																		// For each action possible
+		for (k in this.actSyns)	{																		// For each action possible
 			re=new RegExp(k,"i");																		// Make regex
 			if (text.match(re))	return this.actSyns[k];													// Return action if found
 			}
