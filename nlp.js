@@ -10,6 +10,11 @@ class NLP {
 		this.syns=[];																					// Synonyms
 		this.whoSyns=[];																				// Who synonyms
 		this.actSyns=[];																				// Action synonyms
+		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","you","your","yours",		// Stop word list
+			"yourself","yourselves","he","him","his","himself","she","her","hers","herself","it","its",
+			"itself","they","them","their","theirs","themselves","this","that","these","those","am","is",
+			"are","was","were","be","been","have","has","had","having","do","does","doing","a","an",
+			"the","and","if","or","as","of","at","by","for","with","to","again","so","than","too","can" ];
 	}
 
 	AddSyns(type, word, syns)																		// SET SYNONYMS ARRAY
@@ -116,19 +121,27 @@ class NLP {
 		return this.VecDotProduct(vecA, vecB) / (this.VecMagnitude(vecA) * this.VecMagnitude(vecB));
 	}
 
-	Tokenize(text) 
+	Tokenize(text) 																					// TOKENIZE TEXT STRING
 	{
 		text=(" "+text).replace(/\{.*?\}/g,"");															// Remove text in braces
 		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
-		text=text.replace(/\W(the|a|so|from|in|we|it|and|you|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will)\W/ig," ");	// Remove stop words
-		text=text.replace(/\W(going|this|that|these|has|had|get|you|your|did|for|and|um|er|hmm|hm|i'm|yeah)\W/ig," ");	// Remove stop words
-		text=text.replace(/\W(the|a|so|from|in|we|it|and|you|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will)\W/ig," ");	// Remove stop words afain?
-		text=text.replace(/\W(going|this|that|these|has|had|get|you|your|did|for|and|um|er|hmm|hm|i'm|yeah)\W/ig," ");	// Remove stop words
-		return text.split(/ +/);																		// Tokenize
+		return text.split(/ +/);																		// Tokenize and return
+	}
+
+	CleanText(text, minSize)																		// PREPROCESS/CLEAN TEST
+	{
+		let i,res=[];
+		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
+		let words=text.split(/ +/);																		// Tokenize
+		for (i=0;i<words.length;i++) 																	// For each word
+			if (!this.stopWords.includes(words[i]) && (words[i].length > minSize)) 						// If not a stop word and big enough
+				res.push(this.Stem(words[i]));															// Add to list
+	 	return res.join(' ').trim();																	// Put text back together
 	}
 
 	Stem(w) 																						// STEM WORD USING PORTER 1980 METHOD
 	{
+		return w;
 		let step2list = {
 					"ational" : "ate",	"tional" : "tion",	"enci" : "ence",  	"anci" : "ance",	"izer" : "ize",
 					"bli" : "ble",		"alli" : "al",		"entli" : "ent",	"eli" : "e",		"ousli" : "ous",
@@ -149,7 +162,6 @@ class NLP {
 		let stem,suffix,firstch,re,re2,re3,re4;
 
 		if (w.length < 3) { return w; }
-		w=w.replace(/-|'|\"|\(|\)|\[|\]|\{|\}|\<|\>|\\|\//g,"");									// No non-word chars
 		
 		firstch = w.substr(0,1);
 		if (firstch == "y") 	w = firstch.toUpperCase() + w.substr(1);
@@ -251,6 +263,11 @@ class NLP {
 	if (firstch == "y") w = firstch.toLowerCase() + w.substr(1);
 		
 	return w;
+	}
+
+
+	StopWords(text)
+	{
 	}
 
 } // NLP class closure

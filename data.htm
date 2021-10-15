@@ -238,13 +238,7 @@
 						re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");							// Make regex
 						s=s.replace(re,"STUDENT");													// Encode entity
 						}
-				v=nlp.Tokenize(s);
-				vv=[];
-				for (j=0;j<v.length;++j) 
-					if (v[j] && v[j].length > 2)
-						vv.push(nlp.Stem(v[j]));													// Stem and add
-				d+="    - "+vv.join(" ").trim()+"\n";												// Merge back and add
-				
+					d+="    - "+nlp.CleanText(s,3)+"\n";											// Clean and add
 				}
 			}
 			trace(d)
