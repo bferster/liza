@@ -144,8 +144,8 @@
 		for (i=0;i<rawData.length;++i) {															// For each line
 			v=nlp.Tokenize(rawData[i].text);														// Tokenize line
 			for (j=0;j<v.length;++j) 																// For each word															
-				if (v[j].length > 4)																// If big enough	
-					keyWords.push(v[j]);															// Add to key word list	
+				if (v[j].length > 3)																// If big enough	
+					keyWords.push(nlp.Stem(v[j]));													// Add to key word list	
 			}
 		keyWords=[... new Set(keyWords)];															// Make unique
 	}
@@ -214,8 +214,6 @@
 	  	.then(res => res.json()).then(res =>{ trace(res); })
 	
 	}
-
-
 
 	function MakeStories(mask)																	// MAKE ALL FILES
 	{
@@ -532,6 +530,8 @@ POST https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/123
 		if (v[4]) t+=v[4]/1000;																		// Ms
 		return t;																					// Return time in ms
 	}
+
+
 
 </script>
 </body>
