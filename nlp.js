@@ -120,9 +120,12 @@ class NLP {
 	{
 		text=(" "+text).replace(/\{.*?\}/g,"");															// Remove text in braces
 		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
-		text=text.replace(/\W(the|a|so|from|in|we|it|and|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will|going|this|that,these|has|had|get)\W/g," ");	// Remove stop words
-		return text.split(/ +/);																	// Tokenize
-		}
+		text=text.replace(/\W(the|a|so|from|in|we|it|and|you|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will)\W/ig," ");	// Remove stop words
+		text=text.replace(/\W(going|this|that|these|has|had|get|you|your|did|for|and|um|er|hmm|hm|i'm|yeah)\W/ig," ");	// Remove stop words
+		text=text.replace(/\W(the|a|so|from|in|we|it|and|you|with|into|as|some|are|on|of|by|an|for|really|to|of|does|our|if|be|will)\W/ig," ");	// Remove stop words afain?
+		text=text.replace(/\W(going|this|that|these|has|had|get|you|your|did|for|and|um|er|hmm|hm|i'm|yeah)\W/ig," ");	// Remove stop words
+		return text.split(/ +/);																		// Tokenize
+	}
 
 	Stem(w) 																						// STEM WORD USING PORTER 1980 METHOD
 	{
@@ -146,7 +149,7 @@ class NLP {
 		let stem,suffix,firstch,re,re2,re3,re4;
 
 		if (w.length < 3) { return w; }
-		w=w.replace(/\W/g,"");																		// No non-word chars
+		w=w.replace(/-|'|\"|\(|\)|\[|\]|\{|\}|\<|\>|\\|\//g,"");									// No non-word chars
 		
 		firstch = w.substr(0,1);
 		if (firstch == "y") 	w = firstch.toUpperCase() + w.substr(1);

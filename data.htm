@@ -19,6 +19,8 @@
 						border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; }
 	</style>
 	<body>
+		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
+		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/lizalogo.png" style="width:25%">
 			<span style="font-size:24px;vertical-align:12px"><b> dataParser</b></span>
@@ -51,7 +53,6 @@
 
 	let rawData=[], intents=[], responses=[], keyWords=[];
 	let nlp=new NLP();																				// Alloc NLP class
-	OAIGet();
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();
@@ -59,6 +60,11 @@
 		$("#lz-makeResponse").on("click",()=>{ MakeStories(8);    } );								// ON MAKE RESPONSE
 		$("#lz-makeSession").on("click", ()=>{ MakeSession();     } );								// ON MAKE SESSION
 		$("#lz-makeStories").on("click", ()=>{ MakeStories(1|2|4) } );								// ON MAKE ALL 3 FILES
+		$("#lz-importData").on("click",()=>{ $("#lz-tempFile").trigger("click"); });				// ON IMPORT
+		$("#lz-tempFile").on("change",(e)=>{														// ON FILE LOAD
+			ImportCSV(e);																			// Read file
+			$("#lz-tempFile").val("");																// Clear value		
+			});
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
 				GetTextBox("Type intent","","",(s)=>{ WitTrainIntent(s); });	
@@ -144,8 +150,8 @@
 		for (i=0;i<rawData.length;++i) {															// For each line
 			v=nlp.Tokenize(rawData[i].text);														// Tokenize line
 			for (j=0;j<v.length;++j) 																// For each word															
-				if (v[j].length > 3)																// If big enough	
-					keyWords.push(nlp.Stem(v[j]));													// Add to key word list	
+				if (v[j].length > 4)																// If big enough	
+					keyWords.push(v[j]);															// Add to key word list	
 			}
 		keyWords=[... new Set(keyWords)];															// Make unique
 	}
@@ -212,7 +218,38 @@
 			  body: JSON.stringify(body)
 			  })	
 	  	.then(res => res.json()).then(res =>{ trace(res); })
-	
+	}
+
+	function ImportCSV(e)																		// IMPORT SESSION FROM CSV
+	{	
+		let i,j,s,who,d="",v,vv=[]
+		let file=e.target.files[0];																	// Point at file
+		if (!file) 	return;																			// Quit if bad
+		let reader=new FileReader();																// Init reader
+		reader.readAsText(file);																	// Read file
+		reader.onload=(e)=>{ 																		// When loaded
+			let csv=Papa.parse(e.target.result, { header:false, skipEmptyLines:true }).data;		// Parse CSV using papa lib
+			for (i=0;i<csv.length;++i) {															// For each line
+				if (csv[i][7] == "Teacher")	{
+					if (csv[i][11] == "1") 		s=csv[i][10];
+					else if (csv[i][11] == "2") s=csv[i][13];
+					who=nlp.GetWho(s);																// Get who
+					if (who) {																		// Got one
+						re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");							// Make regex
+						s=s.replace(re,"STUDENT");													// Encode entity
+						}
+				v=nlp.Tokenize(s);
+				vv=[];
+				for (j=0;j<v.length;++j) 
+					if (v[j] && v[j].length > 2)
+						vv.push(nlp.Stem(v[j]));													// Stem and add
+				d+="    - "+vv.join(" ").trim()+"\n";												// Merge back and add
+				
+				}
+			}
+			trace(d)
+			Sound("ding");																			// Ding
+			};
 	}
 
 	function MakeStories(mask)																	// MAKE ALL FILES
@@ -530,8 +567,6 @@ POST https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/123
 		if (v[4]) t+=v[4]/1000;																		// Ms
 		return t;																					// Return time in ms
 	}
-
-
 
 </script>
 </body>
