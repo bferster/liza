@@ -10,11 +10,13 @@ class NLP {
 		this.syns=[];																					// Synonyms
 		this.whoSyns=[];																				// Who synonyms
 		this.actSyns=[];																				// Action synonyms
-		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","you","your","yours",		// Stop word list
+		this.keyWords=[];																				// 
+		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list
 			"yourself","yourselves","he","him","his","himself","she","her","hers","herself","it","its",
 			"itself","they","them","their","theirs","themselves","this","that","these","those","am","is",
 			"are","was","were","be","been","have","has","had","having","do","does","doing","a","an",
-			"the","and","if","or","as","of","at","by","for","with","to","again","so","than","too","can" ];
+			"the","and","if","or","as","of","at","by","for","with","to","again","so","than","too","can", 
+			"their","we're","gonna"];
 	}
 
 	AddSyns(type, word, syns)																		// SET SYNONYMS ARRAY
@@ -27,6 +29,12 @@ class NLP {
 		}
 	}
 	
+	AddKeyWords(words)																				// ADD TO KEYWORDS ARRAY
+	{
+		let i;
+		for (i=0;i<words.length;++i)	this.keyWords.push(words[i]);									// Add each  each word
+	}
+
 	GetWho(text, both)																				// GET WHO IN TEXT
 	{
 		let i,who=both ? ":" : "";

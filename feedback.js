@@ -219,7 +219,7 @@ class ResponsePanel  {
 				<span id="lztab-1" class="lz-rptab">EVIDENCE</span> 
 				<span id="lztab-2" class="lz-rptab">THINKING</span> 
 				<span id="lztab-3" class="lz-rptab" style="width:calc(25% - 4px)">FEEDBACK</span> 
-				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:100vh" : ""}"></div>
+				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:-var(--maxvh)" : ""}"></div>
 				<div style="flex-grow:1;margin-top:12px">
 					<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
 					<img id="lz-chatBut" src="img/sendtext.png" title="Message teacher" style="cursor:pointer">

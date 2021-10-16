@@ -100,7 +100,6 @@ class Voice {
 			return;
 			}
 		try{																							// Try
-			trace(who)
 			speechSynthesis.cancel();																	// Clear current speech queue			
 			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice
 			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex

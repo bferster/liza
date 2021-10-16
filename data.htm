@@ -230,9 +230,12 @@
 		reader.onload=(e)=>{ 																		// When loaded
 			let csv=Papa.parse(e.target.result, { header:false, skipEmptyLines:true }).data;		// Parse CSV using papa lib
 			for (i=0;i<csv.length;++i) {															// For each line
-				if (csv[i][7] == "Teacher")	{
-					if (csv[i][11] == "1") 		s=csv[i][10];
-					else if (csv[i][11] == "2") s=csv[i][13];
+				if (csv[i][7] == "Teacher")	{														// Only remarks
+					if (csv[i][11] == "1") 		s=csv[i][10];										// Original correction
+					else if (csv[i][11] == "2") s=csv[i][13];										// Double correction
+					else						continue;											// Skip all others
+					if (s.length < 4)			continue;											// Skip if too short
+					s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,"STUDENT");					// You -> STUDENT
 					who=nlp.GetWho(s);																// Get who
 					if (who) {																		// Got one
 						re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");							// Make regex

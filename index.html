@@ -27,7 +27,7 @@
 							}
 		.lz-splash { 		color:#999; text-align:center; margin-top:5%;  display:none;
 							}
-		.lz-main { 			width:100%; height:100vh; background-color: #ddd; display:none; text-align:center;
+		.lz-main { 			width:100%; height:var(--maxvh); background-color: #ddd; display:none; text-align:center;
 							}
 		.lz-error { 		position: absolute; top:16px; left:19px;
 							}
@@ -37,7 +37,7 @@
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							padding:16px; border-radius: 16px; width: 600px;
 							}
-		.lz-blackboard {	position: absolute; left:calc(100vw - 588px); top:calc(100vh - 336px); width:550px; height:256px;display:none;
+		.lz-blackboard {	position: absolute; left:calc(100vw - 588px); top:calc(var(--maxvh) - 336px); width:550px; height:256px;display:none;
 							background-color:#999; border:1px solid #999; padding:12px; border-radius:8px; 
 							}
 		.lz-canvas {		position: absolute; left:50px; top: 12px; width: 512px; height:256px; border-radius: 4px;
@@ -53,13 +53,13 @@
 							border-radius: 100px; background-color: #d7ebff; border: 1px solid #999; 
 							font-size: 16px; text-align:center; display: none;
 							}
-		.lz-rpback { 		position:absolute; width:29%; height:calc(100vh - 70px); top:12px; left:12px; padding:3px;
+		.lz-rpback { 		position:absolute; width:29%; height:calc(var(--maxvh) - 70px); top:12px; left:12px; padding:3px;
 							border-radius:8px; border:1px solid #999; background-color:#aaa; text-align:center;
 							}
 		.lz-rpinner { 		display:flex; flex-wrap:wrap; width:calc(100% - 29px); border-radius:8px; margin:2px 0 0 2px;
 							user-select:none; text-align:center; background-color:#eee; padding:12px;
 							}
-		.lz-rplist { 		text-align:left; overflow-y:auto; max-height:calc(100vh - 312px); padding:0 16px; margin-right:2px;
+		.lz-rplist { 		text-align:left; overflow-y:auto; height:calc(var(--maxvh) - 312px); padding:0 16px; margin-right:2px; width:100%;
 							border:1px solid #aaa; border-radius:8px; background-color:#fff; border-top-left-radius:0; border-top-right-radius:0; border-top:none;
 							}
 		.lz-rptab {			width:calc(25% - 4px); cursor:pointer; font-size:11px; background-color:#eee; padding:4px 0; border:1px solid #999;
@@ -67,7 +67,7 @@
 							}
 		.lz-rptitle {		width:100%; display:inline-block; font-size:24px; font-family:Chalk; text-align:center; font-weight:600;
 							}
-		.lz-timebar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 128px);
+		.lz-timebar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(var(--maxvh) - 128px);
 							background-color:#aaa; border-radius: 12px 12px 0 0; height:90px; user-select:none;
 							}
 		.lz-timeback { 		position:absolute;width:calc(100% - 32px); height:68px; left:0; top:0; background-color:#fff; border-radius:8px; margin:16px 16px 0 16px;
@@ -84,7 +84,7 @@
 		.lz-playerslider{ 	background:#ccc; height:1px; width:80px; border:none; display:inline-block;
 							margin-left:6px;
 							}
-		.lz-feedbar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(100vh - 256px); user-select:none;
+		.lz-feedbar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(var(--maxvh) - 256px); user-select:none;
 							background-color:#aaa; border-radius: 12px 12px 0 0; height:218px;  
 							}
 		.lz-feedback { 		display:flex; flex-direction: row; width:calc(100% - 16px); height:208px; margin: 8px; 
@@ -112,10 +112,10 @@
 							font-size: 12px; background-color: #27ae60; padding: 2px 8px 2px 8px; vertical-align:3px;
 							}
 
-		 table {			border-spacing: 0px;  }
-
+		:root  {			--maxvh: 100vh  }
+		table  {			border-spacing: 0px;  }
 		@font-face {  		font-family: Chalk; src: url(img/Inkfree.ttf);   }
-		
+
 		body ::-webkit-scrollbar { width: 9px; height:8px } 
 		body ::-webkit-scrollbar-track { background: transparent; }
 		body ::-webkit-scrollbar-thumb { border-radius:8px ;background:#a4baec }
@@ -175,21 +175,19 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost")) lo
 var app=null;																						// Holds app
 var isMobile=false;																					// Flag for mobile devices
 
-	$(window).on("resize orientationchange", ()=>{                                       		 	// ON WINDOW RESIZE
+	$(window).on("resize orientationchange", ()=>{                                       		 // ON WINDOW RESIZE
+		document.documentElement.style.setProperty("--maxvh", window.innerHeight+"px");				// Set CSS var for IOS 100vh isssue
 		app.sc.Resize();																			// Resize 3D system
 		if (app && app.allowResize)	{																// If app loaded and allowing resizing
 			app.Draw();																				// Redraw to fit screen
-			if (isMobile) {																			// IOS issues
-				$("#lz-rpback").height(window.innerHeight-70);								
-				$("#lz-rplist").height(window.innerHeight-312);									
-				$("#lz-feedbar").css("top",window.innerHeight-256+"px");							
 				}
-			}
 		});
 				
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		isMobile=navigator.userAgent.match(/(ipad|iphone|ipod|android)/i) ? true : false;			// Set mobile flag
 		var url=window.location.search.substring(1);						   						// Get query string
+		document.documentElement.style.setProperty("--maxvh", window.innerHeight+"px");				// Set CSS var for IOS 100vh isssue
+		
 		app=new App(url);                                                    						// Alloc app
 		if (window.location.host != "localhost") {													// Not in debug
 			$("#splashDiv").fadeIn();																// Fade in splash page

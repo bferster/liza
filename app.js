@@ -83,6 +83,7 @@ class App  {
 				for (i=0;i<d.length;++i) {															// For each line
 					if (d[i].type == "student") this.AddStudent(d[i]);								// Add student
 					if (d[i].type == "action") 	app.nlp.AddSyns("action",d[i].id,d[i].text.split(",")); // Add action and its synonyms
+					if (d[i].type == "keyword") app.nlp.AddKeyWords(d[i].text.split(","));			 // Add keywords
 					}
 				this.curStudent=app.students[0].id;													// Pick first student
 				})	
@@ -243,11 +244,10 @@ class App  {
 	{
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
-trace(v)
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[2] == "TALK") {																		// TALK
-			if (this.role != v[3]) 	app.voice.Talk(v[4],v[3]);										// Not same as me				
-			else					Bubble(v[4]);													// Show text bubble instwad
+			if (this.role != v[3]) 			 app.voice.Talk(v[4],v[3]);								// Not same as me				
+			else if (this.role != "Teacher") Bubble(v[4]);											// Show text bubble instwad
 			}
 		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5); }		// CHAT
 		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
