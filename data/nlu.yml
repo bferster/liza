@@ -1,0 +1,1993 @@
+version: "2.0"
+
+nlu:
+- intent: bot_challenge
+  examples: |
+    - STUDENT bot?
+    - STUDENT human?
+    - am talking bot?
+    - am talking human?
+- intent: addition
+  examples: |
+    - 2+2?
+    - can STUDENT add two numbers?
+- intent: time
+  examples: |
+    - time it?
+    - when now?
+- intent: howru
+  examples: |
+    - how you?
+    - how STUDENT doing?
+- intent: why
+  examples: |
+    - why STUDENT say that?
+    - how did STUDENT know?
+- intent: why
+  examples: |
+    - why STUDENT say that?
+    - how did STUDENT know?
+- intent: r100
+  examples: |
+    - awesome awesome before get started, want ask, STUDENT guys can come up with name STUDENT want call STUDENT collective don't like say boys girls don't like say STUDENT guys,    school mascot STUDENT want be JET eyes eagles ketchup packets, can call STUDENT group
+    - awesome you're, n STUDENT can help us figure out couple questions  glad have STUDENT group,  STUDENT can STUDENT can kind help us follow prompts ,  question re answering  glad STUDENT here all right
+    - all wild cats talking about water moon right? All right
+    - that's totally correct think all agree with STUDENT STUDENT had microscope STUDENT would use look water really closely, although think about happens before point right
+    - STUDENT think STUDENT said this, did STUDENT say same thing right.
+    - hi STUDENT see STUDENT got STUDENT hand.  going wait because   talking STUDENT deb because specific question asked OK OK, put pin STUDENT i'll come back you
+    - awesome awesome okay STUDENT STUDENT will pair up find answer question, thank STUDENT folks
+    - right STUDENT totally did NASA did send small machine
+    - nailed yes STUDENT high five hashtag awesome lunar orbiter name machine great
+    - Totally STUDENT got 
+    - STUDENT STUDENT STUDENT board with?
+    - STUDENT nailed absolutely use much equipment science NASA get play with like lasers all day am jealous m, yes thumbs up
+    - see STUDENT answer, did STUDENT put question equipment did scientists use discover water moon
+    - love STUDENT know STUDENT have much prior knowledge about space yeah appreciate  STUDENT know think you'll bring lot whatever group STUDENT 
+    - Does sound okay
+    - glad  glad hear think STUDENT will have lot contribute with STUDENT knowledge
+    - wondering could get volunteer answer thinking
+    - yeah awesome STUDENT identify equipment
+    - now can get someone else build samantha's answer can get someone else talk about how microscope would allow us discover water n got first part question right equipment now, can get someone think about how connects discovering waterpark yes STUDENT
+    - STUDENT answer not around, think multiple answers here right 've identified equipment STUDENT actually
+    - awesome lunar orbiter now have someone else add answer,  how did allow scientists discover water moon? Yes, STUDENT
+    - Yes, ice ice deposits, yes STUDENT
+    - yeah did am happy hear STUDENT already know much about or like STUDENT nt NASA really awesome i've always wanted go check out like nasa's facilities museums think STUDENT STUDENT probably have lot talk about feed both terest space, thank STUDENT sharing
+    - Add , STUDENT know how exactly those equipment used discover water moon right,  think each STUDENT had like piece,  n just had just needed add that,   have microscope microscope used actually sorry um
+    - just stop pause minute see STUDENT guys have questions yeah STUDENT
+    - STUDENT Would STUDENT mind reading us again,  question  going be answering together?
+    - Excellent STUDENT could STUDENT read second part that, circling
+    - Oh good,   means STUDENT can help us, think STUDENT background knowledge going be very helpful us group STUDENT
+    - deb going ask STUDENT read, second part question, STUDENT see where says circle
+    - Excellent  looking equipment use discover water moon
+    - recap  going look evidence let's quick reread group keep going around STUDENT, STUDENT wouldn't mind reading first paragraph re, where says name equipment use
+    - Excellent STUDENT could STUDENT read second paragraph, us
+    - Yes, good vestigation part good, look question again
+    - does so, other folks think about now where want agree an answer go ahead STUDENT
+    - STUDENT just get STUDENT voice here take look last paragraph, real quick Would STUDENT mind reading number three us
+    - Thank STUDENT much Okay, question asking us equipment scientists use yes STUDENT
+    - Nice yeah use lot equipment yeah
+    - equipment, did use discover water moon
+    - today going dig more question equipment scientists use discover water moon,  thank STUDENT all sharing STUDENT answers
+    - yeah STUDENT  learning about space, little bit, but  al practicing good science thinking skills,   can all learn more about science thinking skills STUDENT
+    - All right, i'll STUDENT think about question, while work with someone else n i'll come back STUDENT okay
+    - yeah great answer STUDENT
+    - yeah when STUDENT done why don't STUDENT STUDENT talk about STUDENT's new answer comp STUDENT new answers while work with other people
+    - can STUDENT read question, question actually asking STUDENT
+    - STUDENT can have just second
+    - thing want ask STUDENT look first part question so, can STUDENT read first part question STUDENT
+    - can STUDENT reread chunk text
+    - yeah STUDENT
+    - yeah STUDENT did STUDENT find STUDENT reading, did STUDENT find
+    - yeah STUDENT STUDENT have STUDENT guys both reading, did STUDENT find something similar or something different STUDENT STUDENT STUDENT
+    - hi so, can STUDENT guys repe STUDENT answers question real quick 'll go down line from STUDENT all way down STUDENT from right from right from left right yeah STUDENT have question
+    - ll  really glad STUDENT feel like STUDENT have good understanding space, but  just  just talk really about answer real quick  excited hear STUDENT have though end, whenever get STUDENT turn
+    - STUDENT repe STUDENT answer was, real quick
+    - Absolutely absolutely STUDENT guys, all think should have an understanding word equipment means
+    - great ask STUDENT again kind equipment,   use would STUDENT would would STUDENT circle
+    - yeah that'd be that'd be that'd be great thing lot times STUDENT might look keywords
+    - ll great thing answer has multiple answers sometimes STUDENT want circle, many STUDENT can
+    - Does anybody have any questions about about mean when say specific examples
+    - like couple people just circle microscope great example, but multiple tools like STUDENT just pointed out come from things
+    - Does make sense everybody does anybody have any clarifying questions have yeah def
+    - glad STUDENT really excited learn about space STUDENT
+    - Okay,  now  looking first part question, equipment did scientists use discover water moon
+    - Does make sense?
+    - anybody still unsure evidence means or something all understand? raise STUDENT hand STUDENT know evidence is
+    - just going be talking about STUDENT question today
+    - So,  article heard lot things about NASA moon desert just talk about STUDENT answers
+    - have lot different answers
+    - look back texts
+    - think about it
+    - see had best answer
+    - Okay,   just going work making sure have best answer question
+    - look back, says that,  used small machine called lunar orbiter vestigate
+    - did anybody talk about ? see
+    - did anybody say like title?
+    - So, make answer better
+    - could say NASA sent small machine called lunar orbiter
+    - look back number three which says means moon still drier than driest desert Earth
+    - water found microscopic
+    - Meaning STUDENT wouldn't be able see
+    - Now look question remember questions said
+    - STUDENT looking straight, STUDENT need scientific tool called microscope look really close
+    - question said equipment did scientists use discover water moon?
+    - Right, STUDENT use look water
+    - STUDENT understand how could improve STUDENT answer?
+    - Okay,   talking about equipment used discover water
+    - But get back topic
+    - asked equipment did scientists use discover water moon?
+    - look back STUDENT answer
+    - NASA sent small machine called loomer Lunar Orbiter vestigate
+    - Alright,   discussion question equipment did scientists use discover water moon?
+    - Okay,  STUDENT answer discussion question?
+    - Go back text STUDENT read
+    - STUDENT right
+    - But equipment did use discover water moon?
+    - Okay n not full water
+    - Okay,  what's STUDENT answer?
+    - all used?
+    - didn't say wrong
+    - found it
+    - So, but did use discover water that,  used microscope microscope look it
+    - Go back text look
+    - STUDENT, STUDENT think?
+    - STUDENT had use microscope
+    - STUDENT can't even see it
+    - NASA sent small machine called lunar orbiter vestigate looked ice deposits craters,  n use microscope see because  tiny
+    - makes sense?
+    - Anybody have any questions about question?
+    - But didn't use discover water
+    - Yeah, yeah,  do, but just discussing question
+    - is, didn't say wrong
+    - But use machine,  Lunar Orbiter find discover
+    - But n use microscope found 
+    - Alright,  have gathered STUDENT all here today because  concerned about each STUDENT answers question STUDENT each talked about equipment or tools needed
+    - STUDENT, STUDENT talked about specific tool, microscope
+    - piece equipment used different purpose
+    - microscope used different purpose
+    - didn't use microscope men use something else discover water moon
+    - Everybody look back text find did use discover water moon
+    - STUDENT did STUDENT find answer
+    - But all those pieces equipment used different purpose
+    - trying figure out which
+    - equipment use find water moon
+    - Yeah,  scientists use Lunar Orbiter vestigate discover water moon
+    - equipment used Lunar Orbiter discover water moon
+    - Alright,   next question talking about convincing evidence water moon could be valuable
+    - brought STUDENT here together because  concerned about STUDENT answers
+    - ly person STUDENT ly person said yes,   valuable kind told why thought valuable
+    - would be really cool
+    - astronauts use STUDENT
+    - A, n, STUDENT say
+    - Yeah,  can all agree water valuable resource
+    - convincing evidence  valuable resource STUDENT
+    - would take long time
+    - But eventually, would be very, very, very valuable resource astronauts use,
+    - STUDENT answered question, equipment did scientists use discover water moon?
+    - Yes,   need microscope look really closely things
+    - But not scientist used find water moon
+    - how discovered ice moon or water
+    - STUDENT did some great reading STUDENT
+    - But even, STUDENT did circle, STUDENT circled same thing STUDENT, STUDENT at, STUDENT at, STUDENT both actually not correct with answer,  STUDENT would have circled about Lunar Orbiter, STUDENT would have been correct
+    - called Lunar Orbiter
+    - did send small machine
+    - Okay, STUDENT, STUDENT, STUDENT put NASA sent small machine
+    - STUDENT could have nt more detail, STUDENT put small machine,   small machine, but,    called lunar orbiter
+    - semi right
+    - equipment called lunar or orbiter NASA sent vestigate
+    - says, NASA send small mach, small machine called lunar orbiter vestigate
+    - should have been STUDENT answer
+    - just hang out minute
+    - talk about some things
+    - first question STUDENT answer experiment designed, equipment did scientists use discover water moon
+    - Okay, thank STUDENT very much
+    - STUDENT guys had varying levels understanding
+    - nd first I'd like address STUDENT STUDENT, would STUDENT like read STUDENT answer us
+    - which good thing, because can help each other grow
+    - Yes, why don't why don't STUDENT look back STUDENT STUDENT work together since STUDENT STUDENT had same answer
+    - STUDENT can talk about it
+    - going speak with STUDENT moment
+    - Okay, STUDENT, would STUDENT like read STUDENT answer
+    - Okay,    ly STUDENT circle
+    - Yeah,  going read question
+    - Okay, equipment, did scientist used discover water moon
+    - might have used those when discovered, but not use discover water
+    - Okay,  STUDENT, would STUDENT like read us STUDENT answer
+    - very close 
+    - STUDENT would STUDENT like read STUDENT answer
+    - Okay hold just moment
+    - Did STUDENT guys get chance finish reading, paragraph two,  revise STUDENT answer
+    - Yes,  very hard say without microscope, but lunar orbiter very powerful
+    - Lunar Orbiter
+    - STUDENT right re
+    - but yes STUDENT are
+    - STUDENT should be able find STUDENT evidence support STUDENT answer
+    - Yes, STUDENT look through n circle STUDENT answer
+    - don't think STUDENT had
+    - Did STUDENT have chance go back read paragraph two,
+    - Okay, go ahead moment
+    - would be awesome
+    - didn't know STUDENT taught something
+    - Okay STUDENT STUDENT think
+    - Guess all have unless STUDENT have some questions
+    - talk about some STUDENT answers
+    - Would STUDENT like volunteer STUDENT answer
+    - question have equipment did scientists use discover water moon
+    - glad STUDENT here with us
+    - STUDENT don't think STUDENT should be group
+    - glad STUDENT group because maybe STUDENT can help us all out with some questions have how answered
+    - Can start with STUDENT answer
+    - Help understand STUDENT don't mind equipment might use just discover water moon
+    - STUDENT Can STUDENT help understand
+    - really like fact STUDENT have lot knowledge about because tells STUDENT probably really terested space
+    - But like STUDENT thinking keeps water together passage
+    - But specifically focus can just how discovered water moon
+    - Did use discover water
+    - All STUDENT can take look question again
+    - says equipment did scientists use discover water moon
+    - STUDENT can take look STUDENT passage
+    - Can somebody volunteers give word STUDENT might have underlined can help us find an answer
+    - STUDENT, could STUDENT help us out little bit more, maybe with finding different piece equipment might have used
+    - told us scientists found craters full water moon
+    - Because STUDENT response said found craters full water moon, but can STUDENT look STUDENT passage with take look at, paragraph two,  STUDENT passage
+    - Can STUDENT look STUDENT passage with
+    - With space suits walking big craters
+    - made says, NASA send small machine called Lunar Orbiter vestigate
+    - Now lunar orbiter will land moon South Pole look ice deposits large polar craters
+    - All right, thank STUDENT STUDENT answers
+    - wanted just STUDENT
+    - STUDENT remind STUDENT answer
+    - I'd like take look read paragraph four, STUDENT will, STUDENT group
+    - STUDENT look paragraph four
+    - n question two says,  convincing evidence water moon could be valuable
+    - STUDENT you
+    - see who told water heavy carrying water maybe not good idea
+    - can you, would STUDENT like volunteer read first paragraph?
+    - ll STUDENT know what, because STUDENT know lot means STUDENT can help rest us out don't know much you
+    - Would STUDENT like STUDENT, would STUDENT like read second paragraph?
+    - When STUDENT deposit something, how much do, STUDENT deposit?  STUDENT have deposit really large piece something or smaller pieces?
+    - when STUDENT think paycheck every ek would be smaller amount STUDENT would make entire month
+    - Does makes sense?
+    - didn't send microscope
+    - sent machine called lunar orbit orbiter right
+    - However, not,  didn't just send microscope up moon
+    - had send machine called lunar orbiter right
+    - STUDENT partially correct STUDENT need microscope see this
+    - Does make little bit more sense?
+    - STUDENT STUDENT partially correct, but equipment sent machine called Lunar Orbiter able go across ground,  surface,  moon surface check deposits
+    - would someone like read third paragraph?
+    - have STUDENT all STUDENT seen frost wintertime or fall?
+    - Have STUDENT seen STUDENT mom's car windows or grass?
+    - Did scientists use discover water moon
+    - Okay, 've just answered equipment
+    - will really help us STUDENT knowing some things because STUDENT might be able teach us some things don't know
+    - definitely need oxygen
+    - When go space, don't , because don't have oxygen up like here
+    - look passage see equipment
+    - Can anybody tell
+    - look passages see paragraph might be
+    - Did use find that
+    - Okay, but  going equipment
+    - about number, paragraph two, could anybody find answer
+    - Your, STUDENT answer not wrong
+    - STUDENT need microscope be able
+    - But al use Lunar Orbiter use find water water crater, n had go use microscope
+    - look back text
+    - Says,   paragraph lunar orbiter will land moon's South Pole look ice deposits large polar crater
+    - STUDENT right, STUDENT right
+    - needed lunar orbit Orbiter get moon
+    - see surface moon
+    - n figured out was
+    - Okay,  microscope actually gave evidence
+    - Deposits, very small water n had get microscope out make sure thought re
+    - water moon
+    - Yes,  took lunar orbiter 
+    - equipment used
+    - n tool used microscope
+    - appreciate STUDENT guys coming today STUDENT all done very good job
+    - STUDENT feel pretty good STUDENT feel little confused
+    - How Does everybody feel after STUDENT read passage
+    - Even nice thing about because all know different formation where, STUDENT know,  little bit more, maybe STUDENT can teach us some things along way
+    - Yes, sometimes have read passage, maybe more than time really understand saying us right
+    - STUDENT talk about STUDENT answer
+    - someone says, use lot of
+    - Equipment like oxygen tanks
+    - was,  will did send small machine, but really doesn't
+    - more than lunar orbiter use dry
+    - Because wants know equipment sent Lunar Orbiter
+    - But else, other kind equipment or tool
+    - Did have use
+    - why said STUDENT you right track
+    - who can tell tool tools did use
+    - tool had equipment had use
+    - Lunar Orbiter find water
+    - n actually make sure see
+    - had use microscope
+    - Can who can read sentence
+    - Okay, says scientists said ton top soil lot
+    - would hold only 32 ounces water
+    - question STUDENT answered 
+    - STUDENT guys did really good writing down an answer
+    - very proud STUDENT tried read pair paragraph
+    - Did STUDENT guys circle, word
+    - Who would like tell word circled
+    - Did STUDENT circle STUDENT question
+    - STUDENT, start with you
+    - Did STUDENT circle, those two words
+    - How about you, STUDENT
+    - Okay, STUDENT said meet scientific tool called microscope look really closely STUDENT right,  microscope piece equipment
+    - Okay, look back reading passage STUDENT STUDENT since STUDENT guys had same answer microscope
+    - want STUDENT guys look back STUDENT reading passage
+    - STUDENT finish before come back you
+    - Go ahead work next question
+    - STUDENT al right scientists use equipment like oxygen tanks,
+    - second question answered,     convincing evidence water moon could be valuable
+    - Can someone tell two words circled
+    - But  going look more thing
+    - Could STUDENT tell word another word STUDENT circled
+    - Valuable okay yes agree valuable key word
+    - Other key word question STUDENT
+    - look back question
+    - STUDENT could   enough water
+    - says,  convincing evidence water moon could be valuable
+    - who would like circled paper or breeding passage
+    - STUDENT, did STUDENT underline or circle
+    - Okay, STUDENT, STUDENT know, did STUDENT underline or circle
+    - n did STUDENT underline or circle
+    - absolutely something reading
+    - but  trying figure out equipment did scientists use discover water moon
+    - absolutely true
+    - STUDENT scientists found craters full water moon
+    - can STUDENT look little deeper try answer question?
+    - STUDENT know all about space?
+    - STUDENT,   such awesome formation  proud you,  STUDENT go out look formation STUDENT free time,  can't wait all formation with rest STUDENT when get back with m
+    - love STUDENT know about oxygen
+    - right now, love STUDENT know   oxygen tanks
+    - Can STUDENT look back reading might be YouTube videos this, too,  STUDENT can look little bit later, when STUDENT get back home
+    - but  going talk little bit about wate
+    - But can STUDENT look back reading can STUDENT tell just same way STUDENT found out about oxygen can STUDENT look back about water see says about because think use brain just little bit read reading, STUDENT going have all those same answers about water too
+    - STUDENT, don't think STUDENT answer wrong, sweetheart
+    - Did STUDENT find answer re?
+    - All right,  awesome
+    - So,  paragraph e, does tell us, scientists have found evidence water can be found deep within moon's polar craters
+    - wonder, maybe STUDENT can help us out because sent him mission find answer
+    - STUDENT, would STUDENT agree with STUDENT said?
+    - sure bet STUDENT could probably tell STUDENT more STUDENT can formation together
+    - STUDENT answer not wrong, honey, you're, STUDENT right
+    - But take look question asking,  asking us used discover water
+    - STUDENT, n you'll be able help us explore little bit more about wh 've read about
+    - But want challenge STUDENT go back would STUDENT actually read discussion question again
+    - Scientists found craters full water moon, STUDENT absolutely correct
+    - know STUDENT can really help us out here
+    - know STUDENT know lot about space
+    - want challenge, just like STUDENT, take look question
+    - Can STUDENT read question
+    - awesome,  love STUDENT know because  very, very helpful necessary all those astronauts up re
+    - hop back STUDENT second see able find answered, or answer specific question
+    - STUDENT,  totally okay when STUDENT just-
+    - finding finding discovering really similar words totally understand why could get confused with m
+    - point STUDENT right direction
+    - going point STUDENT paragraph three
+    - Look paragraph three
+    - Would STUDENT remind STUDENT had told before
+    - Can STUDENT read discussion question us
+    - STUDENT want go back STUDENT answer
+    - STUDENT need scientific tool called microscope look really closely
+    - very, very true,
+    - Look question again
+    - Can STUDENT read out loud
+    - looking equipment definitely found craters full water,
+    - talk with STUDENT see can work together e
+    - see can figure out because STUDENT had same answer you
+    - STUDENT need scientific tool look really closely exactly STUDENT had said
+    - STUDENT know means
+    - NASA sent small machine called lunar orbiter vestigate does mean vestigate
+    - What, doing when he's vestigating crimes
+    - Does does, just leave unsolved end
+    - STUDENT, can STUDENT can STUDENT keep reading second paragraph
+    - Okay,  two pieces equipment  actually looking here
+    - kind version other slits
+    - wouldn't STUDENT say needed use not e, but two pieces equipment actually figure out water moon
+    - Yeah, had use Lunar Orbiter al had use microscope
+    - STUDENT think STUDENT could put STUDENT listening ears maybe STUDENT can help us answer question better
+    - maybe you'll be able help us answer question little bit differently
+    - glad STUDENT ready help
+    - Can STUDENT tell something STUDENT found interesting about reading
+    - I'd like start with STUDENT
+    - Maybe each STUDENT can tell something STUDENT remember or STUDENT found interesting about reading
+    - So,  want know from STUDENT all
+    - Whar about you,  something interesting stood out STUDENT about reading
+    - Yes, lot equipment gets used
+    - about you,  something really interesting about reading
+    - Yes, really interesting
+    - Thank STUDENT raising STUDENT hand, would STUDENT like something interesting about reading
+    - STUDENT said STUDENT knew lot about science
+    - something interesting about article stood out you
+    - Question number out loud us
+    - Raise STUDENT hand STUDENT would like volunteer read
+    - love all those answers
+    - could have someone
+    - saw STUDENT hand first
+    - Question number us, please
+    - Okay saw savannas hand first
+    - STUDENT think, STUDENT
+    - STUDENT,  STUDENT have something like add
+    - Yeah,   big question
+    - where STUDENT think can find answer ?
+    - really good observation
+    - Okay,   know question asking us equipment astronauts use discover water
+    - Can anyone tell think would be answer STUDENTs question, which is, wouldn't be microscope discovered water or can STUDENT support answer with evidence Lunar Orbiter
+    - Okay great question
+    - Okay STUDENT STUDENT think?
+    - Okay, like answer lot STUDENT, would STUDENT like add anything that
+    - STUDENT, would STUDENT like add
+    - Okay, anybody else have different answer than that
+    - Just those two pieces equipment
+    - go question two convincing evidence water moon could be valuable
+    - question asking us please raise STUDENT hand STUDENT think STUDENT know question asking us
+    - So, could please hear little bit more about scientific tool like microscope STUDENT think STUDENT might need?
+    - Oh, wait STUDENT turn, please
+    - like connection STUDENT made re
+    - Something about answer STUDENT really liked STUDENT thought made sense?
+    - STUDENT doing great job listening
+    - Thank STUDENT clarifying that
+    - glad STUDENT could clarify
+    - Okay, let talk with STUDENT just moment I'll come back you
+    - Can STUDENT maybe help him out see STUDENT can give different answer?
+    - STUDENT, can STUDENT tell, or maybe how about with with STUDENT, he's not sure moon t or dry
+    - Okay STUDENT STUDENT able help?
+    - STUDENT, can STUDENT read first sentence bullet point number three STUDENT document, please, just first sentence
+    - Can you, can everyone look back number three STUDENT document
+    - stop STUDENT re
+    - looking number three, not number e, can STUDENT try again?
+    - How ne STUDENT been NASA before love that
+    - Can STUDENT me?
+    - All right, so, STUDENT,  stay number three, but would like STUDENT keep reading
+    - STUDENT ren't wrong all
+    - would probably need microscope, y going test water
+    - sorry, STUDENT, ?
+    - STUDENT, will STUDENT go number two read first sentence STUDENT document?
+    - word starts with an o, lunar what?
+    - said, small machine STUDENT exactly right here
+    - does small machine go up moon?
+    - always things STUDENT can learn
+    - All right,  STUDENT,  question equipment did scientists use discover water moon?
+    - STUDENT remember put ?
+    - did STUDENT put?
+    - All right,  STUDENT have anything else STUDENT want add?
+    - STUDENT answer isn't wrong
+    - But discussion question equipment did scientists use discover water moon?
+    - STUDENT guys said use scientific tool called microscope, which answering question
+    - Right n says equipment did scientists used discover water moon
+    - can STUDENT guys look back paragraph two?
+    - STUDENT, else STUDENT think?
+    - Say more time
+    - look back paragraph two,  first sentence
+    - does say STUDENT?
+    - STUDENT guys see ?
+    - brought STUDENT all back here small group because,   want talk with STUDENT guys about STUDENT answers STUDENT guys put question number e
+    - what, did STUDENT correct did STUDENT write down again
+    - STUDENT put
+    - have written, have STUDENT put scientist, use lot equipment like oxygen tanks
+    - Okay, while STUDENT looking for
+    - going talk with other four
+    - Yeah, want STUDENT guys just look question
+    - really proud STUDENT guys answering question,  reading passage answering questions
+    - just see STUDENT guys got STUDENT
+    - Did STUDENT find e
+    - how many STUDENT guys picked out equipment or discover
+    - STUDENT did STUDENT get
+    - STUDENT, STUDENT put same thing STUDENT
+    - have STUDENT have written down STUDENT need scientific tool called microscope look really look really close
+    - Can STUDENT gues ?
+    - STUDENT STUDENT while  talking with STUDENT STUDENT STUDENT want STUDENT to look back passage see STUDENT can find different equipment used
+    - Okay  going talk with STUDENT STUDENT STUDENT
+    - use lot equipment don't y?
+    - good connection STUDENT
+    - Yeah, but   usually passage STUDENT guys read didn't see lot equipment used, but STUDENT very, very right
+    - saw you,  STUDENT put NASA sentma small machine
+    - called lunar orbiter isn't
+    - want STUDENT keep STUDENT mind
+    - very good job,  
+    - want give STUDENT guys little p back STUDENT answers look lot better than STUDENT initial answers
+    - Just looked STUDENT revised answers
+    - Did STUDENT get chance revise yours?
+    - 'll talk about here just minute
+    - Does make sense
+    - STUDENT answer scientists found see using smaller machines
+    - But guys, did know ice water right?q
+    - Yeah,  that's understandable because question asked did use discover water moon
+    - question just responded equipment scientists use discover water moon? Okay
+    - Okay,   just read passage about finding water moon
+- intent: r300
+  examples: |
+    - awesome STUDENT STUDENT get awesome points circling parts text prompt because direction A+  direction following points
+    - amazing yeah love love STUDENT STUDENT agree with STUDENT STUDENT adding more answer together, STUDENT guys have collaborated Even better answer
+    - love STUDENT guys really using reading pointing specific parts sentences reading help equipment allow us discover water moon STUDENT come up with STUDENT answer think already,  now have identified two different equipments STUDENT guys able build each other's answers to
+    - yeah STUDENT pulled out something very specific STUDENT found another piece equipment method mentioned text, which very good, ll
+    - love STUDENT brought background knowledge STUDENT fact about some about scientists astronauts needing those oxygen tanks really awesome background knowledge
+    - Okay,  STUDENT read story love STUDENT found story
+    - yeah love STUDENT picked up microscope because  really important when  thinking about word microscopic
+    - yeah STUDENT love STUDENT know about NASA STUDENT using evidence from reading
+    - yeah love, how STUDENT summarize STUDENT, alright,  love, how STUDENT summarize article STUDENT
+    - yeah STUDENT awesome background knowledge, thank STUDENT bringing background knowledge so
+    - yeah love STUDENT both know microscopes used look small things STUDENT able pull out text
+    - STUDENT STUDENT did STUDENT definitely got answer correct
+    - right, you, STUDENT know STUDENT know sort equipment scientists use discover equipment moon uh discover water moon
+    - Absolutely yeah no, all great observations about how thinking can change sort learning new piece
+    - really like how STUDENT use STUDENT background knowledge answer question
+    - am sure STUDENT going great job when look back specific tool because STUDENT probably heard before
+    - Yeah, am glad STUDENT know much about space
+    - Great, can really tell STUDENT use STUDENT background knowledge with that
+    - STUDENT absolutely right ice deposit piece frozen water planet
+    - good way thinking about, STUDENT
+    - STUDENT did mention specific piece equipment although may not be best answer
+    - STUDENT still address equipment part question,  appreciate that
+    - very specific appreciate STUDENT being really specific STUDENT answer
+    - like STUDENT revised answer STUDENT guys work ll together
+    - But yeah, did great job STUDENT very specific also
+    - see STUDENT line thought really appreciate STUDENT telling us sent small machine, which equipment used discover which find out, or see
+    - appreciate answer
+    - STUDENT did great job using STUDENT background knowledge using all formation text
+    - right answer
+    - appreciate that
+    - can see STUDENT thinking,  where STUDENT going with that
+    - really like fact STUDENT use those contexts clues explain extracting meant
+    - appreciate STUDENT opinion no STUDENT don't think   going be convincing or or  going be valuable
+    - Reading STUDENT told us extracting getting water out see where STUDENT use evidence, saying might take lot time money
+    - Because  possible could get from moon see STUDENT's thinking was, said water very heavy
+    - can see how would be very useful leave behind all ight because may be able find water use water moon not have carry would be valuable
+    - can see STUDENT appreciate fact STUDENT see value because would be valuable source
+    - STUDENT did good job
+    - Yeah, STUDENT did very good job going back finding evidence
+    - Yes,   two words really want focus ,
+    - very good point
+    - STUDENT could circle convincing evidence together
+    - Yeah,  great idea
+    - always want make sure  looking forward
+    - Even  not valuable right now
+    - Like STUDENT just said STUDENT answer would be valuable future
+    - Now, but future
+    - like STUDENT said STUDENT have good, STUDENT have good point may not be valuable
+    - love STUDENT, use text when found answer wonder if
+    - love STUDENT cited where STUDENT found text
+    - STUDENT, STUDENT said STUDENT need specific tool called microscope look really closely which absolutely true
+    - stead saying equipment like question did STUDENT just said tool
+    - perfectly because y synonyms, which means y same or mean same thing
+    - STUDENT told STUDENT gave from text microscope needed look really really closely
+    - glad STUDENT had some place STUDENT could reference back to, because really helpful showing STUDENT know where formation came from
+    - Scientists have found craters full water moon,    absolutely true
+    - STUDENT, STUDENT have found some specific evidence text STUDENT pulled right out
+    - really proud STUDENT finding that
+    - Oh, nice way explain that
+    - Oh, see where STUDENT talking about says water found microscopic mean right,  very small
+    - Which great STUDENT all refer back text
+    - STUDENT got three STUDENT have listed science equipment right which STUDENT first part question
+    - STUDENT know, those pieces equipment use
+    - some awesome prior knowledge STUDENT
+    - can add bit background fo here
+    - so, STUDENT Can STUDENT give another example equipment, maybe something from article just read STUDENT know NASA using space
+    - STUDENT offer lot sight,
+    - That's, ,  fault so, stead, should have said,  way STUDENT answer see where STUDENT coming from
+    - maybe phrased poorly
+    - think definitely gives lot whoever's reading answer clude 
+    - think very good
+    - like STUDENT use detail re
+    - that's, very good
+    - glad STUDENT able get sort perspective
+    - STUDENT give really good strong details very specific part
+    - can kind see STUDENT enjoyment now way can sort improve or something might want see is
+    - Okay, that's, great
+    - think STUDENT got main idea
+    - heart STUDENT answer re
+    - found some water moon
+    - Thank STUDENT very much listening
+    - Those very good listening skills making sure STUDENT always being an active learner think STUDENT really took heart
+    - appreciate that
+    - very good
+    - said re
+    - Why doesn't say anything about water great point but
+    - right, y, STUDENT know, y,   very valuable like how STUDENT pointed out
+    - But when look back question
+    - Okay, awesome,  love how Deb's original response found same STUDENT,  shows STUDENT able make connection with h classmate relate h thinking STUDENT thinking
+    - good skill
+    - love how STUDENT STUDENT STUDENT able look specifically text
+    - use background knowledge like STUDENT used make ferences using background knowledge text tells us, right
+    - want make ferences use use prior knowledge very important
+    - Now can see since STUDENT already have lot prior knowledge about space, how, why STUDENT would come up with answer
+    - great answer, passage
+    - can see exactly why STUDENT would say because does say water microscopic STUDENT would need see microscope, STUDENT would use microscope see
+    - can, STUDENT nt NASA STUDENT actually saw all those things could, can understand why STUDENT would think because   lot things STUDENT probably learned
+    - see why STUDENT would say that,
+    - see where STUDENT get answer,
+    - like STUDENT thinking awesome
+    - STUDENT use details from text support STUDENT thinking
+    - Okay, see STUDENT thinking awesome job using evidence from text ll
+    - like tool scientists use when discovering things
+    - So,   really good explanation definition equipment is
+    - Yes, those some things from STUDENT personal experience,    get formation from personal experience
+    - STUDENT did great job finding first part sentence
+    - Good thinking, because talking about water
+    - talking about moon, but few more
+    - appreciate,  STUDENT added detail us
+    - Water valuable resource right
+    - place can look exactly where STUDENT look STUDENT found right spot look under section
+    - Because has words just talking about
+    - just right place look that
+    - STUDENT did find some evidence, didn't you
+    - All right, see, when STUDENT guys doing great job with talking through working through together STUDENT know where find right place look
+    - STUDENT guys all given really good details
+    - STUDENT guys given really good details that
+    - I've seen STUDENT remembered detail from passage
+    - Because agree with STUDENT no, maybe  not good vestment
+    - think STUDENT justified STUDENT answer 
+    - think STUDENT STUDENT STUDENT All said that, yes,  valuable n STUDENT gave reason why STUDENT thought valuable
+    - spoke STUDENT
+    - justified h answer
+    - wouldn't say STUDENT wrong because says valuable
+    - STUDENT said yeah n STUDENT pulled STUDENT evidence from text,  would asy STUDENT answer right
+    - think all had reasons justified reason
+    - think pretty good complete answer because gave value
+    - But think STUDENT's answer,  said,Yeah, because can drink water can stay hydrated
+    - water how water could be used
+    - STUDENT summarize very ll okay about craters
+    - STUDENT talked about craters craters full water moon
+    - Okay, now STUDENT elaborate little bit more STUDENT answer
+    - like answer
+    - Now, okay, can see STUDENT understand STUDENT reading
+    - STUDENT look back text find STUDENT answer get all formation
+    - like how STUDENT thinking about how STUDENT thinking about STUDENT could use moon, even thought  not re, very good pull from STUDENT read, STUDENT
+    - STUDENT using deep reading skills really engage with text awesome
+    - love STUDENT use vocabulary term microscopic really good
+    - But love STUDENT using prior knowledge really good
+    - loved STUDENT answer STUDENT really use details article STUDENT nt back read water can be split two parts hydrogen oxygen
+    - like STUDENT said STUDENT answer
+    - looks like STUDENT done STUDENT answer
+    - STUDENT,  water valuable, but really need discuss why
+    - Okay,  can see how STUDENT may have misunderstanding because  say STUDENT would need tool called microscope right STUDENT
+    - see where STUDENT found about microscope, STUDENT can see water
+    - But like how STUDENT found machine because did ask tool machine question really like how STUDENT found that, but let's see can find another tool
+    - really like how STUDENT restated text, but need put little really like that
+    - Yeah,  you, STUDENT definitely STUDENT restated text
+    - love how STUDENT used  like text to backup STUDENT answer
+    - really like how mean STUDENT nt straight text STUDENT tell
+    - Yeah, yeah, STUDENT right
+    - try think about
+    - Okay,  next time really love how STUDENT came up with answer
+    - glad talking about question
+    - Good,  glad STUDENT looking specifically found those water craters
+    - STUDENT found exactly where STUDENT should be looking word machine re
+    - STUDENT al found both talked about water
+    - Now did question ask us find about water
+    - STUDENT found exactly both equipment talked about, really, really good
+    - did say will be long time because still haven't been able access water,
+    - glad STUDENT looking text, stead just going off STUDENT know
+    - right after paragraph
+    - want be , STUDENT exactly right
+    - Because  asking us directly about text,  yes
+    - Okay,  STUDENT did find some important formation where
+    - So, STUDENT made really important
+    - Good, agree y not ready
+    - No, STUDENT answers great STUDENT caught fact NASA did send small machine, but STUDENT didn't tell small machine did wanted know
+    - say great text evidence use
+    - say especially specifically text, but look back question
+    - say you, STUDENT basically rephrase first sentence
+    - Yes,   very good
+    - love how STUDENT reading very closely paying attention those very big words very good
+    - probably helped STUDENT little bit with reading passage being able connect some experiences STUDENT had back packet passage
+    - now reason STUDENT could be confused because says, but haven't proved
+    - Okay,  'll keep going
+    - Which which good because did use small machine does say small machine,
+    - STUDENT just used a, sentence from paragraph had piece equipment
+    - STUDENT answer was, NASA sent small machine
+    - STUDENT ballpark
+    - STUDENT found equipment
+    - like STUDENT use wording scientific tool
+    - like STUDENT use word scientific tool
+    - Great,  great job re,
+    - really appreciate STUDENT explaining STUDENT answer
+    - understand STUDENT mean
+    - like STUDENT shared STUDENT opinion STUDENT answer
+    - sometimes  hard us STUDENTs even sometimes teachers because  not scientist understand how long takes figure out how get things right
+    - Like right now,  not ready like STUDENT shared STUDENT opinion, good job re
+    - think STUDENT correct,  sometimes  not going be ready
+    - STUDENT guys have all shared STUDENT responses with us been really, really good
+    - really liked STUDENT guys tried pull STUDENT evidence from text
+    - Okay,  things would say STUDENT guys did really good job trying pull things STUDENT found Out text
+    - Yeah,  certainly makes sense from having gone see type stuff
+    - great STUDENT had chance see some other things have happened space
+    - great job be able identify means
+    - STUDENT guys did really good job using STUDENT past knowledge microscope
+    - STUDENT looked back tech stuff convincing evidence water can be valuable
+    - Good job STUDENT may be redirected rethought STUDENT answer
+    - Yes,    within text, does state stuff,
+    - Okay,  STUDENT know, good job
+    - Yes,  within actual document state STUDENT can split up between oxygen, hydrogen oxygen
+    - STUDENT able sort of, STUDENT know, find those key evident key evidence, very quickly
+    - very good job
+    - Very good looking deep STUDENT question circle
+    - Alright,  first look question again
+    - very impressed about how everyone took time look over look text had some really deep connections really STUDENT really thought about things asking
+    - great response love how STUDENT made connection because helps some us out detective
+    - Made connection  studying about space moon
+    - STUDENT made connection detective
+    - used like STUDENT use h dad an astronaut
+    - again, STUDENT goin back when STUDENT said STUDENT didn't understand about word, think, STUDENT know, more than STUDENT think evidence STUDENT just showed evidence about how survive
+    - appreciate you, when looking text STUDENT notice scientists use microscope
+    - appreciate STUDENT c get correct answer
+    - very that's, very good ask STUDENT STUDENT seeking know why STUDENT answer wrong
+    - love y'all all thinking about story using
+    - Using text help support STUDENT answers,
+    - think STUDENT doing good job putting together
+    - such great comment,   really great STUDENT able tie with real world experience would think definitely use those things moon
+    - STUDENT can bring STUDENT prior knowledge article sort like STUDENT
+    - especially like STUDENT said about an opinion because asking an opinion
+    - STUDENT,    perfect
+    - really, really think STUDENT did really good job identifying separating fact now versus later
+    - you're, STUDENT may know lot about space, that's, agree with you
+    - STUDENT know answer makes perfect sense
+    - STUDENT great job talking about question
+    - far goes
+    - STUDENT obviously understand question
+    - again,  just going that
+    - STUDENT picking up key parts text which water can be split two parts hydrogen oxygen important
+    - STUDENT already parts STUDENT answer question STUDENT provide evidence STUDENT explain STUDENT evidence
+    - STUDENT great STUDENT answers
+    - Yes, astronauts can drink water stay hydrated
+    - STUDENT can't survive without water
+    - hard because like STUDENT have STUDENT own opinion
+    - would really like STUDENT do, though
+    - Yeah, mean,  great way say
+    - Okay,   have first noun equipment an excellent strategy look if question focused noun specific things
+    - STUDENT did,  fact, STUDENT response very good finding pieces text evidence
+    - great piece text evidence
+    - great thought process, putting those two together
+    - Okay convincing evidence valuable
+    - correct
+    - like STUDENT found because STUDENT did find paragraph four right under heading helped lead STUDENT right direction
+    - like way STUDENT gone back put key words from question with STUDENT answer
+    - appreciate STUDENT looking your
+    - like how STUDENT making connection
+    - like how STUDENT bringing prior knowledge STUDENT already know help STUDENT answer question
+    - know exactly where  text  believe, part three first pair first section
+    - So, good job STUDENTon deaf
+    - Okay, can see how STUDENT got re, can see can see that
+    - Good job, y reading that
+    - Yes,   true
+    - like STUDENT nt back text had some support support STUDENT answer agree with you
+    - am very glad STUDENT nt back texts able find support STUDENT answer
+    - did really good job
+    - really liked STUDENT answer how STUDENT can how STUDENT cluded both parts those,  water heavy water can be broken two parts,  us
+    - actually very ll done,
+    - very logical series steps STUDENT took get answer
+    - love where STUDENT nt with very logical series steps STUDENT took,
+    - Yeah,  makes complete total sense
+    - good job connecting dots re
+    - good STUDENT pulled Lunar Orbiter
+    - STUDENT can definitely still say STUDENT answer is,  big part STUDENT want reconstruct to, but think be little more specific
+    - now STUDENT chosen answer gives us more detail, stead just circling same STUDENT
+    - STUDENT thought process lot deeper ll
+    - First all, because know really important detail, but now know how found those craters 've answered question with much more detail
+    - Great, that's, really good STUDENT
+    - appreciate STUDENT noticed where water found
+    - Okay, now, like how STUDENT have started thinking about question
+    - did say equipment use discover water moon,  STUDENT starting think about equipment Would need find water moon
+    - STUDENT have mentioned two pieces equipment specifically referenced text Lunar Orbiter microscope
+    - like how STUDENT read text STUDENT saw mentioned microscope STUDENT thinking,  have have microscope see water deposit
+    - refore,  microscope used find water deposits
+    - Right,   like how STUDENT have focused part question STUDENT focused part where says y,  discovered water moon STUDENT specifically said where found water moon,  found craters
+    - Okay,   like how STUDENT have referenced something text specifically mentioned does fact say water can be broken down oxygen hydrogen
+    - great because STUDENT obviously nt text text does fact say astronauts could drink water
+    - Absolutely text says,  great STUDENT point formation out text water H2O can be splitting oxygen hydrogen
+    - Right,   love STUDENT guys able close STUDENT eyes see help STUDENTelop that
+    - STUDENT found directly text
+    - Anything STUDENT did use lot background knowledge STUDENT answer
+    - Okay, understand that
+    - but love STUDENT brought STUDENT outside knowledge conversation
+    - just like that
+    - STUDENT example
+    - Okay,  just like STUDENT love STUDENT using STUDENT background knowledge contribute discussion y al may be
+    - first question, STUDENT said scientists use microscope look closely wanted say really good like STUDENT used specific name tool scientists use, but al want encourage STUDENT to
+    - STUDENT did really good job, saying microscope tool used because STUDENT definitely correct is
+    - awesome want say good response because STUDENT said use lot equipment n STUDENT specific saying oxygen tanks
+    - think  really good when STUDENT reading text think about STUDENT already know experiences STUDENT have like STUDENT saying
+    - already knows lot about space learned astronauts use specific things great keep mind when STUDENT reading text
+    - Right, definitely appreciate like STUDENT able find exactly where text STUDENT found STUDENT answer have concern, though,   question
+    - very good response like STUDENT provided use water would be STUDENT evidence STUDENT pulled from text um
+    - STUDENT able find text good job
+    - great job pulling out text
+    - strength far from was,   STUDENT pointed out material use,  n STUDENT said used which very good
+    - like that's good plan thinking when reading yesterday first time like no not yeah like STUDENT response like how STUDENT look evidence
+    - STUDENT answer, which really good  keep Keep up good job looking evidence before even asked question
+    - STUDENT think  good vestment thought thought STUDENT answer great because, like
+    - STUDENT know, someone could have given like shorter simple answer, guess, but STUDENT answer still very good good job us man, thank STUDENT very much, no problem, no problem  dead, STUDENT said
+    - STUDENT like how STUDENT added evidence STUDENT have stay hydrated because STUDENT can't STUDENT can't survive without water 
+    - like how STUDENT paid attention STUDENT paid lot attention STUDENT paid lot of
+    - Attention details which very key reading passages like this, because STUDENT mess up details n STUDENT answer like could be not STUDENT wanted say, but like STUDENT messed up reading n STUDENT answer when county all messed up STUDENT know mean ll
+    - STUDENT response actually really good
+    - like how STUDENT use word microscope STUDENT knew used for
+    - right,  like STUDENT answer, how STUDENT use evidence from STUDENT knew told you,   name machine set up for
+    - Like  lot more general towards check said n an opinion STUDENT add or STUDENT guess STUDENT saw re
+    - think STUDENT did really great job, pulling from text,
+    - great response
+    - STUDENT had some STUDENT personal views, along with some thoughts came from text
+    - STUDENT said related text really ll
+    - STUDENT, think STUDENT had some great vocab sorry, did STUDENT have question, STUDENT
+    - yeah  definitely good answer give STUDENT use multiple paragraphs looking through find answer, but where question kind of
+    - glad could expand can see how   much more getting space finding water than thought was
+    - But STUDENT use great academic knowledge
+    - nd great academic vocab STUDENT response
+    - STUDENT notice small machine very good which al stated, shows STUDENT use STUDENT context from text, which very good
+    - But STUDENT used great academic vocab STUDENT response
+    - did use microscope look water closest answer small see how STUDENT connected those two
+    - background knowledge helpful understand what's going passage, want STUDENT use background knowledge help STUDENT understand passage better be able read find answers
+    - thing noticed STUDENT started out with STUDENT context STUDENT background knowledge which great,  always useful
+    - Yes, right  always great have background knowledge help us understand text better or understand question better
+    - Awesome STUDENT got right from passage,
+    - mention piece evidence passage because says clearly passage   example, future astronauts can drink water
+    - STUDENT had said water can be split two parts, hydrogen oxygen, STUDENT right,   from passage,  STUDENT did get from password, which good,
+    - STUDENT, just STUDENT said, STUDENT said STUDENT understood, but still want give STUDENT feedback
+    - awesome see STUDENT did,
+    - great use reading, help us with answer
+    - awesome says text, which great used resources,
+    - awesome yes,  cluded important details
+    - STUDENT don't think  valuable,  see where STUDENT coming from because does say right here making plan will take lot time money,
+    - look last sentence, because like STUDENT brought up making plan will take lot time money
+    - STUDENT al noticed STUDENT have be did STUDENT background knowledge referencing use oxygen tanks moon
+    - knew STUDENT using STUDENT background knowledge because reading,  read,  didn't read anything about oxygen tanks, but STUDENT knew when STUDENT Loon
+    - STUDENT need have oxygen be able breathe, right?
+    - can see why STUDENT think microscope important,  agree microscope very important, with discovering water moon
+    - Okay,  see how STUDENT did connect but STUDENT STUDENT kind scanning page words connected water, because question about finding water moon
+    - really good strategy
+    - STUDENT,  did use microscope really look closely,  really good way use text evidence STUDENT answer
+    - Thank STUDENT pointing out, STUDENT
+    - thank STUDENT explaining STUDENT answer using text really ll
+    - answer because really, like said, really uses text like STUDENT's
+    - STUDENT quoted reading really ll really like that,  STUDENT al found text where
+    - STUDENT really liked STUDENT answer STUDENT really, STUDENT mentioned evidence from from reading
+    - talks about specific things question asks
+    - really like STUDENT STUDENT took us very specific part text um
+    - lot people use lot good language responses STUDENT STUDENT guys really use lot Nice language specific language from texts really appreciate
+    - STUDENT's response really good because does lead us answering question,  question equipment did use
+    - answers NASA sent small machine
+    - Okay,  STUDENT's response NASA sent small machine
+    - Yes, thank you,  is
+    - really, really nice way phrase that
+    - awesome love, how long like how STUDENT worded STUDENT answer
+    - love, how STUDENT comprehend reading ll
+    - love, how STUDENT said STUDENT look back reading like determine which machine STUDENT thought would be best e
+    - , STUDENT answer right about microscope data scientists did use microscope look water already found reading says already found water
+    - really like how STUDENT looks back reading really understood question because STUDENT totally did
+    - STUDENT totally right about how NASA STUDENT much equipment like oxygen tanks other things like that,   definitely use when go moon, but
+    - ll great,  can definitely tell STUDENT guys read reading understood
+    - totally understand where STUDENT coming from,  think great way STUDENT guys terpreted terpreted reading,
+    - definitely can see how STUDENT would find confusing
+    - glad STUDENT guys didn't notice when STUDENT guys read,
+    - agree does say other equipment Thank you
+    - STUDENT answer almost perfect does show STUDENT read reading understood understood question which great
+    - definitely could have,   see where STUDENT coming from,
+    - Oh, even STUDENT bring up really great point
+    - saw STUDENT use STUDENT background formation when you
+    - Right,  think STUDENT STUDENT STUDENT all did this, STUDENT used all STUDENT background knowledge when answering question, which great
+    - Good STUDENT STUDENT both found specific formation text great
+    - STUDENT got answer STUDENT use evidence from text because says small machine,
+    - Right,  STUDENT again STUDENT using some evidence from text which great, but
+    - Oh right Okay,  when read sentence,  STUDENT immediately think okay good need water drink, which great answer, but goes say that
+    - thought great response, noticed STUDENT used STUDENT vocabulary,
+    - STUDENT made an amazing excellent ll thought out response
+    - Now STUDENT built STUDENT response
+    - great response
+    - noticing STUDENT use text support STUDENT answer, STUDENT used two words scientific tool
+    - awesome  noticing, STUDENT said STUDENT referred exactly where text STUDENT found STUDENT answer STUDENT said paragraph three
+    - noticed said used microscope find water,  exactly question asks really like how STUDENT referred back question help support STUDENT answer
+    - awesome see STUDENT just improved STUDENT response just looking back STUDENT read STUDENT read sentence STUDENT strengthen STUDENT response
+    - tools,  equipment, thought about question n looking back text STUDENT did same thing STUDENT looked STUDENT found another thing use how discovered water moon adding those key terms STUDENT answering question equipment
+    - awesome STUDENT started with found creators water n you, STUDENT referred back question STUDENT thought about STUDENT peers responses STUDENT ended up adding equipment used
+    - Alright,   noticing STUDENT really strengthen STUDENT response from start end STUDENT really use STUDENT thinking STUDENT use text support you
+    - Thank STUDENT much sharing STUDENT responses
+    - want particularly point out, STUDENT STUDENT's responses STUDENT guys did really good job highlighting exact equipment use
+    - Naming exact specific examples equipment
+    - pointed out, STUDENT,  STUDENT, both STUDENT had done really good job from beginning
+    - Exactly, but STUDENT did an awesome job backing up STUDENT answer, really liked that
+    - STUDENT background knowledge very beneficial,  love how STUDENT have that
+    - STUDENT, know STUDENT talking about all STUDENT knowledge
+    - OK, now, saw lot vocabulary STUDENT guys used STUDENT responses amazing
+    - STUDENT did really good job with that
+    - using tool STUDENT used,  really good take equipment look through text examine, right?
+    - STUDENT did
+    - STUDENT looked through STUDENT tried find word fitted
+    - shows STUDENT understand STUDENT reading STUDENT understand questions  asking you, but STUDENT had great start STUDENT question answer, mean
+    - NASA don't think had any oxygen tank love, how STUDENT use STUDENT background knowledge answer questions,
+    - See orbits craters closer STUDENT connected microscopes, which really good
+    - use science STUDENT, but
+    - actually really good
+    - thing noticed STUDENT took evidence from text scientists wanting see things
+    - STUDENT connect fact waters found moon used oxygen right,
+    - love how STUDENT challenging STUDENT capacities think about truly makes water valuable really valuable get from moon
+    - true love, how STUDENT challenging question itself,  think , reasons support evidence water valuable don't think that
+    - Just not great connection
+    - mm hmm really good STUDENT realize from article  
+    - STUDENT people use background knowledge, because tells STUDENT really thinking about STUDENT already know, but STUDENT really like you
+    - Right, really like that, just like STUDENT, think STUDENT have really good grasp STUDENT trying say,  think STUDENT really understand text
+    - really like answer
+    - like STUDENT gave reason why STUDENT think um
+    - like lot really good evidence STUDENT shared with STUDENT answer
+    - which concern have you, although very good point  going cost lot money might take very long time us get re
+    - like about STUDENT responses, STUDENT took specifically from text you
+    - STUDENT said, water heavy  good don't have carry ships anymore like STUDENT really liked answer because right from text STUDENT took formation, right from text,    really important part answering text specific questions
+    - great job!   great job using STUDENT skills text using context text find STUDENT answer
+    - think really great response STUDENT had STUDENT used STUDENT academic vocabulary STUDENT used something stated directly from text
+    - STUDENT did use an idea stated directly from text
+    - STUDENT answer really great
+    - yeah thing noticed from STUDENT response, thought STUDENT response really ll STUDENT wrote very ll STUDENT made points very clear
+    - That, think STUDENT answer great,  STUDENT did great job again  clarifying STUDENT know, saying that
+    - scientists use lot equipment like oxygen tanks  clear point
+    - glad STUDENT nt back text because know answers want focus two things using evidence
+    - really like STUDENT could find specifically types tells STUDENT reading very carefully,   fact STUDENT remembered where came from
+    - very good means STUDENT paying attention, yes, good job
+    - did have evidence STUDENT said, why would be good thing
+    - like STUDENT did state yours like STUDENT agreement or disagreement case, STUDENT would did agree,  n STUDENT did say why would be valuable resource because   water moon,   could drink STUDENT answer, STUDENT had very good answer
+    - like very clarifying
+    - know found really awesome STUDENT picked up because think really great piece formation
+    - like STUDENT really pulled from text
+    - great love how STUDENT took trying pick tool equipment,  use those cinnamon synonyms found answer,    great job
+    - yep discover water moon definitely important definitely found first paragraph,  understand where STUDENT would get answer,
+    - love STUDENT had really specific reference text talking about NASA sent small machine
+    - STUDENT, STUDENT response really awesome
+    - STUDENT, STUDENT answer really awesome
+    - love how STUDENT talked about microscopes really specific
+    - STUDENT even described microscope does, which allows STUDENT see something super up close, which talk about article
+    - great jobs see STUDENT use STUDENT knew important words question,  n STUDENT looked STUDENT saw sweater right,   want use just same ideas work with questions answered before
+    - yeah understand understand STUDENT confusion
+    - How phrase, could have been confusing next time i'll make sure more concisely explain STUDENT guys
+    - STUDENT really great job because STUDENT look through text STUDENT found equipment mentioned, which lunar orbiter but STUDENT al notice microscope mentioned, but STUDENT realize microscope does not help find water moon
+    - guys  really great job really love STUDENT guys starting use text STUDENT read previously
+    - great STUDENT able gather formation out article
+    - great STUDENT able point out
+    - piece equipment mentioned article
+    - microscope type equipment
+    - very good thing point out
+    - more than just those pieces equipment scientists have use astronauts have use get moon
+    - STUDENT right scientific tool use during science see things closely
+    - would make sense
+    - some STUDENT science classes, maybe
+    - STUDENT use before
+    - Right,  STUDENT kind using STUDENT prior knowledge experience come up with answer, which great
+    - did use microscope night STUDENT found right from evidence
+    - like how STUDENT answer
+    - STUDENT, STUDENT specific STUDENT said found water Craters moon
+    - Right,   great answer, because see STUDENT got STUDENT formation right from article ch paragraph water heavy
+    - takes up lot space
+    - STUDENT have put steps together very ll STUDENT brain
+    - need things even be space
+    - very, very, very good
+    - STUDENT like about didn't know anything about topic finding water moon,  had never read passage could learn how astronauts discovered water moon from STUDENT answer
+    - like STUDENT expanded STUDENT thinking
+    - STUDENT, really like STUDENT just did STUDENT started with an idea n STUDENT came up with some STUDENT own thoughts, STUDENT own thought maybe didn't have carry heavy water could carry other things ll
+    - see how 've made link between using water make hydrogen fuel oxygen something astronauts use very good
+    - really liked STUDENT had an answer STUDENT opinion whether or not STUDENT think   compelling evidence
+    - isn't much water moon
+    - STUDENT, love how STUDENT have said things STUDENT learned from text party support STUDENT answer
+    - Right okay good,  I, like all STUDENT answers STUDENT all really clearly worked with text use STUDENT best work get where STUDENT are
+    - can see where STUDENT would say microscope oh go ahead
+    - wonderful thinking
+    - loved way STUDENT flexible change STUDENT thinking made STUDENT answers much better
+    - wanted say, STUDENT
+    - loved STUDENT first answer STUDENT agreed with STUDENT, because means STUDENT listening STUDENT friends thinking
+    - really important learning
+    - like STUDENT second answer better because STUDENT put STUDENT own words
+    - thank STUDENT much using sentence starter
+    - great answer
+    - both STUDENT found STUDENT answers somewhere text, STUDENT re,  clear STUDENT read text really love STUDENT looking text, STUDENT definitely read, or least looked, which great
+    - Okay, Deb, just want say really love STUDENT listened STUDENT listening such an important skill STUDENT
+    - Sometimes  n talking think  credible STUDENT listened answer STUDENT agreed with her
+    - really great skill
+    - even value all formation side STUDENT brain never lose passion space because  amazing
+    - love STUDENT used STUDENT listening skill STUDENT listen STUDENTs answer
+    - STUDENT really strong answer like how STUDENT reference text, STUDENT said  called lunar orbiter because says right side text
+    - Thank STUDENT sharing STUDENT answer connecting with others have said, seems like STUDENT asking, How come STUDENT didn't get full credit STUDENT answer
+    - like STUDENT gave specific tool
+    - great read answers directly text
+    - like how STUDENT took STUDENT answer correctly from text
+    - STUDENT saying lunar orbiter vestigates polar craters ice very strong answer because STUDENT look text STUDENT quoted text directly
+    - Which good because provides more space strong answer because  rooted text
+    - How STUDENT even expanded STUDENT thinking just now
+    - Yeah, really appreciate appreciate STUDENT looking carefully question exactly words equipment
+    - Yeah, really appreciate STUDENT give us fact from passage when STUDENT answer question
+    - STUDENT really gave us evidence STUDENT found text,  importance water
+    - really appreciate STUDENT looking carefully question
+    - Okay, really appreciate STUDENT give us fact exactly evidence all passage when STUDENT answer question
+    - Yeah, like
+    - STUDENT had target right place passage STUDENT answer
+- intent: r200
+  examples: |
+    - think about before actually look water with microscope equipment did scientists use discover water found moon,   use microscope after had found, but did use find STUDENT remember
+    - STUDENT remember called machine science has all sorts wacky names machines looking  looking see can find name small machine was.  STUDENT remember?
+    - yep totally yeah look text look back, think  close same line about small machine  not sure, but us know
+    - STUDENT STUDENT STUDENT ready come back us with an answer, or STUDENT want to vestigate some other answers first
+    - yeah totally microscope STUDENT look three sentences Here three paragraphs paragraph three, says water found microscopic meaning STUDENT wouldn't be able see STUDENT looking straight, STUDENT would need scientific cool tool called microscope look really closely re's part with microscope but, go before n.  see where STUDENT found called Lunar orbiter paragraph two right?
+    - says NASA send small machine called lunar orbiter vestigate question equipment did scientists use discover water moon, not look afterwards, does make sense
+    - Hello think all really great starting answers,  just want us really work looking text, little more,    can make answers more complete built textual evidence see reading Can get yes
+    - think all have different strengths here just want us really practice not just like knowing content but al being able use skill backing responses up with text with evidence from text
+    - Like where where found answer texts, yes STUDENT
+    - yes,  great STUDENT have microscope  saying need because discover water, because water small STUDENT wouldn't be able see otherwise awesome
+    - glad STUDENT brought up, because just about ask other answers people had,  why don't STUDENT little bit about STUDENT thinking with STUDENT answer
+    - yeah does machine call
+    - tiny water ll can, yes love that,   have lunar orbiter  going polar crater  looking small water where's small water located 
+    - form so,  like  looking giant lake  looking can yeah  form water same,  text part two, yes don't
+    - yeah definitely lot different equipment even reading right 've already identified two different
+    - Okay, think, part doing right now isn't just about knowledge learning  going think about evidence  looking text OK,   background knowledge going be great  going help us understand little bit reading, but specifically al want look evidence right
+    - equipment, did use okay   looking name what's name small machine came
+    - Okay,  might have found answer second paragraph  thinking perhaps equipment used small machine called lunar orbiter vestigate
+    - yeah think re,  can see, even very short text see two different pieces equipment mentioned right sad lunar orbiter  seeing thing about microscope even just few sentences  seeing multiple pieces equipment, but how decide which answer question right
+    - did did third paragraph tell us scientist used microscope find water
+    - but know sure, does paragraph tell us had does say scientists used e
+    - yeah STUDENT you STUDENT thinking might have needed use microscope see
+    - STUDENT why don't STUDENT tell more about STUDENT answer made STUDENT say STUDENT said
+    - awesome STUDENT which piece equipment,  STUDENT think most important here.
+    - All right, STUDENT, can STUDENT tell more about STUDENT answer made STUDENT say NASA sent small machine
+    - would be, can STUDENT tell more about small machine does
+    - awesome little machine lands moon
+    - awesome STUDENT how could STUDENT rewrite STUDENT answer clude piece formation
+    - STUDENT STUDENT, STUDENT said STUDENT will have same answer,  why don't work together
+    - STUDENT i'll be with STUDENT just second
+    - STUDENT, can STUDENT tell more about STUDENT answer why STUDENT said STUDENT did
+    - STUDENT can STUDENT read line again where STUDENT found story, does say
+    - Okay,  question equipment did scientists use does sentence mentioned scientists actually use microscope STUDENT
+    - Okay,   STUDENT had same answer STUDENT, can STUDENT tell why STUDENT put answer ll
+    - yeah STUDENT right Those all great examples equipment,  STUDENT said scientists found craters full water moon, can STUDENT tell more about answer
+    - Absolutely, yes,   evidence  called textual evidence, means STUDENT drawing STUDENT answer from source
+    - first thing want us talk about when  here group want STUDENT think question asking
+    - wh does mean circle evidence
+    - noticed STUDENT answer STUDENT definitely say lot equipment scientists use  assuming STUDENT probably done some sort dependent research or reading this
+    - Alright,   talking about sort evidence or sort equipment scientists use get water or find water, not evidence sort looks
+    - couple STUDENT put would need microscope right
+    - STUDENT asked STUDENT equipment did scientists use discover water moon,  how would STUDENT answer using textual evidence
+    - But like little parts concern wanted help STUDENT guys sort find STUDENT can fix those answers, looking things like evidence complete answers
+    - An action word like verb,  tells us STUDENT with equipment water
+    - Can someone tell discover means?
+    - absolutely correct
+    - specifically looking piece equipment used discover water or find water
+    - not trying look, STUDENT, did STUDENT have something tell
+    - trying discover
+    -,  specifically asking us about water right
+    - think  really cool STUDENT got experience that
+    - Yeah, all those things really important
+    - does equipment main guys
+    - going tell us about equipment used water
+    - while  reading,   looking for
+    - going be paragraph two,   going read you
+    - going look at, paragraph two, okay
+    - just want STUDENT listen while am reading find particular equipment might stop talk about
+    - Now sent small machine called lunar orbiter vestigate
+    - small machine, what's another word, maybe question
+    - means same thing
+    - Does anybody know synonym word vestigate
+    - lunar orbiter will land moon South Pole look ice deposit large polar crater,  ice deposits very small, scientists said top ton top layer moon surface would hold total about 32 ounces water
+    - an ice deposit
+    - Okay,  STUDENT want STUDENT answer with us
+    - means moon still drier than driest desert Earth
+    - STUDENT looking straight
+    - water found microscopic meaning STUDENT wouldn't be able see
+    - STUDENT need scientific toll called microscope look really closely
+    - microscope, helping guys
+    - Yeah, y looking really closely, y not looking
+    - y not discovering yet order look really closely,  have have already found right
+    - had discovering have looking, those two words
+    - those two different things
+    - kind words those talked about earlier lesson
+    - had some really great responses
+    - trying figure out equipment scientists used discover water moon
+    - when look back text
+    - going make sure answers can be proven from text
+    - think  asking us say like title object
+    - STUDENT did, STUDENT did say that, but look, says equipment
+    - name machine called?
+    - lunar orbiter looks ice deposits large polar crater
+    - look back see can find
+    - Because  passage
+    - says, NASA sent small machine called Looper Lunar Orbiter vestigate
+    - did use find lot water craters
+    - But tool where using?
+    - telling us talk about equipment
+    - But look back question
+    - read sentence
+    - But look back see called
+    - Okay,   number two, NASA sent small machine called lunar orbiter vestigate
+    - Now, does microscope do? did say microscope did text?
+    - Does anyone know discover means?
+    - STUDENT have find water before STUDENT can look right
+    - Before can look
+    - going use Lunar Orbiter find
+    - Right discovers when find have find first
+    - Okay, but can use microscope discover water?
+    - STUDENT need scientific tool called microscope look very closely
+    - But look discussion question
+    - STUDENT right STUDENT did talk about water
+    - Does say anything about equipment used?
+    - need find equipment used
+    - look back STUDENT passage, equipment did use find water
+    - look number two
+    - Lunar Orbiter looks ice deposits large polar crater
+    - ice deposits very small wh ice?
+    - Need STUDENT narrow down STUDENT answer more specific
+    - go back text,  have specific answers from text
+    - equipment did use?
+    - did find water
+    - But question wants know equipment did use
+    - But equipment did use find?
+    - used moon, but need figure out exactly which piece equipment use discover water moon
+    - need go back text find specifically where states equipment used discover water moon 
+    - But  specifically talking about which piece equipment used discover water moon
+    - go back texts look
+    - yes specific tool or equipment used
+    - says text
+    - go back look
+    - talks about equipment but can be another word equipment
+    - Go back look what's another word can use STUDENT
+    - name machine
+    - tells why astronauts using water from moon need go back text, all us figure out why think water moon could be valuable
+    - go look wh says, Can astronauts use
+    - water main for
+    - astronauts use water for
+    - why valid valuable
+    - But does say text about how astronauts use water, should be under bottle water valuable source
+    - ways  being used
+    - Or how can be useful
+    - can use what's man
+    - can be way can be don't have use travel with re
+    - All right,  how use hydrogen oxygen
+    - Right,  going be very valuable astronauts right y going use water
+    - also, STUDENT saying wouldn't have travel with
+    - Yeah, oxygen,  n can use hydrogen from water rocket fuel
+    - From Earth Moon,  n I'll back right dices what's re
+    - learn some more
+    - STUDENT answer was, STUDENT need scientific tool called microscope look really closely
+    - STUDENT go back , think  second paragraph, you'll see NASA sent small machine called lunar orbiter vestigate lunar orbiter looks ice deposit large polar crater
+    - But did STUDENT read article because  not sure STUDENT really need answer because STUDENT circled same her
+    - STUDENT would have read [unintellible] see where says, NASA send small machine called lunar orbiter vestigate because STUDENT have understand question asking
+    - would be STUDENT question
+    - equipment did scientists use discover water moon
+    - question didn't ask anything about found, did use find
+    - ,   STUDENT refer back question, did mention equipment
+    - assuming STUDENT address STUDENT thinking microscope ll
+    - STUDENT lcome STUDENT, STUDENT said STUDENT had circled same thing STUDENT
+    - Okay, STUDENT, which what, what, where did STUDENT circle or words
+    - Did important word or words did STUDENT circle question
+    - STUDENT think important words could be equipment?
+    - Yes,  where found
+    - use that, but  just like with STUDENT
+    - asked him, did use discover water
+    - n 'll talk about answer
+    - where found looked ice deposits
+    - So, since ice wasn't necessarily water,  but frozen water look large polar craters
+    - guess really cold 
+    - landed moon South Pole
+    - did STUDENT say STUDENT have new answer
+    - Did STUDENT have chance, did STUDENT go back look find same answer or did STUDENT find something different
+    -, STUDENT,   see here talking about using all other equipment
+    - Right help survive
+    - appreciate answers STUDENT gave, go ahead review some things 've talked about
+    - Thank STUDENT joining small group table, guys
+    - STUDENT right,   sure   lot more than just oxygen tanks lot more than know about Here, since not an astronaut or don't go out space
+    - Yes,   have use lot equipment
+    - Maybe other equipment might have used just find oxygen, or excuse, just find water moon, some other points STUDENT made us passage read some other points,  made
+    - tell, just reading passage STUDENT
+    - Can STUDENT tell word equipment might refer passage, kind equipment
+    - STUDENT underlined equipment discover
+    - Did scientists discover water moon with
+    - How else could have found or other STUDENTices could have used find water moon craters
+    - When read deeper passage,   answer STUDENT gave us
+    - STUDENT thinking use lot more equipment body go craters like talking about oxygen tanks
+    - but ice deposits are, can STUDENT tell says ice deposits very small
+    - y looking something very small y having take lunar orbiter re
+    - al read paragraph three
+    - STUDENT based passage, makes STUDENT think evidence not convincing
+    - makes STUDENT think way
+    - word could second sentence
+    - Can STUDENT circle word could with STUDENT pencil, STUDENT will,   second sentence paragraph four, says, could be useful lots ways
+    - would STUDENT think word useful iss al same maybe valuable look back paragraph  telling us, could be useful
+    - STUDENT think could be an important way express water can be valuable future
+    - agree with you
+    - haven't seen yet because something may take lot time money us see but
+    - haven't seen yet
+    - so, carrying all water may not be very may not be very good idea can find water way use moon,
+    - Am correct STUDENT STUDENT thinking
+    - Space spacecraft, would be valuable not have carry all ight had access water moon
+    - could carry more equipment or more astronauts stead
+    - would make valuable us
+    - STUDENT STUDENT person who said no
+    - Can STUDENT tell STUDENT answer give some thinking STUDENT had mind
+    - did first paragraph tells us?  STUDENT know?
+    - stop second
+    - Can someone paraphrase paragraph me?
+    - Yeah, would deposits be, STUDENT think would look like?
+    - tool use because deposits small STUDENT can't see with STUDENT eyes, STUDENT have use tool microscope be able see
+    - Okay moisture
+    - But still bigger than moisture found moon
+    - can see frost with naked eye, but found moon,  would not even be able tell  without Lunar Orbiter microscope, being able see that
+    - STUDENT Can STUDENT tell, can STUDENT read paragraph, where says
+    - Where did STUDENT find evidence that
+    - scientists use lot equipment like oxygen tanks
+    - Where paragraph, does talk about scientists use equipment like oxygen tanks
+    - Can STUDENT tell where STUDENT found
+    - Why would microscope, help us see water
+    - Because   big, or  small
+    - STUDENT think water moon looks same glass water would drink
+    - paragraph three, does say about
+    - When, when says  not able see
+    - does say right after that
+    - having glass water with lunch,  can see that
+    - can see   something glass
+    - does tell us water moon compared water have here
+    - STUDENT know have STUDENT turned before naked eye
+    - can't see with naked eye
+    - might have because found crater
+    - might be lots re, but  small
+    - how STUDENT think lunar orbiter being able that
+    - But how can equipment, find water moon
+    - Because remember,  paragraph three, says,  wouldn't be able see water
+    - Does tell us happened
+    - STUDENT said scientists found craters full water moon
+    - talk about STUDENT answer
+    - Did say re
+    - can be found
+    - Can STUDENT help find passage where talks about oxygen tanks
+    - But passage ly talking about
+    - anything passage talks about oxygen
+    - found moon
+    - Yeah, which really isn't telling us
+    - machine right
+    - STUDENT Did STUDENT find anything talking about oxygen
+    - Lunar Orbiter helped find water, but want all STUDENT look paragraph three
+    - does say about water paragraph three
+    - need do, how find can't see
+    - STUDENT look paragraph to
+    - Can STUDENT look down four sentence
+    - cup right here 30 ounces
+    - Would though word water have be take ton surface which
+    - couldn't even describe would be trucks trucks loads topsoil okay upload moon still would ly fill glass
+    - great STUDENT know lot about space, but  going specifically talk about moon water found moon
+    - going look questions ,   have
+    - just want STUDENT guys look together with can get deeper understanding reading passage
+    - But want us look deeper question asked us, okay, because all struggled little bit with giving specific answer question
+    - Okay,   two words really want focus equipment discover,
+    - says use equipment discover water find water moon
+    - But remember,  second word STUDENT circled or underlined question was, discover paragraph
+    - but said when circled second key word
+    - so, would STUDENT like look back STUDENT paragraph see STUDENT can find
+    - question need al look word discovered use discover, discover an action word
+    - something did
+    - NASA sand, small machine, but can STUDENT look back STUDENT paragraph see STUDENT can find name machine
+    - Okay,  STUDENT, STUDENT correct
+    - right, good job
+    - Can STUDENT tell paragraph STUDENT found
+    - Lunar Orbiter
+    - But yes,  two key words wanting STUDENT guys find evidence valuable yes def
+    - Did anybody see paragraph four,  word valuable actually beginning paragraph
+    - Can STUDENT tell more?
+    - know where was
+    - wonder,  asking about equipment
+    - kind like machine used discover
+    - But now  asking about machine
+    - Did STUDENT find answer text?
+    - y synonyms each other
+    - when have something same word tool would call synonym
+    - STUDENT right equipment tools,  equipment another word tool
+    - STUDENT said STUDENT use microscope look closely
+    - loved STUDENT answer, but want challenge STUDENT little bit
+    - STUDENT know difference or can STUDENT explain difference between discovering looking
+    - when STUDENT discover something, have STUDENT ever seen before?
+    - Finding but planning first time
+    - STUDENT, STUDENT told STUDENT circled same answer STUDENT but want STUDENT challenge STUDENT see STUDENT can find text where says or where talks about microscope, because
+    - Scientists use lot equipment like oxygen tanks
+    - Now did scientists use oxygen tanks discover water moon?
+    - remember,  looking equipment
+    - lunar orbiter doing different job
+    - called lunar orbiter what?
+    - Hmm that, again  coming back STUDENT had told us about look discover how little confusing
+    - Which verb using paragraph look or discover?
+    - Hey everybody,  want challenge STUDENT think about answer STUDENT have right now see STUDENT can find evidence text supports answer
+    - Can STUDENT read discussion question us
+    - am excited STUDENT excited about space, but challenge STUDENT go back reading think about response STUDENT gave
+    - discovering water moon
+    - think STUDENT STUDENT had told us about oxygen tanks
+    - Did use oxygen tanks discover water moon, or did use something else
+    - Okay,   know,  know much, but still don't know used to, discover water moon
+    - but doesn't tell us equipment used discover
+    - STUDENT, where reading STUDENT did STUDENT find some evidence answer question
+    - Yeah,   looking specific tool used discover water moon
+    - Did discover water with microscope?
+    - Hmm, look back paragraph two second
+    - didn't talk anyone moon, but sent lunar look clues
+    - sent Orbiter look clues
+    - did find with lunar orbiter
+    - STUDENT Did STUDENT find any evidence when STUDENT looking answer different question
+    - trying figure out which used discover water but, plot twist
+    - Discovering orbiting, looking around
+    - STUDENT remind vestigating means again
+    - Good,   had look clues order figure out water moon
+    - al had see water firsthand did use see water STUDENT
+    - Aside from question itself
+    - Okay,   something else about reading STUDENT found interesting
+    - Can someone raised hand tell question asking us trying get answer of
+    - Someone raise STUDENT hand, question asking us for
+    - Did use discover water STUDENT saying
+    - STUDENT said
+    - STUDENT didn't find reading
+    - Yeah,  really good question
+    - remember question being asked determine like STUDENT says equipment used discover water
+    - STUDENT think STUDENT,   asking about equipment used water,  would need all different equipment or ly just parts would help us discover water?
+    - STUDENT will refer back STUDENT article back STUDENT reading
+    - would love know where STUDENT think STUDENT might find answer equipment use discover water STUDENT, see STUDENT hand up
+    - said thought paragraph three
+    - Okay, so, STUDENT just gave us an excellent answer
+    - said thinks can find answer paragraph two,  n heard from STUDENT
+    - Thank STUDENT raising STUDENT hand STUDENT thought paragraph three,  STUDENT thought paragraph two,
+    - So, STUDENT, could STUDENT please read us paragraph read us sentence where STUDENT think answers question about kind equipment using discover water
+    - Okay, STUDENT does STUDENT answer change way STUDENT would would answer or STUDENT still believe  paragraph three
+    - STUDENT,  STUDENT able relate STUDENT saying where lunar orbiter use actually discover water, but microscope use study water
+    - Right discover water Lunar Orbiter
+    - Okay,  someone raise STUDENT hand tell some other equipment 've talked about reading
+    - any other equipment y've talked about
+    - 've talked about lunar Lunar Orbiter 've talked about microscope
+    - read our, read paragraphs other equipment discussed paragraph read?
+    - STUDENT think took microscope with moon?
+    - Hey, STUDENT can STUDENT tell little bit more why STUDENT like STUDENTs answer
+    - like connection STUDENT made re
+    - Can STUDENT tell more about STUDENT think about craters full water moon?
+    - STUDENT think moon t? Or did say moon very dry?
+    - Thank STUDENT much reading
+    - So, STUDENT, did discover moon t or dry?
+    - did find craters full water, or just looking water find
+    - Right,   wouldn't, STUDENT would need more than just microscope look right
+    - else could have put stead just small machine?
+    - said, NASA send small machine
+    - Right,  why looking STUDENT's answer
+    - else could STUDENT have put STUDENT answer stead just saying small machine, how could STUDENT have made more depth answered more depth?
+    - Bus small machine could be anything
+    - else could STUDENT put STUDENT answer?
+    - STUDENT guys picked out some really good keywords,  two key words looked equipment discover
+    - Why did STUDENT write down answer STUDENT did
+    - OK,  STUDENT why did you, why did STUDENT put down same thing STUDENT STUDENT mind going same way hers?
+    - Okay, ll equipment same thing tool right but  trying figure out equipment used discover 
+    - STUDENT guys know discover means
+    - Yeah,   trying figure out equipment used scientist find water moon
+    - did send small machine, but STUDENT know small machine called
+    - STUDENT exactly right
+    - Okay, want STUDENT look back passage see STUDENT can figure out small machine called
+    - saw where STUDENT
+    - made STUDENT change STUDENT answer
+    - Where STUDENT revised STUDENT answer
+    - made STUDENT change STUDENT mind
+    - STUDENT said using small machine, STUDENT
+    - STUDENT did correct STUDENT answer, but STUDENT answer
+    - Uh,  figure out how look back story figure out more depth answer
+    - made STUDENT change STUDENT answer?
+    - other machine STUDENT found Lunar Orbiter
+    - Okay, STUDENT STUDENT revised STUDENT 
+    - Scientists found moon microscopic talked little bit about that
+    - STUDENT put water
+    - made STUDENT change change STUDENT answer
+    - discover water moon
+    - want us look question said question asked equipment did scientist
+    - trying figure out equipment wh sort tool did scientists use find water moon
+    - did STUDENT change STUDENT answer to
+    - Where did you,   can STUDENT tell paragraph STUDENT found 
+    - said that,   see found NASA send small machine called lunar orbiter vestigate
+    - Perfect answering STUDENT answered perfectly
+    - How many STUDENT guys looking word water passage
+    - whenever  looking passage have be able read understand ice moon same thing water
+    - STUDENT didn't know anything about water,  STUDENT didn't know water meant same thing ice
+    - STUDENT know small machine called?
+    - So,  STUDENT see how answer? Does help, STUDENT?
+    - lunar orbiter,  paragraph two, says looks ice deposits large polar craters,  ice deposits very small
+    - where text can STUDENT find word   see, look word,   machine, machine re
+    - look back text
+    - But look more question
+    - asking equipment, kind equipment searches what, looking for?
+    - Now go back look text
+    - looking for, again, ?
+    - asking text field like back text
+    - piece equipment used looking water right
+    - STUDENT think microscope help 
+    - Look water while y physically moon
+    - STUDENT look text
+    - use lunar orbiter right
+    - microscopes, has both but when  talking specifically about finding water
+    - See STUDENT can look back texts find where says film equipment used find water moon
+    - but question specifically  asking piece equipment
+    - Did use search water moon
+    - STUDENT go back text STUDENT look first part Where y talking about piece equipment
+    - y've talked about moon being desert right think   no water
+    - Can STUDENT list off some equipment used
+    - looking specific piece formation specific piece equipment
+    - looking what?
+    - looking water moon
+    - looking quick equipment
+    - does say about Lunar Orbiter
+    - STUDENT think STUDENT know everything about space, STUDENT don't have learn everything more
+    - Okay,  STUDENT have think little bit more about questions because says two words essential STUDENT answer words equipment words water
+    - STUDENT have think about two words before STUDENT try make an answer
+    - read this,   STUDENT said,, STUDENT, STUDENT said scientists used lot equipment like oxygen tanks, but question not asking STUDENT about using be moon, STUDENT have something say, Savanah?
+    - But need with every STUDENT classmate right now explain why need look another answer
+    - Yes,  would be an option maybe STUDENT Can with us something knows of space not reading STUDENT have read
+    - what's thing equipment,   use find water moon
+    - Now, STUDENT think use microscope look really closely
+    - STUDENT think need look things really closely
+    - STUDENT really know something microscope something really, really, really small
+    - example, why STUDENT think STUDENT microscope
+    - STUDENT read text again
+    - wanted kind dive here
+    - want make sure  all same page kind understanding test text full extent
+    - get even little more basic re
+    - say, STUDENT know,  question equipment did scientists use discover water Mars
+    - So,   equipment talk about text? see what's getting used?
+    - Very good, very good
+    - glad STUDENT seeing
+    - take look back, STUDENT noticed, paragraph two could have some sight us
+    - take back see sort equipment see mentioned specifically paragraph two,
+    - So, STUDENT, STUDENT said NASA sent small machine
+    - take c that
+    - n switch track
+    - really excited get talk STUDENT guys about
+    - should look responses kind see where can grow where can improve with understanding article
+    - Now got read about something really cool
+    - I'd like start with STUDENT
+    - STUDENT STUDENT answer was,  sort how STUDENT got re
+    - hear STUDENT answer
+    - how STUDENT think STUDENT got answer
+    - hard know STUDENT meant, because maybe grade STUDENT paper before grade STUDENT
+    - a,  teacher, STUDENT know, STUDENT want put yourself position little bit when see response like that
+    - definitely some room improvement STUDENT gave some good formation but
+    - makes very interesting read
+    - But al have part getting moon about searching all 've got whole elaborate backstory
+    - While some water re
+    - might not be whole lot might not be buckets buckets buckets oceans water
+    - Can STUDENT remind question says,
+    - But n al have remember right,  looking equipment,  looking for, STUDENT know, mechanisms help us get because questions answering
+    - glad  able see that
+    - take look right now
+    - STUDENT got all figured out
+    - had STUDENT response scientists use lot equipment like oxygen tanks
+    - STUDENT  excited hear
+    - Improvement tell changes
+    - STUDENT could give moment, STUDENT, talk about why STUDENT confused what's going 
+    - STUDENT, absolutely STUDENT can
+    - Could lunar order maybe al be small machine
+    - STUDENT STUDENT think good idea
+    - talking about more than piece
+    - maybe good response could be talking about, STUDENT know, cluding multiple es read about re
+    - could be more than e
+    - But way use equipment here means could be plural
+    - How STUDENT feel about STUDENT answer
+    - might STUDENT say stead
+    - Just kind circle back little bit
+    - Now 've kind talked some other people STUDENT re
+    - STUDENT giving another shot
+    - make sure  speaking, yes
+    - NASA, y es sent lunar orbiter right
+    - know y kind subject
+    - y kind who article talking about, right
+    - y es use microscope look small, small, STUDENT know, particles water when find those moon
+    - when  giving response question equipment did scientists use discover water
+    - STUDENT started off really powerfully n up when STUDENT end STUDENT response re
+    - STUDENT talk about look really close
+    - STUDENT looking for?
+    - So, but STUDENT looking closely for? Good job though
+    - STUDENT just provided  use microscope look really closely
+    - Now, microscope attached to?
+    - But,   part actually goes down looks very closely, but need figure out how found water craters
+    - think about way, STUDENT, should STUDENT look very closely water molecules without microscope?
+    - look made STUDENT think that
+    - key word look question asked STUDENT see STUDENT need look water
+- intent: r400
+  examples: |
+    - right guys want right look question want underline question think most important word word question
+    - mind reading question finding word think really important
+    - want look back question just read want find most important word word think most important question
+    - question which most important word pick
+    - want look question want find action word because 've underlined equipment 've underlined water haven't underlined action word
+    - look back question find word question synonym vestigate
+    - look back question take STUDENT pencil maybe circle important words question
+    - what's really important word question could help find answer take STUDENT pencil just underline really important words could help find answer
+    - ahead look back question want circle underline words think important question
+    - look back question look words will help understand looking reading passage
+    - want guys figure underline pick words question think words important words might help answer question little more depth
+    - want look question number find keyword words important might help answer question
+    - read text read question words kind synonyms each other
+    - might word question help answer question what's word
+    - right back reread question take STUDENT highlighters slowly STUDENT looking equipment scientists discover water moon
+    - want look question more time words don't understand circle
+    - look words STUDENT ideas think words mean
+    - think about words question think about STUDENT n will discuss words
+    - okay want look STUDENT paper want circle words question circle maybe words from question i'll give about seconds
+    - i'll give seconds think some synonyms words similar each words what's another word equipment what's another word discover
+    - close think might need look question little maybe rephrase sometimes feel like  helpful question words understand really asking
+    - want want circle action words question main action words verbs question
+    - right think should after looking answers kind look question kind determine some keywords question
+    - okay within question just like talked about first session think some words need pull before even worry about answering question
+    - want just couple minutes look back question want take STUDENT pencil circle highlight some important words feel important something stands
+    - okay going right going same strategy 've taught before about important make connections find question's asking help back text first want STUDENT pencil highlighter look back over find important word words feel don't understand okay
+    - n sometimes when looking questions really careful because sometimes y'll trick throwing little something could answer clever make sure watch make sure STUDENT looking could best answer give
+    - okay great thank anybody words would help look back text determine exactly looking
+    - word important word going give clue going looking answer question
+    - when given question look words
+    - want either circle star word think most important question
+    - want before start take minute look back question number guys going looking words question important words could look back STUDENT text answer question
+    - want guys first start looking back question want either underline highlight circle words question need help answer question take about seconds look back over question want circle words question
+    - words underline question help answer question
+    - some main main words sentence just second here back question maybe underline think main parts question need
+    - could find question STUDENT paper circle points circle like words question could lead text find correct answer
+    - when answering question want look important words
+    - another strategy when answering questions really focus words question circle words question action words most important words texts question here word raise STUDENT hand
+    - main words question order answer attention question know exactly thing asking
+    - want reread think about most important part question circle okay
+    - everybody take second think about most important part question
+    - take second reread question circle most important part
+    - identify word focus when back text word help answer question
+    - tool helps focus make sure finding formation reading take minute take STUDENT pencil circle think most important word question going help know look equipment scientists discover water moon
+    - what's important word take minute circle STUDENT question going circled
+    - going give about little less minute just read question circle think most important words question
+    - look question word really important everybody look question STUDENT piece paper find words think important answering question
+    - look little clues text question
+    - strategy just question pick words question tell should looking
+    - like treasure hunt right could take second circle words question STUDENT looking
+    - want reread prompt want circle most important word prompt just take minute ahead
+    - exactly question asking maybe some already know about space answer question
+    - right back question hand everyone want when unpacking question look specific details looking
+    - want focus action word question
+    - want first find most important word question look back question n want read pick most important word will help answer question take seconds n 'll come back
+    - want circle more three words phrases think most important question remember should something leads STUDENT response take minutes
+    - everyone circle word question think most important word focus when answering
+    - what's important word question
+    - actually like take moment take look question just dependently STUDENTself read over question maybe circle some words phrases think might help answering question asking i'll give minute
+    - look back question tell think question asking tell maybe just three words question asking
+    - what's specific part question need look think about
+    - suggesting should order answer look some keywords keywords some context clues will help find find question
+    - some words some context clues will help answer what's main part question looking question
+    - okay okay when STUDENT answering next time when questions make sure STUDENT answering parts question much detail
+    - explained piece equipment wanted tell used find water moon
+    - little more background knowledge STUDENT answer could water moon important help
+    - yeah just maybe next time just think reason thing found important
+    - maybe like adding couple words sentence rephrasing really make huge difference sentence
+    - tell STUDENT words  ready using using what's passage STUDENT words
+    - mean said last time adding extra sentence ly help sometimes never make worse
+    - tell would important water able split hydrogen oxygen because said adding extra sentences from making sentence slightly like vague detailed something very detailed
+    - right wish little more formation like small machine used
+    - wish STUDENT answers little more detail
+    - al think maybe next time STUDENT responses could give little more personalized approach STUDENT response maybe found from text along thought about sound good
+    - like said maybe personalize little STUDENT views sound good
+    - thank STUDENT like saying think really good response just maybe next step read little further n STUDENT answer before respond okay
+    - STUDENT answer necessarily wrong just think could expand further could look back text exactly where STUDENT answer paragraph more knowledge STUDENT answer
+    - adding more formation would make STUDENT answer little more what's word looking specific little more task
+    - just needed little further name machine equipment
+    - just needed little further name machine good
+    - STUDENT realized STUDENT good answer agreed next time would like either something says based text make STUDENT answer STUDENT adding discussion adding STUDENT opinion
+    - next time would just like said microscope look closer water could added another equipment text disagree anything just discussion saying same things
+    - suggestion would look passage paragraph before where stated equipment find water first place before could even look microscope something else find water suggestion would n revise STUDENT response
+    - actually wasn't wrong where answered STUDENT question just wanted little more specific equipment called good start almost just needed name equipment right track
+    - correct just needed right track just needed name object next time when STUDENT given response make sure STUDENT specific possible great start
+    - just want look find evidence support STUDENT answer
+    - exactly great observation another thing anything always direct evidence from text answer STUDENT question long quotation mark evidence good yeah exactly
+    - okay thing need make sure answering question fully question says equipment scientists discover water moon want STUDENT response want scientists discovered water moon using blank equipment
+    - want using good language good vocabulary learning from text
+    - want make sure  about being specific want good examples from text want back reread more specific because want specific answers
+    - would love back reread question n passage come STUDENT answer because want know STUDENT ideas thoughts answer
+    - going back STUDENT said STUDENT want finish STUDENT statement because STUDENT right track lunar orbiter small machine answer question context
+    - just make sure when STUDENT writing answers like need very clear about part just needed second piece
+    - just need more specifics right when answering questions like need specifics don't necessarily take whole paragraph read
+    - STUDENT when STUDENT looking answers need able look y asking equipment next time just make sure name clude name
+    - need little more detailed
+    - guys anything could support STUDENT answers from text
+    - want really reference text just show found evidence text know
+    - think  important when something know evidence back case somebody asked know know true found source quote text
+    - would anybody maybe like revise answer maybe just clude piece evidence specific word
+    - know expectation maybe using more specific language STUDENT would maybe like revise STUDENT answer using words just discussed phrases just discussed
+    - want want make sure STUDENT using terms reading like just just like es just talked about like microscope like orbiter things like want make sure STUDENT using most strong vocabulary from reading
+    - going show example sentence right here would start sentence keep mind   million ways start sentence would discover water moon scientist used blank
+    - look find least more tools pull STUDENT response STUDENT need scientific tool called microscope STUDENT al need blank STUDENT al need blank
+    - sure circle same STUDENT want come STUDENT words STUDENT answers
+    - types equipment reading example sentence might help
+    - perfect STUDENT whole sentence make whole sentence
+    - said nasa sent small machine perfect nasa send small machine want more want build nt back highlighted lunar orbiter highlight second
+    - perfect rebuild STUDENT sentence explains both
+    - ly suggestion like STUDENT answer almost perfect just name small machine that's ly issue otherwise STUDENT answer perfect
+    - ll glad worked STUDENT classmates think  really important work STUDENT classmates when answering STUDENT question STUDENT paper really would love could explain STUDENT answer rather didn't listen someone else
+    - ly ly recommendation STUDENT answer because  almost just name small machine used make STUDENT answer perfect
+    - okay great next time when STUDENT maybe explain microscope used
+    - maybe machine called
+    - answer question fully would need describe exact small machine found water
+    - think should looking text pulling evidence specific sentence relates explaining water valuable
+    - said would heavy carry water n STUDENT response should something about water being carried would good thing just elaborate little
+    - make sure relate answer back question being asked
+    - maybe could elaborate tool tool help
+    - referring water moon text kind elaborate response tell need microscope
+    - STUDENT like hear more concrete examples kind equipment
+    - sure correct answer small machine guess just looking more specific
+    - sometimes just clude quote al want clude thoughts make quote expand thoughts quote  kind pieces need STUDENT thoughts author's thoughts writer's thoughts
+    - more details make answer better
+    - maybe already knew piece formation find another piece formation from text right focusing stuff find from text always want first more formation great later really want focus reading
+    - answered question need more tools maybe think further answers
+    - maybe another tool like rereading through text right n reread through text find little more details maybe even more tools came within article
+    - would helped STUDENT answer made little more specific STUDENT wrong small machine just little more detail clarification  nice clear
+    - even though STUDENT background knowledge activated even though know different tools maybe could just look through article find specifically used
+    - answer actual question which equipment scientists discover water moon just need little more detail make sure rereading text answer question
+    - just need beef STUDENT answer little little more academic vocabulary
+    - might want STUDENT answer ll very concrete make sure STUDENT using STUDENT resources from passage
+    - great corporating formation STUDENT answer really shows understand reading think would great detail STUDENT answers
+    - sentence STUDENT words shows understand
+    - really small saying STUDENT answer shows understand microscope know water moon really small formation from reading passage
+    - exactly STUDENT words show understand perfect
+    - basically words STUDENT classmates using already know from going nasa some words want hear STUDENT answer
+    - next time when giving answers questions want make sure cluding details like name small machine nasa sent STUDENT absolutely right
+    - like told STUDENT when STUDENT giving answers want make sure STUDENT evidence back STUDENT statement ll
+    - think more details STUDENT answer sentence spring
+    - want more supporting details give STUDENTself stronger answer
+    - yeah could equipments maybe could start sentence just equipments used discover water moon
+    - could making response even better kind adding question response could water valuable split hydrogen oxygen
+    - keep first part STUDENT answer n back find little evidence text think answer correct
+    - would look back STUDENT answer some more evidence from reading good
+    - yeah think really good answer think could little further just maybe quoting text just STUDENT really getting STUDENT formation from text
+    - some words would strengthen STUDENT response make connect question little more
+    - STUDENT right exactly right formation  thing like answer STUDENT question STUDENT exact words something like discover water moon need specific scientific tool called microscope look really closely right just little sentence helps give STUDENT answer some context look without question still know STUDENT talking about
+    - right nasa send small machine some details like machine called remember
+    - when some answers want some specific details from text will show really deep understanding text
+    - formation from sentence STUDENT response just make little stronger
+    - right suggestion maybe being little more specific STUDENT words even cluding evidence ready tell STUDENT response
+    - think suggestion like suggestion STUDENT would just more specific details STUDENT peers understand better
+    - oxygen needed astronauts breathe added STUDENT response would help STUDENT friends reading response understand water moon valuable
+    - please restate question STUDENT response
+    - could develop little more know kind small machine different things like just develop STUDENT thought process little more already
+    - want make sure going want make sure using text support answers
+    - will part improvement area improvement think could work would looking tools referenced because telescopes sometimes al other tools utilize ll
+    - just want make sure STUDENT going back referencing reading assignment make sure STUDENT getting points possible
+    - just want make sure when answering questions being clear possible
+    - yeah wh meant basically just want make sure STUDENT stating formation written text
+    - always about more words just want make sure STUDENT using text STUDENT able reference text STUDENT reading
+    - ly part would ly suggestion suggestion everybody just STUDENT answers would like state where found STUDENT evidence next time
+    - suggestion would adding know because paragraph four states
+    - tell machine little more specific about
+    - yeah perfect when saying answers want specific possible text because really important give evidence stead just general specific thing from text definitely clude always STUDENT response because gives idea much understand what's going
+    - when looking answers want able maybe explain just needed equipment ll
+    - when answer want very specific like text small machine talking about kind small machine
+    - want specify equipment lunar orbiter which small machine correct just want make sure super specific about
+    - deeper text more evidence details response would great
+    - just make sure going deeper text reading more time find even more formation
+    - want look deeper find more evidence would amazing
+    - would look definitely more closely find some more tools more evidence from text support STUDENT answer question
+    - make sure evidence from text support scientist sent small machine called lunar orbiter states want word make sure understanding where came from corporated STUDENT answer
+    - thing STUDENT answer text where find answer paragraph
+    - STUDENT responses where found STUDENT answers text STUDENT response like paragraph found answer
+    - want work just being little more specific STUDENT response know mean just pick details from text know earlier lesson comparing contrasting using context background formation make sure look specific details text
+    - focus really building answer identifying scientific equipment
+    - n explain equipment used discover water moon n STUDENT gotten STUDENT answer
+    - work text find something going give even more specific formation about small machine
+    - mentioned small machine better answer would tell machine
+    - more specific look back paragraph find rest more detailed part answer
+    - would like ahead start looking back through passage word discover
+    - hear gave little more specific name stead just saying small machine called microscope
+    - looking finding first time would change STUDENT answer just little make little more clear
+    - able come same sort answer give more details might able better form STUDENT reader who's teacher
+    - think little more specific STUDENT response said oxygen tanks yeah absolutely y oxygen tanks could tell maybe another piece equipment nasa used article help discover water moon
+    - words seem tough making sure STUDENT reader knows exactly saying long don't confusion know STUDENT just smart know
+    - right kind want readers know talking about scientist specifically could nasa could scientist used want either think would convey STUDENT meeting
+    - maybe next time when STUDENT could could more specific said nasa sent small machine
+    - could clarify STUDENT statement little more right ll that'd good strategy
+    - however al specific text evidence just like STUDENT learned can't just stop nasa said small machine right
+    - keep reading small machine very specific STUDENT answer sure answer every single part question using evidence from text STUDENT
+    - place text mentions hydrogen oxygen used
+    - exactly exactly more detail better STUDENT answer
+    - lunar orbiter right nasa sent small machine called lunar orbiter think could clarified STUDENT answer
+    - take little answer make great answer make make more sense make concrete
+    - about restate question form answer
+    - answer grows yeah really short word answer created whole sentence where anybody reading answer identify talking about learning about
+    - just write down questions n words STUDENT paper STUDENT ipad just rearrange restate question
+    - when answering questions probably should refer back reading given find answers need
+    - would answer convince water valuable could valuable moon
+    - perhaps could worded saying water valuable could valuable
+    - STUDENT wrote nasa sent small machine very good maybe need vestigate look little further machine called
+    - strategy could work together STUDENT help figure could okay strategy look back text know where look text
+    - good STUDENT right broken down hydrogen oxygen little further answer al find broken down oxygen hydrogen along STUDENT evidence
+    - looking more specifically want find exact name machine kind able explain machine STUDENT answer right just wanted some more detail
+    - when looking answer want look details will tell water going valuable
+    - want give like question think valuable STUDENT details together valuable because surviving
+    - maybe al passage remember STUDENT reading passage help figure would valuable
+    - yeah STUDENT said said could useful because broken down could extended answer little more said valuable about breaking down
+    - important make sure read formation before answer question
+    - really important when answering questions even though found part question stem STUDENT answer STUDENT look around make sure total
+    - yeah sometimes works sometimes look around small machine small machine answer question because al small machine what
+    - always look back text refer when trying find answers
+    - need restate question answers
+    - when restate question kind take some some some words from question STUDENT answer
+    - equipment scientists discover water moon lunar orbiter gives reader more formation know nothing about topic helps learn more about doesn't
+    - whenever looking passages really want focus textual evidence textual evidence when question refer back STUDENT passage find exact answer close possible
+    - always want prove STUDENT answer always know  right
+    - want detailed possible when answer questions formation need response
+    - when talked about could break down hydrogen oxygen talked about makes STUDENT water valuable
+    - correct make sure answer question when answer STUDENT question make sure STUDENT details
+    - should looking something more specific small machine called would more solid answer just small machine when STUDENT reading says equipment scientists discover water moon should name machine
+    - correct response like just just conversation someone like super excited about moon asked kind machine discover water n STUDENT answer should more specific answer STUDENT conversation like would name machine tell used kind answer should looking answering
+    - know STUDENT found piece equipment used little more specific here
+    - next time when asked question stead saying answered like STUDENT neighbor make sure write answer stead saying found same thing friend want hear found
+    - ll  always good detail answers more detail provide answer better stronger answer
+    - think could wrote answer differently clude question
+    - STUDENT answer correct because third paragraph states exactly said maybe adding exactly y looking al help STUDENT other friends maybe STUDENT working partners
+    - ly thing would STUDENTs correct STUDENT teacher want little more specific could just name actual machine called lunar orbiter STUDENT very just little more specific
+    - yeah want specific evidence from reading want pull straight shows found answer question STUDENT thing think will help really pull answer STUDENT reading
+    - stead just agreeing STUDENT maybe think about agree STUDENT picked agree could still agree STUDENT n tell reason agree
+    - need help getting started could equipment scientists used discover water n write STUDENT response
+    - sort wondering could little more specific perhaps identifying small machine could possibly little more specific would n know want choose perhaps lunar orbiter
+    - think back text look mention equipment scientists used underline could n build STUDENT answer 'd complete full answer question
+    - usually  best when answer question just stick question save extra formation discussions like when right
+    - think could little more specific response because lots small machines world right
+    - back text type small machine sent give name when respond question being specific answer
+    - STUDENT answer said nasa sent small machine would like tell little more about small machine looking text could expand give more details small machine
+    - alright talk about found STUDENT found just maybe read just looking equipment scientists find water talk about STUDENTself another STUDENT clue i've never read text i'll read STUDENT question know exactly STUDENT talking about when answer
+    - yeah tell something about else identifies machine
+    - you'll example going restate question convincing evidence water moon could valuable
+    - n would text says water split parts hydrogen oxygen n would explain important
+    - ly thing would like just restate question
+    - n need evidence support STUDENT answer n found evidence from number perfect just provide evidence n explain
+    - would need more evidence STUDENT evidence bringing water moon hard would al talk about water moon would good
+    - best place start words question n going back headings look underneath heading answer
+    - correct want more specific good answer could said nasa sent small machine called lunar orbiter STUDENT right track
+    - n more specific answer could name machine called
+    - STUDENT said scientists equipment like oxygen tanks could more specific passage
+    - want guys look answer question want read over STUDENT answer want think STUDENTself could more specific when answering question
+    - STUDENT right nasa send small machine give more specific best answer could nasa sent small machine gave name
+    - looking something specific when would want refer back text when says equipment scientists discover water moon when would want look back text find STUDENT answer because already know various tools like said mask
+    - just want little deeper text maybe help STUDENT fellow STUDENTs figure some more details about nasa find water moon
+    - want help each other understand text know words everybody thinks want guys reconstruct STUDENT answer give little more detail about equipment specifically helped discover water
+    - thing help future answer question teaching about question somebody reading passage just like guys would best explain would full picture guys reading
+    - sure al remind teaching even from STUDENT perspective STUDENT answer question n give little more detail STUDENT answer will help more concrete answer
+    - detail just added critical  valuable fact when break down oxygen hydrogen astronauts breathe oxygen oxygen hydrogen fuel second part just gave  valuable great answer
+    - would loved just said machine just talked more about machine
+    - just want little further STUDENT explanation some evidence from read about
+    - just want STUDENT answer little more specific sometimes mean writing more stuff
+    - when STUDENT answering discussion questions text read just corporate something specifically from text text mentions lunar orbiter would good thing clude STUDENT response addition said about finding craters water y like suits masks oxygen tanks
+    - yeah really good answer STUDENT definitely correct want elaborate little more nasa sent small machine small machine called
+    - right when term lunar orbiter using evidence support response something want make sure STUDENT because shows
+    - al want make sure when STUDENT answering question STUDENT specifically using evidence examples text gives
+    - awesome make connections STUDENT background knowledge order answer question want make sure comes from text
+    - however when look question asks equipment found craters water would similar STUDENT where just want make sure STUDENT using specific piece evidence support said when said   craters water
+    - could STUDENT response could added something like another article read said could base moon n connect article reading idea could
+    - pretty good would maybe just little about like said y carrying water ships anymore because y keeping base y going build moon
+    - want when STUDENT answering questions about text want look specific things even same ideas STUDENT classmate articulate explain STUDENT thinking
+    - necessarily example STUDENT answer n same answer just work kind STUDENT words describe thought about
+    - evidence some evidence answer
+    - want look back reading circle evidence where talks about want answer need specific evidence from reading
+    - perfect beautiful love make more sense make sure STUDENT answering full question when equipment remember equipment n details awesome ll
+    - good think could STUDENT sentenceto STUDENT answer make even more detailed more specific question
+    - yeah just kind from STUDENT prior knowledge know look STUDENT prior knowledge what's article answer specific questions hand
+    - going writing right from text make sure support answers   something text will support answer will something texts answer anybody want talk about response first
+    - STUDENT 'll just little part STUDENT response make sure  nice clear  important water broken down parts thank sharing
+    - think about restating question STUDENT answer stuck can't come something always feel free raise STUDENT hand STUDENT stuck need little more help
+    - would take money vestment even water moon when tell back finish STUDENT work please evidence support STUDENT answer
+    - sentence starter says scientists used n   line blank where would equipment used discover water moon
+    - found answer paragraph blank where STUDENT going number   number side paragraphs want know exactly where found STUDENT answer okay make sense
+    - okay ll start STUDENT want friends want start thinking about changing wording STUDENT answer okay just STUDENT best matters
+    - STUDENT okay want start working sentence starter okay need read
+    - great glad glad could fill sentence starter
+    - STUDENT answer right think should little more detail describe maybe adjective name small machine could
+    - love STUDENT could rewrite STUDENT answer maybe name would super helpful
+    - wondering describe machine adjectives texts describe machine
+    - goodness STUDENT just answered next question next question going machine could little more detail STUDENT answer
+    - wondering push STUDENT thinking further more space spaceship good
+    - guys just need little more specific kind machine used discover water
+    - will revise STUDENT answer clude equipment
+    - right would like some context from story able answer question make sense
+    - however when writing answers comprehension questions about text given need sure just providing formation from text
+    - evidence from text front
+    - just matter combining STUDENT answers
+    - pieces equipment absolutely however when answering question text 've read need just using evidence from text background formation
+    - want want look back reading find something from reading answers question about equipment scientists discover water moon
+    - right STUDENT answer isn't wrong send small machine want more detail know could pull more detail from small machine called remember
+    - want want back text more details STUDENT answer small machine called re
+    - ahead look reading might answer make from partial answer complete answer n i'll come right back
+    - going suggest STUDENT group keeps looking through looking each other's answer seeing could each dividually
+    - right path getting answer nasa sent small machine tell more about machine more specific while using evidence from text something support STUDENT answer type machine
+    - read what's story when answer question support read story support answer
+    - very true said said earlier really want sure answering what's being asked don't want talk about things text y really asking because little confusing STUDENT
+    - suggestion would find some reasons even long future identified could important future
+    - suggestion would keep make connection  important water moon
+    - explain benefit astronauts nasa don't carry water anymore other benefit provide expand STUDENT answer little
+    - wondering could look little deeper first excuse second paragraph find more specific tool evidence answer
+    - would read part another detail
+    - maybe think about equipment's looking water maybe where's water maybe something effect really make more detailed answer
+    - wonder sometimes could even words help look even deeper turn words beginning statement figure rest formation text
+    - suggest back text underline answer just gave n want circle something else links help further STUDENT answer
+    - want underline answer which nasa sent small machine underlined small machine okay n want just circle more detail would further STUDENT answer little more
+    - wondering al little more specific sending small machines
+    - wondering make STUDENT answer little more specific looking equipment discover water moon
+    - wondering guys wouldn't mind going back rereading text seeing find more specific answer
+    - STUDENT going look text second come answer little more detailed
+    - when question tells text
+    - think specific name small machine want specific possible when thinking about specific equipment
+    - wondering could make sure circle back right passage formation passage might help build stronger answer equipment scientists needed specific mission
+    - back through reread really find idea connected text
+    - very good alright STUDENT answer almost STUDENT just half want little more specific told nasa sent small machine which absolutely true tell small machine called
+    - yeah suggestion just evidence from story
+    - yeah maybe just response n think could al talk about just telling about being environmentalist
+    - yeah think could describe some equipment moon
+    - think could al talk about STUDENT experience going nasa
+    - ll find connect read text experience nasa learning about equipment
+    - STUDENT described equipment looks like think could tell little more about gathering equipment going moon look water first place
+    - yeah clude n maybe al talk about would need look water moon
+    - think little more specific about small machine
+    - would helpful elaborate more details STUDENT response great start good STUDENT
+    - give actual word citing source n will answer okay okay
+    - machine okay next time please give specific name machine that's
+    - ahead take look STUDENT answer nasa send small machine STUDENT answer wrong would just love could explain little more little more specific
+    - help make STUDENT answer more specific
+    - want talk about equipment answer
+    - back question equipment want make sure answer equipment discover water great
+    - front right take look STUDENT original answers want check boxes equipment discover water move
+    - wonder little further want build STUDENT explanation little small machine would able know machine called would happen know
+    - point want build upon make sure being specific possible love when nt back able find actual name small machine sent thank STUDENT just ahead build upon STUDENT answer some formation found
+    - okay thank sharing STUDENT would love want change STUDENT answer anything else want STUDENT response make more compelling
+    - think  good idea some language question STUDENT response n definitely zone piece equipment found STUDENT answer
+    - n rest look back STUDENT response n three things name piece equipment piece equipment discover water moon take seconds back STUDENT work
+    - STUDENT response clude piece equipment think could more specific right think could back text tell specific name piece equipment STUDENT talking about
+    - exactly always more adding details make sure update formation n part said missing
+    - n course because amazing STUDENTs want make sure last thing always explain case asking highlight where find text just make sure STUDENT highlighting
+    - right more specific help better knowledge base here think maybe   more formation text around section help specific
+    - okay great gets more specific know some specific science vocabulary right would something want STUDENT response just extend circle STUDENT think would much clearer response
+    - awesome answer STUDENT think maybe make little more detailed clude name small machine
+    - water great okay equipment discover water keeping mind words using evidence from text look STUDENT revised answer make sure answered question completely
+    - strategy already using back look evidence text n revise STUDENT answer make little more complete address every part question sound good
+    - yeah some details describe things know nasa sent small machine kind small machine
+    - love STUDENT thinking when small machine think could different things maybe keep hunting   specific vocabulary great question STUDENT
+    - about kind equipment scientists used think suggestion would back think about equipment scientists using
+    - would encourage back look article just make STUDENT correct answer even stronger because small machine could different things want make sure talking really specifically about type small machine scientists using
+    - discover water moon think will make answer much better some details just talked about
+    - just make sure same page focus formation text maybe future when going further STUDENT nasa experience that'd great
+    - second paragraph talk about small machine nasa used want think about little about make STUDENT answer more detailed specific
+    - alright think about adding some more details STUDENT response based else mentioned passage
+    - given 've talked about words equipment discover 've talked about STUDENT answer want revise STUDENT answer align question asking
+    - response want tell know STUDENT answer said circle same STUDENT answer question STUDENT words
+    - because looking found text answered question correctly always update answers more formation hear classmates sharing
+    - yeah take look think STUDENT text front might great time take look STUDENT's answer pull specific name piece equipment
+    - think STUDENT good track look passage find word vestigate
+    - following sentence just explain wh lunar orbiter yeah jamines think STUDENT answer more specific name machine n STUDENT answer qould perfect STUDENT
+    - right ren't wrong could more detail about reading explain machine just make sure give more detail stead just saying small machine
+    - maybe could STUDENT answer about would helpful moon ready since astronauts need drink
+    - exactly similar STUDENT told  really helpful just want little about  helpful moon
+    - suggestion make sure mention addition base being built would really helpful water re
+    - didn't STUDENT answer wrong think found piece evidence from from article wonder could stronger answer little ranking sorting other pieces evidence
+    - don't little rereading maybe adding maybe elaborating STUDENT answer little after reread
+- intent: r500
+  examples: |
+    - great everyone STUDENT thinking changed
+    - alright somebody tell maybe y thinking changed throughout conversation
+    - exactly STUDENT how's STUDENT thinking changed since very beginning
+    - approach question little differently STUDENT looked
+    - about keyword discover thinking about changing STUDENT thinking back
+    - find stead small machine lunar orbiter make change
+    - okay tell correct answer about correcting STUDENT answer
+    - talked about changed STUDENT thinking
+    - STUDENT thinking change differently
+    - given guys some feedback want think about started thinking n changed
+    - tell STUDENT answer changed from beginning
+    - would discussion today would STUDENT answer would would change
+    - ways STUDENT mind kind changing thinking differently STUDENT hearing from STUDENT other friends STUDENT group
+    - alright example start saying started thinking n would STUDENT prior response n think because explain STUDENT thinking changed
+    - take minute turn around STUDENT partner next STUDENT going talk about STUDENT takeaway from revision process
+    - anyone else want maybe y thinking thought right answer know right answer
+    - great anyone else want answers maybe answers changed
+    - anyone else want thinking about first answer could changed after rereading
+    - okay when STUDENT thinking about STUDENT original answer STUDENT answer think difference between answers
+    - lunar orbiter STUDENT wh exactly made come conclusion answer
+    - okay different about answer versus STUDENT first response
+    - STUDENT about STUDENT answer change when able revise
+    - just think about team like together together figure name tool called STUDENT
+    - proceed discussion would want observe STUDENT thinking changes move along discussion okay
+    - STUDENT want STUDENT thinking changed STUDENT thinking
+    - great STUDENT participating already would mind telling STUDENT thinking when nt back revise STUDENT response
+    - anything else anyone anything different when revising answer
+    - first STUDENT going answer started thinking blank n STUDENT going answer think blank because blank ahead take seconds answer questions
+    - made change STUDENT thinking
+    - n after STUDENT finished curious could about STUDENT thinking changed from STUDENT original answer second answer wrote
+    - different about STUDENT first answer STUDENT second said
+    - question from STUDENT first answer STUDENT second answer STUDENT thinking change
+    - thank okay STUDENT feel like STUDENT changed STUDENT process working through text questions
+    - before conversation thought answer didn't know answer still confused just before conversation thought n after conversation just think
+    - thank okay STUDENT feel like STUDENT changed STUDENT process working through text questions
+    - whatever think  okay STUDENT response hasn't changed  okay changed just curious thinking take moment before conversation thought after conversation thought
+    - think need take away when answering reading comprehension questions really need focus going back reading article detail maybe highlighting text annotating text really understand detail learning learning
+    - okay from reading text today using tools going back rereading text circling important formation broaden STUDENT understanding future topic discuss whether  space farming
+    - STUDENT knowledge restating question next lesson
+    - when answering questions like what's something need make sure when answering question
+    - next time question underline STUDENT keywords help more specific
+    - STUDENT figured full answer will next time when STUDENT looking back text
+    - alright next time back look story find STUDENT answer
+    - next time answering question like think make STUDENT answer better
+    - lcome back from lunch 'll just pick from where left STUDENT talked about earlier maybe future specifying techniques STUDENT responses
+    - next time when STUDENT answering kinds questions sure look STUDENT formation STUDENT answer text
+    - somebody tell want STUDENT hands raised mean find evidence
+    - when talking about evidence thinking about words text reading help answer question
+    - might look words leading words like called like notice called before great example word might might
+    - alright STUDENT explain evidence
+    - when looking evidence need find certain specific things text will help
+    - want look story where find answers
+    - next time STUDENT reading tough question help look action words question because going help know specifically STUDENT looking
+    - when read something  three step process when STUDENT trying answer question
+    - n look STUDENT question look really asking n read
+    - when read text read question need correlate need together y actually asking
+    - want good something keep over over over
+    - remember when looked question found keyword
+    - keyword help answer question
+    - always find identify keyword really understand STUDENT looking back text
+    - used passage provided find answer didn't just background knowledge made sure back find something text
+    - make sure when STUDENT reading passage take holiday highlight important facts when STUDENT question
+    - highlight important words STUDENT question back find passage
+    - remember small machine like nt back reread STUDENT text figure machine actually called
+    - sometimes read things quite absorb everything  always good idea back reread STUDENT text underline important formation details help answer questions about afterwards keep knowledge
+    - strategies going today look some words question
+    - restating question listen carefully words being used such question
+    - answer question using race method restate question
+    - look really closely words question
+    - remember when reading question look really closely words words need look text
+    - remember when looking question always look important words
+    - n look text same words find answer
+    - often when read will tell sequence will tell happened first n happens next  important when answering questions look gone order story
+    - don't want just agree  good agree people  al good know think something
+    - when given questions 'd like find answers very specific because more specific more sense make later
+    - think 've kind learned lesson when reading formation attention just assume
+    - make sense know know different things about space al need make sure really reading formation being given
+    - looked very closely text looked words
+    - need definitely through STUDENT passage n highlight important details always want highlight STUDENT headings STUDENT headings
+    - because details could give some really good text evidence need want find details along STUDENT question could possibly support STUDENT answer
+    - maybe like chronological timeline events text broke down text circled like happened first n happened n happened might able find more suitable answer question
+    - built STUDENT answer appreciate build STUDENT answer more specific narrowed down core knowledge looking n said okay machine what
+    - okay much like STUDENT earlier just trying look question specifically boiling down just core components
+    - sometimes takes little work everything together  called summarizing want able together words come best answer
+    - really like race form going restate question going answer question going cite evidence n going explain evidence
+    - example when read equipment scientists discover water moon think restate question answer n fill blank spots questions asking
+    - example might equipment scientist used discover moon would n leave answer blank n could back text determine exactly equipment
+    - think next time need strategy looking keywords really specific
+    - very important highlight keywords give best answer
+    - sometimes  okay back reread find answer
+    - exactly would like goes everyone just STUDENT when STUDENT answering questions already know ll specific formation from reading
+    - great good strategy finding clues keywords help find STUDENT answer
+    - told before read noticed word water question scanned through looked things related water
+    - great really liked response because explained STUDENTself really ll said read question question asking n found explained really great response
+    - definitely STUDENT imagination really like visualize situation before giving STUDENT answer really good strategy answering questions
+    - perfect response used direct language from text used specific vocab provided reasoning very specific perfect response good
+    - find evidence need quotes from text like STUDENT quoted said paragraph three could look texts find where reading
+    - like STUDENT connecting STUDENT background knowledge help  great STUDENT using STUDENT notes help further understand text excellent strategy good readers
+    - n provided reasoning which can't survive without water  very important backup STUDENT answers reasoning
+    - hearing read text details evidence help support STUDENT thinking
+    - STUDENT connecting details another part text explain could valuable
+    - STUDENT using STUDENT background knowledge definition orbiter able apply STUDENT answer
+    - when answering comprehension questions like really need text make sure using formation
+    - going give some sentence starters going help really solidify learning reading strategies
+    - think about thinking thinking strategy when reading text answering question
+    - change STUDENT answer STUDENT al wrote thinking
+    - she's going back text finding specific piece evidence used discover water moon
+    - really good thing just able when rereading STUDENT able where found STUDENT answer able find another part could
+    - excellent strategy looking text pulling keywords
+    - think excellent strategy anyone think about when reading text think
+    - when STUDENT trying answer question just locate words paragraph
+    - when read want make sure backing saying formation from text
+    - great great segue wanted guys next because just gave specific evidence question said analyze picked answer based specifically great process
+    - when drawing prior knowledge things complex reviewing couple times important
+    - important look back passage determine best answer question  always helpful circle words question
+    - mean STUDENT 100% right using background knowledge when answer questions especially questions about text always want make sure answers evidence found directly from text
+    - going suggest when start first thing before start reading actually look closely question
+    - guess other strategy STUDENT going want think about question y asking n STUDENT trying make some connections between concepts STUDENT reading
+    - help make some ferences want read little more closely meaning material before
+    - yeah really important skill scientists need able look text quotes formation from text support answers
+    - okay looking evidence text circling evidence great strategy make sure answering question completely
+    - going thinking about strategies revise answers strategies next time come across question like
+    - love looking keywords really strong reading technique
+    - think little specificity putting little effort save trouble revise several times
+    - sort noticed through talking STUDENT mean al added some specificity STUDENT answer think helped more full response
+    - think totally great strategy think question provide STUDENT answer just look over STUDENT answer more time n make sure answers matches question you'll good
+    - fantastic really appreciate something STUDENT just took little parts world lunar orbit draw conclusion from really looking small details here
+    - question when looking answer  important think about keywords al helpful create sentence wouldn't necessarily STUDENT response
+    - think  nice though when read text scan text specific pieces equipment n when write answers ever asked tell paragraph found STUDENT able point exact part text
+    - think STUDENT just when just read beginning paragraph
+    - yeah exactly could specify small machine strategy response questions
+    - ll case adding name would sufficient talking more about strategy specifying STUDENT responses stead just like adding name to
+    - STUDENT strategy absolutely right locate keywords question find text

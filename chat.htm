@@ -45,7 +45,7 @@
 
 	</style>
 	<body>
-		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
+		<input type="file" id="lz-tempFile" accept=".txt" style="display:none">
 		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
 		&nbsp; &nbsp;<span id="lz-stats"></span>
 	<script>
@@ -78,6 +78,29 @@ class App {
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
+			
+			let nums=[]; nums["*100"]=0; nums["*200"]=0; nums["*300"]=0;	nums["*400"]=0;	nums["*500"]=0;	
+			let oks=[];  oks["*100"]=0; oks["*200"]=0;	oks["*300"]=0;	oks["*400"]=0;	oks["*500"]=0	;
+			let tots=[];
+			v=e.target.result.split("\n")
+			for (i=0;i<v.length;++i) {																// For each line
+				if (!v[i]) continue;
+				if (v[i].charAt(0) == "*")	k=v[i].trim();											// Get series
+				if (v[i].match(/^   /)) {
+					nums[k]++;																			// Advance total count
+					app.chat.GetResponse(v[i].substr(5), k, (res, id)=>{
+						if (id.substr(1) == res.intent.name.substr(1))	oks["*"+id.substr(1)]++;
+						tots["*100"]=Math.floor(oks["*100"]/nums["*100"]*100);
+						tots["*200"]=Math.floor(oks["*200"]/nums["*200"]*100);
+						tots["*300"]=Math.floor(oks["*300"]/nums["*300"]*100);
+						tots["*400"]=Math.floor(oks["*400"]/nums["*400"]*100);
+						tots["*500"]=Math.floor(oks["*500"]/nums["*500"]*100);
+						trace(id, res.intent.name,res.text,tots)
+						})
+				}
+			}
+			return;
+	
 			this.csv=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
 			for (i=0;i<this.csv.length;++i) {														// For each line
 				for (k in this.csv[i]) if (!k)  delete this.csv[i][k];								// If empty field, delete it
@@ -87,7 +110,7 @@ class App {
 					}
 				else{																				// Teacher remarks
 					++n;																			// Inc count
-					this.csv[i].response="";														// No respose for teacher remaks
+					this.csv[i].response="";														// No respobse for teacher remaks
 					if (this.csv[i].code == this.csv[i].calc)								  ++dots;		// Pure match
 					if (Math.floor(this.csv[i].code) == Math.floor(this.csv[i].calc))		  ++tens;		// Tens match
 					if (Math.floor(this.csv[i].code/100) == Math.floor(this.csv[i].calc/100)) ++hundreds;	// Hundreds match
@@ -103,13 +126,16 @@ class App {
 
 	LoadConfig()																				// LOAD CONFIG FILE
 	{	
-		let i,k,o,v,intent;
+		let i;
 		fetch('data/config.csv')																	// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
-				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
-				this.nlp.SetWho(data);																// Set who array
-				this.SetKeywords(data);																// Set keywords array
+				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
+				for (i=0;i<d.length;++i) {															// For each line
+				if (d[i].type == "student") app.nlp.AddSyns("student",d[i].id,d[i].text.split(","));	// Add student synonyms
+					if (d[i].type == "action") 	app.nlp.AddSyns("action",d[i].id,d[i].text.split(",")); // Add action and its synonyms
+					if (d[i].type == "keyword") app.nlp.AddKeyWords(d[i].text.split(","));			// Add keywords
+					}
 				});
 	
 		fetch('data/100-responses.csv')															// Load file
@@ -244,7 +270,7 @@ class Chat {
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
 				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
-				app.chat.GetResponse(s,(o)=>{															// Send to AI
+				app.chat.GetResponse(s,null,(o)=>{															// Send to AI
 					let n=(o.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;							// Go to second choice
 					let intent=o.intent_ranking[n].name.substr(1);										// Get intent
 					let who=app.ParseRemark(intent,s);													// Parse remark for data
@@ -261,7 +287,7 @@ class Chat {
 			$("#co-revText").val("");																	// Clear input
 		}
 
-		GetResponse(msg, callback)																	// GET RESPONSE FROM AI
+		GetResponse(msg, id, callback)																// GET RESPONSE FROM AI
 		{
 			let xhttp=new XMLHttpRequest();																// Alloc hxmlhttp
 			xhttp.onreadystatechange = function() {														// ON STATE CHANGE
@@ -270,7 +296,7 @@ class Chat {
 					if (o.intent.name[0] == "r")														// If our intent
 						app.dots=o.intent.name[4] == "." ? true : false;								// Set dots flag
 					trace(o);																			// Log
-					if (callback) callback(o);															// Run callback
+					if (callback) callback(o,id);														// Run callback
 						return;																			// Quit
 					}
 				};
