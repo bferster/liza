@@ -12,11 +12,11 @@ class NLP {
 		this.actSyns=[];																				// Action synonyms
 		this.keyWords=[];																				// 
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list
-			"yourself","yourselves","he","him","his","himself","she","her","hers","herself","it","its",
-			"itself","they","them","their","theirs","themselves","this","that","these","those","am","is",
-			"are","was","were","be","been","have","has","had","having","do","does","doing","a","an",
-			"the","and","if","or","as","of","at","by","for","with","to","again","so","than","too","can", 
-			"their","we're","gonna"];
+			"yourself","yourselves","he","him","his","himself","she","her","hers","herself",
+			"it","its","it's","itself","they","them","their","theirs","themselves","this","that",
+			"these","those","am","is","are","was","were","be","been","have","has","had","having",
+			"do","does","doing","a","an","the","and","if","or","as","of","at","by","for","with","to",
+			"again","so","than","too","can","their","we're","gonna"];
 	}
 
 	AddSyns(type, word, syns)																		// SET SYNONYMS ARRAY
@@ -133,7 +133,7 @@ class NLP {
 	{
 		text=(" "+text).replace(/\{.*?\}/g,"");															// Remove text in braces
 		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
-		return text.split(/\b\w+\b/);																	// Tokenize and return
+		return text.split(/ /);																			// Tokenize and return
 	}
 
 	CleanText(text, minSize)																		// PREPROCESS/CLEAN TEST

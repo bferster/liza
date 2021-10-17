@@ -233,7 +233,7 @@
 				if (csv[i][7] == "Teacher")	{														// Only remarks
 					if (csv[i][11] == "1") 		s=csv[i][10];										// Original correction
 					else if (csv[i][11] == "2") s=csv[i][13];										// Double correction
-					else						continue;											// Skip all others
+					else						s=csv[i][9];										// No correction, use original
 					if (s.length < 4)			continue;											// Skip if too short
 					s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,"STUDENT");					// You -> STUDENT
 					who=nlp.GetWho(s);																// Get who
