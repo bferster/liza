@@ -133,7 +133,7 @@ class NLP {
 	{
 		text=(" "+text).replace(/\{.*?\}/g,"");															// Remove text in braces
 		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
-		return text.split(/ +/);																		// Tokenize and return
+		return text.split(/\b\w+\b/);																	// Tokenize and return
 	}
 
 	CleanText(text, minSize)																		// PREPROCESS/CLEAN TEST

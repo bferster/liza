@@ -90,11 +90,11 @@ class App {
 					nums[k]++;																			// Advance total count
 					app.chat.GetResponse(v[i].substr(5), k, (res, id)=>{
 						if (id.substr(1) == res.intent.name.substr(1))	oks["*"+id.substr(1)]++;
-						tots["*100"]=Math.floor(oks["*100"]/nums["*100"]*100);
-						tots["*200"]=Math.floor(oks["*200"]/nums["*200"]*100);
-						tots["*300"]=Math.floor(oks["*300"]/nums["*300"]*100);
-						tots["*400"]=Math.floor(oks["*400"]/nums["*400"]*100);
-						tots["*500"]=Math.floor(oks["*500"]/nums["*500"]*100);
+						tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%";
+						tots["*200"]=oks["*200"]+"/"+nums["*200"]+"="+Math.floor(oks["*200"]/nums["*200"]*100)+"%";
+						tots["*300"]=oks["*300"]+"/"+nums["*300"]+"="+Math.floor(oks["*300"]/nums["*300"]*100)+"%";
+						tots["*400"]=oks["*400"]+"/"+nums["*400"]+"="+Math.floor(oks["*400"]/nums["*400"]*100)+"%";
+						tots["*500"]=oks["*500"]+"/"+nums["*500"]+"="+Math.floor(oks["*500"]/nums["*500"]*100)+"%";
 						trace(id, res.intent.name,res.text,tots)
 						})
 				}
@@ -138,7 +138,7 @@ class App {
 					}
 				});
 	
-		fetch('data/100-responses.csv')															// Load file
+/*		fetch('data/100-responses.csv')																// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
 				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
@@ -152,6 +152,7 @@ class App {
 						this.responses[intent].push(o);												// Add response to response intent array
 					}
 				});
+*/
 	}
 
 	SetKeywords(data)																			// PROCESS KEYWORDS																	
