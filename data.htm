@@ -80,8 +80,8 @@
 			.then(res =>{																			// Process																	
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
 				for (i=0;i<d.length;++i) {															// For each line
-					if (d[i].type == "student") 
-						nlp.AddSyns("student",d[i].id,d[i].text.split(","));						// Add student synonyms
+					if (d[i].type == "student") nlp.AddSyns("student",d[i].id,d[i].text.split(",")); 	// Add student synonyms
+					if (d[i].type == "keyword") nlp.AddSyns("keyword", d[i].id, d[i].text.split(","));	// Add keywords
 					}
 				LoadRawData('data/rawData.csv');													// Load raw data file
 			});
@@ -220,9 +220,8 @@
 	  	.then(res => res.json()).then(res =>{ trace(res); })
 	}
 
-	function ImportCSV(e)																		// IMPORT SESSION FROM CSV
-	{	
-		let i,j,s,who,d="",v,vv=[]
+	function ImportCSV(e) {																		// IMPORT SESSION FROM CSV
+		let i,k,re,s,who,d="";
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
@@ -235,15 +234,23 @@
 					else if (csv[i][11] == "2") s=csv[i][13];										// Double correction
 					else						s=csv[i][9];										// No correction, use original
 					if (s.length < 4)			continue;											// Skip if too short
-					s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,"STUDENT");					// You -> STUDENT
-					who=nlp.GetWho(s);																// Get who
+					s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`[student](student) `);		// You -> STUDENT entity
+					s=nlp.CleanText(s,3);															// Clean text
+					for (k in nlp.keyWords) {														// For each keyword
+						re=new RegExp("[^[]"+k+"[^)]","ig");										// Make regex
+						s=s.replace(re,` [${k}](${nlp.keyWords[k]}) `);								// Encode keyword entity
+					 	}																				
+					who=nlp.GetWho(s,true);															// Get who
 					if (who) {																		// Got one
 						re=new RegExp(`\\b${who.split(":")[0]}\\b`,"i");							// Make regex
-						s=s.replace(re,"STUDENT");													// Encode entity
+						s=s.replace(re,`[student](student) `);										// Encode student entity
 						}
-					d+="    - "+nlp.CleanText(s,3)+"\n";											// Clean and add
+					s=s.replace(/jazmin|oliver|luis|chris|farrah/gi," ");							// Remove remaining student names
+					if (s.length < 4)			continue;											// Skip if too short
+					s+=" [affirmation](remark)";													// Add remark type
+					d+="    - "+s.replace(/  /g," ")+"\n";											// Format, remove extra spaces, and add
+					}
 				}
-			}
 			trace(d)
 			Sound("ding");																			// Ding
 			};

@@ -10,7 +10,7 @@ class NLP {
 		this.syns=[];																					// Synonyms
 		this.whoSyns=[];																				// Who synonyms
 		this.actSyns=[];																				// Action synonyms
-		this.keyWords=[];																				// 
+		this.keyWords=[];																				// Keywords
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list
 			"yourself","yourselves","he","him","his","himself","she","her","hers","herself",
 			"it","its","it's","itself","they","them","their","theirs","themselves","this","that",
@@ -25,16 +25,11 @@ class NLP {
 		for (i=0;i<syns.length;++i) {																	// For each syn
 			if (type == "student")		this.whoSyns[syns[i]]=word;										// Add who
 			else if (type == "action")	this.actSyns[syns[i]]=word;										// Add actions
+			else if (type == "keyword")	this.keyWords[syns[i]]=word;									// Add actions
 			else						this.syns[syns[i]]=word;										// Add general synonym
 		}
 	}
 	
-	AddKeyWords(words)																				// ADD TO KEYWORDS ARRAY
-	{
-		let i;
-		for (i=0;i<words.length;++i)	this.keyWords.push(words[i]);									// Add each  each word
-	}
-
 	GetWho(text, both)																				// GET WHO IN TEXT
 	{
 		let i,who=both ? ":" : "";
