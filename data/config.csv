@@ -35,4 +35,7 @@ keyword,search,"search,discover,discovering,discovered,find,found,finding,look,l
 keyword,expand,"expand,more,add,elaborate,further",
 keyword,action,"underline",circle,highlight,highlighter,write,read,reread,scan,rank,sort,brainstorm",
 keyword,role,"astronaut,astronauts,scientist,scientists",
-
+keyword,meta,"sum-up,qualities,quality,transfer,transfers,transferring,similar,check,synonym,synonyms,intellectual,intellectually,identify,identifies,broaden,takeaway,understanding,changed,think,thinking,explain,strategy,strategies,plan,restate,summerize,summerizing,determine,academic,language,comprehension,transfer,specific,evidence",
+keyword,concern,"better,why,how,misunderstand,misunderstanding,clarity,focus,verb,action,clue,clues,success,successfully,concern,concerned,expect",
+keyword,value,"love,like,liked,enjoy,enjoyed,great,good,buried,treasure",
+keyword,clarify,"because,mean,means,meaning,but,need,what,why,where,when,how,meaning,trying,define,defining,missing,else,add,remember,another,example,seen,before,talking,responding,mention,more,tell",

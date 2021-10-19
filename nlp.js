@@ -136,10 +136,15 @@ class NLP {
 		let i,res=[];
 		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
 		let words=text.split(/ +/);																		// Tokenize
-		for (i=0;i<words.length;i++) 																	// For each word
+		for (i=0;i<words.length;i++) {																	// For each word
+			if (typeof(this.whoSyns[words[i]]) == "string") {											// A valid string
+				if (this.whoSyns[words[i]] == "Class") words[i]="class";								// Whole class
+				else words[i]="student"																	// Generic student
+				}
 			if (!this.stopWords.includes(words[i]) && (words[i].length > minSize)) 						// If not a stop word and big enough
 				res.push(this.Stem(words[i]));															// Add to list
-	 	return res.join(' ').trim();																	// Put text back together
+			}
+		return res.join(' ').trim();																	// Put text back together
 	}
 
 	Stem(w) 																						// STEM WORD USING PORTER 1980 METHOD
