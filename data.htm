@@ -51,7 +51,7 @@
 // APP 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	let rawData=[], intents=[], responses=[], keyWords=[];
+	let rawData=[], intents=[], responses=[], keyWords=[], vocab=[]; uvocab=[]
 	let nlp=new NLP();																				// Alloc NLP class
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
@@ -143,18 +143,37 @@
 			}
 	}		
 
-	function GetKeyWords()																		// GET UNIQUE LIST OF WORDS
+	function GetKeyWords()																// GET UNIQUE LIST OF WORDS
 	{
-		let i,j,k,v;
+		let i,j,k,v,s;
 		keyWords=[];																				// Clear array
 		for (i=0;i<rawData.length;++i) {															// For each line
-			v=nlp.Tokenize(rawData[i].text);														// Tokenize line
+			s=nlp.CleanText(rawData[i].text);														// Clean text
+			if (!s) continue;																		// No text
+			v=nlp.Tokenize(s);																		// Clean and tokenize line
 			for (j=0;j<v.length;++j) 																// For each word															
-				if (v[j].length > 4)																// If big enough	
-					keyWords.push(v[j]);															// Add to key word list	
+				keyWords.push(v[j]);																// Add to key word list	
 			}
 		keyWords=[... new Set(keyWords)];															// Make unique
-	}
+	
+		for (k=100;k<600;k+=100) {																	// Top series
+			vocab["r"+k]=[];																		// Start fresh
+			for (i=0;i<rawData.length;++i) {														// For each line
+				if (rawData[i].speaker != "Teacher") continue;										// Only teachers
+				if (Math.floor(rawData[i].intent) != k) continue;									// Only this intent
+				s=nlp.CleanText(rawData[i].text,4,false);											// Clean text
+				if (!s) continue;																	// No text
+				v=nlp.Tokenize(s);																	// Clean and tokenize line
+				for (j=0;j<v.length;++j) 	vocab["r"+k].push(v[j]);								// Add to key word list	
+				}
+			vocab["r"+k]=[... new Set(vocab["r"+k])];												// Make unique
+			}
+		uvocab["r500"]=vocab["r500"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r300"],...vocab["r400"]].includes(x));
+		uvocab["r400"]=vocab["r400"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r300"],...vocab["r500"]].includes(x));
+		uvocab["r300"]=vocab["r300"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r400"],...vocab["r500"]].includes(x));
+		uvocab["r200"]=vocab["r200"].filter(x => ![...vocab["r100"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
+		uvocab["r100"]=vocab["r100"].filter(x => ![...vocab["r200"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
+		}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT 
@@ -245,17 +264,23 @@
 
 	function MakeNluLine(s)																		// FORMAT TEXT AS NLU INPUT
 	{
-		let k,re,who,keys=[];
+		let i,j,k,re,who,keys=[],levs=[];
+		let levels=["tasklevel","clarifylevel","valuelevel","metalevel"];							// Level labels
 		s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`student`);								// You -> STUDENT entity
-		s=nlp.CleanText(s,3);																		// Clean text
+		s=nlp.CleanText(s);																			// Clean text
 		for (k in nlp.keyWords) {																	// For each keyword
 			re=new RegExp("[^[]"+k+"[^)]","i");														// Make regex
 			if (s.match(re)) keys.push(nlp.keyWords[k]);											// Get keyword entity
 			}																				
-		s=s.replace(/jazmin|oliver|luis|chris|farrah/gi," ");										// Remove remaining student names
+		for (i=4;i<=levels.length;++i) {															// For each level
+			for (j=0;j<uvocab["r"+i*100].length;++j) {												// For each unique vocab word
+				re=new RegExp("[^[]"+uvocab["r"+i*100][j]+"[^)]","i");								// Make regex
+				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
+				}
+			}																				
 		s.replace(/  /g," ")																		// Remove extra spaces
-//		s+=" [affirmation](remark)";																// Add remark type
 		keys=[... new Set(keys)];																	// Make keywords unique
+		if (levs.length) { levs.sort((a,b)=>{ return b-a }); keys.push(levels[levs[0]]) };  		// Add level			
 		if (keys.length) s+= " :: "+keys.join(",");													// Add keys, if any
 		return s;																					// Return clean example
 	}

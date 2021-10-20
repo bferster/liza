@@ -126,23 +126,23 @@ class NLP {
 
 	Tokenize(text) 																					// TOKENIZE TEXT STRING
 	{
-		text=(" "+text).replace(/\{.*?\}/g,"");															// Remove text in braces
-		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
-		return text.split(/ /);																			// Tokenize and return
+		return text.match(/\b[\w|'|-]+\b/g);															// Tokenize and return
 	}
 
-	CleanText(text, minSize)																		// PREPROCESS/CLEAN TEST
+	CleanText(text, minSize=0, stops=false)															// PREPROCESS/CLEAN TEST
 	{
 		let i,res=[];
-		text=text.trim().toLowerCase().replace(/[^a-z0-9 \+\-\*\/\'\%\$\=]/g,"");						// Keep only germane chars(alph, space, num, *-+/'%$)
-		let words=text.split(/ +/);																		// Tokenize
+		if (!text)	return "";																			// Nothing to clean
+		let words=this.Tokenize(text);																	// Tokenize
 		for (i=0;i<words.length;i++) {																	// For each word
 			if (typeof(this.whoSyns[words[i]]) == "string") {											// A valid string
 				if (this.whoSyns[words[i]] == "Class") words[i]="class";								// Whole class
 				else words[i]="student"																	// Generic student
 				}
-			if (!this.stopWords.includes(words[i]) && (words[i].length > minSize)) 						// If not a stop word and big enough
-				res.push(this.Stem(words[i]));															// Add to list
+			if (words[i].length > minSize) {															// Big enough
+				if (!stops || !this.stopWords.includes(words[i])) 										// If not a stop word 
+					res.push(this.Stem(words[i]));														// Add to list
+				}
 			}
 		return res.join(' ').trim();																	// Put text back together
 	}
