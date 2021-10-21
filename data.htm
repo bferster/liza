@@ -265,14 +265,14 @@
 	function MakeNluLine(s)																		// FORMAT TEXT AS NLU INPUT
 	{
 		let i,j,k,re,who,keys=[],levs=[];
-		let levels=["tasklevel","clarifylevel","valuelevel","metalevel"];							// Level labels
+		let levels=["task","clarify","value","concern","meta"];										// Level labels
 		s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`student`);								// You -> STUDENT entity
 		s=nlp.CleanText(s);																			// Clean text
 		for (k in nlp.keyWords) {																	// For each keyword
 			re=new RegExp("[^[]"+k+"[^)]","i");														// Make regex
 			if (s.match(re)) keys.push(nlp.keyWords[k]);											// Get keyword entity
 			}																				
-		for (i=4;i<=levels.length;++i) {															// For each level
+		for (i=4;i<=levels.length;++i) {															// For each level (100-500)
 			for (j=0;j<uvocab["r"+i*100].length;++j) {												// For each unique vocab word
 				re=new RegExp("[^[]"+uvocab["r"+i*100][j]+"[^)]","i");								// Make regex
 				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
@@ -280,7 +280,10 @@
 			}																				
 		s.replace(/  /g," ")																		// Remove extra spaces
 		keys=[... new Set(keys)];																	// Make keywords unique
-		if (levs.length) { levs.sort((a,b)=>{ return b-a }); keys.push(levels[levs[0]]) };  		// Add level			
+		if (levs.length) { 																			// If a level set
+			levs.sort((a,b)=>{ return b-a }); 														// Top dog
+			for (i=0;i<10;++i) keys.push(levels[levs[0]]+i);										// Add multiple tags 
+			};  				
 		if (keys.length) s+= " :: "+keys.join(",");													// Add keys, if any
 		return s;																					// Return clean example
 	}
