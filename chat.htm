@@ -85,9 +85,9 @@ class App {
 			v=e.target.result.split("\n")
 			for (i=0;i<v.length;++i) {																// For each line
 				if (!v[i]) continue;
-				if (v[i].charAt(0) == "*")	k=v[i].trim();											// Get series
+				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
 				if (v[i].match(/^   /)) {
-					nums[k]++;																			// Advance total count
+					nums[k]++;																		// Advance total count
 					app.chat.GetResponse(v[i].substr(5), k, (res, id)=>{
 						if (id.substr(1) == res.intent.name.substr(1))	oks["*"+id.substr(1)]++;
 						tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%";

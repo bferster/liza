@@ -262,7 +262,7 @@
 			};
 	}
 
-	function MakeNluLine(s)																		// FORMAT TEXT AS NLU INPUT
+	function MakeNluLine(s, intent)																// FORMAT TEXT AS NLU INPUT
 	{
 		let i,j,k,re,who,keys=[],levs=[];
 		let levels=["task","clarify","value","concern","meta"];										// Level labels
@@ -280,11 +280,12 @@
 			}																				
 		s.replace(/  /g," ")																		// Remove extra spaces
 		keys=[... new Set(keys)];																	// Make keywords unique
-		if (levs.length) { 																			// If a level set
+		if (levs.length) { 
 			levs.sort((a,b)=>{ return b-a }); 														// Top dog
-			for (i=0;i<10;++i) keys.push(levels[levs[0]]+i);										// Add multiple tags 
+			if (intent/100-1 == levs[0])															// If a match
+				for (i=0;i<10;++i) keys.push(levels[levs[0]]+i);									// Add multiple tags 
 			};  				
-		if (keys.length) s+= " :: "+keys.join(",");													// Add keys, if any
+		if (keys.length) s+= " :: "+keys.join(", ");												// Add keys, if any
 		return s;																					// Return clean example
 	}
 
@@ -326,7 +327,7 @@
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
-				ss=MakeNluLine(o.text);																// Get clean text
+				ss=MakeNluLine(o.text,id.substr(1));												// Get clean text
 				who=nlp.GetWho(o.text);																// Get who
 				if (o.intent && (ints[id].length < num)) 											// If under limit and coded
 					ints[id].push("    - "+ss.trim()+"\n");											// Add it
