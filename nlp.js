@@ -126,7 +126,8 @@ class NLP {
 
 	Tokenize(text) 																					// TOKENIZE TEXT STRING
 	{
-		return text.match(/\b[\w|'|-]+\b/g);															// Tokenize and return
+		let r=text.match(/\b[\w|'|-]+\b/g);																// Tokenize 
+		return r ? r : [];																				// Return list or empty array
 	}
 
 	CleanText(text, minSize=0, stops=false)															// PREPROCESS/CLEAN TEST
@@ -134,6 +135,7 @@ class NLP {
 		let i,res=[];
 		if (!text)	return "";																			// Nothing to clean
 		let words=this.Tokenize(text);																	// Tokenize
+		if (!words)	return "";																			// Nothing to clean
 		for (i=0;i<words.length;i++) {																	// For each word
 			if (typeof(this.whoSyns[words[i]]) == "string") {											// A valid string
 				if (this.whoSyns[words[i]] == "Class") words[i]="class";								// Whole class
