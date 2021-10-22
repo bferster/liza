@@ -21,6 +21,8 @@
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
 		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
+		<input type="file" id="lz-testFile" accept=".txt" style="display:none">
+
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/lizalogo.png" style="width:25%">
 			<span style="font-size:24px;vertical-align:12px"><b> dataParser</b></span>
@@ -37,7 +39,7 @@
 				<div class="co-bs" id="lz-makeTrain">Make nlu.yml</div>
 				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeResponse">Make response</div>
 				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeSession">Make session</div>
-				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeStories">Make stories</div>
+				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeStories">Test data</div>
 			</p>
 			<hr>
 			<p id="outp" style="text-align:left"></p>
@@ -49,7 +51,7 @@
 // APP 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	let rawData=[], intents=[], responses=[], keyWords=[], vocab=[]; uvocab=[]
+	let rawData=[], intents=[], responses=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
@@ -57,10 +59,14 @@
 		$("#lz-makeTrain").on("click",()=>   { MakeStories(1);    } );								// ON MAKE TRAINING FILE
 		$("#lz-makeResponse").on("click",()=>{ MakeStories(8);    } );								// ON MAKE RESPONSE
 		$("#lz-makeSession").on("click", ()=>{ MakeSession();     } );								// ON MAKE SESSION
-		$("#lz-makeStories").on("click", ()=>{ MakeStories(1|2|4) } );								// ON MAKE ALL 3 FILES
+		$("#lz-makeStories").on("click", ()=>{ $("#lz-testFile").trigger("click"); } );				// ON TEST DATA
 		$("#lz-importData").on("click",()=>{ $("#lz-tempFile").trigger("click"); });				// ON IMPORT
 		$("#lz-tempFile").on("change",(e)=>{														// ON FILE LOAD
 			ImportCSV(e);																			// Read file
+			$("#lz-tempFile").val("");																// Clear value		
+			});
+		$("#lz-testFile").on("change",(e)=>{														// ON TEST FILE LOAD
+			TestData(e);																			// Read file
 			$("#lz-tempFile").val("");																// Clear value		
 			});
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
@@ -169,7 +175,56 @@
 		uvocab["r300"]=vocab["r300"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r400"],...vocab["r500"]].includes(x));
 		uvocab["r200"]=vocab["r200"].filter(x => ![...vocab["r100"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
 		uvocab["r100"]=vocab["r100"].filter(x => ![...vocab["r200"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
+	}
+	
+	function TestData(e)																		// TEST DATA
+	{	
+		let i,k,o,v;
+		let file=e.target.files[0];																	// Point at file
+		if (!file) 	return;																			// Quit if bad
+		let reader=new FileReader();																// Init reader
+		reader.readAsText(file);																	// Read file
+		reader.onload=(e)=>{ 																		// When loaded
+			let nums=[]; nums["*100"]=0; nums["*200"]=0; nums["*300"]=0;	nums["*400"]=0;	nums["*500"]=0;	
+			let oks=[];  oks["*100"]=0; oks["*200"]=0;	oks["*300"]=0;	oks["*400"]=0;	oks["*500"]=0	;
+			let tots=[];
+			v=e.target.result.split("\n")
+			for (i=0;i<v.length;++i) {																// For each line
+				if (!v[i]) continue;
+				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
+				if (v[i].match(/^   /)) {
+					GetResponse2(v[i].substr(5), k, (res, id)=>{
+						nums["*"+id]++;																// Advance total count
+						if (id == res.intent.name.substr(1))	oks["*"+id]++;
+						tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%";
+						tots["*200"]=oks["*200"]+"/"+nums["*200"]+"="+Math.floor(oks["*200"]/nums["*200"]*100)+"%";
+						tots["*300"]=oks["*300"]+"/"+nums["*300"]+"="+Math.floor(oks["*300"]/nums["*300"]*100)+"%";
+						tots["*400"]=oks["*400"]+"/"+nums["*400"]+"="+Math.floor(oks["*400"]/nums["*400"]*100)+"%";
+						tots["*500"]=oks["*500"]+"/"+nums["*500"]+"="+Math.floor(oks["*500"]/nums["*500"]*100)+"%";
+						trace(id,res,tots);
+						})
+				}
+			}
 		}
+	}
+
+	function GetResponse2(msg, id, callback)														// GET RESPONSE FROM AI
+	{
+		let xhttp=new XMLHttpRequest();																// Alloc hxmlhttp
+		xhttp.onreadystatechange = function() {														// ON STATE CHANGE
+			if (this.readyState == 4 && this.status == 200) {										// Valid response
+				let o=JSON.parse(this.response);													// Objectify
+	//			trace(o);																			// Log
+				if (callback) callback(o,id);														// Run callback
+					return;																			// Quit
+				}
+			};
+		xhttp.open("POST", "https://lizasim.com:5005/model/parse");									// Set url
+		xhttp.setRequestHeader("Content-Type", "application/json");									// Set type
+		xhttp.send(JSON.stringify({text:msg}));														// Set paqyload
+		}
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT 
@@ -192,27 +247,13 @@
 
 	function AddIntentTags(s, intent="") 														// ADD INTENT TAGS
 	{
+		return s;
 		let i,re,levs=[],tags=[];
 		if (isNaN(intent)) return s;																// Only for real intents
 		let levels=["task","clarify","value","concern","meta"];										// Level labels
-		if (intent > 100) {																			// If adding mandatory tags
-			for (i=0;i<4;++i) tags.push(levels[intent/100-1]+i);									// Add multiple tags 
-			}
-		else if (levs.length) { 																	// If a level detected
-			for (i=2;i<=levels.length;++i) {														// For each level (200-500)
-				for (j=0;j<uvocab["r"+i*100].length;++j) {											// For each unique vocab word
-					re=new RegExp("[^[]"+uvocab["r"+i*100][j]+"[^)]","i");							// Make regex
-					if (s.match(re)) levs.push(i-1);												// Add new entity(s)
-					}
-				}																				
-			levs.sort((a,b)=>{ return b-a }); 														// Top dog
-			for (i=0;i<4;++i) tags.push(levels[levs[0]]+i);											// Add multiple tags 
-			};  				
-		if (tags.length) {																			// If a tag to add
-			s+=(s.match(/ :: /)) ? ", " :" :: ";													// Add header	 
-			s+=tags.join(", ");																		// Add tags, if any
-			}
-		return s;
+		for (i=0;i<4;++i) tags.push(levels[intent/100-1]+i);										// Add multiple tags 
+		s+=(s.match(/ :: /)) ? ", " :" :: ";														// Add header	 
+		s+=tags.join(", ");																			// Add tags, if any
 	}
 
 	function MakeStories(mask)																	// MAKE ALL FILES
@@ -268,17 +309,15 @@
 		let str2=str;
 		for (k in ints)	{																			// For each intent
 			tot=Math.floor(Math.min(num,ints[k].length)*(1-test));									// Get training
-			inc=Math.max(ints[k].length/num,1);														// Sampling increment, at least 1
+			inc=Math.max(tot/num,1);																// Sampling increment, at least 1
 			str+="- intent: "+k+"\n  examples: |\n";												// Add header
 			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
-			for (i=0;i<ints[k].length;i+=inc) {														// For each one wanted
+			for (i=0;i<tot;i+=inc) {																// For each one wanted
 				ss=ints[k][Math.floor(i)];															// Get it
 				str+=AddIntentTags(ss,k.substr(1))+"\n";											// Add mandatory intent tags
 				}
-			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) {										// For each test example
-				ss=ints[k][i+tot];																	// Get it
-				str2+=AddIntentTags(ss)+"\n";														// Add calculated intent tags
-				}
+			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) 										// For each test example
+				str2+=ints[k][i+tot]+"\n";															// Add it without tags
 			}
 		if (mask&1) SaveTextAsFile("nlu.yml",str);													// Write training file
 		if (mask&1) SaveTextAsFile("test-nlu.txt",str2);											// Write testing file

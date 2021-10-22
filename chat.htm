@@ -87,11 +87,9 @@ class App {
 				if (!v[i]) continue;
 				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
 				if (v[i].match(/^   /)) {
-					nums[k]++;																		// Advance total count
-				trace(k,v[i])
-				continue	
-				app.chat.GetResponse(v[i].substr(5), k, (res, id)=>{
-						if (id.substr(1) == res.intent.name.substr(1))	oks["*"+id.substr(1)]++;
+					nums["*"+k]++;																	// Advance total count
+					app.chat.GetResponse(v[i].substr(5), k, (res, id)=>{
+						if (id == res.intent.name.substr(1))	oks["*"+id]++;
 						tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%";
 						tots["*200"]=oks["*200"]+"/"+nums["*200"]+"="+Math.floor(oks["*200"]/nums["*200"]*100)+"%";
 						tots["*300"]=oks["*300"]+"/"+nums["*300"]+"="+Math.floor(oks["*300"]/nums["*300"]*100)+"%";

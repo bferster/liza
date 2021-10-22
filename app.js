@@ -134,7 +134,7 @@ class App  {
 			})
 		.then(response => response.json())
  		.then(data => callback(data))
-		}
+	}
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
