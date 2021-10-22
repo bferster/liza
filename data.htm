@@ -60,16 +60,16 @@
 		$("#lz-makeResponse").on("click",()=>{ MakeStories(8);    } );								// ON MAKE RESPONSE
 		$("#lz-makeSession").on("click", ()=>{ MakeSession();     } );								// ON MAKE SESSION
 		$("#lz-makeStories").on("click", ()=>{ $("#lz-testFile").trigger("click"); } );				// ON TEST DATA
-		$("#lz-importData").on("click",()=>  { $("#lz-tempFile").trigger("click"); });				// ON IMPORT
-		$("#lz-tempFile").on("change",(e)=>  {														// ON FILE LOAD
+		$("#lz-importData").on("click",()=>{ $("#lz-tempFile").trigger("click"); });				// ON IMPORT
+		$("#lz-tempFile").on("change",(e)=>{														// ON FILE LOAD
 			ImportCSV(e);																			// Read file
 			$("#lz-tempFile").val("");																// Clear value		
 			});
-		$("#lz-testFile").on("change",(e)=>  {														// ON TEST FILE LOAD
+		$("#lz-testFile").on("change",(e)=>{														// ON TEST FILE LOAD
 			TestData(e);																			// Read file
 			$("#lz-tempFile").val("");																// Clear value		
 			});
-		$(window).on("keydown",function(e)   {														// HANDLE KEYPRESS
+		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
 				GetTextBox("Type intent","","",(s)=>{ WitTrainIntent(s); });	
 				}
@@ -245,6 +245,30 @@
 		return s;																					// Return clean example
 	}
 
+	function AddIntentTags(s, intent="") 														// ADD INTENT TAGS
+	{
+		let i,re,levs=[],tags=[];
+		if (isNaN(intent)) return s;																// Only for real intents
+		let levels=["task","clarify","value","concern","meta"];										// Level labels
+		for (i=4;i<=levels.length;++i) {															// For each level (100-500)
+			for (j=0;j<uvocab["r"+i*100].length;++j) {												// For each unique vocab word
+				re=new RegExp("[^[]"+uvocab["r"+i*100][j]+"[^)]","i");								// Make regex
+				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
+				}
+			}																				
+		if (levs.length) { 
+			levs.sort((a,b)=>{ return b-a }); 														// Top dog
+			if (intent/100-1 == levs[0])															// If a match
+				for (i=0;i<10;++i) tags.push(levels[levs[0]]+i);									// Add multiple tags 
+			};  				
+		if (tags.length) {																			// Any tags?
+			s+=(s.match(/ :: /)) ? ", " :" :: ";													// Add header	 
+			s+=tags.join(", ");																		// Add tags, if any
+			}
+		return s;
+		}
+
+
 	function MakeStories(mask)																	// MAKE ALL FILES
 	{
 		let ints=[],doms=[],sess=[],dupes=[];
@@ -295,18 +319,20 @@
 		for (k in ints)	ints[k]=[... new Set(ints[k])];												// Make unique																		// For each intent
 
 		let str="version: \"2.0\"\n\nnlu:\n";														// NLU header
-		let str2=str;																				// Copy for testing
+		let str2=str;
 		for (k in ints)	{																			// For each intent
 			tot=Math.floor(Math.min(num,ints[k].length)*(1-test));									// Get training
 			inc=Math.max(tot/num,1);																// Sampling increment, at least 1
-			str+="- intent: "+k+"\n  examples: |\n";												// Add training header
-			str2+="- intent: "+k+"\n  examples: |\n";												// Add testing header
+			str+="- intent: "+k+"\n  examples: |\n";												// Add header
+			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
 			for (i=0;i<tot;i+=inc) {																// For each one wanted
 				ss=ints[k][Math.floor(i)];															// Get it
-				str+=ints[k][i+tot]+"\n";															// Add it 
+				str+=AddIntentTags(ss,k.substr(1))+"\n";											// Add intent tags
 				}
-			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) 										// For each test example
-				str2+=ints[k][i+tot]+"\n";															// Add it
+			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) {										// For each test example
+				ss=ints[k][Math.floor(i+tot)];														// Get it
+				str2+=AddIntentTags(ss,k.substr(1))+"\n";											// Add intent tags
+				}
 			}
 		if (mask&1) SaveTextAsFile("nlu.yml",str);													// Write training file
 		if (mask&1) SaveTextAsFile("test-nlu.txt",str2);											// Write testing file
@@ -481,23 +507,9 @@
 			});
 	}
 
-/*
-	function AddIntentTags(s, intent="") 														// ADD INTENT TAGS
-	{
-		return s;
-		let i,re,levs=[],tags=[];
-		if (isNaN(intent)) return s;																// Only for real intents
-		let levels=["task","clarify","value","concern","meta"];										// Level labels
-		for (i=0;i<4;++i) tags.push(levels[intent/100-1]+i);										// Add multiple tags 
-		s+=(s.match(/ :: /)) ? ", " :" :: ";														// Add header	 
-		s+=tags.join(", ");																			// Add tags, if any
-	}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
+/*///////////////////////////////////////////////////////////////////////////////////////////////
 // WIT
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 	function WitTrainIntent(intent)
 	{
