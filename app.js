@@ -83,7 +83,6 @@ class App  {
 				for (i=0;i<d.length;++i) {															// For each line
 					if (d[i].type == "student") this.AddStudent(d[i]);								// Add student
 					if (d[i].type == "action") 	app.nlp.AddSyns("action",d[i].id,d[i].text.split(",")); // Add action and its synonyms
-					if (d[i].type == "keyword") app.nlp.AddKeyWords(d[i].text.split(","));			 // Add keywords
 					}
 				this.curStudent=app.students[0].id;													// Pick first student
 				})	

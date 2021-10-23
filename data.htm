@@ -25,16 +25,16 @@
 
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/lizalogo.png" style="width:25%">
-			<span style="font-size:24px;vertical-align:12px"><b> dataParser</b></span>
+			<span style="font-size:24px;vertical-align:12px"><b><i> dataparser</b></i></span>
 			<hr>
-			Scene: <select class="co-is" id="lz-scene">
-				<option>All</option><option>0</option><option>1</option>><option>2</option>
+			Dataset: <select class="co-is" id="lz-dataset">
+				<option>Cleaned</option><option>Original</option>><option>Testdata</option>
 				</select>
 			&nbsp &nbsp; Series: <select class="co-is" id="lz-series">
 				<option>Hundreds</option><option>Integers</option><option>Decimals</option><option>
 			</select>
 			&nbsp &nbsp; Max per intent: <input type="input" class="co-is" style="width:40px" value="500" id="lz-num"/>
-			&nbsp &nbsp; Test % <input type="input" class="co-is" style="width:40px" value="20" id="lz-session"/>
+			&nbsp &nbsp; Test % <input type="input" class="co-is" style="width:40px" value="0" id="lz-session"/>
 			<hr><p>
 				<div class="co-bs" id="lz-makeTrain">Make nlu.yml</div>
 				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeResponse">Make response</div>
@@ -56,11 +56,13 @@
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();
-		$("#lz-makeTrain").on("click",()=>   { MakeStories(1);    } );								// ON MAKE TRAINING FILE
-		$("#lz-makeResponse").on("click",()=>{ MakeStories(8);    } );								// ON MAKE RESPONSE
-		$("#lz-makeSession").on("click", ()=>{ MakeSession();     } );								// ON MAKE SESSION
-		$("#lz-makeStories").on("click", ()=>{ $("#lz-testFile").trigger("click"); } );				// ON TEST DATA
-		$("#lz-importData").on("click",()=>{ $("#lz-tempFile").trigger("click"); });				// ON IMPORT
+		$("#lz-makeTrain").on("click",()=>	  { MakeStories(1);    } );								// ON MAKE NLU ILE
+		$("#lz-makeResponse").on("click",()=> { MakeStories(8);    } );								// ON MAKE RESPONSE
+		$("#lz-makeSession").on("click", ()=> { MakeSession();     } );								// ON MAKE SESSION
+		$("#lz-makeStories").on("click", ()=> { $("#lz-testFile").trigger("click"); 	});			// ON TEST DATA
+		$("#lz-importData").on("click",()=>   { $("#lz-tempFile").trigger("click"); 	});			// ON IMPORT
+		$("#lz-dataset").on("change", ()=>    { LoadConfig($("#lz-dataset").val()) 		});			// ON DATASET
+				
 		$("#lz-tempFile").on("change",(e)=>{														// ON FILE LOAD
 			ImportCSV(e);																			// Read file
 			$("#lz-tempFile").val("");																// Clear value		
@@ -76,7 +78,7 @@
 			});
 		});
 
-	function LoadConfig()																		// LOAD CONFIG FILE
+	function LoadConfig(dataset="Cleaned")														// LOAD CONFIG FILE
 	{	
 		let i;
 		fetch('data/config.csv')																	// Load file
@@ -87,7 +89,7 @@
 					if (d[i].type == "student") nlp.AddSyns("student",d[i].id,d[i].text.split(",")); 	// Add student synonyms
 					if (d[i].type == "keyword") nlp.AddSyns("keyword", d[i].id, d[i].text.split(","));	// Add keywords
 					}
-				LoadRawData('data/rawData3.csv');													// Load raw data file
+				LoadRawData("data/"+dataset+".csv");												// Load raw data file
 			});
 		}
 	
@@ -157,12 +159,12 @@
 				keyWords.push(v[j]);																// Add to key word list	
 			}
 		keyWords=[... new Set(keyWords)];															// Make unique
-	
+
 		for (k=100;k<600;k+=100) {																	// Top series
 			vocab["r"+k]=[];																		// Start fresh
 			for (i=0;i<rawData.length;++i) {														// For each line
 				if (rawData[i].speaker != "Teacher") continue;										// Only teachers
-				if (Math.floor(rawData[i].intent) != k) continue;									// Only this intent
+				if (Math.floor(Math.floor(rawData[i].intent/100)*100) != k) continue;				// Only this intent's 100s level
 				s=nlp.CleanText(rawData[i].text,4,false);											// Clean text
 				if (!s) continue;																	// No text
 				v=nlp.Tokenize(s);																	// Clean and tokenize line
@@ -170,6 +172,7 @@
 				}
 			vocab["r"+k]=[... new Set(vocab["r"+k])];												// Make unique
 			}
+		uvocab=[];
 		uvocab["r500"]=vocab["r500"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r300"],...vocab["r400"]].includes(x));
 		uvocab["r400"]=vocab["r400"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r300"],...vocab["r500"]].includes(x));
 		uvocab["r300"]=vocab["r300"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r400"],...vocab["r500"]].includes(x));
@@ -230,14 +233,26 @@
 // OUTPUT 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	function MakeNluLine(s)																	// FORMAT TEXT AS NLU INPUT
+	function MakeNluLine(s, intent)																// FORMAT TEXT AS NLU INPUT
 	{
-		let who,keys=[];
+		let i,who,keys=[];
 		s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`student`);								// You -> STUDENT entity
 		s=nlp.CleanText(s);																			// Clean text
 		for (k in nlp.keyWords) {																	// For each keyword
 			re=new RegExp("[^[]"+k+"[^)]","i");														// Make regex
-			if (s.match(re)) keys.push(nlp.keyWords[k]);											// Get keyword entity
+			if (s.match(re)) {																		// A match
+				if (nlp.keyWords[k].match(/-it/)) {													// A level tag
+					if ((intent == 200) && (nlp.keyWords[k] == "explain-it")) 						// 200 match
+						keys.push(nlp.keyWords[k]);													// Add tag		
+					else if ((intent == 300) && (nlp.keyWords[k] == "value-it")) 					// 300 match
+						keys.push(nlp.keyWords[k]);													// Add tag		
+					else if ((intent == 400) && (nlp.keyWords[k] == "suggest-it")) 					// 400 match
+						keys.push(nlp.keyWords[k]);													// Add tag		
+					else if ((intent == 500) && (nlp.keyWords[k] == "metacog-it")) 					// 500 match
+						keys.push(nlp.keyWords[k]);													// Add tag		
+					}
+				else keys.push(nlp.keyWords[k]);													// Add regular tag
+				}
 			}																				
 		s.replace(/  /g," ")																		// Remove extra spaces
 		keys=[... new Set(keys)];																	// Make keywords unique
@@ -266,7 +281,7 @@
 			s+=tags.join(", ");																		// Add tags, if any
 			}
 		return s;
-		}
+	}
 
 
 	function MakeStories(mask)																	// MAKE ALL FILES
@@ -302,7 +317,7 @@
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
-				ss=MakeNluLine(o.text);																// Get clean text
+				ss=MakeNluLine(o.text,id.substr(1));												// Get clean text
 				who=nlp.GetWho(o.text);																// Get who
 				if (o.intent) ints[id].push("    - "+ss.trim());									// If coded, add it
 				}
@@ -334,8 +349,8 @@
 				str2+=AddIntentTags(ss,k.substr(1))+"\n";											// Add intent tags
 				}
 			}
-		if (mask&1) SaveTextAsFile("nlu.yml",str);													// Write training file
-		if (mask&1) SaveTextAsFile("test-nlu.txt",str2);											// Write testing file
+		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
+		if (mask&1 && (test > 0)) SaveTextAsFile("test-nlu.txt",str2);								// Write testing file
 
 		str="version: \"2.0\"\n\nstories:\n\n";														// STORIES header
 		str+="- story: addition\n  steps:\n";														// Add story header
