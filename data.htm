@@ -31,15 +31,15 @@
 				<option>Cleaned</option><option>Original</option>><option>Testdata</option>
 				</select>
 			&nbsp &nbsp; Series: <select class="co-is" id="lz-series">
-				<option>Hundreds</option><option>Integers</option><option>Decimals</option><option>
+				<option>Hundreds</option><option>Tens</option><option>Decimals</option><option>
 			</select>
 			&nbsp &nbsp; Max per intent: <input type="input" class="co-is" style="width:40px" value="500" id="lz-num"/>
-			&nbsp &nbsp; Test % <input type="input" class="co-is" style="width:40px" value="0" id="lz-session"/>
+			&nbsp &nbsp; Test % <input type="input" class="co-is" style="width:40px" value="0" id="lz-holdOut"/>
 			<hr><p>
 				<div class="co-bs" id="lz-makeTrain">Make nlu.yml</div>
-				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeResponse">Make response</div>
-				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeSession">Make session</div>
-				&nbsp &nbsp &nbsp;<div class="co-bs" id="lz-makeStories">Test data</div>
+				&nbsp; &nbsp; &nbsp;<div class="co-bs" id="lz-testData">Test data</div>
+				&nbsp; &nbsp; &nbsp;<div class="co-bs" id="lz-makeSession">Make session</div>
+				&nbsp;<input type="input" class="co-is" style="width:40px" value="78" id="lz-session"/>
 			</p>
 			<hr>
 			<p id="outp" style="text-align:left"></p>
@@ -57,9 +57,8 @@
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();
 		$("#lz-makeTrain").on("click",()=>	  { MakeStories(1);    } );								// ON MAKE NLU ILE
-		$("#lz-makeResponse").on("click",()=> { MakeStories(8);    } );								// ON MAKE RESPONSE
 		$("#lz-makeSession").on("click", ()=> { MakeSession();     } );								// ON MAKE SESSION
-		$("#lz-makeStories").on("click", ()=> { $("#lz-testFile").trigger("click"); 	});			// ON TEST DATA
+		$("#lz-testData").on("click", ()=> 	  { $("#lz-testFile").trigger("click"); 	});			// ON TEST DATA
 		$("#lz-importData").on("click",()=>   { $("#lz-tempFile").trigger("click"); 	});			// ON IMPORT
 		$("#lz-dataset").on("change", ()=>    { LoadConfig($("#lz-dataset").val()) 		});			// ON DATASET
 				
@@ -110,6 +109,7 @@
 		let nRemarks=0, nResponses=0; 																// Counts
 		for (i=0;i<rawData.length;++i) {															// For each entry
 			o=rawData[i];																			// Point at line
+			o.text=nlp.CleanText(o.text);															// Clean text
 			if (!o.intent)	continue;																// Skip no intents
 			if (o.speaker == "Teacher") {															// A remark
 				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
@@ -147,14 +147,13 @@
 			}
 	}		
 
-	function GetKeyWords()																// GET UNIQUE LIST OF WORDS
+	function GetKeyWords()																		// GET UNIQUE LIST OF WORDS
 	{
 		let i,j,k,v,s;
 		keyWords=[];																				// Clear array
 		for (i=0;i<rawData.length;++i) {															// For each line
-			s=nlp.CleanText(rawData[i].text);														// Clean text
-			if (!s) continue;																		// No text
-			v=nlp.Tokenize(s);																		// Clean and tokenize line
+			if (!rawData[i].text) continue;															// Nothing there
+			v=nlp.Tokenize(rawData[i].text);														// Clean and tokenize line
 			for (j=0;j<v.length;++j) 																// For each word															
 				keyWords.push(v[j]);																// Add to key word list	
 			}
@@ -163,12 +162,11 @@
 		for (k=100;k<600;k+=100) {																	// Top series
 			vocab["r"+k]=[];																		// Start fresh
 			for (i=0;i<rawData.length;++i) {														// For each line
-				if (rawData[i].speaker != "Teacher") continue;										// Only teachers
+				if (!rawData[i].text)										continue;				// Nothing there
+				if (rawData[i].speaker != "Teacher") 						continue;				// Only teachers
 				if (Math.floor(Math.floor(rawData[i].intent/100)*100) != k) continue;				// Only this intent's 100s level
-				s=nlp.CleanText(rawData[i].text,4,false);											// Clean text
-				if (!s) continue;																	// No text
-				v=nlp.Tokenize(s);																	// Clean and tokenize line
-				for (j=0;j<v.length;++j) 	vocab["r"+k].push(v[j]);								// Add to key word list	
+				v=nlp.Tokenize(rawData[i].text);													// Tokenize line
+				for (j=0;j<v.length;++j)  if (v[j].length > 4) vocab["r"+k].push(v[j]);				// Add to key word list	
 				}
 			vocab["r"+k]=[... new Set(vocab["r"+k])];												// Make unique
 			}
@@ -233,26 +231,14 @@
 // OUTPUT 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	function MakeNluLine(s, intent)																// FORMAT TEXT AS NLU INPUT
+	function MakeNluLine(s)																		// CLEAN TEXT FOR NLU INPUT
 	{
 		let i,who,keys=[];
 		s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`student`);								// You -> STUDENT entity
 		s=nlp.CleanText(s);																			// Clean text
 		for (k in nlp.keyWords) {																	// For each keyword
-			re=new RegExp("[^[]"+k+"[^)]","i");														// Make regex
-			if (s.match(re)) {																		// A match
-				if (nlp.keyWords[k].match(/-it/)) {													// A level tag
-					if ((intent == 200) && (nlp.keyWords[k] == "explain-it")) 						// 200 match
-						keys.push(nlp.keyWords[k]);													// Add tag		
-					else if ((intent == 300) && (nlp.keyWords[k] == "value-it")) 					// 300 match
-						keys.push(nlp.keyWords[k]);													// Add tag		
-					else if ((intent == 400) && (nlp.keyWords[k] == "suggest-it")) 					// 400 match
-						keys.push(nlp.keyWords[k]);													// Add tag		
-					else if ((intent == 500) && (nlp.keyWords[k] == "metacog-it")) 					// 500 match
-						keys.push(nlp.keyWords[k]);													// Add tag		
-					}
-				else keys.push(nlp.keyWords[k]);													// Add regular tag
-				}
+			re=new RegExp("\\b"+k+"\\b","i");														// Make regex
+			if (s.match(re)) keys.push(nlp.keyWords[k]);											// Add regular tag
 			}																				
 		s.replace(/  /g," ")																		// Remove extra spaces
 		keys=[... new Set(keys)];																	// Make keywords unique
@@ -260,21 +246,19 @@
 		return s;																					// Return clean example
 	}
 
-	function AddIntentTags(s, intent="") 														// ADD INTENT TAGS
+	function AddIntentTags(s) 																	// ADD INTENT TAGS
 	{
-		let i,re,levs=[],tags=[];
-		if (isNaN(intent)) return s;																// Only for real intents
+		let i,k,re,levs=[],tags=[];
 		let levels=["task","clarify","value","concern","meta"];										// Level labels
-		for (i=4;i<=levels.length;++i) {															// For each level (100-500)
+		for (i=4;i<=levels.length;++i) {															// For each level (400-500)
 			for (j=0;j<uvocab["r"+i*100].length;++j) {												// For each unique vocab word
-				re=new RegExp("[^[]"+uvocab["r"+i*100][j]+"[^)]","i");								// Make regex
+				re=new RegExp("\\b"+uvocab["r"+i*100][j]+"\\b","i");								// Make regex
 				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
 				}
 			}																				
 		if (levs.length) { 
 			levs.sort((a,b)=>{ return b-a }); 														// Top dog
-			if (intent/100-1 == levs[0])															// If a match
-				for (i=0;i<10;++i) tags.push(levels[levs[0]]+i);									// Add multiple tags 
+			tags.push(levels[levs[0]]);																// Add tags 
 			};  				
 		if (tags.length) {																			// Any tags?
 			s+=(s.match(/ :: /)) ? ", " :" :: ";													// Add header	 
@@ -283,13 +267,12 @@
 		return s;
 	}
 
-
 	function MakeStories(mask)																	// MAKE ALL FILES
 	{
 		let ints=[],doms=[],sess=[],dupes=[];
 		let rType,keys=[],resps=[];
 		let i,inc,o,c,ss,re,who,id,sid,tot;
-		let test=$("#lz-session").val()/100;														// Percent to test
+		let test=$("#lz-holdOut").val()/100;														// Percent to test
 		let level=$("#lz-series").val();															// Level of intents
 		let num=$("#lz-num").val();																	// Max per intent
 		ints["bot_challenge"]=[]; 
@@ -297,27 +280,23 @@
 		ints["bot_challenge"].push("    - am I talking to a bot?"); ints["bot_challenge"].push("    - am I talking to a human?")
 		ints["addition"]=[]; 
 		ints["addition"].push("    - what is 2+2?"); ints["addition"].push("    - can you add two numbers?")
-		ints["time"]=[]; 
-		ints["time"].push("    - what time is it?"); ints["time"].push("    - when is now?")
-		ints["howru"]=[]; 
-		ints["howru"].push("    - how are you?"); ints["howru"].push("    - how are you doing?")
 		ints["why"]=[]; 
 		ints["why"].push("    - why do you say that?"); ints["why"].push("    - how did you know?")
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
-			else if (level == "Integers")	id=Math.floor(o.intent);								// Just the whole numbers					
+			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
 			else							id=Math.floor(o.intent/100)*100;						// Cap at 100s
 			sid="session-"+o.rerid;																	// Session id
-			if (!sess[sid]) 			  		sess[sid]=[];										// Alloc session holder
+			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder
 			if (o.speaker == "Teacher") {															// If remark
 				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
 				if (id < 100)	continue;															// Skip if uncoded
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
-				ss=MakeNluLine(o.text,id.substr(1));												// Get clean text
+				ss=MakeNluLine(o.text);																// Get clean text
 				who=nlp.GetWho(o.text);																// Get who
 				if (o.intent) ints[id].push("    - "+ss.trim());									// If coded, add it
 				}
@@ -342,11 +321,11 @@
 			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
 			for (i=0;i<tot;i+=inc) {																// For each one wanted
 				ss=ints[k][Math.floor(i)];															// Get it
-				str+=AddIntentTags(ss,k.substr(1))+"\n";											// Add intent tags
+				str+=AddIntentTags(ss)+"\n";														// Add intent tags
 				}
 			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) {										// For each test example
 				ss=ints[k][Math.floor(i+tot)];														// Get it
-				str2+=AddIntentTags(ss,k.substr(1))+"\n";											// Add intent tags
+				str2+=AddIntentTags(ss)+"\n";														// Add intent tags
 				}
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
@@ -406,32 +385,43 @@
 
 	async function MakeSession()																// CREATE SESSION FILE
 	{
-		let i,t,o,session=[],texts=[],startTime=0;
-		let fields=["scene","actor","code","time","text","calc"];									// Field names
-		let teacher=$("#lz-session").val().split("-")[0];											// Teacher to add
-
+		let i,t,s,o,session=[],texts=[],intents=[],startTime=0;
+		let fields=["scene","actor","code","time","text"];											// Field names
+		let sessId=$("#lz-session").val().split("-")[0];											// Session to add
+		LoadingIcon(true);																			// Show loading icon
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
-			if (o.rerid != teacher) 	continue;													// Skip if not right teacher
-			if (!startTime)				startTime=TimecodeToSeconds(o.timestamp);					// Set 1st time
-			texts.push(o.text);																		// Add to array of texts
+			if (o.rerid != sessId) 	continue;														// Skip if not right session
+			if (!startTime)			startTime=TimecodeToSeconds(o.timestamp);						// Set 1st time
+			s=MakeNluLine(o.text);
+			texts.push(s);																			// Add to array of texts
 			t=TimecodeToSeconds(o.timestamp)-startTime;												// Get event time
-			session.push({ scene:o.topic, actor:o.speaker, code:o.intent, time:t,text:o.text,calc:0 });	// Add line 
+			session.push({ scene:o.topic, actor:o.speaker, code:tt, time:t, text:s});				// Add line 
 			}
+			
+			let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib
+			SaveTextAsFile("session-"+sessId+".csv",str);											// Write file
+			LoadingIcon(false);																		// Hide loading icon
 		
 		const fetchAll=async(texts) => {															// GET ALL INTENTS AT ONCE
   			let i,n;
 			const res   = await Promise.all(texts.map(t => GetResponse(t)));						// Ask for intents
   			const jsons = await Promise.all(res.map(r => r.json()));								// Wait for them
 			for (i=0;i<jsons.length;++i) {															// For each line
-				n=(jsons[i].intent_ranking[0].name == "nlu_fallback") ? 1 : 0;						// Go to second choice
-				session[i].calc=jsons[i].intent_ranking[n].name.substr(1);							// Get intent
+				if (session[i].actor == "Teacher") {
+					n=(jsons[i].intent_ranking[0].name == "nlu_fallback") ? 1 : 0;					// Go to second choice
+					session[i].calc=jsons[i].intent_ranking[n].name.substr(1);						// Get intent
+				 	if (Math.floor(session[i].intent/100)*100 == session[i].calc) session[i].ok=1;	// A match
+					else														  session[i].ok=0;	// None
+				trace(i,jsons[i],session[i].calc,session[i].text)
+					}
 				}
 			let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib
-			SaveTextAsFile("session-"+teacher+".csv",str);											// Write file
+			SaveTextAsFile("session-"+sessId+".csv",str);											// Write file
+			LoadingIcon(false);																		// Hide loading icon
 			Sound("ding");																			// Sound
 			}
-		fetchAll(texts);																			// Get all intents
+//		fetchAll(texts);																			// Get all intents
 	}
 
 	function GetResponse(msg)																	// GET RESPONSE FROM AI
@@ -486,7 +476,6 @@
 			Sound("ding");																			// Ding
 			};
 	}
-
 
 	function ChooseKeywords()
 	{
@@ -642,6 +631,17 @@ POST https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/123
 		t+=v[3]*1000;																				// Get secs
 		if (v[4]) t+=v[4]/1000;																		// Ms
 		return t;																					// Return time in ms
+	}
+
+	function LoadingIcon(mode)																	// SHOW/HIDE LOADING ICON		
+	{
+		if (!mode) {																				// If hiding
+			$("#lz-loadingIcon").remove();															// Remove it
+			return;																					// Quit
+			}
+		var str="<img src='img/loading.gif' width='128'";											// Img
+		str+="id='lz-loadingIcon' style='position:absolute;top:calc(50% - 64px);left:calc(50% - 64px);z-index:5000'>";	
+		$("body").append(str);																		// Add icon to container
 	}
 
 </script>

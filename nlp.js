@@ -19,6 +19,12 @@ class NLP {
 			"again","so","than","too","can","their","we're","gonna"];
 	}
 
+	Tokenize(text) 																					// TOKENIZE TEXT STRING
+	{
+		let r=text.match(/\b[\w|'|-]+\b/g);																// Tokenize 
+		return r ? r : [];																				// Return list or empty array
+	}
+
 	AddSyns(type, word, syns)																		// SET SYNONYMS ARRAY
 	{
 		let i;
@@ -51,6 +57,23 @@ class NLP {
 			}
 		return "";																						// Return action found
 		}
+
+	CleanText(text, minSize=0)																		// PREPROCESS/CLEAN TEST
+	{
+		let i,res=[];
+		if (!text)	return "";																			// Nothing to clean
+		text=text.toLowerCase();																		// Make l/c
+		let words=this.Tokenize(text);																	// Tokenize
+		if (!words)	return "";																			// Nothing to clean
+		for (i=0;i<words.length;i++) {																	// For each word
+			if (typeof(this.whoSyns[words[i]]) == "string") {											// A valid string
+				if (this.whoSyns[words[i]] == "Class")  words[i]="class";								// Whole class
+				else 									words[i]="student";								// Generic student
+				}
+			if (words[i].length > minSize)				res.push(words[i]);								// If big enough, add to list
+			}
+		return res.join(' ').trim();																	// Put text back together
+	}
 
 	Compare(textA, textB)																			// HOW SIMILAR TWO STRINGS ARE
 	{
@@ -124,34 +147,8 @@ class NLP {
 		return this.VecDotProduct(vecA, vecB) / (this.VecMagnitude(vecA) * this.VecMagnitude(vecB));
 	}
 
-	Tokenize(text) 																					// TOKENIZE TEXT STRING
-	{
-		let r=text.match(/\b[\w|'|-]+\b/g);																// Tokenize 
-		return r ? r : [];																				// Return list or empty array
-	}
-
-	CleanText(text, minSize=0, stops=false)															// PREPROCESS/CLEAN TEST
-	{
-		let i,res=[];
-		if (!text)	return "";																			// Nothing to clean
-		let words=this.Tokenize(text);																	// Tokenize
-		if (!words)	return "";																			// Nothing to clean
-		for (i=0;i<words.length;i++) {																	// For each word
-			if (typeof(this.whoSyns[words[i]]) == "string") {											// A valid string
-				if (this.whoSyns[words[i]] == "Class") words[i]="class";								// Whole class
-				else words[i]="student"																	// Generic student
-				}
-			if (words[i].length > minSize) {															// Big enough
-				if (!stops || !this.stopWords.includes(words[i])) 										// If not a stop word 
-					res.push(this.Stem(words[i]));														// Add to list
-				}
-			}
-		return res.join(' ').trim();																	// Put text back together
-	}
-
 	Stem(w) 																						// STEM WORD USING PORTER 1980 METHOD
 	{
-		return w;
 		let step2list = {
 					"ational" : "ate",	"tional" : "tion",	"enci" : "ence",  	"anci" : "ance",	"izer" : "ize",
 					"bli" : "ble",		"alli" : "al",		"entli" : "ent",	"eli" : "e",		"ousli" : "ous",
