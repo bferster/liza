@@ -84,10 +84,8 @@
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
-				for (i=0;i<d.length;++i) {															// For each line
-					if (d[i].type == "student") nlp.AddSyns("student",d[i].id,d[i].text.split(",")); 	// Add student synonyms
-					if (d[i].type == "keyword") nlp.AddSyns("keyword", d[i].id, d[i].text.split(","));	// Add keywords
-					}
+				for (i=0;i<d.length;++i) 															// For each line
+					 nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 							// Add synonyms, keywords, keytags
 				LoadRawData("data/"+dataset+".csv");												// Load raw data file
 			});
 		}
@@ -241,7 +239,7 @@
 			if (s.match(re)) keys.push(nlp.keyWords[k]);											// Add regular tag
 			}																				
 		s.replace(/  /g," ")																		// Remove extra spaces
-		keys=[... new Set(keys)];																	// Make keywords unique
+		keys=[... new Set(keys)];																	// Make unique
 		if (keys.length) s+= " :: "+keys.join(", ");												// Add keys, if any
 		return s;																					// Return clean example
 	}
@@ -250,7 +248,12 @@
 	{
 		let i,k,re,levs=[],tags=[];
 		let levels=["task","clarify","value","concern","meta"];										// Level labels
-		for (i=4;i<=levels.length;++i) {															// For each level (400-500)
+		for (k in nlp.keyTags) {																	// For each keyword
+			re=new RegExp("\\b"+k+"\\b","i");														// Make regex
+			if (s.match(re)) tags.push(nlp.keyTags[k]);												// Add tag
+			}																				
+		tags=[... new Set(tags)];																	// Make unique
+		for (i=4;i<=levels.length;++i) {															// For each level
 			for (j=0;j<uvocab["r"+i*100].length;++j) {												// For each unique vocab word
 				re=new RegExp("\\b"+uvocab["r"+i*100][j]+"\\b","i");								// Make regex
 				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
@@ -258,7 +261,7 @@
 			}																				
 		if (levs.length) { 
 			levs.sort((a,b)=>{ return b-a }); 														// Top dog
-			tags.push(levels[levs[0]]);																// Add tags 
+			tags.push("tag"+levels[levs[0]]);														// Add tags 
 			};  				
 		if (tags.length) {																			// Any tags?
 			s+=(s.match(/ :: /)) ? ", " :" :: ";													// Add header	 
@@ -275,19 +278,21 @@
 		let test=$("#lz-holdOut").val()/100;														// Percent to test
 		let level=$("#lz-series").val();															// Level of intents
 		let num=$("#lz-num").val();																	// Max per intent
-		ints["bot_challenge"]=[]; 
-		ints["bot_challenge"].push("    - are you a bot?"); ints["bot_challenge"].push("    - are you human?")
-		ints["bot_challenge"].push("    - am I talking to a bot?"); ints["bot_challenge"].push("    - am I talking to a human?")
-		ints["addition"]=[]; 
-		ints["addition"].push("    - what is 2+2?"); ints["addition"].push("    - can you add two numbers?")
-		ints["why"]=[]; 
-		ints["why"].push("    - why do you say that?"); ints["why"].push("    - how did you know?")
+
+		ints["bot_challenge"]=[]; 	ints["why"]=[];	  ints["addition"]=[]; 							// Built-ins
+		ints["bot_challenge"].push("    - are you a bot?"); ints["bot_challenge"].push("    - are you human?");
+		ints["bot_challenge"].push("    - am I talking to a bot?"); ints["bot_challenge"].push("    - am I talking to a human?");
+		ints["addition"].push("    - what is 2+2?"); ints["addition"].push("    - can you add two numbers?");
+		ints["why"].push("    - why do you say that?"); ints["why"].push("    - how did you know?");
+	
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
 			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
 			else							id=Math.floor(o.intent/100)*100;						// Cap at 100s
+			if (id < 150) 					id=100;													// Cap <150 to 100
+			
 			sid="session-"+o.rerid;																	// Session id
 			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder
 			if (o.speaker == "Teacher") {															// If remark
@@ -413,7 +418,6 @@
 					session[i].calc=jsons[i].intent_ranking[n].name.substr(1);						// Get intent
 				 	if (Math.floor(session[i].intent/100)*100 == session[i].calc) session[i].ok=1;	// A match
 					else														  session[i].ok=0;	// None
-				trace(i,jsons[i],session[i].calc,session[i].text)
 					}
 				}
 			let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib

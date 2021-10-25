@@ -11,6 +11,7 @@ class NLP {
 		this.whoSyns=[];																				// Who synonyms
 		this.actSyns=[];																				// Action synonyms
 		this.keyWords=[];																				// Keywords
+		this.keyTags=[];																				// Keywors keyed to intents 
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list
 			"yourself","yourselves","he","him","his","himself","she","her","hers","herself",
 			"it","its","it's","itself","they","them","their","theirs","themselves","this","that",
@@ -31,7 +32,8 @@ class NLP {
 		for (i=0;i<syns.length;++i) {																	// For each syn
 			if (type == "student")		this.whoSyns[syns[i]]=word;										// Add who
 			else if (type == "action")	this.actSyns[syns[i]]=word;										// Add actions
-			else if (type == "keyword")	this.keyWords[syns[i]]=word;									// Add actions
+			else if (type == "keyword")	this.keyWords[syns[i]]=word;									// Add keywords
+			else if (type == "keytag")	this.keyTags[syns[i]]=word;										// Add keytags
 			else						this.syns[syns[i]]=word;										// Add general synonym
 		}
 	}
