@@ -30,6 +30,8 @@ class Voice {
 					});
 				};
 			this.tts.onend=()=> { 																		// ON TALKING END
+				trace("start again")
+				if (app.inSim) this.Listen();															// Resume listening
 				this.talking=0;  																		// Stop talking animation
 				let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
 				if (app.curStudent)																		// A valid student
@@ -79,6 +81,7 @@ class Voice {
 			}
 		try{																							// Try
 			speechSynthesis.cancel();																	// Clear current speech queue			
+			if (app.inSim) this.StopListening();														// Stop listening
 			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice
 			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex
 			if (who == "male")			this.tts.voice=this.voices[this.maleVoice];						// Set male voice

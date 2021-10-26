@@ -141,7 +141,6 @@ class App  {
 	{
 		let stu=app.nlp.GetWho(text);																// Get student menitioned, if any
 		if (stu) app.curStudent=stu;																// Set new active student 
-		trace(stu)
 		let act=app.nlp.GetAction(text);															// Set action
 		app.DoAction(act);																			// If a please + action mentioned, do it
 		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+text);							// Send remark
