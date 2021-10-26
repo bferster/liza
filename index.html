@@ -49,17 +49,17 @@
 							border-radius: 8px; background-color: #eee; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							font-size: 14px; text-align:center; display: none;
 							}
-		.lz-bubble {		position: absolute;  width: auto; padding: 12px; left: calc(50% - 150px); top:80px; width:300px;
-							border-radius: 100px; background-color: #d7ebff; border: 1px solid #999; 
-							font-size: 16px; text-align:center; display: none;
+		.lz-bubble {		position:absolute;  width:auto; padding:12px; left:calc(50% - 150px); top:80px; width:300px; display: none;
+							border-radius:8px; background-color:#eee; border: 1px solid #999; font-size:16px; text-align:center; 
+							box-shadow: 4px 2px 4px 2px #aaa; 
 							}
-		.lz-rpback { 		position:absolute; width:29%; height:calc(var(--maxvh) - 70px); top:12px; left:12px; padding:3px;
-							border-radius:8px; border:1px solid #999; background-color:#aaa; text-align:center;
+		.lz-rpback { 		position:absolute; width:29%; height:calc(var(--maxvh) - 45px); top:0; left:0; padding:3px;
+							border-right:1px solid #aaa; background-color:#eee; text-align:center; user-select:none;
 							}
-		.lz-rpinner { 		display:flex; flex-wrap:wrap; width:calc(100% - 29px); border-radius:8px; margin:2px 0 0 2px;
-							user-select:none; text-align:center; background-color:#eee; padding:12px;
+		.lz-rpinner { 		display:flex; flex-wrap:wrap; width:calc(100% - 24px); margin:2px 0 0 2px;
+							text-align:center; background-color:#eee; padding:12px;
 							}
-		.lz-rplist { 		text-align:left; overflow-y:auto; height:calc(var(--maxvh) - 312px); padding:0 16px; margin-right:2px; width:100%;
+		.lz-rplist { 		text-align:left; overflow-y:auto; height:calc(var(--maxvh) - 303px); padding:0 16px; margin-right:2px; width:100%;
 							border:1px solid #aaa; border-radius:8px; background-color:#fff; border-top-left-radius:0; border-top-right-radius:0; border-top:none;
 							}
 		.lz-rptab {			width:calc(25% - 4px); cursor:pointer; font-size:11px; background-color:#eee; padding:4px 0; border:1px solid #999;
@@ -104,13 +104,16 @@
 							}
 		.lz-prompt {		color:#fff; width:100%;	vertical-align: 3px; margin-left:16px; font-size:16px;
 							}
+		.lz-startBut {		cursor:pointer; color:#fff; text-align:center; border-radius:24px; display:inline-block;
+							font-size:15px; background-color:#27ae60; padding:3px 0; vertical-align:6px; width:80px;
+							} 
+
 		.lz-is {			border-radius:16px; padding:0 8px; width:250px; height: 24px;
 							border:1px solid #999; font-size: 13px;
 							}
-		.lz-bs {			cursor: pointer; color:#fff; 
-							text-align: center; border-radius: 16px; display: inline-block; user-select: none;
-							font-size: 12px; background-color: #27ae60; padding: 2px 8px 2px 8px; vertical-align:3px;
-							}
+		.lz-bs {			cursor: pointer; color:#fff; text-align: center; border-radius: 16px; display: inline-block;
+							font-size: 12px; background-color: #27ae60; padding: 2px 8px 2px 8px; vertical-align:3px;user-select: none;
+							} 
 
 		:root  {			--maxvh: 100vh  }
 		table  {			border-spacing: 0px;  }
@@ -129,7 +132,7 @@
 	<div id="splashDiv" class="lz-splash">
 		<img src="img/lizalogo.png" style='width:25%;opacity:.66;' alt=""><br>
 		<br><p style="color:#000;font-size:14px"><em>A tool for engaging people in highly affective script-driven discourse<br>for learning and practicing goal-directed behaviors.</em></p>
-		<br><div id='startBut' class='lz-bs' onclick='app.voice.Talk("hello")'>Start</div><br><br>
+		<br><div id='splashBut' class='lz-bs' onclick='app.voice.Talk("Welcome to Lyza","Teacher")'>Start</div><br><br>
 		<div style='color:#000'><br>
 			<b>This demo ONLY runs in the Chrome Desktop Browser</b><br><br>
 			Right now it reacts to only few things like:<br><br>
@@ -143,9 +146,8 @@
 		</div>
 	</div>
 	<div id="controllerDiv" class="lz-controller">
-		<img id="talkBut" src="img/talkbut.png" title="Click to talk" style="cursor:pointer">&nbsp;
-		<input id="talkInput" type='text' class="lz-is" style="vertical-align:8px" placeholder="Type a remark">
-		<span id='promptSpan' class='lz-prompt'></span>
+		<div id="startBut" class="lz-startBut">START</div>
+		<input id="talkInput" type='text' class="lz-is" style="margin-left:18px;vertical-align:8px;display:none" placeholder="Type a remark">
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="slideBut" src="img/nextslide.gif" title="Next slide (Shift-click for previous)" style="cursor:pointer;margin-right:16px;float:right">
@@ -180,7 +182,7 @@ var isMobile=false;																					// Flag for mobile devices
 		app.sc.Resize();																			// Resize 3D system
 		if (app && app.allowResize)	{																// If app loaded and allowing resizing
 			app.Draw();																				// Redraw to fit screen
-				}
+			}
 		});
 				
 	$(document).ready(function() {								           						// ON PAGE LOADED
@@ -191,7 +193,7 @@ var isMobile=false;																					// Flag for mobile devices
 		app=new App(url);                                                    						// Alloc app
 		if (window.location.host != "localhost") {													// Not in debug
 			$("#splashDiv").fadeIn();																// Fade in splash page
-			$("#startBut").click( ()=> {															// On start button clicked
+			$("#splashBut").click( ()=> {															// On start button clicked
 				$("#splashDiv").fadeOut();															// Fade out splash
 				$("#mainDiv").fadeIn(2000);															// Fade in main
 				$("#controllerDiv").fadeIn(2000);													// Fade in controller

@@ -9,12 +9,11 @@ class Voice {
 		var _this=this;
 		this.hasRecognition=false;																		// Assume no STT
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
-		this.mediaRecorder=null;																		// Holds audio capture
-		this.listening=false;																			// Flag if listening
-		this.talkStartTime=0;																			// Time started talking
 		try {																							// Try
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			var mac=(navigator.platform == "MacIntel");													// A mac?
+			var mac=0;																					// Assume non-mac
+			if (window.navigator.userAgentData)															// Exists?
+				mac=window.navigator.userAgentData.platform != "Windows";								// A mac?
 			this.femaleVoice=mac ? 0 : 1;																// Female voice
 			this.maleVoice=mac ? 1 : 0;																	// Male voice
  			this.talking=0;																				// Talking flag to move mouth
@@ -25,13 +24,11 @@ class Voice {
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
 					if (voice.lang == "en-US")						_this.voices.push(voice);			// Just look at English
 					if (voice.name == "Google UK English Female")	_this.voices.push(voice),_this.instructorVoice=_this.voices.length-1;		// Instructor's voice
-					if (voice.name.match(/Microsoft David/i))		_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Male voice
-					if (voice.name.match(/Microsoft Zira/i))		_this.voices.push(voice),_this.femaleVoice=_this.voices.length-1;			// Female voice
+					if (voice.name.match(/Microsoft Mark/i))		_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Male voice
+					if (voice.name == "Google US English")			_this.voices.push(voice),_this.femaleVoice=_this.voices.length-1;			// Female voice
 					if (voice.name.match(/Alex/i))					_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Mac male voice
-					if (voice.name.match(/Samantha/i))				_this.voices.push(voice),_this.femaleVoice=_this.voices.length-1;			// Mac female voice
 					});
 				};
-
 			this.tts.onend=()=> { 																		// ON TALKING END
 				this.talking=0;  																		// Stop talking animation
 				let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
@@ -47,11 +44,7 @@ class Voice {
 			this.recognition.continuous=false;															// Continual recognition off
 			this.recognition.lang="en-US";																// US English
 			this.recognition.interimResults=true
-			this.recognition.onend=(e)=> { 																// ON STT END
-				$("#talkBut").prop("src","img/talkbut.png"); 											// Restore button
-				this.listening=false; 																	// Set flag
-				if (this.mediaRecorder)	this.mediaRecorder.stop();										// Stop audio capture
-				};
+			this.recognition.onend=(e)=>{ if (app.inSim) this.Listen();	};								// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 
 			this.recognition.onresult=(e)=> { 															// On some speech recognized
@@ -61,35 +54,20 @@ class Voice {
 					}
 				};
 			} catch(e) { trace("Voice error",e) };														// On error
-	
-		try {/*																							// Try
-				navigator.mediaDevices.getUserMedia({ audio:true, video:false })						// Open RTC audio capture
-				.then((stream)=>{																		// On open
-					this.mediaRecorder=new MediaRecorder(stream, { mimeType:"audio/webm" });			// Open recorder
-					this.mediaRecorder.addEventListener('dataavailable', (e)=> {						// On data in from microphone
-						let reader = new FileReader();
-						reader.readAsDataURL(e.data); 
-						reader.onloadend=()=>{
-							app.ws.send(app.sessionId+"|"+app.role+"|AUDIO|Teacher|"+reader.result); 		// Send to server
-							}
-					});
-				});
-	
-			*/} catch(e) { trace("Audio capture error",e) };												// On error
 		}
 
-	Listen()																						// TURN ON SPEECH RECOGNITIOM
+	Listen()																						// TURN ON SPEECH RECOGNITION
 	{
-		if (this.listening)	return;																		// Quit if already started
-		this.talkStartTime=new Date().getTime();														// Record start talk time
-		
 		try { 
 			this.recognition.start(); 																	// Start recognition
-			this.listening=true; 																		// We're listening
-			if (this.mediaRecorder)	this.mediaRecorder.start(1000);										// Start audio capture
-		} catch(e) { trace("Voice error",e) };															// On errir
-		
-		$("#talkBut").prop("src","img/intalkbut.png");													// Talking but
+		} catch(e) { trace("Voice error",e) };															// On error
+	}
+
+	StopListening()																					// TURN OFF SPEECH RECOGNITION
+	{
+		try { 
+			this.recognition.abort(); 																	// Stop recognition
+		} catch(e) { trace("Voice error",e) };															// On error
 	}
 
 	Talk(text, who)																					// SAY SOMETHING

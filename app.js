@@ -19,6 +19,7 @@ class App  {
 		this.responses=[];																			// Holds student responses
 		this.sessionData=[];																		// Holds session data
 		this.curStudent="";																			// Currently active student
+		this.inSim=false;																			// In simulation or not
 
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
@@ -36,19 +37,24 @@ class App  {
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) this.sessionId=v[i].substr(2) 							// Get session	
 			}
-		if (!this.voice.hasRecognition)	$("#talkBut").hide();										// This platform doesn't have voice recognition
-
-		$("#settingsBut").on("click", ()=> { this.Settings();  });									// On settings button click	
-		$("#talkBut").on("click", ()=> { this.voice.Listen(); });									// On talk button click, start listening
-		$("#helpBut").on("click", ()=> { ShowHelp(); });											// On help button click, show help
-		$("#writeBut").on("click", ()=> { 															// On BB button clck
+		$("#settingsBut").on("click", ()=> { this.Settings();  });									// ON SETTINGS
+		$("#helpBut").on("click", ()=> { ShowHelp(); });											// ON HELP
+		$("#startBut").on("click", ()=> { 															// ON START 
+			this.inSim=!this.inSim;																	// Toggle sim flag
+			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
+			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
+			$("#talkInput").css("display",this.inSim ? "inline-block" : "none");					// Text input
+			if (this.inSim) this.voice.Listen()														// Turn on speech recognition
+			else 			this.voice.StopListening();;											// Off						
+			});									
+		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
 			$("#lz-feedbar").remove();																// Remove feedback panel
 			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
 			$("#blackboardDiv").css("top",h+"px");													// Set top
 			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			}); 
-		$("#slideBut").on("click", (e)=> { 															// On BB button clck
+		$("#slideBut").on("click", (e)=> { 															// ON SLIDE
 			if (e.shiftKey)	this.bb.ShowSlide(-1);													// Last slide
 			else			this.bb.ShowSlide(1);													// Next slide
 			}); 
@@ -66,10 +72,6 @@ class App  {
 	
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
-		$("body").on("keydown", (e)=> {																// On key hit
-			if ((e.target == document.body) && (e.keyCode == 32) && this.voice.hasRecognition)		// Spacebar in body
-				 app.voice.Listen();																// Start listening	
-			});															
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE
@@ -139,6 +141,7 @@ class App  {
 	{
 		let stu=app.nlp.GetWho(text);																// Get student menitioned, if any
 		if (stu) app.curStudent=stu;																// Set new active student 
+		trace(stu)
 		let act=app.nlp.GetAction(text);															// Set action
 		app.DoAction(act);																			// If a please + action mentioned, do it
 		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+text);							// Send remark
@@ -191,7 +194,7 @@ class App  {
 		$("#lz-videoChat").remove(); 																// Remove old one
 		let link="japp.htm?LizaChat~Session~"+app.sessionId+"&"+app.role;							// Make link
 		let str=`<div id="lz-videoChat" style="position:absolute;background-color:#999;
-			width:66%;height:${$(window).width()*.5625*.66}px;top:12%;left:17%">
+			width:75%;height:${$(window).width()*.5625*.75}px;top:50px;left:12.5%;display:none">
 			<span id="co-ift"style="cursor:pointer;margin-left:4px;float:left;pointer-events:auto;color:#fff">Minimize window</span>
 			<img style="cursor:pointer;float:right;margin:4px;pointer-events:auto;width:12px" src="img/closedotw.gif"
 			onclick='$("#lz-videoChat").remove()'>
@@ -199,7 +202,7 @@ class App  {
 			allow=camera;microphone;autoplay frameborder="0" allowfullscreen>
 			</iframe>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add it
-
+		$("#lz-videoChat").show("slide",{ direction:"up" },1000);									// Slide down 
 		$("#co-ift").on("click", ()=>{																// ON SMALLER BUT
 			let w=$(window).width()*.66,h=w*.5625;													// Default size
 			let x=17,y=12;
@@ -210,7 +213,6 @@ class App  {
 			else $("#co-ift").text("Minimize window");												// Restore title		
 			$("#lz-videoChat").css({width:w+"px", height:h+"px", left:x+"%",top:y+"%"});			// Set size
 			});	
-
 	}
 
 	InitSocketServer()																			// INIT SOCKET SERVER
@@ -243,12 +245,13 @@ class App  {
 	{
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
+		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[2] == "TALK") {																		// TALK
 			if (this.role != v[3]) 			 app.voice.Talk(v[4],v[3]);								// Not same as me				
-			else if (this.role != "Teacher") Bubble(v[4]);											// Show text bubble instwad
+			else if (this.role != "Teacher") Bubble(v[4],3,bx);										// Show text bubble instwad
 			}
-		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5); }		// CHAT
+		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5,bx); }		// CHAT
 		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
 		else if (v[2] == "VIDEO")  	this.VideoChat();												// VIDEO
 		else if (v[2] == "AUDIO")  	{																// AUDIO

@@ -2,7 +2,7 @@ type,id,text,data
 student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,ability=.5,color=#076290,"
 student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
 student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,ability=.5,color=#e26d33,"
-student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara","sex=female,ability=.5,color=#9b4286,"
+student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=female,ability=.5,color=#9b4286,"
 student,Oliver,"oliver,liver","sex=male,ability=.5,color=#734325,"
 student,Class,"all,everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
 action,firstSlide,"begin slide,start slide",
@@ -41,5 +41,5 @@ keyword,learn,"learn,learning,learned,memorize,master,determine,study,grasp,unde
 keyword,evidence,"exact,exactly,specific,specifically,detail,details,evidence,example,examples,clue,clues,case,illustration,archetype,exemplar,kind,data,datum,information,sign,indication,symptom,demonstration,proof,indication,giveaway",
 keytag,tag500,"connecting,comprehension,reasoning,academic,imagination,visualize,situation,relate,related,explain,boil,boiling,context,support,supporting,keyword,keywords,correlate,process,example,pattern,symbol,illustration,figure,encounter,take,away,similar,beyond,reference,referencing,learn,learning,learned,annotating,annotation,synonym,synonyms,skill,inference,inferences,concepts,incorporate,analyze,restate,answering,strategy,strategies,working,routine,curious,versus,conclude,conclusion,difference,revise,revision,reflect,reflecting,thinking,change,changed,comprehension,comprehend,intellectual,intellectually,remember,next,similar,understand,understanding,broaden,broad,sum,sum-up,qualities,absorb,chronological,timeline,summary,summarizing,imagination,takeaway,technique,techniques,solidify,correlate,scenario,scenarios,reason,reasoning,solidify",
 keytag,tag400,"concern,concerning,explain,explained,misunderstand,misunderstanding,clarity,focus,specify,specific,describe,answering,figure,mention,mentioned,mentioning,context,clues,deeper,identified",
-keytag,tag300,"finest,superb,notice,noticed,like,liked,love,loved,appreciate,appreciated,good,great,awesome,glad,amaze,amazing,awe,excellent,outstanding,admirable,magnificent,supreme,top-notch,first-class,",
-keytag,tag200,"right,wrong,describe,describes,perhaps,sure,make,maybe,called,about,first,starting,build,responses,dive,focus,expecially,answer,improving,allow,allows,confusion,confused,clear,clearer,when,says,justify,point,refine,clarify,told,teach,taught",
+keytag!,tag300,"finest,superb,notice,noticed,like,liked,love,loved,appreciate,appreciated,good,great,awesome,glad,amaze,amazing,awe,excellent,outstanding,admirable,magnificent,supreme,top-notch,first-class,",
+keytag!,tag200,"right,wrong,describe,describes,perhaps,sure,make,maybe,called,about,first,starting,build,responses,dive,focus,expecially,answer,improving,allow,allows,confusion,confused,clear,clearer,when,says,justify,point,refine,clarify,told,teach,taught",

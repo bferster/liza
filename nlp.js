@@ -40,11 +40,13 @@ class NLP {
 	
 	GetWho(text, both)																				// GET WHO IN TEXT
 	{
-		let i,who=both ? ":" : "";
+		let i,syn,who=both ? ":" : "";
 		let v=this.Tokenize(text);																		// Tokenize	
-		for (i=0;i<v.length;++i) 																		// For each token
-			if (typeof(this.whoSyns[v[i]]) == "string") 												// A valid string
-				who=this.whoSyns[v[i]]+(both ? ":"+v[i] : "");											// Set canonical who[:trigger word]
+		for (i=0;i<v.length;++i) {																		// For each token
+			syn=this.whoSyns[v[i].toLowerCase()];														// Get synonym
+			if (typeof(syn) == "string") 																// A valid string
+				who=syn+(both ? ":"+v[i] : "");															// Set canonical who[:trigger word]
+			}
 		return who;																						// Return last trigger:who 
 	}
 

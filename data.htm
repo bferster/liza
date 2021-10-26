@@ -178,20 +178,22 @@
 	
 	function TestData(e)																		// TEST DATA
 	{	
-		let i,k,o,v;
+		let i,k,o,v,ins=0,tot=3,str="";
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
+			LoadingIcon(true);																		// Show loading icon
 			let nums=[]; nums["*100"]=0; nums["*200"]=0; nums["*300"]=0;	nums["*400"]=0;	nums["*500"]=0;	
 			let oks=[];  oks["*100"]=0; oks["*200"]=0;	oks["*300"]=0;	oks["*400"]=0;	oks["*500"]=0	;
-			let tots=[];
+			let tots=[];	report=[]
 			v=e.target.result.split("\n")
 			for (i=0;i<v.length;++i) {																// For each line
 				if (!v[i]) continue;
 				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
 				if (v[i].match(/^   /)) {
+					ins++;																			// Sent one
 					GetResponse2(v[i].substr(5), k, (res, id)=>{
 						nums["*"+id]++;																// Advance total count
 						if (id == res.intent.name.substr(1))	oks["*"+id]++;
@@ -200,10 +202,25 @@
 						tots["*300"]=oks["*300"]+"/"+nums["*300"]+"="+Math.floor(oks["*300"]/nums["*300"]*100)+"%";
 						tots["*400"]=oks["*400"]+"/"+nums["*400"]+"="+Math.floor(oks["*400"]/nums["*400"]*100)+"%";
 						tots["*500"]=oks["*500"]+"/"+nums["*500"]+"="+Math.floor(oks["*500"]/nums["*500"]*100)+"%";
-						trace(id,res,tots);
+						$("#lz-loadingIconText").html("<b>"+(100-Math.floor(ins/tot*100))+"%</b>");	// Show progress
+						str=id;																		// Coded intent
+						str+=(id == res.intent.name.substr(1)) ? "   " : " X ";						// Right or wrong?
+						str+=res.intent_ranking[0].name.substr(1);									// Main intent
+						str+=" | "+res.intent_ranking[1].name.substr(1);							// 2nd choice
+//						str+=" | "+res.intent_ranking[2].name.substr(1);							// 3rd choice
+						str+=" | "+res.text;														// Text
+						report.push(str);															// Add to report
+						if (!--ins)	{																// If last
+							Sound("ding");															// Ding				
+							LoadingIcon(false);														// Show loading icon
+							report.sort((a,b)=>{ return b-a }); 									// Sort
+							trace(report);															// Show results
+							trace(str,tots);														// Show results
+							}
 						})
+					}
 				}
-			}
+			tot=ins;																				// Total sent
 		}
 	}
 
@@ -362,7 +379,6 @@
 					}
 				}
 			}
-
 		str="version: \"2.0\"\n\nsession_config:\n";												// Domain header
 		str+="  session_expiration_time: 60\n  carry_over_slots_to_new_session: true\n\nintents:\n";
 		for (k in ints)	str+="  - "+k+"\n";															// Add intent
@@ -437,27 +453,6 @@
 			})
 	}
 
-	function OAIGet(msg)																	// GET RESPONSE FROM AI
-	{
-		let body={
-		"prompt": "The following is a list of companies and the categories they fall into\n\nFacebook: Social media, Technology\nLinkedIn: Social media, Technology, Enterprise, Careers\nUber: Transportation, Technology, Marketplace\nUnilever: Conglomerate, Consumer Goods\nMcdonalds: Food, Fast Food, Logistics, Restaurants\nFedEx:",
-		"temperature": 0,
-		"max_tokens": 6,
-		"top_p": 1.0,
-		"frequency_penalty": 0.0,
-		"presence_penalty": 0.0,
-		"stop": ["\n"]
-		}
-
-		const url="https://api.openai.com/v1/engines/davinci/completions"
-		let token="sk-u4nGW65-X-gajLxEDQlh9OTT3BlbkF-X-JHp7xp1JaQ5HJT7Ca3pqs".replace(/-X-/g,"");	// Get token
-		fetch(url,{ method:"POST",
-			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
-			  body: JSON.stringify(body)
-			  })	
-	  	.then(res => res.json()).then(res =>{ trace(res); })
-	}
-
 	function ImportCSV(e) {																		// IMPORT SESSION FROM CSV
 		let i,d="";
 		let file=e.target.files[0];																	// Point at file
@@ -479,40 +474,6 @@
 			trace(d)
 			Sound("ding");																			// Ding
 			};
-	}
-
-	function ChooseKeywords()
-	{
-		let i=0,str="";
-		$("#outp").html(0+". "+keyWords[0]);														// Show 
-
-		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
-			trace(e.which)
-			if (e.which == 37)	{																	// Left arrow
-				i=Math.max(i-1,0);																	// Back
-				$("#outp").html(i+". <b>"+keyWords[i]+"</b><br><br>"+str);							// Show 
-				}
-			if (e.which == 39)	{																	// Right arrow
-				i=Math.min(i+1,keyWords.length-1);													// Forward
-				$("#outp").html(i+". <b>"+keyWords[i]+"</b><br><br>"+str);							// Show 
-				}
-			if (e.which == 13)	{																	// Right arrow
-				str+=keyWords[i]+", ";
-				$("#outp").html(i+". <b>"+keyWords[i]+"</b><br><br>"+str);							// Show 
-				++i;
-				Sound("click")
-				}
-			if (e.which == 8)	{																	// Back
-				let v=str.split(", ");																// Get as  array
-				v.pop();																			// Remove last
-				v.pop();																			// Remove last
-				v=[... new Set(v)];																	// Make unique
-				str=v.toString();																	// To string
-				str=str.replace(/,/g,", ")+", ";													// Add spaces
-				$("#outp").html(i+". <b>"+keyWords[i]+"</b><br><br>"+str);							// Show 
-				Sound("delete")
-				}
-			});
 	}
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////
@@ -559,7 +520,26 @@ POST https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/123
     }
   }
 }
+	function OAIGet(msg)																	// GET RESPONSE FROM AI
+	{
+		let body={
+		"prompt": "The following is a list of companies and the categories they fall into\n\nFacebook: Social media, Technology\nLinkedIn: Social media, Technology, Enterprise, Careers\nUber: Transportation, Technology, Marketplace\nUnilever: Conglomerate, Consumer Goods\nMcdonalds: Food, Fast Food, Logistics, Restaurants\nFedEx:",
+		"temperature": 0,
+		"max_tokens": 6,
+		"top_p": 1.0,
+		"frequency_penalty": 0.0,
+		"presence_penalty": 0.0,
+		"stop": ["\n"]
+		}
 
+		const url="https://api.openai.com/v1/engines/davinci/completions"
+		let token="sk-u4nGW65-X-gajLxEDQlh9OTT3BlbkF-X-JHp7xp1JaQ5HJT7Ca3pqs".replace(/-X-/g,"");	// Get token
+		fetch(url,{ method:"POST",
+			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
+			  body: JSON.stringify(body)
+			  })	
+	  	.then(res => res.json()).then(res =>{ trace(res); })
+	}
 */
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS 
@@ -643,10 +623,12 @@ POST https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/123
 			$("#lz-loadingIcon").remove();															// Remove it
 			return;																					// Quit
 			}
-		var str="<img src='img/loading.gif' width='128'";											// Img
-		str+="id='lz-loadingIcon' style='position:absolute;top:calc(50% - 64px);left:calc(50% - 64px);z-index:5000'>";	
+		let str="<div id='lz-loadingIcon' style='position:absolute;top:calc(50% - 64px);left:calc(50% - 64px);z-index:5000;text-align:center'>";
+		str+="<img src='img/loading.gif' width='128'>";												// Img
+		str+="<div id='lz-loadingIconText' style='margin-top:-78px;color:#999'></div></div>";		// Progress
 		$("body").append(str);																		// Add icon to container
 	}
+
 
 </script>
 </body>

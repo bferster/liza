@@ -271,7 +271,7 @@ class Chat {
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
 				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
-				app.chat.GetResponse(s,null,(o)=>{															// Send to AI
+				app.chat.GetResponse(s,null,(o)=>{														// Send to AI
 					let n=(o.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;							// Go to second choice
 					let intent=o.intent_ranking[n].name.substr(1);										// Get intent
 					let who=app.ParseRemark(intent,s);													// Parse remark for data

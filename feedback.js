@@ -208,36 +208,35 @@ class ResponsePanel  {
 		$("#lz-rpback").remove();																	// Remove old one
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
-				<div style="width:calc(50% - 18px);border-right:1px solid #999;height:120px;padding:8px">
+				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px">
 					<div class="lz-rptitle">${intent}</div><p>${intentDesc}</p>	
 				</div>
-				<div style="width:calc(50% - 18px);height:120px;padding:8px">
+				<div style="width:calc(50% - 10px);height:120px;padding:8px">
 					<div class="lz-rptitle">said to ${app.role}</div><p>${remark}</p>
 				</div>
-				<div style="width:100%;height:18px"></div>
+				<div style="margin:12px 0;width:100%">
+					<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
+				</div>
 				<span id="lztab-0" class="lz-rptab">LANGUAGE</span>
 				<span id="lztab-1" class="lz-rptab">EVIDENCE</span> 
 				<span id="lztab-2" class="lz-rptab">THINKING</span> 
 				<span id="lztab-3" class="lz-rptab" style="width:calc(25% - 4px)">FEEDBACK</span> 
 				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:-var(--maxvh)" : ""}"></div>
-				<div style="flex-grow:1;margin-top:12px">
-					<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
-					<img id="lz-chatBut" src="img/sendtext.png" title="Message teacher" style="cursor:pointer">
-					<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none"></select>
 				</div>
-			</div>`;
+				<input id="lz-chat" class="lz-is" placeholder="Message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">
+				<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none;margin:-6px 12px 0 0"></select>`;
 
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		addSeqs();																					// Add possible moves to select
 		if (isMobile) $("#lz-rpback").height(window.innerHeight-70);								// IOS issue
 		if (isMobile) $("#lz-rplist").height(window.innerHeight-312);								// IOS issue
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
-		
-	
-		$("#lz-chatBut").on("click", ()=> {															// ON MESSAGE TEACHER
-			GetTextBox("Message teacher", "Type messge to send to teacher", "", (s)=>{				// Text box
-				app.ws.send(app.sessionId+"|"+app.role+"|CHAT|Teacher|"+s);							// Send message
-				});
+
+		$("#lz-chat").on("change", ()=> {															// ON MESSAGE TEACHER
+			app.ws.send(app.sessionId+"|"+app.role+"|CHAT|Teacher|<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val()); // Send message
+			let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;		// Bubble center
+			Bubble("<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val(),5,bx);					// Show
+			$("#lz-chat").val("");																	// Clear input
 			});
 		
 		$("[id^=lztab-]").on("click", (e)=> { 														// ON TAB CLICK
