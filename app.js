@@ -43,7 +43,6 @@ class App  {
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
-			$("#talkInput").css("display",this.inSim ? "inline-block" : "none");					// Text input
 			if (this.inSim) this.voice.Listen()														// Turn on speech recognition
 			else 			this.voice.StopListening();;											// Off						
 			});									
@@ -145,11 +144,14 @@ class App  {
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
-		let stu=app.nlp.GetWho(text);																// Get student menitioned, if any
-		if (stu) app.curStudent=stu;																// Set new active student 
+		let talkingTo=app.nlp.GetWho(text);															// Get student menitioned, if any
+		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
+		else	 					talkingTo=app.curStudent;										// Get last one
+		if (app.role != "Teacher")	talkingTo="Teacher";											// Always to teach, unless teacher
+
 		let act=app.nlp.GetAction(text);															// Set action
 		app.DoAction(act);																			// If a please + action mentioned, do it
-		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+stu+"|"+text);					// Send remark
+		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);			// Send remark
 		app.GetIntent(text,(res)=>{ 																// Get intent from AI
 			let r=app.GenerateResponse(text,res);													// Generate response
 			let intent=res.intent.name.substr(1);													// Get intent
@@ -167,15 +169,15 @@ class App  {
 	{
 		let i,r=[];
 		if (data.intent.name == "addition") {
-			r=["The answer is 4, of course", "Would you believe 22?"]; 
+			r=["The answer is 4 of course", "Would you believe 22?"]; 
 			i=Math.floor(Math.random()*r.length);
-			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
+			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
 			return r[i];
 			}
 		else if (data.intent.name == "why") {
 			r=["I added them on my fingers", "Because I know how to add"]; 
 			i=Math.floor(Math.random()*r.length);
-			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
+			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
 			return r[i];
 			}
 		return "";
@@ -261,8 +263,8 @@ class App  {
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[2] == "TALK") {																		// TALK
-			if (this.role != v[3]) 			 app.voice.Talk(v[5],v[3]);								// Not same as me				
-			else if (this.role != "Teacher") Bubble(v[5],3,bx);										// Show text bubble instead
+			if ((v[3] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
+			else  												 app.voice.Talk(v[5],v[3]);			// Talk	
 			if (this.role != "Teacher" && v[3] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
 				this.GetIntent(v[5],(res)=>{ 														// Get intent from AI
 					let intent=res.intent.name.substr(1);											// Get intent

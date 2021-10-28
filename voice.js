@@ -7,6 +7,7 @@ class Voice {
 	constructor(callback)																			// CONSTRUCTOR
 	{
 		var _this=this;
+		this.listening=false;																			// Recognizing?
 		this.hasRecognition=false;																		// Assume no STT
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		try {																							// Try
@@ -45,7 +46,7 @@ class Voice {
 			this.recognition.continuous=false;															// Continual recognition off
 			this.recognition.lang="en-US";																// US English
 			this.recognition.interimResults=true
-			this.recognition.onend=(e)=>{ if (app.inSim) this.Listen();	};								// ON STT END RE-LISTEN	IF IN SIM											
+			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };		// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 
 			this.recognition.onresult=(e)=> { 															// On some speech recognized
@@ -61,6 +62,7 @@ class Voice {
 	{
 		try { 
 			this.recognition.start(); 																	// Start recognition
+			this.listening=true;																		// We're listening
 		} catch(e) { trace("Voice error",e) };															// On error
 	}
 
@@ -68,6 +70,7 @@ class Voice {
 	{
 		try { 
 			this.recognition.abort(); 																	// Stop recognition
+			this.listening=false;																		// Not listening
 		} catch(e) { trace("Voice error",e) };															// On error
 	}
 
