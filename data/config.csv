@@ -1,9 +1,9 @@
 type,id,text,data
 student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,ability=.5,color=#076290,"
-student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
 student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,ability=.5,color=#e26d33,"
 student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=female,ability=.5,color=#9b4286,"
 student,Oliver,"oliver,liver","sex=male,ability=.5,color=#734325,"
+student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
 student,Class,"all,everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
 action,firstSlide,"begin slide,start slide",
 action,nextSlide,"advance side,next side,nextSlide slide",

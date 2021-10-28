@@ -72,6 +72,12 @@ class App  {
 	
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
+		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
+			if ((e.which == 81) && e.ctrlKey)	{													// Test key (Ctrl+Q)
+				app.OnPhrase("student want focus exactly what question asking answer completely");
+	//			GetTextBox("Type intent","","",(s)=>{ WitTrainIntent(s); });	
+				}
+			});
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE
@@ -89,7 +95,7 @@ class App  {
 				this.curStudent=app.students[0].id;													// Pick first student
 				})	
 			.then(res =>{ this.LoadSession("data/session-67.csv"); })								// Load sample session	
-			.then(res =>{ this.LoadResponses("data/responses.csv"); });							// Load responses
+			.then(res =>{ this.LoadResponses("data/responses.csv"); });								// Load responses
 	}
 
 	AddStudent(d)																				// ADD STUDENT TO DATA
@@ -143,28 +149,36 @@ class App  {
 		if (stu) app.curStudent=stu;																// Set new active student 
 		let act=app.nlp.GetAction(text);															// Set action
 		app.DoAction(act);																			// If a please + action mentioned, do it
-		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+text);							// Send remark
+		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+stu+"|"+text);					// Send remark
 		app.GetIntent(text,(res)=>{ 																// Get intent from AI
 			let r=app.GenerateResponse(text,res);													// Generate response
+			let intent=res.intent.name.substr(1);													// Get intent
+			intent=isNaN(intent) ? 0 : intent;														// Validate
+			if (intent) {
+				let s=app.fb.intentLabels[intent/100];												// Get intent label
+				s+=intent ? " - "+intent : "";														// Add number
+				Prompt(s);																			// Show in prompt area
+				}	
 			trace(res,r)
 			});
 	}
-		
+
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
 		let i,r=[];
 		if (data.intent.name == "addition") {
 			r=["The answer is 4, of course", "Would you believe 22?"]; 
 			i=Math.floor(Math.random()*r.length);
-			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|"+r[i]);			// Send response
+			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
 			return r[i];
 			}
 		else if (data.intent.name == "why") {
 			r=["I added them on my fingers", "Because I know how to add"]; 
 			i=Math.floor(Math.random()*r.length);
-			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|"+r[i]);			// Send response
+			this.ws.send(this.sessionId+"|"+this.role+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
 			return r[i];
 			}
+		return "";
 		}
 
 	DoAction(act)																				// PERFORM ACTION
@@ -247,8 +261,17 @@ class App  {
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[2] == "TALK") {																		// TALK
-			if (this.role != v[3]) 			 app.voice.Talk(v[4],v[3]);								// Not same as me				
-			else if (this.role != "Teacher") Bubble(v[4],3,bx);										// Show text bubble instwad
+			if (this.role != v[3]) 			 app.voice.Talk(v[5],v[3]);								// Not same as me				
+			else if (this.role != "Teacher") Bubble(v[5],3,bx);										// Show text bubble instead
+			if (this.role != "Teacher" && v[3] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
+				this.GetIntent(v[5],(res)=>{ 														// Get intent from AI
+					let intent=res.intent.name.substr(1);											// Get intent
+					intent=isNaN(intent) ? 0 : intent;												// Validate
+					this.rp.curIntent=intent;														// Set current intent
+					if (v[4]) app.curStudent=v[4];													// Set new active student 
+					this.rp.Draw(v[5],app.curStudent);												// Redraw response panel
+					});
+				}
 			}
 		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5,bx); }		// CHAT
 		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT

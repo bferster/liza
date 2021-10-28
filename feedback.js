@@ -14,6 +14,7 @@ class Feedback {
 		this.data=null;																				// Pointer to session data to show
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
+		this.intentLabels=["Intent","General","Ask","Value","Correct","Think"];						// Intent labels
 	}
 
 	OnClick(e) 																					// ON SCREEN CLICK
@@ -109,13 +110,12 @@ class Feedback {
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
 	{
 		let i,o,x,col,y=31,str="";
-		let labs=["Think","Correct","Value","Ask","General"];										// Labels
 		let wid=$(window).width()-350;																// Size of graph
 		clearInterval(this.interval);																// Clear timer
 		const getPixFromTime=(time)=>{ return time/this.maxTime*(wid-67)+62; };						// CONVERT TIME TO PIXELS
 
 		for (i=0;i<5;++i) {																			// For each grid line
-			str+=`<text x="0" y="${y+4}" fill="#999">${labs[i]}</text>						
+			str+=`<text x="0" y="${y+4}" fill="#999">${this.intentLabels[5-i]}</text>						
 			<line x1="59" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:1"/>
 			<text x="${wid+10}" y="${y+4}" fill="#999">${(5-i)*100}</text>`;						// Draw it
 			y+=31;																					// Next line down
@@ -193,15 +193,22 @@ class Feedback {
 
 class ResponsePanel  {																					
 
-	constructor()   																				// CONSTRUCTOR
+	constructor()   																			// CONSTRUCTOR
 	{
+		this.curIntent=0;
+		this.intentDescs=["No intent found",
+						  "Low information remark or compliment that has a low impact",
+					   	  "Explains the text or question with or without reference to the text",
+						  "Values specific element of response related to a reading or thinking skill",
+						  "Shares specific concern with a portion of a student response",
+						  "Aware of thought processes to plan, monitor, adjust, and reflect on learning actions" ];
 	}
 
-	Draw()																							// DRAW
+	Draw(remark="Nothing",student="Nobody")														// DRAW
 	{
-		let intent="Transfer";
-		let intentDesc="Prompts students to think about applying the strategies or knowledge learned in the lesson to future."
-		let remark="Do you feel like you could try this strategy next time you encounter a tricky question like this?";
+		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
+		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number
+		let intentDesc=this.intentDescs[this.curIntent/100];										// Get intent description
 		$("#mainDiv").css("margin-left","15%");														// Shift right													
 		app.sc.Resize();																			// Resize renderer
 		app.sc.SetCamera(0,200,600,0,0,0);															// Reset camera	
@@ -209,10 +216,10 @@ class ResponsePanel  {
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px">
-					<div class="lz-rptitle">${intent}</div><p>${intentDesc}</p>	
+					<div class="lz-rptitle">${intentLabel}</div><p>${intentDesc}</p>	
 				</div>
 				<div style="width:calc(50% - 10px);height:120px;padding:8px">
-					<div class="lz-rptitle">said to ${app.role}</div><p>${remark}</p>
+					<div class="lz-rptitle">said to ${student}</div><p>${remark}</p>
 				</div>
 				<div style="margin:12px 0;width:100%">
 					<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
@@ -273,7 +280,7 @@ class ResponsePanel  {
 
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+app.responses[app.role][id].text);	// PLAY
+				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.responses[app.role][id].text);	// PLAY
 				});
 			}
 

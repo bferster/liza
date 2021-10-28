@@ -30,7 +30,6 @@ class Voice {
 					});
 				};
 			this.tts.onend=()=> { 																		// ON TALKING END
-				trace("start again")
 				if (app.inSim) this.Listen();															// Resume listening
 				this.talking=0;  																		// Stop talking animation
 				let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
@@ -74,6 +73,7 @@ class Voice {
 
 	Talk(text, who)																					// SAY SOMETHING
 	{
+		if (!text)	return;																				// Nothing to say
 		text=text.replace(/\{.*?\}/g,"");																// Remove any braced text
 		if (who == "Class") {																			// Show thought bubbles instead of TTS
 			Bubble(text);																				// Show
