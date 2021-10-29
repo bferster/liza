@@ -280,7 +280,7 @@ class ResponsePanel  {
 
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|teacher|"+app.responses[app.role][id].text);	// LC teacher so not to echo
+				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.responses[app.role][id].text);
 				});
 			}
 

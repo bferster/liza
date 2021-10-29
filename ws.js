@@ -64,6 +64,7 @@
 			else if (v[2] == "CHAT")  Broadcast(v[0], message);									// CHAT
 			else if (v[2] == "VIDEO") Broadcast(v[0], message);									// VIDEO
 			else if (v[2] == "AUDIO") Broadcast(v[0], message,true);							// AUDIO
+			else if (v[2] == "START") ;															// Save START status
 			});
 		} catch(e) { console.log(e) }
 	});

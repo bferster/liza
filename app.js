@@ -45,6 +45,7 @@ class App  {
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			if (this.inSim) this.voice.Listen()														// Turn on speech recognition
 			else 			this.voice.StopListening();;											// Off						
+			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|START|"+this.inSim);	// Send sim status
 			});									
 		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
 			$("#lz-feedbar").remove();																// Remove feedback panel
@@ -57,24 +58,12 @@ class App  {
 			if (e.shiftKey)	this.bb.ShowSlide(-1);													// Last slide
 			else			this.bb.ShowSlide(1);													// Next slide
 			}); 
-		$("#muteBut").on("click", ()=> { 															// On mute button click
-			if (app.voice.thoughtBubbles) 	$("#muteBut").prop("src","img/unmutebut.png");			// If was muted, show unmute icon
-			else 							$("#muteBut").prop("src","img/mutebut.png");			// Mute icon
-			app.voice.thoughtBubbles=!app.voice.thoughtBubbles;										// Toggle flag
-			if (app.voice.thoughtBubbles) 															// Type input
-				$("#talkBut").hide(),$("#talkInput").show();										// Show input field
-			else if (app.voice.hasRecognition) 														// This platform has voice recognition
-				$("#talkBut").show(),$("#talkInput").hide();										// Show mic button
-				}); 
-	
 		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
-	
 		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 81) && e.ctrlKey)	{													// Test key (Ctrl+Q)
 				app.OnPhrase("student want focus exactly what question asking answer completely");
-	//			GetTextBox("Type intent","","",(s)=>{ WitTrainIntent(s); });	
 				}
 			});
 	}
