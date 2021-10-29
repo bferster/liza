@@ -141,17 +141,18 @@ class App  {
 		let act=app.nlp.GetAction(text);															// Set action
 		app.DoAction(act);																			// If a please + action mentioned, do it
 		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);			// Send remark
-		app.GetIntent(text,(res)=>{ 																// Get intent from AI
-			let r=app.GenerateResponse(text,res);													// Generate response
-			let intent=res.intent.name.substr(1);													// Get intent
-			intent=isNaN(intent) ? 0 : intent;														// Validate
-			if (intent) {
-				let s=app.fb.intentLabels[intent/100];												// Get intent label
-				s+=intent ? " - "+intent : "";														// Add number
-				Prompt(s);																			// Show in prompt area
-				}	
-			trace(res,r)
-			});
+		if (!act) 																					// If no action happening
+			app.GetIntent(text,(res)=>{ 															// Get intent from AI
+				let r=app.GenerateResponse(text,res);												// Generate response
+				let intent=res.intent.name.substr(1);												// Get intent
+				intent=isNaN(intent) ? 0 : intent;													// Validate
+				if (intent) {																		// If an intent detected
+					let s=app.fb.intentLabels[intent/100];											// Get intent label
+					s+=intent ? " - "+intent : "";													// Add number
+					Prompt(s);																		// Show in prompt area
+					}	
+				trace(res,r)
+				});
 	}
 
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
@@ -266,7 +267,7 @@ class App  {
 			}
 		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5,bx); }		// CHAT
 		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
-		else if (v[2] == "VIDEO")  	this.VideoChat();												// VIDEO
+		else if (v[2] == "VIDEO")  	if (!$("#lz-videoChat").length) this.VideoChat();				// VIDEO
 		else if (v[2] == "AUDIO")  	{																// AUDIO
 			fetch(v[4])
 			.then(res  =>{ res.blob() })															// Get as blob

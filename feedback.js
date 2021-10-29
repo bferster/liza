@@ -230,7 +230,7 @@ class ResponsePanel  {
 				<span id="lztab-3" class="lz-rptab" style="width:calc(25% - 4px)">FEEDBACK</span> 
 				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:-var(--maxvh)" : ""}"></div>
 				</div>
-				<input id="lz-chat" class="lz-is" placeholder="Message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">
+				<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">
 				<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none;margin:-6px 12px 0 0"></select>`;
 
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
