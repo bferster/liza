@@ -283,6 +283,7 @@ class App  {
 		this.poses["startUp"]="armL,-51,4,-44,armR,-51,-4,44,base,0,0,0,chest,0,0,0,fingersL,0,0,0,fingersR,0,0,0,forearmL,0,0,-45,forearmR,0,0,47,legL,82,0,0,legR,83,0,0,mouth,0,0,0,neck,0,0,0,shoulderL,0,0,0,shoulderR,0,0,0,spine,0,0,0,thighL,-78,-8,0,thighR,-78,10,0,thumbL,0,0,0,thumbR,0,0,0,wristL,0,-50,0,wristR,8,0,0";
 		this.poses["headUp"]="neck,0,0,0";			this.poses["headDown"]="neck,16,0,0";	this.poses["headBack"]="neck,-16,0,0";
 		this.poses["headLeft"]="neck,0,20,0";		this.poses["headRight"]="neck,0,-20,0"; this.poses["headCenter"]="neck,0,0,0";
+		this.poses["readL"]="neck,45,5,0";			this.poses["readR"]="neck,45,-5,0";		this.poses["readS"]="neck,45,5,0,wristL,0,50,0,wristR,0,-50,0";
 		this.poses["mouthOpen"]="mouth,8,0,0";												this.poses["mouthClosed"]="mouth,0,0,0";
 		this.poses["leftLegStretch"]="legL,50,0,0";											this.poses["leftLegSit"]="legL,90,0,0";	
 		this.poses["rightLegStretch"]="legR,50,0,0";										this.poses["rightLegSit"]="legR,90,0,0";	
@@ -293,12 +294,12 @@ class App  {
 		this.poses["write1"]="wristR,0,-40,0,thumbR,0,-45,0,wristL,0,75,0,neck,45,0,0";		this.poses["write2"]="wristR,0,-40,30,thumbR,0,-45,0";			
 		this.poses["sleep"]="neck,45,62,0,chest,49,0,0,armL,-12,53,0,wristL,0,0,0,forearmL,120,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,50,0,0";
-			
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
 		this.seqs["wave"]="handUp,.6,handRight,.5,4";
 		this.seqs["write"]="write1,.6,write2,.7,write1,.8,write2,.5,write1,.7,write2,.4,write1,.8,write2,.7,startUp,1,1";
+		this.seqs["read"]="readS,1,readL,1,readR,1,readL,1,readR,1,readL,1,readR,1,readL,1,readR,1,headCenter,1,startUp,.5,1";
 
 		this.seqs["nodYes"]="headBack,.4,headDown,.3,headUp,.3,2";
 		this.seqs["nodNo"]="headLeft,.3,headRight,.3,headCenter,.3,2";

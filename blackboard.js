@@ -104,7 +104,7 @@ class Blackboard  {
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		$("#BB-ImageBut").css("box-shadow","0 0 16px 4px #009900");										// Highlight button
 		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
-		str+="max-height:232px;position:absolute;left:82px;top:calc(var(--maxvh) - 308px);overflow-y:auto'>";
+		str+="max-height:232px;position:absolute;left:774px;top:calc(var(--maxvh) - 308px);overflow-y:auto'>";
 		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
 		for (var i=0;i<this.pics.length;++i) 	str+="<div"+trsty+">"+this.pics[i].lab+"</div>"
 		$("body").append(str+"</div");																	// Add popup	
