@@ -28,7 +28,7 @@
 			<span style="font-size:24px;vertical-align:12px"><b><i> dataparser</b></i></span>
 			<hr>
 			Dataset: <select class="co-is" id="lz-dataset">
-				<option>Cleaned</option><option>Original</option>><option>Testdata</option>
+				<option>Newdata</option><option>Cleaned</option><option>Original</option>><option>Testdata</option>
 				</select>
 			&nbsp &nbsp; Series: <select class="co-is" id="lz-series">
 				<option>Hundreds</option><option>Tens</option><option>Decimals</option><option>
@@ -55,7 +55,7 @@
 	let nlp=new NLP();																				// Alloc NLP class
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
-		LoadConfig();
+		LoadConfig();																				// Load config file
 		$("#lz-makeTrain").on("click",()=>	  { MakeStories(1);    } );								// ON MAKE NLU ILE
 		$("#lz-makeSession").on("click", ()=> { MakeSession();     } );								// ON MAKE SESSION
 		$("#lz-testData").on("click", ()=> 	  { $("#lz-testFile").trigger("click"); 	});			// ON TEST DATA
@@ -77,7 +77,7 @@
 			});
 		});
 
-	function LoadConfig(dataset="Cleaned")														// LOAD CONFIG FILE
+	function LoadConfig(dataset="Newdata")														// LOAD CONFIG FILE
 	{	
 		let i;
 		fetch('data/config.csv')																	// Load file
@@ -110,6 +110,9 @@
 			o.text=nlp.CleanText(o.text);															// Clean text
 			if (!o.intent)	continue;																// Skip no intents
 			if (o.speaker == "Teacher") {															// A remark
+				if (o.clean_intent <= 0)			{ rawData.splice(i,1); continue;	}			// Remove bad remark
+				if (o.clean_intent == 1)			o.text=nlp.CleanText(o.clean_text);				// Get cleaned text			
+				if (o.clean_intent == 2)			o.text=nlp.CleanText(o.revised);				// Get revised text			
 				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
 				++nRemarks;																			// Add to count											
 				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
@@ -278,7 +281,6 @@
 			}																				
 		if (levs.length) { 
 			levs.sort((a,b)=>{ return b-a }); 														// Top dog
-			trace(levs)
 			tags.push("tag"+levels[levs[0]]);														// Add tags 
 			};  				
 		if (tags.length) {																			// Any tags?
@@ -290,6 +292,7 @@
 
 	function FindPreviousResponse(ind)															// GET PREVIOUS STUDENT RESPONSE
 	{
+return "";																					// No previous response
 		let s,k,re,keys=[];
 		while (--ind >= 0) 	{																		// Search backward
 			if (rawData[ind].speaker != "Teacher") {												// If not a teacher
@@ -301,7 +304,6 @@
 				return nlp.CleanText(rawData[ind].text,4)+" "+keys.join(" ")+" ";					// If keys, return them
 				}
 			}
-		return "";
 		}
 
 	function MakeStories(mask)																	// MAKE ALL FILES
@@ -331,7 +333,7 @@
 			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder
 			if (o.speaker == "Teacher") {															// If remark
 				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
-				if (id < 100)	continue;															// Skip if uncoded
+				if (id < 300)	continue;															// Skip if uncoded
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
