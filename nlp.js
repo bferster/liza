@@ -34,7 +34,7 @@ class NLP {
 			else if (type == "action")	this.actSyns[syns[i]]=word;										// Add actions
 			else if (type == "keyword")	this.keyWords[syns[i]]=word;									// Add keywords
 			else if (type == "keytag")	this.keyTags[syns[i]]=word;										// Add keytags
-			else						this.syns[syns[i]]=word;										// Add general synonym
+//			else						this.syns[syns[i]]=word;										// Add general synonym
 		}
 	}
 	

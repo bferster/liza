@@ -182,7 +182,7 @@ class App  {
 				animateIt(app.students[i].id);														// Animate them									
 		else																						// Just one
 			animateIt(app.curStudent);																// Animate that one	
-
+trace(act)
 		function animateIt(student) {																// ANIMATE STUDENT
 			let seat=student ? app.students.find(x => x.id == student).seat : 0;					// Get seat number
 			if (act == "fidget")			app.students[seat].fidget=1;							// Fidget								
