@@ -14,16 +14,12 @@ class Blackboard  {
 		this.startPosX=0;																				// Start pos X
 		this.startPosY=0;																				// Start pos Y
 		this.fontHgt=25;																				// Height of text
-		this.hgt=276;																					// Height
 		this.wid=552;																					// Width
 		this.pics=[];																					// List of pictures
 		this.chars=[];																					// Chars typed for backspacing
 		this.texMap=[{},{}];																			// Points to material maps
 		this.backCol="#333";																			// Background color
 		this.curSideId="#blackboardCan-0";																// Currently active blackboard side
-		this.AddPic("Math lesson","assets/BB2.png");
-		this.AddPic("Liza tips","assets/BB1.png");
-		this.AddPic("US map","assets/USMap.png");
 		this.InitCanvas(); 																				// Init left and right canvas
 		$("#BBClearBut").on("click", ()=> { app.bb.Clear(); });											// On clear button click
 		$("[id^=BB-]").on("click", function() { app.bb.ButtonRoute(this.id)	});							// On BB Drawing menu button click
@@ -104,10 +100,10 @@ class Blackboard  {
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		$("#BB-ImageBut").css("box-shadow","0 0 16px 4px #009900");										// Highlight button
 		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
-		str+="max-height:232px;position:absolute;left:774px;top:calc(var(--maxvh) - 308px);overflow-y:auto'>";
+		str+="max-height:232px;position:absolute;left:64px;top:24px;overflow-y:auto'>";
 		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
 		for (var i=0;i<this.pics.length;++i) 	str+="<div"+trsty+">"+this.pics[i].lab+"</div>"
-		$("body").append(str+"</div");																	// Add popup	
+		$("#blackboardDiv").append(str+"</div");														// Add popup	
 	}
 
 	AddPic(lab, url)																				// ADD PIC																			

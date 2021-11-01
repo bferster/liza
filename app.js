@@ -79,9 +79,13 @@ class App  {
 				for (i=0;i<d.length;++i) {															// For each line
 					if (d[i].type == "student") this.AddStudent(d[i]);								// Add student
 					if (d[i].type == "action") 	app.nlp.AddSyns("action",d[i].id,d[i].text.split(",")); // Add action and its synonyms
+					if (d[i].type == "picture") this.bb.AddPic(d[i].id,d[i].text);					// Add BB pic
 					}
 				this.curStudent=app.students[0].id;													// Pick first student
-				})	
+				this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);						// Set right side
+				this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);						// Left 
+		
+			})	
 			.then(res =>{ this.LoadSession("data/session-67.csv"); })								// Load sample session	
 			.then(res =>{ this.LoadResponses("data/responses.csv"); });								// Load responses
 	}
@@ -182,7 +186,6 @@ class App  {
 				animateIt(app.students[i].id);														// Animate them									
 		else																						// Just one
 			animateIt(app.curStudent);																// Animate that one	
-trace(act)
 		function animateIt(student) {																// ANIMATE STUDENT
 			let seat=student ? app.students.find(x => x.id == student).seat : 0;					// Get seat number
 			if (act == "fidget")			app.students[seat].fidget=1;							// Fidget								

@@ -84,6 +84,8 @@
 		.lz-playerslider{ 	background:#ccc; height:1px; width:80px; border:none; display:inline-block;
 							margin-left:6px;
 							}
+		.lz-promptbar {		position:absolute; font-family:Chalk; top:calc(var(--maxvh) - 76px); font-size: 24px;  margin-left:19px;
+							}
 		.lz-feedbar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(var(--maxvh) - 256px); user-select:none;
 							background-color:#aaa; border-radius: 12px 12px 0 0; height:218px;  
 							}
@@ -166,7 +168,8 @@
 		<canvas id="blackboardCan-0" height=256 width=512 class='lz-canvas' tabindex='1'></canvas>
 		<canvas id="blackboardCan-1" height=256 width=512 class='lz-canvas' tabindex='1'></canvas>
 	</div>
-</div>
+	<div id="promptDiv" class="lz-promptbar">What equipment did scientists use to discover water on the moon?</div>
+	</div>
 <script>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
