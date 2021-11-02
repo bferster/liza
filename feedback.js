@@ -120,15 +120,16 @@ class Feedback {
 			<text x="${wid+10}" y="${y+4}" fill="#999">${(5-i)*100}</text>`;						// Draw it
 			y+=31;																					// Next line down
 			}
-		str+=`<polyline style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" points="`;
-		y=1;
+		str+=`<path style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" d="`;
+		y=5*31+31;
 		for (i=0;i<this.data.length;i++) {															// For each event
 			o=this.data[i];																			// Point at it
-			x=getPixFromTime(o.time);																// Get x pos
-			if (o.actor == "Teacher") y=5-Math.max(Math.floor(o.code/100),1);						// If a teacher, get y 5-1
-			str+=x+","+(y*31+31)+" ";																// Add point
+			x=getPixFromTime(o.time).toFixed(2);													// Get x pos
+			if (o.actor == "Teacher") y=((5-Math.max(Math.floor(o.code/100),1))*31+31).toFixed(2);	// If a teacher, get y 5-1
+			if (i == 0) str+="M "+x+" "+y;															// Move there
+			else 		str+=" L "+x+" "+y;															// Add point
 			}
-		str+=`"/>`;
+		str+=`"/>`;																					// Close path
 		y=1;
 		for (i=0;i<this.data.length;i++) {															// For each event
 			o=this.data[i];																			// Point at it
@@ -141,6 +142,21 @@ class Feedback {
 		
 		return str;																					// Return graph markup
 		}	
+
+/*
+		str+=`<path style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" d="`;
+		for (i=0;i<this.data.length;i++) {															// For each event
+			o=this.data[i];																			// Point at it
+			x=getPixFromTime(o.time);																// Get x pos
+			if (i == 0)	{ x1=x; y1=y; str+="M "+x+" "+y;	}										// Move there
+			else if (i == 1) {																		// Make control point
+				x1=x+(x-x1)/2;																		// Mid x
+				y1=y+(y-y1)/2;																		// Y
+				str+=" Q "+x1+" "+y1+" "+x+" "+y;													// Add control and point
+				}
+			else str+=" T "+x+" "+y;																// Add point
+*/
+
 
 		ShowText()
 		{

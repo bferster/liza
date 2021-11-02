@@ -138,8 +138,6 @@ class Blackboard  {
 		imageObj.label=label;																			// Set label
 		imageObj.side=(side == undefined) ? this.curSide : side;										// Set curSide if playing back slides
 		imageObj.snum=(slideNum == undefined) ? 0 :	slideNum;											// Set curSlide id playing back slides
-	trace(label, record, slideNum, side)
-
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.maxSlides=Math.floor(imageObj.height/256);											// Get max number of slides
 			if (imageObj.label.match(/slide/i))	_this.ctx[this.side].drawImage(this,0,this.snum*-256); 	// If slides, crop by number
