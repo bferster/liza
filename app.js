@@ -254,6 +254,7 @@ class App  {
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
+
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[2] == "TALK") {																		// TALK
 			if ((v[3] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
@@ -270,14 +271,8 @@ class App  {
 			}
 		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5,bx); }		// CHAT
 		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
-		else if (v[2] == "VIDEO")  	if (!$("#lz-videoChat").length) this.VideoChat();				// VIDEO
-		else if (v[2] == "AUDIO")  	{																// AUDIO
-			fetch(v[4])
-			.then(res  =>{ res.blob() })															// Get as blob
-			.then(blob =>{ 
-				new Audio(URL.createObjectURL(blob)).play(); 
-			} )																				
-		}	
+		else if (v[2] == "VIDEO")  	{ if (!$("#lz-videoChat").length) this.VideoChat();	}			// VIDEO
+		else if (v[2] == "PICTURE") app.bb.SetPic(v[4],true,"",v[3]); 								// PICTURE
 	}
 
 	InitClassroom()																				// INIT CLASSROOM

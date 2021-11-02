@@ -5,9 +5,11 @@ student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=f
 student,Oliver,"oliver,liver","sex=male,ability=.5,color=#734325,"
 student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
 student,Class,"all,everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
-picture,Liza tips,assets/BB1.png
+picture,Question,assets/Discussion.png
 picture,Math lesson,assets/BB2.png
 picture,Lunar orbiter,assets/rover.png
+picture,Important words,assets/ImportantWords.png
+picture,Misleading words,assets/MisleadingWords.png
 action,firstSlide,"begin slide,start slide",
 action,nextSlide,"advance side,next side,nextSlide slide",
 action,lastSlide,"back side,back slide,last slide,last side,previous slide,previous side",

@@ -96,14 +96,19 @@ class Blackboard  {
 	ChoosePic()																						// CHOOSE PIC TO SHOW																			
 	{
 		var trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
-		trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"' onclick='app.bb.SetPic($(this).text(),true)' ";
+		trsty+="onMouseOut='this.style.backgroundColor=\"#f8f8f8\"'";
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		$("#BB-ImageBut").css("box-shadow","0 0 16px 4px #009900");										// Highlight button
 		var str="<div id='BBImagePicker' style='width:200px;background-color:#fff;border-radius:4px;padding:8px;";
 		str+="max-height:232px;position:absolute;left:64px;top:24px;overflow-y:auto'>";
 		str+="<b>Choose image</b><img src='img/closedot.gif' style='float:right' onclick='$(\"#BBImagePicker\").remove();$(\"[id^=BB-]\").css(\"box-shadow\",\"\")'><hr>";	// Title and closer
-		for (var i=0;i<this.pics.length;++i) 	str+="<div"+trsty+">"+this.pics[i].lab+"</div>"
+		for (var i=0;i<this.pics.length;++i) 	str+="<div"+trsty+"id='BBpic-'+i>"+this.pics[i].lab+"</div>"
 		$("#blackboardDiv").append(str+"</div");														// Add popup	
+
+		$("[id^=BBpic-]").on("click", function(){														// ON CLICK PIC
+			app.bb.SetPic($(this).text(),true)
+			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.role+"|PICTURE|"+app.bb.curSide+"|"+$(this).text());	// Send pic change
+			});
 	}
 
 	AddPic(lab, url)																				// ADD PIC																			
@@ -133,6 +138,7 @@ class Blackboard  {
 		imageObj.label=label;																			// Set label
 		imageObj.side=(side == undefined) ? this.curSide : side;										// Set curSide if playing back slides
 		imageObj.snum=(slideNum == undefined) ? 0 :	slideNum;											// Set curSlide id playing back slides
+	trace(label, record, slideNum, side)
 
 		imageObj.onload=function() { 																	// When loaded
 			app.bb.maxSlides=Math.floor(imageObj.height/256);											// Get max number of slides

@@ -24,10 +24,11 @@
 	ID|SENDER|OP|DATA-0 ... DATA-N
 	------------------------------
 	1|Luis|INIT
-	1|Luis|TALK|Luis|Hello, I am Luis
+	1|Luis|TALK|Luis|Teacher|Hello, I am Luis
 	1|Luis|ACT|Luis|standUp
 	1|Luis|CHAT|All|on
 	1|Luis|VIDEO|All|on
+	1|Luis|PICTURE|0|Lunar orbiter
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
@@ -59,12 +60,13 @@
 				str=v[0]+" "+v[1]+" -> "+req.socket.remoteAddress.substr(7);					// Add id, and IP
 				console.log("Meeting: "+str);													// Log client
 				}
-			if (v[2] == "TALK") 	  Broadcast(v[0], message);									// Broadcast TALK to everyone connected
-			else if (v[2] == "ACT")   Broadcast(v[0], message);									// ACT 
-			else if (v[2] == "CHAT")  Broadcast(v[0], message);									// CHAT
-			else if (v[2] == "VIDEO") Broadcast(v[0], message);									// VIDEO
-			else if (v[2] == "AUDIO") Broadcast(v[0], message,true);							// AUDIO
-			else if (v[2] == "START") ;															// Save START status
+			if (v[2] == "TALK") 	  	Broadcast(v[0], message);								// Broadcast TALK to everyone connected
+			else if (v[2] == "ACT")		Broadcast(v[0], message);								// ACT 
+			else if (v[2] == "CHAT")	Broadcast(v[0], message);								// CHAT
+			else if (v[2] == "VIDEO")	Broadcast(v[0], message);								// VIDEO
+			else if (v[2] == "PICTURE") Broadcast(v[0], message);								// PICTURE
+			else if (v[2] == "AUDIO") 	Broadcast(v[0], message,true);							// AUDIO
+			else if (v[2] == "START") ;															// START
 			});
 		} catch(e) { console.log(e) }
 	});
