@@ -327,7 +327,7 @@ return "";																					// No previous response
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
 			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
 			else							id=Math.floor(o.intent/100)*100;						// Cap at 100s
-			if (id < 150) 					id=100;													// Cap <150 to 100
+//			if ((id > 100) && (id < 150))	id=100;													// Cap 100-150 to 100
 			
 			sid="session-"+o.rerid;																	// Session id
 			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder

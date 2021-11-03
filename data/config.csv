@@ -5,6 +5,9 @@ student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=f
 student,Oliver,"oliver,liver","sex=male,ability=.5,color=#734325,"
 student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
 student,Class,"all,everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
+resource,Teacher prep,assets/prep.pdf
+resource,Student facing,assets/student.pdf
+resource,Strategy supports,assets/supports.pdf
 picture,Question,assets/Discussion.png
 picture,Math lesson,assets/BB2.png
 picture,Lunar orbiter,assets/rover.png

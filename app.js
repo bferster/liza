@@ -20,7 +20,8 @@ class App  {
 		this.sessionData=[];																		// Holds session data
 		this.curStudent="";																			// Currently active student
 		this.inSim=false;																			// In simulation or not
-		this.pickMeQuestion="";																		// Whole class pickme question
+		this.pickMeQuestion="";																		// Whole class 'pick me' question
+		this.resources=[];																			// Teacher resources
 
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
@@ -38,21 +39,22 @@ class App  {
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) this.sessionId=v[i].substr(2) 							// Get session	
 			}
-		$("#settingsBut").on("click", ()=> { this.Settings();  });									// ON SETTINGS
-		$("#helpBut").on("click", ()=> { ShowHelp(); });											// ON HELP
-		$("#startBut").on("click", ()=> { 															// ON START 
+		$("#resourceBut").on("click", ()=> { this.ShowResources();  });								// ON RESOURCES	
+		$("#settingsBut").on("click",  ()=> { this.Settings();  });									// ON SETTINGS
+		$("#helpBut").on("click",      ()=> { ShowHelp(); });										// ON HELP
+		$("#startBut").on("click",     ()=> { 														// ON START 
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
-			if (this.inSim) this.voice.Listen()														// Turn on speech recognition
-			else 			this.voice.StopListening();;											// Off						
-			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|START|"+this.inSim);	// Send sim status
+			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
+			else 						this.voice.StopListening();;								// Off						
+			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|START|"+this.inSim);  // Send sim status
 			});									
 		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
 			$("#lz-feedbar").remove();																// Remove feedback panel
 			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
 			$("#blackboardDiv").css("top",h+"px");													// Set top
-			var m=$("#blackboardDiv").css("display") == "none" ? 1 : 0;								// Hide or show
+			$("#blackboardDiv").css("display") == "none" ? 1 : 0;									// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			}); 
 		$("#slideBut").on("click", (e)=> { 															// ON SLIDE
@@ -60,7 +62,6 @@ class App  {
 			else			this.bb.ShowSlide(1);													// Next slide
 			}); 
 		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
-		$("#talkInput").on("click",  function() { $(this).focus() });								// On click, set focus
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 81) && e.ctrlKey)	{													// Test key (Ctrl+Q)
@@ -76,11 +77,12 @@ class App  {
 			.then(res =>{ 																				
 				let i;
 				this.students=[]
-				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
+				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papaparse lib
 				for (i=0;i<d.length;++i) {															// For each line
-					if (d[i].type == "student") this.AddStudent(d[i]);								// Add student
-					if (d[i].type == "action") 	app.nlp.AddSyns("action",d[i].id,d[i].text.split(",")); // Add action and its synonyms
-					if (d[i].type == "picture") this.bb.AddPic(d[i].id,d[i].text);					// Add BB pic
+					if (d[i].type == "student")  this.AddStudent(d[i]);								// Add student
+					if (d[i].type == "action") 	 app.nlp.AddSyns("action",d[i].id,d[i].text.split(",")); // Add action and its synonyms
+					if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);					// Add BB pic
+					if (d[i].type == "resource") this.resources.push({ lab:d[i].id, url:d[i].text }); // Add resource
 					}
 				this.curStudent=app.students[0].id;													// Pick first student
 				this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);						// Set right side
@@ -182,7 +184,12 @@ class App  {
 			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
 			return r[i];
 			}
-		return "";
+		else if (data.intent.name == "bot_challenge") {
+			r[0]="I am Lysa your AI assistant";
+			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[0]);	// Send response
+			return r[0];
+			}
+		return "";																					// No intent matched
 		}
 
 	DoAction(act)																				// PERFORM ACTION
@@ -367,6 +374,52 @@ class App  {
 			app.LoadProject(ids[this.selectedIndex]);												// Load project
 			$("#settingsEditor").remove(); 															// Kill settings
 			});
+	}
+
+	ShowResources()
+	{
+		if ($("#lz-resources").length) {																	// If already up, bring it down
+			$("#lz-resources").hide("slide",{ direction:"down", complete: ()=>{ $("#lz-resources").remove(); } }); // Slide down
+			return;																						// Quit																					
+			}
+		let str=`<div class="lz-dialog" id="lz-resources" 
+		style="background-color:#ccc;width:50%;overflow:hidden;display:none;padding:8px 8px 0 8px;left:calc(50% - 32px)">
+		&nbsp;<img src="img/lizalogo.png" style="vertical-align:-6px" width="64">
+		<img id="trclose" src="img/closedot.gif" style="float:right">	
+		<span style="font-size:18px;margin:7px 0 0 12px">Teacher resources</span>
+		<div id='resourcesDiv' style='height:50vh;width:calc(100% - 32px);background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div> 
+		<div style="width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0">`;
+		$("body").append(str.replace(/\t|\n|\r/g,""));													// Add to body
+		
+		let trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
+		trsty+="onMouseOut='this.style.backgroundColor=\"#fff\"'";
+		str="<b>Choose a resource to view</b><hr>"
+		for (let i=0;i<this.resources.length;++i)  str+=`<div ${trsty} id="tres-${i}">${this.resources[i].lab}</div>`;
+		$("#resourcesDiv").html(str);																	// Add resources	
+
+		$("#trclose").on("click", (e)=>{																// ON CLOSE
+			if ($("#trIF").length) {
+				$("#resourcesDiv").html(str);															// If a resource, put back file list
+				$("[id^=tres-]").on("click", (e)=>{														// ON CLICK RESOURCE
+					let id=e.target.id.substr(5);
+					let h=500;
+					let ifs="<iframe id='trIF' frameborder='0' src='"+this.resources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
+					$("#resourcesDiv").html(ifs)
+					});
+				}	
+			else $('#lz-resources').remove();															// Remove whole dialog
+			});
+		$("[id^=tres-]").on("click", (e)=>{																// ON CLICK RESOURCE
+			let id=e.target.id.substr(5);
+			let h=500;
+			let ifs="<iframe id='trIF' frameborder='0' src='"+this.resources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
+			$("#resourcesDiv").html(ifs)
+			});
+		
+		var h=window.innerHeight-$("#lz-resources").height()-62;										// Calc top
+		$("#lz-resources").css("top",h+"px");															// Set top
+		$("#lz-resources").show("slide",{ direction:"down" });											// Slide up
+		$("#lz-resources").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 	}
 
 } // App class closure

@@ -40,11 +40,11 @@ class Feedback {
 			<div style="width:250px;margin:4px 0 0 16px;"> 
 				<b style="font-family:Chalk;font-size:48px">${app.curStudent}</b>
 				<table style="font-family:Segoe UI,Verdana,Geneva,sans-serif;font-size:13px">
-				<tr><td>Academic Language &nbsp;</td><td style="width:100px"><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
-				<tr><td>Prior knowledge</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
-				<tr><td>Use of evidence</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
-				<tr><td>Careful thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
-				<tr><td>Curious thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*100}px";></div></td></tr>
+				<tr><td>Academic Language &nbsp;</td><td style="width:100px"><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
+				<tr><td>Prior knowledge</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
+				<tr><td>Use of evidence</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
+				<tr><td>Careful thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
+				<tr><td>Curious thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
 				<tr><td colspan='2'><p class="lz-bs" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</p></td></tr>
 				</table>
 			</div>
@@ -139,24 +139,8 @@ class Feedback {
 			else						col=app.students.find(x => x.id == o.actor).color;			// Get shirt color
 			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
 			}
-		
 		return str;																					// Return graph markup
 		}	
-
-/*
-		str+=`<path style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" d="`;
-		for (i=0;i<this.data.length;i++) {															// For each event
-			o=this.data[i];																			// Point at it
-			x=getPixFromTime(o.time);																// Get x pos
-			if (i == 0)	{ x1=x; y1=y; str+="M "+x+" "+y;	}										// Move there
-			else if (i == 1) {																		// Make control point
-				x1=x+(x-x1)/2;																		// Mid x
-				y1=y+(y-y1)/2;																		// Y
-				str+=" Q "+x1+" "+y1+" "+x+" "+y;													// Add control and point
-				}
-			else str+=" T "+x+" "+y;																// Add point
-*/
-
 
 		ShowText()
 		{

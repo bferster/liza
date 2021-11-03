@@ -388,7 +388,7 @@ class Scene {
 			if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );			// Render outline
 			else					app.sc.renderer.render(app.sc.scene,app.sc.camera);				// Render scene
 			app.sc.lastTime=now;																	// Then is now
-			app.sc.SetClock(app.curClock+=.75);		
+			app.sc.SetClock(app.curClock+=.1);														// Advance clock	
 			}
 		requestAnimationFrame(app.sc.Render);														// Recurse
 	}
