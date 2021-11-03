@@ -53,8 +53,12 @@ class NLP {
 	GetAction(text)																					// GET ACTION FROM TEXT
 	{
 		let k,re;
-		if (!text)					return "";															// Quit if no text
-		if (!text.match(/please/i))	return "";															// Got to say please
+		if (!text) return "";																			// Quit if no text
+		if (text.match(/anyone|y'all|anybody/i))	{													// Addressing  whole class
+			if (text.match(/know|tell|say|no/i))														// Asking for response
+				return "pickme:"+text;																	// Ask to pick back with question
+			}
+		if (!text.match(/please/i))	return "";															// Got to say please and address whole class
 		for (k in this.actSyns)	{																		// For each action possible
 			re=new RegExp(k,"i");																		// Make regex
 			if (text.match(re))	return this.actSyns[k];													// Return action if found

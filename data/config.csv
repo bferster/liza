@@ -33,7 +33,7 @@ action,twistRight,"twist right,spin right,turn right",
 action,twistLeft,"twist left,spin left,turn left",
 action,write,"write,right,rite",
 action,wave,"wave",
-action,read,"read,reed,red",
+action,read,"read,reed,red,re-read,reread",
 prompt,q1,"What equipment did scientists use to discover water on the moon?"
 keyword,space,"nasa,base,sun,moon,rover,mars,land,earth,pole,ship,ships,lunar,orbiter,shuttle,tank,tanks,mask,masks,suit,crater,craters,spaceship,fuel,rocket,rockets",
 keyword,text,"story,sentence,sentences,prompt,paragraph,book,article,essay,passage,section,sections,word,words,headings,information,vocabulary",

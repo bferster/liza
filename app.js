@@ -20,6 +20,7 @@ class App  {
 		this.sessionData=[];																		// Holds session data
 		this.curStudent="";																			// Currently active student
 		this.inSim=false;																			// In simulation or not
+		this.pickMeQuestion="";																		// Whole class pickme question
 
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
@@ -141,10 +142,17 @@ class App  {
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher")	talkingTo="Teacher";											// Always to teach, unless teacher
-
 		let act=app.nlp.GetAction(text);															// Set action
-		app.DoAction(act);																			// If a please + action mentioned, do it
 		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);			// Send remark
+		if (app.pickMeQuestion) {																	// If a pick me question was last asked
+			text=app.pickMeQuestion;																// Send previou question
+			app.pickMeQuestion="";																	// Clear it
+			let t=app.curStudent;																	// Save current student
+			app.curStudent="Class";																	// Address whole class
+			app.DoAction("sit");																	// Arms down	
+			app.curStudent=t;																		// Restore currnt student
+			}
+		app.DoAction(act);																			// If a please + action mentioned, do it
 		if (!act) 																					// If no action happening
 			app.GetIntent(text,(res)=>{ 															// Get intent from AI
 				let r=app.GenerateResponse(text,res);												// Generate response
@@ -157,7 +165,7 @@ class App  {
 					}	
 				trace(res,r)
 				});
-	}
+		}
 
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
@@ -181,6 +189,11 @@ class App  {
 	{
 		let i;
 		if (!act) return;																			// Quit if no act spec's
+		if (act.match(/pickme:/)) {																	// Asking to pick
+			this.pickMeQuestion=act.substr(7);														// Save question
+			app.curStudent="Class";																	// Address whole class
+			act="wave";																				// Wave
+			}
 		if (app.curStudent == "Class") 																// If the whole class
 			for (i=0;i<app.students.length;++i)														// For each student
 				animateIt(app.students[i].id);														// Animate them									
@@ -295,7 +308,7 @@ class App  {
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
-		this.seqs["wave"]="handUp,.6,handRight,.5,4";
+		this.seqs["wave"]="handUp,.6,handRight,.5,3";
 		this.seqs["write"]="write1,.6,write2,.7,write1,.8,write2,.5,write1,.7,write2,.4,write1,.8,write2,.7,startUp,1,1";
 		this.seqs["read"]="readS,1,readL,1,readR,1,readL,1,readR,1,readL,1,readR,1,readL,1,readR,1,headCenter,1,startUp,.5,1";
 
