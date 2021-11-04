@@ -268,7 +268,7 @@
 	{
 		let i,k,re,levs=[],tags=[];
 		let levels=["task","clarify","value","concern","meta"];										// Level labels
-		for (k in nlp.keyTags) {																	// For each keyword
+		for (k in nlp.keyTags) {																	// For each keytag
 			re=new RegExp("\\b"+k+"\\b","i");														// Make regex
 			if (s.match(re)) tags.push(nlp.keyTags[k]);												// Add tag
 			}																				

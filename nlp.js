@@ -71,6 +71,7 @@ class NLP {
 		let i,res=[];
 		if (!text)	return "";																			// Nothing to clean
 		text=text.toLowerCase();																		// Make l/c
+		text=text.replace(/key word/gi,"keyword");														// Key word(s) -> keyword(s)
 		let words=this.Tokenize(text);																	// Tokenize
 		if (!words)	return "";																			// Nothing to clean
 		for (i=0;i<words.length;i++) {																	// For each word

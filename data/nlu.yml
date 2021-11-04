@@ -1,0 +1,347 @@
+- intent: r500
+  examples: |
+    - how has student thinking changed i want you to write in student reflection journal how has student thinking changed from when we started this activity :: action, question, agree, tag500, 
+    - can somebody tell me and i want to see student hands raised what does it mean to find evidence :: search, evidence, question, 
+    - when we're talking about evidence we're thinking about what words do i see in this text or reading that help me answer this question :: text, evidence, ask, question, tell, tag500, 
+    - we might look for cue words or leading words like called like you notice how called is before that so that's a great example of a word that we might that we might use :: text, search, question, agree, evidence, tag500, tagmeta
+    - alright student can you explain to me what evidence is :: evidence, question,  
+    - but when we're looking for evidence we need to find certain specific things that are in that text that will help us :: search, evidence, question,  tagmeta
+    - you want to look in the story for where you can find these answers :: text, search
+    - alright so can somebody tell me how maybe they're thinking has changed throughout this conversation :: talk, question, tag500, 
+    - yes so the next time student reading a tough question it can help you to look for that action words in the question because that's going to help you know specifically what student looking for yes student :: text, search, ask, question, agree, evidence, tag500, 
+    - exactly student so how's student thinking changed since the very beginning :: question, evidence, tag500, 
+    - so how can we approach that question a little differently now that student looked at it :: ask, question, 
+    - when you read something it's a three step process when student trying to answer a question :: action, ask, question, tag500, 
+    - and then you go look at student question and you look at what it's really asking you and then student read it again right so it's three steps skim it read it fast go look at the question and then you read to find the answer to that question does that make sense :: search, action, ask, question, agree, 
+    - when we read the text and we read the question we need to correlate or we need to put them together to see what they're actually asking :: action, ask, question, tag500, 
+    - you the strategy i talked about :: tag500
+    - if you want to be good at something you keep doing it over and over and over :: agree
+    - thank you okay so student do you feel like student changed student student process for working through text and questions :: ask, agree, tag500
+    - about our keyword discover and you were thinking about how that was changing student thinking can you go back to that :: search, question, tag500, tagmeta
+    - what i want to challenge you with is the next time that you are posed with a question i want you to first think about student question and then dig into the passage and really circle and find the evidence :: text, search, evidence, action, ask, question, tag500, 
+    - remember when we looked at our question we found a keyword :: search, ask, question, tag500, tagmeta
+    - keyword to help us and to answer the question :: ask, tag500, tagmeta
+    - always find and identify a keyword so you really understand what student looking for and go back in the text :: search, question, learn, tag500, tagmeta
+    - she used the passage that we provided to find her answer she didn't just use her background knowledge she made sure to go back and find something in the text :: text, search
+    - and how did you find that instead of small machine it was the lunar orbiter what did you do to make that change :: space, tool, search, question, tag500, 
+    - i think what we all need to take away is that when we're answering reading comprehension questions we really need to focus on going back and reading the article in detail and maybe highlighting the text or annotating the text so that we can really understand in detail what we're learning and why we're learning it :: text, ask, question, learn, evidence, tag500,  tagmeta
+    - make sure when student reading the passage you take a holiday you highlight important facts when you go to student question :: text, action, ask, question, tag500, tagmeta
+    - so you see how if you did remember that it was a small machine and i like how you went back and reread student text to figure out what that machine was actually called :: tool, action, question,  tag500, 
+    - sometimes we can read things but not quite absorb everything so it's always a good idea to go back and reread student text underline important information and details that can help you answer questions about it afterwards and keep that knowledge with you :: evidence, action, ask, agree, tag500, tagmeta
+    - now one of the strategies that we were going to use today is to look at some key words that we have in our question :: text, search, ask, tag500, 
+    - okay so from reading the text today and using our tools by going back and rereading the text and circling important information how can this broaden student understanding in the future of any topic that we discuss whether it's space or farming :: evidence, question, agree, learn, tag500, tagmeta
+    - for restating a question you listen carefully for the words being used such as in our question :: text, ask, 
+    - to answer the question using the race method you restate the question :: ask, tag500, 
+    - how can you use student knowledge of restating the question in our next lesson :: ask, question, tag500, 
+    - okay so who can tell me what they did to correct their answer so how did you go about correcting student answer :: question, agree, tagmeta
+    - we look really closely at those key words in our question :: text, search, ask, 
+    - so remember when we are reading our question we have to look really closely at those key words those words that we need to look for in our text :: text, search, ask, question, tag500, 
+    - so remember when we are looking at our question we always have to look for those important words :: text, search, ask, question, tag500, 
+    - and then we have to look in our text for the same words so that we can try to find our answer :: text, search, agree
+    - often when we read it will tell us a sequence it will tell us what happened first and then what happens next so it's important when we are answering our questions to look to see if we have gone in the order that is in the story :: text, search, action, ask, question, tag500, tagmeta
+    - well what i do agree what can you we don't want to just say we agree and it's good to agree with people but it's also good to know why we we think something :: question, tell, agree, 
+    - when we're given questions we'd like to find answers that are very specific because the more specific they are the more sense that they make later on so yeah you were partially right you want to look for that name student :: search, expand, ask, question, agree, evidence,  tagmeta
+    - i think we've all kind of learned a lesson when we're reading the information we have to pay attention to it and not just assume :: evidence, question, learn, 
+    - does that make sense we know we all know different things about space but we also need to make sure that we're really reading the information that we're being given :: evidence, agree, disagree, 
+    - so when we're answering questions like this again what's something that we need to make sure we do when we're answering the question :: ask, question, 
+    - we looked very closely at our text we looked for those key words :: text
+    - but what we need to do is definitely go through student passage and then highlight important details you always want to highlight student headings or student sub headings :: text, action, question, evidence, 
+    - because those are a lot of key details in there that could give you some really good text evidence so that's what you need to do you want to find details that go along with student question and could possibly support student answer :: search, evidence, ask, question, agree, tag500, 
+    - maybe like a chronological timeline of events in a text so if you broke down the text and circled like what happened first and then what happened and then what happened you might be able to find a more suitable answer to the question :: search, expand, ask, question, tag500, tagmeta
+    - you built off student answer i appreciate how you build student answer we got more specific we narrowed down to that core of knowledge we're looking for and then we said okay this is this is what that machine was and this is what it was doing :: tool, search, expand, question, tell, agree, evidence,  tagmeta
+    - okay again so and much like with student earlier we're just we're trying to look at that question and we're specifically boiling it down to just its core components :: search, ask, agree, evidence, tag500, tagmeta
+    - that that is a um sometimes it takes a little bit of work to get everything together and it's called summarizing so we want to be able to put together the words and come up with the best answer :: text, tag500, tagmeta
+    - so i really like to do is the race format so we're going to restate the question we're going to answer the question we're going to cite evidence and then we're going to explain that evidence :: evidence, ask,  tag500, tagmeta
+    - so for example when i read what equipment did scientists use to discover water on the moon i try to think to myself i try to restate the question into an answer and then fill in the blank spots that the questions asking :: space, tool, search, action, ask, question, science, evidence, tag500, tagmeta
+    - so for example i might say the equipment that the scientist used to discover on the moon would be and then leave that answer blank and then we could go back in the text to determine what exactly what equipment :: space, tool, search, question, science, tell, learn, evidence, tag500, tagmeta
+    - but i think next time we need to use the strategy of looking at keywords and be really specific :: search, evidence, tag500,  tagmeta
+    - so next time you have a question you can underline student keywords to help you be more specific :: expand, action, ask, evidence, tag500,  tagmeta
+    - so that is why it's very important to highlight those keywords so you can give the best answer :: action, question, tag500, 
+    - see sometimes it's okay to go back and reread to find the answer :: search, action, agree, 
+    - so now that student figured out the full answer what will you do next time to when student looking back in the text :: search, question, tag500, 
+    - so now that we have talked about this how has this changed student think :: question, tag500, 
+    - alright so next time go back and look in the story to find student answer :: text, search, tag500
+    - yes that is exactly what i would like and that goes for all not just student so when student answering these questions try to use what you already know as well as specific information from what we're reading :: evidence, ask, question, agree,  tagmeta
+    - how did student thinking change there what did you do differently :: question, tag500, 
+    - great job that's a good strategy finding those key clues and keywords to help you find student answer :: search, agree, evidence, tag500, 
+    - so next time you are answering a question like this how do you think you can make student answer better :: ask, question, tag500, 
+    - ok so now that i have given you all some feedback i want you to think about how you started out thinking then how that changed :: question, agree, tag500, 
+    - and how you will apply what you learned in student next task so i'm gonna give you all a couple minutes to think about it and then we will go around in the circle answering :: action, question, learn, tag500, 
+    - so we can start with student and just to repeat i want you to state how you started out thinking how the strategy you used changed based on the feedback i gave and what you will do next time to make sure you are fully answering the question :: ask, question, tag500, 
+    - what do you think you can include after using a background knowledge to answer student question so after you use student background knowledge what do you think what strategy do you think you can use to help promote learning and answering the question :: expand, ask, question, learn, tag500, tagmeta
+    - we're just going to go around student what do you think first student going to say what strategy you used and how you will build on to it for student next assignment or task :: question, tell, tag500, 
+    - and last but not least student what about you what do you think what strategy did you use and how will you take that to either build on or change it in the future :: question, tag500, 
+    - you told me before that what you did was you read you noticed that the word water was in the question so you scanned through and you looked for things that related with water :: text, action, ask, question, science, tell, tag500, 
+    - great so i really liked that response because you explained studentself really well you said that you read the question you saw what the question was asking for and then you found it and explained why so that was a really great response :: search, action, ask, question, tell, agree,  
+    - so can you tell me how student answer changed from the beginning :: question, tag500, 
+    - so what would you with our discussion today what would you say student answer would be and how would it change :: talk, question, tell, tag500, 
+    - so next time you answer a question like that what i want to hear is the actual equipment they were using :: tool, ask, question, tag500, 
+    - definitely use student imagination i really like how you visualize the situation before giving student answer that's a really good strategy to answering questions :: ask, question, agree, tag500, tagmeta
+    - student has that change student thinking a little bit :: tag500
+    - right so next time you get a question on a text are you going to use student background knowledge and not read the text at all or are you going to read the text and then use student background knowledge :: action, ask, agree, tag500, 
+    - right so what are a few things we can do next time when student not quite sure if student answers are all the way there yet :: question, agree, tag500, 
+    - right so you went back and read so what do you want to do next time a teacher asks you for a little bit more information :: evidence, expand, action, question, agree, tag500, 
+    - yes that was a perfect response you used direct language from the text used specific vocab and you provided reasoning it was very specific that was a perfect response good job :: agree, evidence, tag500,  tagmeta
+    - so to find evidence we need to use those quotes from the text and i like that student quoted and she said paragraph three so we could all look at our texts and find where she was reading :: text, search, evidence, tell, 
+    - do you see any ways that student mind is kind of changing are you thinking differently now that student hearing from student other friends and student :: evidence, tag500, 
+    - i like that student connecting student background knowledge to help you it's great that student using student notes to help you further understand this text that's an excellent strategy that good readers use :: expand, agree, learn, tag500
+    - then you provided reasoning which is you can't survive without water it's very important to backup student answers with reasoning :: question, science, tag500, 
+    - i'm wondering what you'll do next time you get a question like this to arrive at an answer like this what's something that you can do next time when you get a question like this :: ask, question, learn, tag500, 
+    - i'm hearing that you read the text for details and evidence to help support student thinking :: evidence, search, action, tag500, 
+    - and i'm hearing that you have an idea of how you can repeat this answer in the future i think it might be great if you write down this process in a notebook :: action, question, agree, tag500, tagmeta
+    - student connecting the details to another part of the text to explain how it could be valuable :: expand, question, evidence, tag500,  
+    - student you are using student background knowledge of a definition of orbiter to be able to apply student answer :: space
+    - so when we're answering comprehension questions like this we really need to dig into the text and make sure we're using all the information :: evidence, ask, question, tag500, 
+    - that's right that's excellent so now when we go forward and we're answering comprehension questions you can use dev's amazing example where we restate the question and we're sure to use all of the evidence from the text :: evidence, ask, question, agree, tag500, 
+    - i am going to give you some sentence starters and this is going to help us really solidify our learning and reading strategies :: text, learn, tag500, tagmeta
+    - alright so for example i can start out saying i started out thinking and you would say student prior response and now i think this way because and then you can tell me so next time you see a question asking about a text i will do what :: ask, question, tell, evidence, tag500, 
+    - so you think about the thinking and thinking strategy that you use when you are reading a text and answering a question :: ask, question, tag500, 
+    - yo yo you started out thinking a certain way and now you think :: tag500
+    - so why did you change student answer to what student also wrote what were you thinking :: question, tag500, 
+    - okay so next time that you see a question like this that's asking about a text what are you going to do :: ask, question, agree, tag500, 
+    - she's going back to the text and finding that specific piece of evidence that was used to discover water on the moon :: space, search, evidence, science,  tagmeta
+    - so we're gonna take a minute to turn around to student partner next to you and student going to talk about what are student takeaway from the revision process :: question, tell, tag500, tagmeta
+    - and so the next time i see a question like this where i have to look at the text again i'm going to talk about a strategy :: search, ask, tell, tag500, 
+    - can you do you remember can you restate what their strategy is :: question, tag500, 
+    - does class else want to share maybe they're thinking on what they thought that was the right answer but now what they know is the right answer :: expand, question, agree, tag500, 
+    - great does class else want to share their answers and maybe how their answers have changed :: expand, question, agree, tag500, 
+    - does class else want to share their thinking about what they had for their first answer and how it could have changed after rereading :: expand, question, tag500, 
+    - so this is a really good thing that you were just able to do so when you were rereading student able to see where you found student answer and you were able to find another part that you could add to it :: search, expand, question, agree, 
+    - that's an excellent strategy to be looking at the text and pulling out those keywords :: search, tag500
+    - and i think that that's an excellent strategy for all to think about when we're reading a text is to think :: question, tag500, 
+    - next time you see this kind of question please be as specific as you can to answer the question okay :: ask, agree, evidence, tag500,  tagmeta
+    - specific name and of the things that you described okay :: agree, evidence,  tagmeta
+    - when student trying to answer this question just to try to locate these key words in the paragraph :: text, ask, question, 
+    - when we read we want to make sure that we're backing up what we're saying with information from the text :: evidence, action, question, tell, 
+    - so every single time that we're using information from a text in order to answer a discussion question we want to make sure that we're referencing back to the text even though we might know a lot about the subject reading already :: evidence, talk, ask, tag500, 
+    - so that's great that's a great segue so what i wanted to ask you all next because you just gave specific evidence of what the question said and you analyze that and picked an answer based off that specifically so that's a great process :: evidence, ask, question, tell, agree, tag500,  tagmeta
+    - or even thinking beyond today some tools that we can use for future texts like these :: tag500, 
+    - okay um so when student thinking about student original answer and student new answer what do you think the difference is between those answers :: question, agree, tag500, 
+    - yes so when we're thinking about answering questions like these later in the future i think that what you said about details is very important :: ask, question, tell, agree, evidence, tag500, 
+    - yes so that use the lunar orbiter so student what on what exactly made you come to that conclusion that new answer that you have :: space, question, agree, evidence, tag500, 
+    - so when we're not drawing on our prior knowledge these things can be complex in reviewing them a couple times is important student you have something to add :: expand, question, 
+    - and what about that and when you all are thinking about that what parts can we use in the future when we're reading a question like this do you think that there's any of the words that we understand better now or anything about this about space that we under or about the moon that we understand better now or water :: space, text, ask, question, science, learn, tag500, 
+    - it's important for you to look back at the passage to try and determine what the best answer to the question is it's always helpful to circle key words in the question :: text, search, action, ask, question, learn, 
+    - awesome so how would that how would you need to revise student answer to include those two ideas :: expand, question, tag500, 
+    - so what do you think you would do next time you get a question like this :: ask, question, tag500, 
+    - okay so what was different about that answer versus student first response :: question, agree, disagree, tag500, 
+    - what do you think will stick with you for the next time student answering a similar question :: ask, question, tag500, 
+    - student what about you how did student answer change when you were able to revise it :: question, tag500, 
+    - i mean student 100 right and using that background knowledge but when we answer questions especially questions about a text we always want to make sure that our answers on have evidence that are found directly from the text :: search, evidence, ask, question, agree, 
+    - mm hmm so let's just think about as a all like what did we do together what do we do together to figure out what the name of that tool was called student :: question,  
+    - so as we proceed with this discussion i would want you to observe how student thinking changes as we move along the discussion is okay :: talk, question, agree, tag500, tagmeta
+    - and moon so i want to make sure that my answers to those questions incorporate all of those components :: space, ask, tag500
+    - ok so student do you want to share student new thinking what has changed in student thinking :: question, agree, tag500, 
+    - what i'm going to suggest to all of you is when you start the first thing you do before you start reading is to actually look closely at the question :: search, ask, question, 
+    - so i guess the other strategy that student going to want to use is to is to think about the question that they're asking and then student trying to make some connections between the concepts that student reading :: ask, tag500, 
+    - how what did you learn right what did you take away from this process of making inferences and making connections what did you learn about that you might be able to apply the next time you encounter a question like this :: ask, question, agree, learn, tag500, tagmeta
+    - that can help you make some inferences you want to read a little bit more closely for the meaning of the the material before it :: expand, action, tag500
+    - yeah so this is a really important skill for scientists we need to be able to look at a text and use quotes or information from the text to support our answers :: evidence, search, science, agree, tag500, 
+    - great so student now that student participating already would you mind telling me what student thinking was when you went back to try to revise student response :: question, agree, tag500, tagmeta
+    - okay so looking for evidence in the text and circling that evidence is a great strategy to make sure that we're answering the question completely :: search, evidence, ask, agree, tag500, 
+    - is there anything else did class do anything different when they were revising their answer :: expand, question, disagree, 
+    - so we're going to be thinking about what strategies we use to revise our answers and how we can use those strategies the next time we come across a question like this so :: ask, question, tag500, 
+    - first student going to answer i started out thinking blank then student going to answer and now i think blank because blank go ahead and take 30 seconds to answer those questions :: ask, tag500, tagmeta
+    - so next time you see a question asking about a text what will you do :: ask, question, tag500, 
+    - what made you change student thinking on that :: question, tag500, 
+    - i love that you are looking for keywords that's a really strong reading technique :: search, tag500
+    - and then after student finished i'm curious if you could share about how student thinking has changed from student original answer to the second answer that you that you wrote :: question, tag500, 
+    - so i suggest that the next time you have a question like this you read through the text and look for those key specific words that might help you have a more rounded out answer :: text, search, expand, action, ask, evidence, tag500,  tagmeta
+    - now that we figured out the full answer what could you do next time so that you don't have to revise and revise and revise :: question, tag500, 
+    - i think that a little bit of specificity and putting a little bit of effort up top may have to save you the trouble of having to revise it several times :: tag500
+    - what was different about student first answer and student second you said :: question, tell, disagree, 
+    - i sort of noticed that through talking with student i mean that you also added some specificity to student answer do you think that helped you get a more full response :: expand, action, tell, 
+    - okay what could you do next time you get a question like this :: ask, question, agree, tag500, 
+    - what do you think you could do going forward to make sure that we are looking for what the question is asking :: search, ask, question, 
+    - i think that's totally a great strategy for you i think if you see the question provide student answer just look over student answer one more time and then make sure it answers matches the question and you'll be good to go :: search, expand, ask, agree, tag500, 
+    - so how can i ask you a question how did you get from student first answer to student second answer how did student thinking change :: ask, question, tag500, 
+    - how can you know to look or how can you how can you see what the question is asking so that you understand what answer to give other than just putting more words down :: text, search, expand, ask, question, learn, 
+    - fantastic so i really appreciate something student just did he took little parts of the world to lunar orbit to draw a conclusion from that so we're really looking for small details here :: space, search, evidence, tag500
+    - the question when we're looking for an answer it's important to think about those keywords and it can also be helpful to create our sentence but i wouldn't say that it necessarily has to be in student response :: text, search, ask, question, tell, tag500, 
+    - before our conversation i thought that the answer was this or i didn't know the answer or i was still confused or just before our conversation this is what i thought and then after the conversation that we just had now i think :: talk, question, 
+    - i think it's nice though when we read a text if we can scan the text for specific pieces of equipment then that way when we write our answers out if i ever asked you can you tell me what paragraph you found that in student be able to point to that exact part of the text :: text, tool, search, action, question, evidence,  tagmeta
+    - so i think student you did just that when you just re read that beginning of paragraph two :: text, action, question, 
+    - has our thinking kind of changed at all since we started talking through this student sorry i saw student hand was up :: tell, evidence, tag500
+    - yeah exactly you could specify the small machine and that's a strategy you can use in response questions :: tool, ask, agree, evidence, tag500,  
+    - hi welcome back from lunch so we'll just pick up from where we left it student as we talked about earlier in the day maybe in the future you can use specifying techniques in student responses :: search, tag500, tagmeta
+    - well in this case adding a name would be sufficient but i i'm talking more about a strategy of specifying student responses instead of just like adding into adding a name into it so :: expand, tell, evidence, tag500, tagmeta
+    - but student strategy is absolutely right you you locate the keywords in the question and you find them in the text :: search, ask, agree, tag500, 
+    - so the next time when student answering these kinds of questions be sure to look for student information or student answer in the text :: evidence, search, ask, question, tag500, 
+    - tell me how your thinking has changed? :: action, question, agree, tag500
+    - what does it means to find evidence :: search, evidence, question
+    - what i mean about evidence is we're thinking about what words do i see what help me answer this question :: text, evidence, ask, question, tell, tag500
+    - lookimg for cue words or leading words is a great example of a word that we might that we might use :: search, question, evidence, tag500, tagmeta
+    - can you explain to me what evidence is :: evidence, question
+    - when looking for evidence we need to find certain specific things that are in that text that will help :: search, evidence, question, tagmeta
+    - look in the story to find these answers :: text, search
+    - how has they're thinking has changed throughout this conversation :: talk, question, tag500
+    - next time student reading a tough question it can help you to look for that action words to know specifically, ask, question, agree, evidence, tag500
+    - so how's student thinking changed since the very beginning :: question, evidence, tag500 
+    - let's approach that question a  differently now student looked :: ask, question
+    - it's a three step process when student trying to answer a question :: action, ask, question, tag500
+    - look at student question what is it really asking student  :: search, ask, question
+    - it is three steps skim, read fast and look at the questionthen you read to find the answer to that question :: search, action, ask, question, agree
+    - we read the question we need to correlate we need to put them together to see what they're actually asking :: action, ask, question, tag500
+    - this is the strategy i mean :: tag500
+    - to be good at something keep doing it over and over and over :: agree
+    - do you feel like student changed student student process for working through text and questions :: ask, agree, tag500
+    - about keyword discovery were you were thinking about how that was changing student thinking :: search, question, tag500, tagmeta
+    - next time  you are posed with a question first think about student question and then dig into the passage and really circle and find the evidence :: text, search, evidence, action, ask, question, tag500, 
+    - we looked at the question and found a keyword :: search, ask, question, tag500, tagmeta
+    - keywords help us to answer questions :: ask, tag500, tagmeta
+    - find and identify a keyword to understand what student looking for :: search, question, learn, tag500, tagmeta
+    - use the passage provided to find answer :: text, search
+    - dont use her background knowledge make sure to go back and find something in text :: text, search
+    - how did you find that instead of small machine it was the lunar orbiter  :: space, tool, search, question
+    - what did you do to make that change :: question, tag500
+    - when answering reading comprehension questions we focus on going back and reading the article in detail and highlight or annotate the text or annotating the text :: text, ask, question, action, evidence, tag500, tagmeta
+    - so we can  understand in detail what we're learning and why we're learning it :: text, ask, question, learn, evidence, tag500, tagmeta
+    - when student reading the passage highlight important facts :: text, action, ask, learn, question, tag500, tagmeta
+    - i like how you went back and reread student text to figure out what that machine was actually called :: tool, action, question,  tag500, 
+    - we can read things but not quite absorb everything :: tag500, tagmeta
+    - go back and reread student text underline important information and details that can help you answer questions about it afterwards and keep that knowledge with you :: evidence, action, ask, agree, tag500, tagmeta
+    - one of the strategies we use is to look at some key words that we have in our question :: text, search, ask, tag500, 
+    - okay so from reading the text today and using our tools by going back and rereading the text and circling important information :: evidence. action,  tag500, tagmeta
+    - how can this broaden student understanding in the future of any topic that we discuss whether :: evidence, question, agree, learn, tag500, tagmeta
+    - listen carefully for the words being used to restate question you :: text, ask, 
+    - answer the question using the same method you restated the question :: ask, tag500, 
+    - use student knowledge of restating the question in next lesson :: ask, question, tag500, 
+    - how did student  go about correcting student answer :: question, agree, tagmeta
+    - examine the key words in question :: text, search, ask, 
+    - when reading question look really closely at keywords :: text, search, ask, question, tag500, 
+    - we always have to look for those important words :: text, search, ask, question, tag500, 
+    - we can find our answer by lookin in our text for the same words :: text, search, agree
+    - it will tell us what happened first and then what happens next so it's important when we are answering our questions to look to see if we have gone in the order that is in the story :: text, search, action, ask, question, tag500, tagmeta
+    - we don't want to just say we agree and it's good to agree with people but it's also good to know why we we think something :: question, tell, agree, 
+    - we'd like to find answers that are very specific because the more specific they are the more sense that they make later on so yeah you were partially right you want to look for that name student :: search, expand, ask, question, agree, evidence,  tagmeta
+    - we've learned a lesson when we're reading the information :: evidence, question, learn, 
+    - we have to pay attention to it and not just assume :: evidence, question, learn, 
+    - we  know different things about space but we also need to make sure that we're really reading the information that we're being given :: evidence, agree, disagree, 
+    - we need to make sure when we're answering the question we're answering questions like this :: ask, question, 
+    - looked for those keywords when we looked very closely at text :: text
+    - go through passage and highlight important details you always want to highlight student headings or student sub headings :: text, action, question, evidence, 
+    - because those are key details that could give you some good evidence :: search, evidence, ask, question, agree, tag500, 
+    - that's what you need to do you want to find details that go along with student question and could possibly support student answer :: search, evidence, ask, question, agree, tag500, 
+    - a chronological timeline of events in a text :: tag500
+    - break down the text and circled hat happened first and what happened next you might be able to find a more suitable answer to the question :: search, expand, ask, question, tag500, tagmeta
+    - you built off student answer :: tag500
+    - got more specific we narrowed down to that core of knowledge we're looking for :: search, expand, question, tell, agree, tag, tagmeta
+    - ook at that question and specifically boil it down to its core components :: search, ask, agree, evidence, tag500, tagmeta
+    - that that is a um sometimes it takes a little bit of work to get everything together and it's called summarizing so we want to be able to put together the words and come up with the best answer :: text, tag500, tagmeta
+    - swe're going to restate the question to answer the question we cite evidence and then explain that evidence :: evidence, ask,  tag500, tagmeta
+    - try to restate the question into an answer and then fill in the blank spots that the questions asking :: search, action, ask, question, science, evidence, tag500, tagmeta
+    - leave that answer blank and then we could go back in the text to determine what exactly what equipment :: search, question, science, tell, learn, evidence, tag500, tagmeta
+    - use the strategy of looking at keywords and be specific :: search, evidence, tag500,  tagmeta
+    - you can underline student keywords to help you be more specific :: expand, action, ask, evidence, tag500,  tagmeta
+    - it's very important to highlight those keywords to get the best answer :: action, question, tag500, 
+    - it's okay to go back and reread to find the answer :: search, action, agree, 
+    - now that student figured out the full answer what will you do next time when looking at the text :: search, question, tag500, 
+    - now has this changed student thinking now that we have talked about this  :: question, tag500, 
+    - next time go back and look in the story to find answer :: text, search, tag500
+    - when student answering these questions use what you already know as well as specific information from what we're reading :: evidence, ask, question, agree,  tagmeta
+    - what did student do differently and how did student thinking change there  :: question, tag500, 
+    - that's a good strategy finding those clues and keywords :: search, agree, evidence, tag500, 
+    - how do you think you can make student answer better next time you are answering a question like this :: ask, question, tag500, 
+    - i want you to think about how student started out thinking then how that changed :: question, agree, tag500, 
+    - how you will apply what you learned in student next task :: action, question, learn, tag500, 
+    - i want you to state how you started out thinking how the strategy you used changed based on the feedback i gave and what you will do next time to make sure you are fully answering the question :: ask, question, tag500, 
+    - what do you think you can include after using a background knowledge to answer student question so after you use student background knowledge what do you think what strategy do you think you can use to help promote learning and answering the question :: expand, ask, question, learn, tag500, tagmeta
+    - what do you think first student going to say what strategy you used and how you will build on to it for student next assignment or task :: question, tell, tag500, 
+    - and last but not least student what about you what do you think what strategy did you use and how will you take that to either build on or change it in the future :: question, tag500, 
+    - what you did was you read you noticed that the word water was in the question so you scanned through and you looked for things that related with water :: text, action, ask, question, science, tell, tag500, 
+    - you explained studentself really well you said that you read the question you saw what the question was asking for :: search, action, ask, question, tell, agree,  
+    - tell me how has student answer changed from the beginning :: question, tag500, 
+    - what would you say student answer would be and how would it change :: talk, question, tell, tag500, 
+    - next time i want to hear is the actual equipment they were using :: tool, ask, question, tag500, 
+    - imagination is a really good strategy to answering questions :: ask, question, agree, tag500, tagmeta
+    - visualization is a really good strategy to answering questions :: ask, question, agree, tag500, tagmeta
+    - changed student thinking a little bit :: tag500
+    - next time you get a question on a text don't use student background knowledge :: action, ask, agree, tag500, 
+    - next time when if student not quite sure if student answers are all the way there yet :: question, agree, tag500, 
+    - you used direct language from the text used specific vocab and you provided reasoning it was very specific that was a perfect response :: agree, evidence, tag500,  tagmeta
+    - we need to use those quotes from the textt o find evidence :: text, search, evidence, tell, 
+    - do you see that student mind is kind of changing are you thinking differently:: evidence, tag500, 
+    - that's an excellent strategy that good readers use :: learn, tag500
+    - student provided reasoning it's very important to backup student answers with reasoning :: question, tag500, 
+    - next time you get a question like this to arrive at an answer like this what's something that you can do next time when you get a question like this :: ask, question, learn, tag500, 
+    - you read the text for details and evidence to help support student thinking :: evidence, search, action, tag500, 
+    - you have an idea of how you can repeat this answer it would be great if you write down this process in a notebook :: action, question, agree, tag500, tagmeta
+    - it could be valuable to connect the details to another part of the text to explain how :: expand, question, evidence, tag500,  
+    - student you are using student background knowledge of a definition of orbiter to be able to apply student answer :: space
+    - when answering comprehension questions we need to dig into the text and make sure we're using the information :: evidence, ask, question, tag500, 
+    - when we go forward and we're answering comprehension questions you can use student's amazing example where we restate the question and we're sure to use all of the evidence from the text :: evidence, ask, question, agree, tag500, 
+    - here are some sentence starters to help us solidify our learning and reading strategies :: text, learn, tag500, tagmeta
+    - you would say student prior response and now i think this way because and then you can tell me so next time you see a question asking about a text i will do what :: ask, question, tell, evidence, tag500, 
+    - when you are reading a text and answering a question think about the thinking and thinking strategy that you use  :: ask, question, tag500, 
+    - student started out thinking a certain way and now you think :: tag500
+    - why did you change student answer to what student also wrote :: question, tag500, 
+    - next time that you see a question like this, what are you going to do :: ask, question, agree, tag500, 
+    - go back to the text and finding that specific piece of evidence that was used :: space, search, evidence, science,  tagmeta
+    - what are student takeaway from the revision process :: question, tell, tag500, tagmeta
+    - next time student see a question like this where have to look at the text again talk about a strategy :: search, ask, tell, tag500, 
+    - can you restate what their strategy is :: question, tag500, 
+    - does class want to share their on what they thought that was the right answer but now what they know is the right answer :: expand, question, agree, tag500, 
+    - does class want to share their answers and maybe how their answers have changed :: expand, question, agree, tag500, 
+    - does class want to share their thinking about what they had for their first answer and how it could have changed after rereading :: expand, question, tag500, 
+    - you were rereading student able to see where you found student answer and you were able to find another part that you could add to it :: search, expand, question, agree, 
+    - pulling out those keywords is an excellent strategy :: search, tag500
+    - that's an excellent strategy for class to think about :: question, tag500, 
+    - be as specific as you can to answer the question  next time you see this kind of question :: ask, agree, evidence, tag500,  tagmeta
+    - locate these key words in the paragraph :: text, ask, question, 
+    - make sure that we're backing up what we're saying with information from the text :: evidence, action, question, tell, 
+    - we're need to use information from a text in order to answer a discussion question we want to make sure that we're referencing back to the text even though we might know a lot about the subject reading already :: evidence, talk, ask, tag500, 
+    - you just gave specific evidence of what the question said and you analyze that and picked an answer based off that specifically so that's a great process :: evidence, ask, question, tell, agree, tag500,  tagmeta
+    - thinking beyond today some tools that we can use for future texts :: tag500, 
+    - student thinking about student original answer and student new answer what do you think the difference is between those answers :: question, agree, tag500, 
+    - in the future i think that what you said about details is very important :: ask, question, tell, agree, evidence, tag500, 
+    - what exactly made you come to that conclusion that new answer :: space, question, agree, evidence, tag500, 
+    - reviewing them a couple times is important student you have something to add :: expand, question, 
+    - think about that what parts to use in the future :: tag500
+    - are there any words that we understand better now or anything about this about that we understand better now ::  text, ask, question, learn, tag500, 
+    - look back at the passage and determine what the best answer to the question is it's always helpful to circle key words in the question :: text, search, action, ask, question, learn, 
+    - awesome so how would that how would you need to revise student answer to include those two ideas :: expand, question, tag500, 
+    - when student get a question like this, what student would do next time  :: ask, question, tag500, 
+    - what was different about that answer versus student first response :: question, agree, disagree, tag500, 
+    - next time student answering same question, what  will stick with you :: ask, question, tag500, 
+    - student what about you how did student answer change when you were able to revise it :: question, tag500, 
+    - we always want to make sure that our answers on have evidence that are found directly from the text :: search, evidence, ask, question, agree, 
+    - what do we do together to figure out what the name of that tool was called student :: question,  
+    - so as we proceed with this discussion i would want you to observe how student thinking changes as we move along the discussion is okay :: talk, question, agree, tag500, tagmeta
+    - make sure that student answers to those questions incorporate all of those components :: space, ask, tag500
+    - do you want to share student new thinking what has changed in student thinking :: question, agree, tag500, 
+    - when you start the first thing you do before you start reading is to actually look closely at the question :: search, ask, question, 
+    - anither strategy to use is to is to think about the question that they're asking and then student trying to make some connections between the concepts that student reading :: ask, tag500, 
+    - how what did you learn right what did you take away from this process of making inferences and making connections what did you learn about that you might be able to apply the next time you encounter a question like this :: ask, question, agree, learn, tag500, tagmeta
+    - allow student to make some inferences you want to read closely for the meaning of the the material before it :: expand, action, tag500
+    - we need to be able to look at a text and use quotes or information from the text to support our answers :: evidence, search, science, agree, tag500, 
+    - would you mind telling me what student thinking was when you went back to try to revise student response :: question, agree, tag500, tagmeta
+    - ooking for evidence in the text and circling that evidence is a good strategy to make sure that we're answering the question completely :: search, evidence, ask, agree, tag500, 
+    - would student do anything different to were revise answer :: expand, question, disagree, 
+    - we're going to be thinking about what strategies we use to revise our answers and how we can use those strategies the next time we come across a question like this so :: ask, question, tag500, 
+    - what will student do when you see a question asking about a text next time:: ask, question, tag500, 
+    - what made you change student thinking on that :: question, tag500, 
+    - looking for keywords is a strong reading technique :: search, tag500
+    - could you could share about how student thinking has changed from student original answer to the second answer that you that you wrote :: question, tag500, 
+    - so i suggest that the next time you have a question like this you read through the text and look for those key specific words that might help you have a more rounded out answer :: text, search, expand, action, ask, evidence, tag500,  tagmeta
+    - what could you do next time so that you don't have to revise and revise and revise :: question, tag500, 
+    - putting a little bit of effort up top may have to save you the trouble of having to revise it several times :: tag500
+    - tell me what was different about student first answer and student :: question, tell, disagree, 
+    - you also added some specificity to student answer do you think that helped you get a more full response :: expand, action, tell, 
+    - if you get a question like this, what could you do next time  :: ask, question, agree, tag500, 
+    - what might  student do going forward to make sure that we are looking for what the question is asking :: search, ask, question, 
+    - that's totally a great strategy for student :: tag500
+    - look over student answer one more time and then make sure it answers matches the question and you'll be good to go :: search, expand, ask, agree, tag500, 
+    - how did you get from student first answer to student second answer how did student thinking change :: ask, question, tag500, 
+    - how can you how can you see what the question is asking so that you understand what answer to give other than just putting more words down :: text, search, expand, ask, question, learn, 
+    - studenttook little parts of the world to lunar orbit to draw a conclusion from that so we're really looking for small details here :: space, search, evidence, tag500
+    - it's important to think about those keywords and it can also be helpful to create our sentence but i wouldn't say that it necessarily has to be in student response :: text, search, ask, question, tell, tag500, 
+    - before our conversation i thought that the answer was this or i didn't know the answer or i was still confused or just before our conversation this is what i thought and then after the conversation that we just had now i think :: talk, question, 
+    - we can read the text for specific pieces of equipment then that way when we write our answers out text, tool, search, action, question, evidence,  tagmeta
+    - tell me what paragraph you found that in student be able to point to that exact part of the text :: tool, text, 
+    - we can read the text for specific pieces of equipment then that way when we write our answers out if i ever asked you can you tell me what paragraph you found that in student be able to point to that exact part of the text :: text, tool, search, action, question, evidence,  tagmeta
+    - so i think student you did just that when you just re read that beginning of paragraph two :: text, action, question, tag500, 
+    - has our thinking kind of changed at all since we started talking through this student sorry i saw student hand was up :: tell, evidence, tag500
+    - that's a strategy you can use in response questions :: tool, ask, agree, evidence, tag500,  
+    - hi welcome back from lunch so we'll just pick up from where we left it student as we talked about earlier in the day maybe in the future you can use specifying techniques in student responses :: search, tag500, tagmeta
+    - this strategy is correct to locate the keywords in the question and you find them in the text :: search, ask, agree, tag500, 
+    - next time be sure to look for student information or student answer in the text :: evidence, search, ask, question, tag500, 

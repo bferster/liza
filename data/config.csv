@@ -4,7 +4,7 @@ student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,ability=.5,color=
 student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=female,ability=.5,color=#9b4286,"
 student,Oliver,"oliver,liver","sex=male,ability=.5,color=#734325,"
 student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
-student,Class,"all,everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
+student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
 resource,Teacher prep,assets/prep.pdf
 resource,Student facing,assets/student.pdf
 resource,Strategy supports,assets/supports.pdf
@@ -49,7 +49,7 @@ keyword,ask,"asking,inquire,inquiring,inquires,request,requests,grill,question,q
 keyword,question,"who,what,why,when,how,which,caused",
 keyword,science,"scientist,scientists,astronaut,astronauts,scientific,microscopic,breathe,broken,hydrogen,oxygen,ice,deposit,deposits,water,aviation,geology",
 keyword,tell,"say,said,saying,talk,talking,told,relater,related",
-keyword,agree,"yes,ok,okay,right,concur,admit,concede,correct,true,accurate,great,cool,yeah,yup,yep,good,same,sense,possible",
+keyword,agree,"yes,ok,okay,right,concur,admit,concede,correct,true,accurate,great,cool,yeah,yup,yep,good,same,possible",
 keyword,disagree,"no,differ,clash,wrong,incorrect,false,inaccurate,faulty,flawed.mistaken,error,erroneous,bad,different,impossible,anywhere,nowhere",
 keyword,learn,"learn,learning,learned,memorize,master,determine,study,grasp,understand,understanding,study,studied,experience,experienced,train,trained,arrive",
 keyword,evidence,"exact,exactly,specific,specifically,detail,details,evidence,example,examples,clue,clues,case,illustration,archetype,exemplar,kind,data,datum,information,sign,indication,symptom,demonstration,proof,indication,giveaway",
