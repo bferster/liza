@@ -110,9 +110,10 @@
 			o.text=nlp.CleanText(o.text);															// Clean text
 			if (!o.intent)	continue;																// Skip no intents
 			if (o.speaker == "Teacher") {															// A remark
-				if (o.clean_intent <= 0)			{ rawData.splice(i,1); continue;	}			// Remove bad remark
-				if (o.clean_intent == 1)			o.text=nlp.CleanText(o.clean_text);				// Get cleaned text			
-				if (o.clean_intent == 2)			o.text=nlp.CleanText(o.revised);				// Get revised text			
+				if (!o.clean_intent)				o.text=nlp.CleanText(o.text);					// No flag set
+				else if (o.clean_intent <= 0)		{ rawData.splice(i,1); continue; }				// Remove bad remark
+				else if (o.clean_intent == 1)		o.text=nlp.CleanText(o.clean_text);				// Get cleaned text			
+				else if (o.clean_intent == 2)		o.text=nlp.CleanText(o.revised);				// Get revised text			
 				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
 				++nRemarks;																			// Add to count											
 				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
@@ -273,7 +274,7 @@
 			if (s.match(re)) tags.push(nlp.keyTags[k]);												// Add tag
 			}																				
 		tags=[... new Set(tags)];																	// Make unique
-		for (i=4;i<=levels.length;++i) {															// For each level
+		for (i=1;i<=levels.length;++i) {															// For each level
 			for (j=0;j<uvocab["r"+i*100].length;++j) {												// For each unique vocab word
 				re=new RegExp("\\b"+uvocab["r"+i*100][j]+"\\b","i");								// Make regex
 				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
@@ -315,11 +316,10 @@ return "";																					// No previous response
 		let level=$("#lz-series").val();															// Level of intents
 		let num=$("#lz-num").val();																	// Max per intent
 		
-		ints["bot_challenge"]=[]; 	ints["why"]=[];	  ints["addition"]=[]; 							// Built-ins
+		ints["bot_challenge"]=[]; 	 ints["addition"]=[]; 											// Built-ins
 		ints["bot_challenge"].push("    - are you a bot?"); ints["bot_challenge"].push("    - are you human?");
 		ints["bot_challenge"].push("    - am I talking to a bot?"); ints["bot_challenge"].push("    - am I talking to a human?");
 		ints["addition"].push("    - what is 2+2?"); ints["addition"].push("    - what does 2+2 equal?"); ints["addition"].push("    - what does 2+2 make?"); 
-		ints["why"].push("    - why do you say that?"); ints["why"].push("    - how did you know?"); ints["why"].push("    - how did you come up with that?");
 		
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
@@ -327,7 +327,6 @@ return "";																					// No previous response
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
 			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
 			else							id=Math.floor(o.intent/100)*100;						// Cap at 100s
-//			if ((id > 100) && (id < 150))	id=100;													// Cap 100-150 to 100
 			
 			sid="session-"+o.rerid;																	// Session id
 			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder
@@ -352,15 +351,17 @@ return "";																					// No previous response
 		}
 
 		for (k in ints)	ints[k]=[... new Set(ints[k])];												// Make unique																		// For each intent
-
 		let str="version: \"2.0\"\n\nnlu:\n";														// NLU header
-		let str2=str;
-		for (k in ints)	{																			// For each intent
-			tot=Math.floor(Math.min(num,ints[k].length)*(1-test));									// Get training
-			inc=Math.max(tot/num,1);																// Sampling increment, at least 1
+		let v=[],j,str2=str;		
+		for (k in ints)	v.push(k);																	// Make normal array of intents
+		v=v.sort();																					// Sort them
+		for (j=0;j<v.length;++j)	{																// For each intent
+			k=v[j];																					// intern name
+			tot=Math.floor(Math.min(num,ints[k].length)*(1-test));									// Get amount to train
+			inc=Math.max(ints[k].length/num,1);														// Sampling increment, at least 1
 			str+="- intent: "+k+"\n  examples: |\n";												// Add header
 			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
-			for (i=0;i<tot;i+=inc) {																// For each one wanted
+			for (i=0;i<tot*inc;i+=inc) {															// For each one wanted
 				ss=ints[k][Math.floor(i)];															// Get it
 				str+=AddIntentTags(ss)+"\n";														// Add intent tags
 				}

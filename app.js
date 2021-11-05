@@ -178,12 +178,6 @@ class App  {
 			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
 			return r[i];
 			}
-		else if (data.intent.name == "why") {
-			r=["I added them on my fingers", "Because I know how to add"]; 
-			i=Math.floor(Math.random()*r.length);
-			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
-			return r[i];
-			}
 		else if (data.intent.name == "bot_challenge") {
 			r[0]="I am Lysa your AI assistant";
 			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[0]);	// Send response
