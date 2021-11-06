@@ -293,7 +293,7 @@
 
 	function FindPreviousResponse(ind)															// GET PREVIOUS STUDENT RESPONSE
 	{
-return "";																					// No previous response
+		return "";																					// No previous response
 		let s,k,re,keys=[];
 		while (--ind >= 0) 	{																		// Search backward
 			if (rawData[ind].speaker != "Teacher") {												// If not a teacher
@@ -305,7 +305,7 @@ return "";																					// No previous response
 				return nlp.CleanText(rawData[ind].text,4)+" "+keys.join(" ")+" ";					// If keys, return them
 				}
 			}
-		}
+	}
 
 	function MakeStories(mask)																	// MAKE ALL FILES
 	{
