@@ -332,7 +332,7 @@
 			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder
 			if (o.speaker == "Teacher") {															// If remark
 				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
-				if (id < 300)	continue;															// Skip if uncoded
+				if (id < 100)	continue;															// Skip if uncoded
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
@@ -361,6 +361,7 @@
 			inc=Math.max(ints[k].length/num,1);														// Sampling increment, at least 1
 			str+="- intent: "+k+"\n  examples: |\n";												// Add header
 			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
+			if (k.substr(1) < 300)	tot=Math.min(num,ints[k].length),inc=1;							// Use only 1st 500 of 100s/200s
 			for (i=0;i<tot*inc;i+=inc) {															// For each one wanted
 				ss=ints[k][Math.floor(i)];															// Get it
 				str+=AddIntentTags(ss)+"\n";														// Add intent tags
