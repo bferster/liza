@@ -274,7 +274,7 @@
 			if (s.match(re)) tags.push(nlp.keyTags[k]);												// Add tag
 			}																				
 		tags=[... new Set(tags)];																	// Make unique
-		for (i=1;i<=levels.length;++i) {															// For each level
+		for (i=4;i<=levels.length;++i) {															// For each level
 			for (j=0;j<uvocab["r"+i*100].length;++j) {												// For each unique vocab word
 				re=new RegExp("\\b"+uvocab["r"+i*100][j]+"\\b","i");								// Make regex
 				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
@@ -361,7 +361,6 @@
 			inc=Math.max(ints[k].length/num,1);														// Sampling increment, at least 1
 			str+="- intent: "+k+"\n  examples: |\n";												// Add header
 			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
-			if (k.substr(1) < 300)	tot=Math.min(num,ints[k].length),inc=1;							// Use only 1st 500 of 100s/200s
 			for (i=0;i<tot*inc;i+=inc) {															// For each one wanted
 				ss=ints[k][Math.floor(i)];															// Get it
 				str+=AddIntentTags(ss)+"\n";														// Add intent tags
