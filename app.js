@@ -321,7 +321,7 @@ class App  {
 		this.seqs["twistLeft"]="twistLeft,1";	this.seqs["twistRight"]="twistRight,1";
 
 		for (i=0;i<10;++i)																			// For each desk
-			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:0xdddddd} );	// Add desk
+			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/deskskin.png" : 0xdddddd} );	// Add desk
 		this.LoadModels();										  									// Load 3D models
 		if (this.role != "Teacher")	this.rp.Draw();													// Show response menu if not teacher
 	}
