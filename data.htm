@@ -338,8 +338,8 @@
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
 				ss=MakeNluLine(FindPreviousResponse(i)+o.text);										// Get clean text
 				who=nlp.GetWho(o.text);																// Get who
-				if (o.intent) ints[id].push("    - "+ss.trim());									// If coded, add it
-				}
+				ints[id].push("    - "+ss.trim());													// Add it
+				} 
 			else{																					// Response
 				rType="agree";
 				if (isNaN(id)) {																	// Ignore numbered responses for now
