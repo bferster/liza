@@ -63,7 +63,7 @@ class Scene {
 		light.position.set(0,0,1);																	// Set angle
 		this.scene.add(light);																		// Add directioal light
 		this.scene.add(new THREE.AmbientLight(0xffffff, 1));										// Add ambient light
-		this.outliner=new THREE.OutlineEffect(this.renderer, { /*defaultThickness:.0035 */ });		// Add outliner
+		this.outliner=new THREE.OutlineEffect(this.renderer, { defaultThickness:.0015  });		// Add outliner
 	}
 
 	Resize()																					// RESIZE 3D SPACE
@@ -429,8 +429,8 @@ class Scene {
 			}
 		
 		var jaw=[0,0,0,1,2,3,4,3,2,4,4,3,2,1,1,1,1,2,3,4,3,3,2,2,1,1,0,0,0,0]
-		if (app.voice.talking == 1)	{																// If student talking
-			let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
+		if (app.voice.talking) {																	// If student talking
+			let snum=app.curStudent ? app.students.find(x => x.id == app.voice.talking).seat : 0;	// Get seat number
 			app.sc.SetBone(app.students[snum].id,"mouth",jaw[app.sc.aniTimer%(jaw.length-1)]*2,0,0); // Animate mouth
 			}
 		for (i=0;i<app.students.length;++i)															// For each student

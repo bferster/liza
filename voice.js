@@ -83,13 +83,13 @@ class Voice {
 			return;
 			}
 		try{																							// Try
+			if (who != "Teacher") 		this.talking=who;												// Trigger mouth animation if a student
 			speechSynthesis.cancel();																	// Clear current speech queue			
 			if (app.inSim) this.StopListening();														// Stop listening
 			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice
 			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex
 			if (who == "male")			this.tts.voice=this.voices[this.maleVoice];						// Set male voice
 			else if (who == "female") 	this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
-			if (who != "Teacher") 		this.talking=1;													// Trigger mouth animation if a student
 			this.tts.text=text;																			// Set text
 			speechSynthesis.speak(this.tts);															// Speak
 			}
