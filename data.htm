@@ -80,6 +80,7 @@
 	function LoadConfig(dataset="Newdata")														// LOAD CONFIG FILE
 	{	
 		let i;
+		rawData=[]; intents=[]; keyWords=[]; vocab=[]; uvocab=[];									// Reset
 		fetch('data/config.csv')																	// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
@@ -332,7 +333,7 @@
 			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder
 			if (o.speaker == "Teacher") {															// If remark
 				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
-				if (id < 300)	continue;															// Skip if uncoded
+				if (id < 100)	continue;															// Skip if uncoded
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
