@@ -179,7 +179,7 @@ class App  {
 			return r[i];
 			}
 		else if (data.intent.name == "bot_challenge") {
-			r[0]="I am Lysa your AI assistant";
+			r[0]="I am Grace your AI assistant";
 			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[0]);	// Send response
 			return r[0];
 			}
