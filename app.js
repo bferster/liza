@@ -96,7 +96,7 @@ class App  {
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		let seatNum=this.students.length;															// Get seat
-		let o={ fidget:0, s:15, seat:seatNum, src:"assets/body.dae" };								// Basic info
+		let o={ fidget:0, s:15, seat:seatNum, src:"assets/body2.dae" };								// Basic info
 		o.id=d.id;																					// Name
 		o.sex=d.data.match(/sex=(.+?)\W/)[1];														// Get sex
 		o.color=d.data.match(/color=(.+?)\W/)[1];													// Get color
