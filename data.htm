@@ -427,7 +427,33 @@
 
 	async function MakeSession()																// CREATE SESSION FILE
 	{
-		let i,t,s,o,newint,session=[],texts=[],intents=[],startTime=0;
+		
+		let i=0,o,n=rawData.length,data=[];
+		let speaker,remark="",response="",intent,student;
+		while (i < n) {																				// For each item
+			o=rawData[i++];																			// Point at line
+			if (o.speaker == "Teacher") {															// If a teacher
+				remark+=o.text+" ";																	// Add remark
+				intent=o.intent ? o.intent : intent													// Set last intent
+				}				
+			else{																					// A student
+				--i;
+				while (i < n) {																		// Collect all responses
+					o=rawData[i];																	// Point at line
+					if (o.speaker == "Teacher") break;												// Quit at next remark
+					response+=o.text+" ",student=o.speaker;											// Add response and set last student
+					++i;																			// Advance
+					}
+				data.push({ intent:intent,student:student,code:"",remark:remark,response:response} );	// Add to data
+				remark=response="";
+				}
+			}
+		let fields=["intent","student","code","remark","response"];									// Field names
+		let str=Papa.unparse(data,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
+		SaveTextAsFile("responses.csv",str);														// Write file
+		Sound("ding");																				// Sound
+/*
+		let i,o,s,newint,session=[],texts=[],intents=[],startTime=0;
 		let fields=["scene","actor","intent","calc","ok","time","text"];							// Field names
 		let sessId=$("#lz-session").val().split("-")[0];											// Session to add
 		LoadingIcon(true);																			// Show loading icon
@@ -458,6 +484,7 @@
 			Sound("ding");																			// Sound
 			}
 		fetchAll(texts);																			// Get all intents
+*/
 	}
 
 	function GetResponse(msg)																	// GET RESPONSE FROM AI
