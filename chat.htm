@@ -45,7 +45,7 @@
 
 	</style>
 	<body>
-		<input type="file" id="lz-tempFile" accept=".txt" style="display:none">
+		<input type="file" id="lz-tempFile" accept=".csv" style="display:none">
 		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
 		&nbsp; &nbsp;<span id="lz-stats"></span>
 	<script>
@@ -63,14 +63,72 @@ class App {
 		this.curKeys=[];																			// Currently active keys
 		this.keywords=[];																			// Keywords
 		this.responses=[];																			// Responses
+		this.rescodes=[];																			// Response codes
 		this.chat=new Chat();																		// Alloc chat
 		this.LoadConfig();																			// Load config file
 		this.nlp=new NLP();																			// Load NLP
 		this.hasDots=true;																			// Trained with dots
+		this.curRes=0;																				// Response counter
 		}
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
 	{	
+		let i=1,file=e.target.files[0];																// Point at file
+		if (!file) 	return;																			// Quit if bad
+		let reader=new FileReader();																// Init reader
+		reader.readAsText(file);																	// Read file
+		reader.onload=(e)=>{ 																		// When loaded
+			this.responses=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			let k,str="<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center''>";
+			str+="<div id='rescode' style='font-size:16px;font-weight:bold'></div>";
+			str+="<div id='lastres' class='co-bs' style='float:left'>Previous</div>";
+			str+="<div id='nextres' class='co-bs' style='float:right'>Next</div><br><br><br>";
+			for (k in app.rescodes) {																// For each genre
+				str+=MakeSelect("rcode-"+k, false, app.rescodes[k]);								// Add select
+				if (!(i++%3)) str+= "<br>";															// Line break
+				}
+			str+="<br><br><div id='saveres' class='co-bs'>Save</div><br><br>";						// Save
+			$("#codingDiv").append(str+"</div>")
+			showRes();
+			Sound("ding");																			// Ding
+			
+			$("#nextres").on("click",()=>{															// ON NEXT
+				app.curRes=Math.min(app.curRes+1,app.responses.length);								// Advance
+				showRes();																			// Show it
+				});
+
+			$("#lastres").on("click",()=>{															// ON PREVIOUS
+				app.curRes=Math.max(app.curRes-1,0);												// Back
+				showRes();																			// Show it
+				});
+
+			$("[id^=rcode-]").on("click",(e)=>{														// ON CHANGE
+				let k=e.target.id.substr(6);														// Get genre
+				app.responses[app.curRes].code=k+"-"+$("#rcode-"+k).val();							// Set new code					
+				$("#rcode-"+k).val(k);																// Reset
+				showRes();																			// Show it
+				});
+
+			$("#saveres").on("click",()=>{															// ON SAVE
+				let fields=["intent","student","code","remark","response"];							// Field names
+				str=Papa.unparse(app.responses,{ header:true, skipEmptyLines:true, columns:fields }); // Make CSV using lib
+		 		app.SaveTextAsFile("responses.csv",str);											// Write file
+				Sound("ding");																		// Ding
+				});
+
+			function showRes() {																	// SHOW RES IN  CHAT WINDOW
+				$("#co-textDiv").html("<div class='co-textS'>"+app.responses[app.curRes].remark+"</div>");	// Add remark
+				$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
+				$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
+				$("#co-textDiv").append("<div class='co-textR'>"+app.responses[app.curRes].response+"</div>");	// Add remark
+				$("#rescode").html(app.curRes+". "+app.responses[app.curRes].code);
+			}
+
+
+		};
+
+
+/*
 		let i,k,o,v,intent="";
 		let hundreds=0,tens=0,dots=0,n=0;															// Remarks counter
 		let file=e.target.files[0];																	// Point at file
@@ -122,7 +180,8 @@ class App {
 			$("#lz-stats").html(str.replace(/\t|\n|\r/g,""));										// Show stats
 			Sound("ding");																			// Ding
 			};
-		}
+*/
+	}
 
 	LoadConfig()																				// LOAD CONFIG FILE
 	{	
@@ -135,24 +194,9 @@ class App {
 				if (d[i].type == "student")     app.nlp.AddSyns("student",d[i].id, d[i].text.split(","));	// Add student synonyms
 					if (d[i].type == "action") 	app.nlp.AddSyns("action", d[i].id, d[i].text.split(",")); 	// Add action and its synonyms
 					if (d[i].type == "keyword") app.nlp.AddSyns("keyword", d[i].id, d[i].text.split(","));	// Add keywords
+					if (d[i].type == "rescode")	app.rescodes[d[i].id]=(d[i].id+","+d[i].text).split(",");	// Add rescodes
 					}
 				});
-	
-/*		fetch('data/100-responses.csv')																// Load file
-			.then(res => res.text())																// Get as text
-			.then(res =>{																			// Process																	
-				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
-				for (i=0;i<data.length;++i) {														// For each response
-					intent="r"+Math.floor(data[i].intent);											// Maken intent
-					if (!this.responses[intent]) this.responses[intent]=[];							// Create response intent entry
-						o={text:data[i].text.toLowerCase(), turn:data[i].turn, keywords:[]};		// Create response
-						let v=app.Tokenize(o.text);													// Tokenize incoming text	
-						for (k=0;k<v.length;++k) 													// For each word
-							if (this.keywords.includes(v[k])) o.keywords.push(v[k]);				// Add to list					
-						this.responses[intent].push(o);												// Add response to response intent array
-					}
-				});
-*/
 	}
 
 	SetKeywords(data)																			// PROCESS KEYWORDS																	
@@ -207,6 +251,24 @@ class App {
  		.then(response => response.json())
   		.then(data => console.log(data));		
 		}
+		
+	SaveTextAsFile(file, contents)																// SAVE TEXT TO LOCAL FILE
+	{
+		if (file.charAt(0) == "*") {																// If asking
+			GetTextBox("Type file name","", file.substr(1), (s)=>{ app.SaveTextAsFile(s, contents); });	// Ask for name
+			return;																					// Quit
+			}
+		var textFileAsBlob=new Blob([contents], {type:'text/plain'});
+		var downloadLink=document.createElement("a");
+		downloadLink.download=file;
+		downloadLink.innerHTML="Download File";
+		downloadLink.href=window.URL.createObjectURL(textFileAsBlob);
+	    downloadLink.onclick=()=>{ downloadLink.remove(); };
+		downloadLink.style.display="none";
+		downloadLink.id="tdll";
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+	}
 
 } // App class closure
 
@@ -246,7 +308,8 @@ class Chat {
 					<img id='co-talkBut'src='img/talkbut.png' style='vertical-align:-3px;margin-left:-22px;width:16px;cursor:pointer'>
 					<img id='co-revTextBut'src='img/sendtext.png' style='vertical-align:-7px;margin-left:12px;cursor:pointer'>
 					</div>	
-				</div>`;
+				</div>
+				<div id="codingDiv"></div>`;
 			$("body").append(str.replace(/\t|\n|\r/g,""));												// Add chatbox
 			
 			$("#co-revText").focus();																	// Focus on input
@@ -410,6 +473,27 @@ class Chat {
 			console.log(msg,p1);
 		else
 			console.log(msg);
+	}
+
+	function MakeSelect(id, multi, items, sel, extra, values)										// CREATE HTML SELECT
+	{
+		var	str="<select class='co-is' style='width:100px' id='"+id+"'";								// Header
+		str+=" data-lastselect='"+(sel ? sel : '')+"' ";												// Init last selected
+		if (multi)																						// Multi select
+			str+="multiple='multiple' size='"+multi+"'";												// Add flag
+		if (extra)																						// If extra param
+			str+=extra;																					// Add them
+		str+=">";																						// End header
+		for (i=0;i<items.length;++i) {																	// For each option
+			str+="<option";																				// Add tag
+			if (values && values[i]) {																	// If has a value
+				str+=" value='"+values[i]+"'";															// Add it
+				if (sel == values[i])	str+=" selected='selected'"										// If value selected, add tag
+				}
+			else if (sel == items[i])	str+=" selected='selected'"										// If name selected, add tag
+			str+=">"+items[i]+"</option>";																// End option
+			}	
+		return str+"</select>";																			// End select				
 	}
 
 	function GetTextBox(title, content, def, callback, x, y)										// GET TEXT LINE BOX

@@ -38,6 +38,12 @@ action,write,"write,right,rite",
 action,wave,"wave",
 action,read,"read,reed,red,re-read,reread",
 prompt,q1,"What equipment did scientists use to discover water on the moon?"
+rescode,reaction,"agree,disagree,confused,question"
+rescode,general,"offtopic,compliment,wait,greeting"
+rescode,academic,"tight,wrong,partial,understand"
+rescode,refer,"material,answer,student,teacher"
+rescode,clarify,"restate,explain,allude"
+rescode,prior,"family,read,media,visit"
 keyword,space,"nasa,base,sun,moon,rover,mars,land,earth,pole,ship,ships,lunar,orbiter,shuttle,tank,tanks,mask,masks,suit,crater,craters,spaceship,fuel,rocket,rockets",
 keyword,text,"story,sentence,sentences,prompt,paragraph,book,article,essay,passage,section,sections,word,words,headings,information,vocabulary",
 keyword,tool,"microscope,machine,machinery,equipment,gizmo,gadget,mechanism,device,utensil,binocular,binoculars",
