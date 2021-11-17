@@ -24,7 +24,7 @@ class Feedback {
 		$("#lz-feedbar").remove();																	// Remove old one
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point
 		if (o.object.name == "body") {																// If a student
-			app.curStudent=o.object.parent.name;													// Set name
+			app.curStudent=o.object.parent.parent.name;												// Set name (body2 is 2 deep)
 			app.fb.Draw(app.sessionData);															// Show feedback
 		}
 	}

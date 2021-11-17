@@ -417,3 +417,8 @@ class App  {
 	}
 
 } // App class closure
+
+/*
+Excited to be working on a classroom simulator for teachers with Harvard's Graduate School of Education. Teaching with Grace (née Liza) helps teachers practice critical teaching skills in a risk-free setting.
+https://www.youtube.com/embed/hTETYuGXFJU (4-mins)
+*/
