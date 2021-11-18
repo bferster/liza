@@ -444,11 +444,11 @@
 					response+=o.text+" ",student=o.speaker;											// Add response and set last student
 					++i;																			// Advance
 					}
-				data.push({ intent:intent,student:student,code:"",remark:remark,response:response} );	// Add to data
+				data.push({ id:o.id,intent:intent,student:student,code:"",remark:remark,response:response} );	// Add to data
 				remark=response="";
 				}
 			}
-		let fields=["intent","student","code","remark","response"];									// Field names
+		let fields=["id","intent","student","code","remark","response"];							// Field names
 		let str=Papa.unparse(data,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
 		SaveTextAsFile("responses.csv",str);														// Write file
 		Sound("ding");																				// Sound

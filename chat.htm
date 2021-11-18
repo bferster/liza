@@ -87,6 +87,7 @@ class App {
 				str+=MakeSelect("rcode-"+k, false, app.rescodes[k]);								// Add select
 				if (!(i++%3)) str+= "<br>";															// Line break
 				}
+			str+="<p><input id='addres' class='co-bs' placeholder='Type code' style='text-align:center;height:22px'></p>";			// Add
 			str+="<br><br><div id='saveres' class='co-bs'>Save</div><br><br>";						// Save
 			$("#codingDiv").append(str+"</div>")
 			showRes();
@@ -102,29 +103,33 @@ class App {
 				showRes();																			// Show it
 				});
 
-			$("[id^=rcode-]").on("click",(e)=>{														// ON CHANGE
+			$("[id^=rcode-]").on("change",(e)=>{													// ON CHANGE CODE
 				let k=e.target.id.substr(6);														// Get genre
 				app.responses[app.curRes].code=k+"-"+$("#rcode-"+k).val();							// Set new code					
 				$("#rcode-"+k).val(k);																// Reset
 				showRes();																			// Show it
 				});
 
+			$("#addres").on("change",(e)=>{															// ON ADD CODE
+				app.responses[app.curRes].code=$("#addres").val();									// Set new code					
+				$("#addres").val("");																// Reset
+				showRes();																			// Show it
+				});
+
 			$("#saveres").on("click",()=>{															// ON SAVE
-				let fields=["intent","student","code","remark","response"];							// Field names
+				let fields=["id","intent","student","code","remark","response"];					// Field names
 				str=Papa.unparse(app.responses,{ header:true, skipEmptyLines:true, columns:fields }); // Make CSV using lib
 		 		app.SaveTextAsFile("responses.csv",str);											// Write file
 				Sound("ding");																		// Ding
 				});
 
 			function showRes() {																	// SHOW RES IN  CHAT WINDOW
-				$("#co-textDiv").html("<div class='co-textS'>"+app.responses[app.curRes].remark+"</div>");	// Add remark
+				$("#co-textDiv").html("<div class='co-textS'><b>TEACHER: </b>"+app.responses[app.curRes].remark+"</div>");	// Add remark
 				$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
 				$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
-				$("#co-textDiv").append("<div class='co-textR'>"+app.responses[app.curRes].response+"</div>");	// Add remark
-				$("#rescode").html(app.curRes+". "+app.responses[app.curRes].code);
+				$("#co-textDiv").append("<div class='co-textR'><b>"+app.responses[app.curRes].student.toUpperCase()+": </b>"+app.responses[app.curRes].response+"</div>");	// Add remark
+				$("#rescode").html(app.responses[app.curRes].id+". "+app.responses[app.curRes].code);
 			}
-
-
 		};
 
 
