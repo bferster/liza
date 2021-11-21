@@ -40,12 +40,11 @@ class Feedback {
 			<div style="width:250px;margin:4px 0 0 16px;"> 
 				<b style="font-family:Chalk;font-size:48px">${app.curStudent}</b>
 				<table style="font-family:Segoe UI,Verdana,Geneva,sans-serif;font-size:13px">
-				<tr><td>Academic Language &nbsp;</td><td style="width:100px"><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td>Prior knowledge</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td>Use of evidence</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td>Careful thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td>Curious thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td colspan='2'><p class="lz-bs" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</p></td></tr>
+				<tr><td>Value/belonging</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
+				<tr><td>Academic language &nbsp;</td><td style="width:100px"><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
+				<tr><td>Evidence</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
+				<tr><td>Thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
+				<tr><td colspan='2'><br><div class="lz-bs" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</div></td></tr>
 				</table>
 			</div>
 			<div style="flex-grow:6">
