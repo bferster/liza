@@ -4,7 +4,7 @@
 	const fs = require('fs');
 	const WebSocket = require('ws');
 	const os = require("os");	
-	let local=os.hostname().match(/^bill/i);
+	let local=os.hostname().match(/^bill|desktop/i);
 
 
 
