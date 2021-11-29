@@ -120,10 +120,12 @@ class App  {
 			.then(res =>{ 																			// On loaded
 				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
 				this.responses=[];																	// Clear array
-				for (i=0;i<data.length;++i) {														// For each line
+				let n=data.length;
+				n=200;
+				for (i=0;i<n;++i) {														// For each line
 					o=data[i];																		// Point at item
-					if (!this.responses[o.speaker])	this.responses[o.speaker]=[];					// Alloc new array
-					this.responses[o.speaker].push({ text:o.text, intent:o.intent, keys:o.keys});	// Add line to speaker											
+					if (!this.responses[o.student])	this.responses[o.student]=[];					// Alloc new array
+					this.responses[o.student].push({ text:o.response, intent:o.intent});			// Add line to speaker											
 					}
 			this.InitClassroom();																	// Init classroom
 			});		
