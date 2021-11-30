@@ -100,6 +100,9 @@
 				rawData=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
 				GetKeyWords();																		// Get keywords
 				ParseData();																		// Parse data and show stats
+				fetch("data/vocab.json")															// Load vocab
+					.then(res => res.text())														// Get as text
+					.then(res => nlp.vocab=JSON.parse(res))											// Save vocab
 			});
 	}
 
@@ -169,7 +172,7 @@
 				if (!rawData[i].text)										continue;				// Nothing there
 				if (rawData[i].speaker != "Teacher") 						continue;				// Only teachers
 				if (Math.floor(Math.floor(rawData[i].intent/100)*100) != k) continue;				// Only this intent's 100s level
-				v=nlp.Tokenize(rawData[i].text);													// Tokenize line
+				v=nlp.Tokenize(rawData[i].text.toLowerCase());										// Tokenize line
 				for (j=0;j<v.length;++j)  if (v[j].length > 4) vocab["r"+k].push(v[j]);				// Add to key word list	
 				}
 			vocab["r"+k]=[... new Set(vocab["r"+k])];												// Make unique
@@ -252,47 +255,6 @@
 // OUTPUT 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	function MakeNluLine(s)																		// CLEAN TEXT FOR NLU INPUT
-	{
-		let i,who,keys=[];
-		s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`student`);								// You -> STUDENT entity
-		s=nlp.CleanText(s);																			// Clean text
-		for (k in nlp.keyWords) {																	// For each keyword
-			re=new RegExp("\\b"+k+"\\b","i");														// Make regex
-			if (s.match(re)) keys.push(nlp.keyWords[k]);											// Add regular tag
-			}																				
-		s.replace(/  /g," ")																		// Remove extra spaces
-		keys=[... new Set(keys)];																	// Make unique
-		if (keys.length) s+= " :: "+keys.join(", ");												// Add keys, if any
-		return s;																					// Return clean example
-	}
-
-	function AddIntentTags(s) 																	// ADD INTENT TAGS
-	{
-		let i,k,re,levs=[],tags=[];
-		let levels=["task","clarify","value","concern","meta"];										// Level labels
-		for (k in nlp.keyTags) {																	// For each keytag
-			re=new RegExp("\\b"+k+"\\b","i");														// Make regex
-			if (s.match(re)) tags.push(nlp.keyTags[k]);												// Add tag
-			}																				
-		tags=[... new Set(tags)];																	// Make unique
-		for (i=4;i<=levels.length;++i) {															// For each level
-			for (j=0;j<uvocab["r"+i*100].length;++j) {												// For each unique vocab word
-				re=new RegExp("\\b"+uvocab["r"+i*100][j]+"\\b","i");								// Make regex
-				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
-				}
-			}																				
-		if (levs.length) { 
-			levs.sort((a,b)=>{ return b-a }); 														// Top dog
-			tags.push("tag"+levels[levs[0]]);														// Add tags 
-			};  				
-		if (tags.length) {																			// Any tags?
-			s+=(s.match(/ :: /)) ? ", " :" :: ";													// Add header	 
-			s+=tags.join(", ");																		// Add tags, if any
-			}
-		return s;
-	}
-
 	function FindPreviousResponse(ind)															// GET PREVIOUS STUDENT RESPONSE
 	{
 		let s,k,re,keys=[];
@@ -338,7 +300,7 @@
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
-				ss=MakeNluLine(FindPreviousResponse(i)+o.text);										// Get clean text
+				ss=nlp.CleanRemark(FindPreviousResponse(i)+o.text);									// Get clean text
 				who=nlp.GetWho(o.text);																// Get who
 				ints[id].push("    - "+ss.trim());													// Add it
 				} 
@@ -365,11 +327,11 @@
 			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
 			for (i=0;i<tot*inc;i+=inc) {															// For each one wanted
 				ss=ints[k][Math.floor(i)];															// Get it
-				str+=AddIntentTags(ss)+"\n";														// Add intent tags
+				str+=nlp.AddIntentTags(ss,uvocab)+"\n";												// Add intent tags
 				}
 			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) {										// For each test example
 				ss=ints[k][Math.floor(i+tot)];														// Get it
-				str2+=AddIntentTags(ss)+"\n";														// Add intent tags
+				str2+=AddIntentTags(ss,uvocab)+"\n";												// Add intent tags
 				}
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
@@ -510,7 +472,7 @@
 					else if (csv[i][11] == "2") s=csv[i][13];										// Double correction
 					else						s=csv[i][10];										// No correction, use original
 					if (s.length < 4)			continue;											// Skip if too short
-					s=MakeNluLine(s);																// Make line	
+					s=nlp.CleanRemark(s);															// Make line	
 					d+="    - "+s+"\n";																// Add
 					}
 				}
