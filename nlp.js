@@ -85,48 +85,58 @@ class NLP {
 		return res.join(' ').trim();																	// Put text back together
 	}
 
-	CleanRemark(s)																				// CLEAN REMARK AND ADD KEYWORDS
+	CleanRemark(s)																					// CLEAN REMARK AND ADD KEYWORDS
 	{
 		let k,re,keys=[];
-		s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`student`);								// You -> STUDENT entity
-		s=nlp.CleanText(s);																			// Clean text
-		for (k in nlp.keyWords) {																	// For each keyword
-			re=new RegExp("\\b"+k+"\\b","i");														// Make regex
-			if (s.match(re)) keys.push(nlp.keyWords[k]);											// Add regular tag
+		s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`student`);									// You -> STUDENT entity
+		s=nlp.CleanText(s);																				// Clean text
+		for (k in nlp.keyWords) {																		// For each keyword
+			re=new RegExp("\\b"+k+"\\b","i");															// Make regex
+			if (s.match(re)) keys.push(nlp.keyWords[k]);												// Add regular tag
 			}																				
-		s.replace(/  /g," ")																		// Remove extra spaces
-		keys=[... new Set(keys)];																	// Make unique
-		if (keys.length) s+= " :: "+keys.join(", ");												// Add keys, if any
-		return s;																					// Return clean example
+		s.replace(/  /g," ")																			// Remove extra spaces
+		keys=[... new Set(keys)];																		// Make unique
+		if (keys.length) s+= " :: "+keys.join(", ");													// Add keys, if any
+		return s;																						// Return clean example
 	}
 
-	AddIntentTags(s) 																			// ADD INTENT TAGS
+	AddIntentTags(s) 																				// ADD INTENT TAGS
 	{
 		let i,j,k,re,levs=[],tags=[];
-		let levels=["task","clarify","value","concern","meta"];										// Level labels
-		for (k in this.keyTags) {																	// For each keytag
-			re=new RegExp("\\b"+k+"\\b","i");														// Make regex
-			if (s.match(re)) tags.push(this.keyTags[k]);											// Add tag
+		let levels=["task","clarify","value","concern","meta"];											// Level labels
+		for (k in this.keyTags) {																		// For each keytag
+			re=new RegExp("\\b"+k+"\\b","i");															// Make regex
+			if (s.match(re)) tags.push(this.keyTags[k]);												// Add tag
 			}																				
-		tags=[... new Set(tags)];																	// Make unique
-		for (i=4;i<=levels.length;++i) {															// For each level
-			for (j=0;j<this.vocab["r"+i*100].length;++j) {											// For each unique vocab word
-				re=new RegExp("\\b"+this.vocab["r"+i*100][j]+"\\b","i");							// Make regex
-				if (s.match(re)) levs.push(i-1);													// Add new entity(s)
+		tags=[... new Set(tags)];																		// Make unique
+		for (i=4;i<=levels.length;++i) {																// For each level
+			for (j=0;j<this.vocab["r"+i*100].length;++j) {												// For each unique vocab word
+				re=new RegExp("\\b"+this.vocab["r"+i*100][j]+"\\b","i");								// Make regex
+				if (s.match(re)) levs.push(i-1);														// Add new entity(s)
 				}
 			}																				
 		if (levs.length) { 
-			levs.sort((a,b)=>{ return b-a }); 														// Top dog
-			tags.push("tag"+levels[levs[0]]);														// Add tags 
+			levs.sort((a,b)=>{ return b-a }); 															// Top dog
+			tags.push("tag"+levels[levs[0]]);															// Add tags 
 			};  				
-		if (tags.length) {																			// Any tags?
-			s+=(s.match(/ :: /)) ? ", " :" :: ";													// Add header	 
-			s+=tags.join(", ");																		// Add tags, if any
+		if (tags.length) {																				// Any tags?
+			s+=(s.match(/ :: /)) ? ", " :" :: ";														// Add header	 
+			s+=tags.join(", ");																			// Add tags, if any
 			}
 		return s;
 	}
 
-
+	GetResponseTags(s)																				// GET RESPONSE KEYWORDS
+	{
+		let k,re,keys=[];
+		s=nlp.CleanText(s,0);																			// Clean
+		for (k in nlp.keyWords) {																		// For each keyword
+			re=new RegExp("\\b"+k+"\\b","i");															// Make regex
+			if (s.match(re)) keys.push(nlp.keyWords[k]+"_res");											// Add key
+			}
+		keys=[... new Set(keys)];																		// Make unique
+		return keys.join(" ")+" ";																		// Return keys
+	}
 
 	Compare(textA, textB)																			// HOW SIMILAR TWO STRINGS ARE
 	{

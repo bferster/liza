@@ -81,7 +81,7 @@
 	function LoadConfig(dataset="Newdata")														// LOAD CONFIG FILE
 	{	
 		let i;
-		rawData=[]; intents=[]; keyWords=[]; vocab=[]; uvocab=[];									// Reset
+		rawData=[]; intents=[]; keyWords=[]; vocab=[];												// Reset
 		fetch('data/config.csv')																	// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
@@ -257,16 +257,9 @@
 
 	function FindPreviousResponse(ind)															// GET PREVIOUS STUDENT RESPONSE
 	{
-		let s,k,re,keys=[];
-		while (--ind >= 0) 	{																		// Search backward
-			if (rawData[ind].speaker != "Teacher") {												// If not a teacher
-				s=nlp.CleanText(rawData[ind].text,0);												// Clean
-				for (k in nlp.keyWords) {															// For each keyword
-					re=new RegExp("\\b"+k+"\\b","i");												// Make regex
-					if (s.match(re)) keys.push(nlp.keyWords[k]+"_res");								// Add key
-					}
-				return /*nlp.CleanText(rawData[ind].text,4)+*/" "+keys.join(" ")+" ";				// If keys, return them
-				}
+		while (--ind >= 0) {																		// Search backwards
+			if (rawData[ind].speaker != "Teacher") 													// If not a teacher
+				return nlp.GetResponseTags(rawData[ind].text);										// Return keywords				
 			}
 		return "";																					// No previous response
 	}
@@ -327,11 +320,11 @@
 			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
 			for (i=0;i<tot*inc;i+=inc) {															// For each one wanted
 				ss=ints[k][Math.floor(i)];															// Get it
-				str+=nlp.AddIntentTags(ss,uvocab)+"\n";												// Add intent tags
+				str+=nlp.AddIntentTags(ss)+"\n";													// Add intent tags
 				}
 			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) {										// For each test example
 				ss=ints[k][Math.floor(i+tot)];														// Get it
-				str2+=AddIntentTags(ss,uvocab)+"\n";												// Add intent tags
+				str2+=nlp.AddIntentTags(s)+"\n";													// Add intent tags
 				}
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
