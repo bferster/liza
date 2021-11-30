@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Liza chat</title>
-		<link REL="SHORTCUT ICON" HREF=img/favicon.ico">
 		<meta charset="utf-8">
+		<title>Liza chat</title>
+		<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="lib/papaparse.min.js"></script>
@@ -78,18 +78,20 @@ class App {
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
-			this.responses=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			this.sres=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
 			let k,str="<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center''>";
-			str+="<div id='rescode' style='font-size:16px;font-weight:bold'></div>";
 			str+="<div id='lastres' class='co-bs' style='float:left'>Previous</div>";
-			str+="<div id='nextres' class='co-bs' style='float:right'>Next</div><br><br><br>";
-			for (k in app.rescodes) {																// For each genre
+			str+="<div id='nextres' class='co-bs' style='float:right'>Next</div><br>";
+			str+="<p id='rescode'   style='font-size:20px'></p>";
+			str+="<div id='oldres'  style='font-size:14px'></div>";
+
+/*			for (k in app.rescodes) {																// For each genre
 				str+=MakeSelect("rcode-"+k, false, app.rescodes[k]);								// Add select
 				if (!(i++%3)) str+= "<br>";															// Line break
 				}
 			str+="<p><input id='addres' class='co-bs' placeholder='Type code' style='text-align:center;height:22px'></p>";			// Add
 			str+="<br><br><div id='saveres' class='co-bs'>Save</div><br><br>";						// Save
-			$("#codingDiv").append(str+"</div>")
+*/			$("#codingDiv").append(str+"</div>")
 			showRes();
 			Sound("ding");																			// Ding
 			
@@ -128,7 +130,13 @@ class App {
 				$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
 				$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 				$("#co-textDiv").append("<div class='co-textR'><b>"+app.responses[app.curRes].student.toUpperCase()+": </b>"+app.responses[app.curRes].response+"</div>");	// Add remark
-				$("#rescode").html(app.responses[app.curRes].id+". "+app.responses[app.curRes].code);
+				app.chat.GetResponse(app.responses[app.curRes].remark, app.responses[app.curRes].intent, (res, id)=>{
+					let str="<b>Original response to #"+app.responses[app.curRes].id+"</b>:<br><i>"+app.responses[app.curRes].response+"</i>";
+					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
+					$("#rescode").css("color",col);
+					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <i>vs. "+id+"</i>");
+					$("#oldres").html(str);
+					});
 			}
 		};
 
@@ -190,11 +198,11 @@ class App {
 
 	LoadConfig()																				// LOAD CONFIG FILE
 	{	
-		let i;
+		let i,d;
 		fetch('data/config.csv')																	// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
-				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
+				d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 						// Parse CSV using papa lib
 				for (i=0;i<d.length;++i) {															// For each line
 				if (d[i].type == "student")     app.nlp.AddSyns("student",d[i].id, d[i].text.split(","));	// Add student synonyms
 					if (d[i].type == "action") 	app.nlp.AddSyns("action", d[i].id, d[i].text.split(",")); 	// Add action and its synonyms
@@ -202,7 +210,14 @@ class App {
 					if (d[i].type == "rescode")	app.rescodes[d[i].id]=(d[i].id+","+d[i].text).split(",");	// Add rescodes
 					}
 				});
-	}
+			fetch('data/responses.csv')																// Load file
+				.then(res => res.text())															// Get as text
+				.then(res =>{																		// Process																	
+					this.responses=[];																// Null array
+					d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
+					for (i=0;i<d.length;++i) if (d[i].student == "Chris") this.responses.push(d[i]); // Add if Chris
+				});
+			}
 
 	SetKeywords(data)																			// PROCESS KEYWORDS																	
 	{
