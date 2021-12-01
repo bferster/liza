@@ -1,18 +1,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // NLP 
+ 
 /////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 class NLP {																																										
 
 	constructor()   																				// CONSTRUCTOR
 	{
-		this.syns=[];																					// Synonyms
-		this.whoSyns=[];																				// Who synonyms
-		this.actSyns=[];																				// Action synonyms
-		this.keyWords=[];																				// Keywords
-		this.keyTags=[];																				// Keywors keyed to intents 
-		this.vocab=[];																					// Unique vocab by intent
+		this.syns=[];																					// Synonyms (loaded externally via config file)
+		this.whoSyns=[];																				// Who synonyms ("")
+		this.actSyns=[];																				// Action synonyms ("")
+		this.keyWords=[];																				// Keywords("")
+		this.keyTags=[];																				// Keywords keyed to intents ("")
+		this.vocab=[];																					// Unique vocab by intent ("")
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list
 			"yourself","yourselves","he","him","his","himself","she","her","hers","herself",
 			"it","its","it's","itself","they","them","their","theirs","themselves","this","that",
@@ -30,6 +33,11 @@ class NLP {
 	AddSyns(type, word, syns)																		// SET SYNONYMS ARRAY
 	{
 		let i;
+		if (type == "vocab") {																			// Vocab list
+			if (!this.vocab[word])	this.vocab[word]=[];												// Add holder
+			this.vocab[word].push(...syns);																// Add words
+			return;																						// Quit
+			}	
 		for (i=0;i<syns.length;++i) {																	// For each syn
 			if (type == "student")		this.whoSyns[syns[i]]=word;										// Add who
 			else if (type == "action")	this.actSyns[syns[i]]=word;										// Add actions
@@ -85,22 +93,31 @@ class NLP {
 		return res.join(' ').trim();																	// Put text back together
 	}
 
-	CleanRemark(s)																					// CLEAN REMARK AND ADD KEYWORDS
+
+	CleanRemark(remark, response="")																	// CLEAN REMARK AND ADD TAGS & KEYWORDS
 	{
-		let k,re,keys=[];
-		s=s.replace(/\byour|you're|you've|yer|you'd\b/gi,`student`);									// You -> STUDENT entity
-		s=nlp.CleanText(s);																				// Clean text
-		for (k in nlp.keyWords) {																		// For each keyword
-			re=new RegExp("\\b"+k+"\\b","i");															// Make regex
-			if (s.match(re)) keys.push(nlp.keyWords[k]);												// Add regular tag
-			}																				
-		s.replace(/  /g," ")																			// Remove extra spaces
-		keys=[... new Set(keys)];																		// Make unique
-		if (keys.length) s+= " :: "+keys.join(", ");													// Add keys, if any
-		return s;																						// Return clean example
+		let str="";
+		remark=this.CleanText(remark);																	// Clean text
+		if (response) str+=this.GetResponseTags(response);												// Add previous responses keywords, if any
+		if (str) str+=" :: ";																			// Add separator
+		str+=remark;																					// Add remark
+		str+=" :: "+this.GetKeywords(remark);															// Add keywords
+		str+=this.GetIntentTags(remark);																// Add keywords															
+		return str.replace(/  /g," ")																	// Remove extra spaces and return
 	}
 
-	AddIntentTags(s) 																				// ADD INTENT TAGS
+	GetKeywords(s)																					//  ADD KEYWORDS
+	{
+		let k,re,keys=[];
+		for (k in this.keyWords) {																		// For each keyword
+			re=new RegExp("\\b"+k+"\\b","i");															// Make regex
+			if (s.match(re)) keys.push(this.keyWords[k]);												// Add regular tag
+			}																				
+		keys=[... new Set(keys)];																		// Make unique
+		return keys.join(", ");																			// Return keys, if any
+	}
+
+	GetIntentTags(s) 																				// ADD INTENT TAGS
 	{
 		let i,j,k,re,levs=[],tags=[];
 		let levels=["task","clarify","value","concern","meta"];											// Level labels
@@ -119,23 +136,19 @@ class NLP {
 			levs.sort((a,b)=>{ return b-a }); 															// Top dog
 			tags.push("tag"+levels[levs[0]]);															// Add tags 
 			};  				
-		if (tags.length) {																				// Any tags?
-			s+=(s.match(/ :: /)) ? ", " :" :: ";														// Add header	 
-			s+=tags.join(", ");																			// Add tags, if any
-			}
-		return s;
+		return " "+tags.join(", ");																		// Return intent tags
 	}
 
 	GetResponseTags(s)																				// GET RESPONSE KEYWORDS
 	{
 		let k,re,keys=[];
-		s=nlp.CleanText(s,0);																			// Clean
-		for (k in nlp.keyWords) {																		// For each keyword
+		s=this.CleanText(s,0);																			// Clean
+		for (k in this.keyWords) {																		// For each keyword
 			re=new RegExp("\\b"+k+"\\b","i");															// Make regex
-			if (s.match(re)) keys.push(nlp.keyWords[k]+"_res");											// Add key
+			if (s.match(re)) keys.push(this.keyWords[k]+"_r");											// Add key
 			}
 		keys=[... new Set(keys)];																		// Make unique
-		return keys.join(" ")+" ";																		// Return keys
+		return keys.join(" ");																			// Return keys
 	}
 
 	Compare(textA, textB)																			// HOW SIMILAR TWO STRINGS ARE

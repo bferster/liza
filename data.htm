@@ -87,7 +87,7 @@
 			.then(res =>{																			// Process																	
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
 				for (i=0;i<d.length;++i) 															// For each line
-					 nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 							// Add synonyms, keywords, keytags
+					 nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 							// Add synonyms, keywords, keytags, vocab
 				LoadRawData("data/"+dataset+".csv");												// Load raw data file
 			});
 		}
@@ -100,9 +100,6 @@
 				rawData=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
 				GetKeyWords();																		// Get keywords
 				ParseData();																		// Parse data and show stats
-				fetch("data/vocab.json")															// Load vocab
-					.then(res => res.text())														// Get as text
-					.then(res => nlp.vocab=JSON.parse(res))											// Save vocab
 			});
 	}
 
@@ -177,13 +174,14 @@
 				}
 			vocab["r"+k]=[... new Set(vocab["r"+k])];												// Make unique
 			}
+return;
 		uvocab=[];
 		uvocab["r500"]=vocab["r500"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r300"],...vocab["r400"]].includes(x));
 		uvocab["r400"]=vocab["r400"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r300"],...vocab["r500"]].includes(x));
 		uvocab["r300"]=vocab["r300"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r400"],...vocab["r500"]].includes(x));
 		uvocab["r200"]=vocab["r200"].filter(x => ![...vocab["r100"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
 		uvocab["r100"]=vocab["r100"].filter(x => ![...vocab["r200"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
-	}
+		}
 	
 	function TestData(e)																		// TEST DATA
 	{	
@@ -259,7 +257,7 @@
 	{
 		while (--ind >= 0) {																		// Search backwards
 			if (rawData[ind].speaker != "Teacher") 													// If not a teacher
-				return nlp.GetResponseTags(rawData[ind].text);										// Return keywords				
+				return rawData[ind].text;															// Return previous response
 			}
 		return "";																					// No previous response
 	}
@@ -293,7 +291,7 @@
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
-				ss=nlp.CleanRemark(FindPreviousResponse(i)+o.text);									// Get clean text
+				ss=nlp.CleanRemark(o.text,FindPreviousResponse(i));									// Get clean text
 				who=nlp.GetWho(o.text);																// Get who
 				ints[id].push("    - "+ss.trim());													// Add it
 				} 
@@ -308,7 +306,7 @@
 		}
 
 		for (k in ints)	ints[k]=[... new Set(ints[k])];												// Make unique																		// For each intent
-		let str="version: \"2.0\"\n\nnlu:\n";														// NLU header
+		let str="version: \"3.0\"\n\nnlu:\n";														// NLU header
 		let v=[],j,str2=str;		
 		for (k in ints)	v.push(k);																	// Make normal array of intents
 		v=v.sort();																					// Sort them
@@ -318,19 +316,15 @@
 			inc=Math.max(ints[k].length/num,1);														// Sampling increment, at least 1
 			str+="- intent: "+k+"\n  examples: |\n";												// Add header
 			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
-			for (i=0;i<tot*inc;i+=inc) {															// For each one wanted
-				ss=ints[k][Math.floor(i)];															// Get it
-				str+=nlp.AddIntentTags(ss)+"\n";													// Add intent tags
-				}
-			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) {										// For each test example
-				ss=ints[k][Math.floor(i+tot)];														// Get it
-				str2+=nlp.AddIntentTags(s)+"\n";													// Add intent tags
-				}
+			for (i=0;i<tot*inc;i+=inc) 																// For each one wanted
+				str+=ints[k][Math.floor(i)]+"\n";													// Get it
+			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) 										// For each test example
+				str2+=ints[k][Math.floor(i+tot)]+"\n";												// Get it
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
 		if (mask&1 && (test > 0)) SaveTextAsFile("test-nlu.txt",str2);								// Write testing file
 
-		str="version: \"2.0\"\n\nstories:\n\n";														// STORIES header
+		str="version: \"3.0\"\n\nstories:\n\n";														// STORIES header
 		str+="- story: addition\n  steps:\n";														// Add story header
 		str+="  - intent: addition\n  - action: utter_addition\n  - intent: why\n\  - action: utter_why\n\n";	// Add steps											
 		str+="- story: time\n  steps:\n";														
@@ -356,7 +350,7 @@
 					}
 				}
 			}
-		str="version: \"2.0\"\n\nsession_config:\n";												// Domain header
+		str="version: \"3.0\"\n\nsession_config:\n";												// Domain header
 		str+="  session_expiration_time: 60\n  carry_over_slots_to_new_session: true\n\nintents:\n";
 		for (k in ints)	str+="  - "+k+"\n";															// Add intent
 		str+="\nresponses:\n";																		// Responses header	

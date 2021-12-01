@@ -130,7 +130,9 @@ class App {
 				$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
 				$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 				$("#co-textDiv").append("<div class='co-textR'><b>"+app.responses[app.curRes].student.toUpperCase()+": </b>"+app.responses[app.curRes].response+"</div>");	// Add remark
-				app.chat.GetResponse(app.responses[app.curRes].remark, app.responses[app.curRes].intent, (res, id)=>{
+				let s=app.nlp.CleanRemark(app.responses[app.curRes].remark);
+				trace(s)
+				app.chat.GetResponse(s, app.responses[app.curRes].intent, (res, id)=>{
 					let str="<b>Original response to #"+app.responses[app.curRes].id+"</b>:<br><i>"+app.responses[app.curRes].response+"</i>";
 					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
 					$("#rescode").css("color",col);
@@ -203,12 +205,8 @@ class App {
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
 				d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 						// Parse CSV using papa lib
-				for (i=0;i<d.length;++i) {															// For each line
-				if (d[i].type == "student")     app.nlp.AddSyns("student",d[i].id, d[i].text.split(","));	// Add student synonyms
-					if (d[i].type == "action") 	app.nlp.AddSyns("action", d[i].id, d[i].text.split(",")); 	// Add action and its synonyms
-					if (d[i].type == "keyword") app.nlp.AddSyns("keyword", d[i].id, d[i].text.split(","));	// Add keywords
-					if (d[i].type == "rescode")	app.rescodes[d[i].id]=(d[i].id+","+d[i].text).split(",");	// Add rescodes
-					}
+				for (i=0;i<d.length;++i) 															// For each line
+					 this.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 						// Add synonyms, keywords, keytags, vocab
 				});
 			fetch('data/responses.csv')																// Load file
 				.then(res => res.text())															// Get as text
