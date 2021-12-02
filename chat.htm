@@ -73,30 +73,26 @@ class App {
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
 	{	
-		let i=1,file=e.target.files[0];																// Point at file
+		let k,i=1,file=e.target.files[0];															// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
-			this.sres=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
-			let k,str="<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center''>";
-			str+="<div id='lastres' class='co-bs' style='float:left'>Previous</div>";
-			str+="<div id='nextres' class='co-bs' style='float:right'>Next</div><br>";
-			str+="<p id='rescode'   style='font-size:20px'></p>";
-			str+="<div id='oldres'  style='font-size:14px'></div>";
+		this.sres=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
 
-/*			for (k in app.rescodes) {																// For each genre
-				str+=MakeSelect("rcode-"+k, false, app.rescodes[k]);								// Add select
-				if (!(i++%3)) str+= "<br>";															// Line break
-				}
-			str+="<p><input id='addres' class='co-bs' placeholder='Type code' style='text-align:center;height:22px'></p>";			// Add
-			str+="<br><br><div id='saveres' class='co-bs'>Save</div><br><br>";						// Save
-*/			$("#codingDiv").append(str+"</div>")
-			showRes();
+		let str="<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center''>";
+		str+="<div id='lastres' class='co-bs' style='float:left'>Previous</div>";
+		str+="<div id='nextres' class='co-bs' style='float:right'>Next</div><br>";
+		str+="<p id='rescode'   style='font-size:20px'></p>";
+		str+="<div id='oldres'  style='font-size:14px'></div>";
+		$("#codingDiv").append(str+"</div>")
 			Sound("ding");																			// Ding
 			
 			$("#nextres").on("click",()=>{															// ON NEXT
-				app.curRes=Math.min(app.curRes+1,app.responses.length);								// Advance
+				let i,n=app.responses.length;
+				for (i=app.curRes+1;i<n;++i)														// Look for next
+					if (app.responses[i].intent > 300 && app.responses[i].remark)	break;			// If past 300, quit looking
+				app.curRes=Math.min(i,n);															// Set spot							
 				showRes();																			// Show it
 				});
 
@@ -131,71 +127,20 @@ class App {
 				$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 				$("#co-textDiv").append("<div class='co-textR'><b>"+app.responses[app.curRes].student.toUpperCase()+": </b>"+app.responses[app.curRes].response+"</div>");	// Add remark
 				let s=app.nlp.CleanRemark(app.responses[app.curRes].remark);
-				trace(s)
-				app.chat.GetResponse(s, app.responses[app.curRes].intent, (res, id)=>{
-					let str="<b>Original response to #"+app.responses[app.curRes].id+"</b>:<br><i>"+app.responses[app.curRes].response+"</i>";
+				let random=" "+app.nlp.vocab.r100[Math.floor(Math.random()*500)];
+				    random+=" "+app.nlp.vocab.r100[Math.floor(Math.random()*500)];
+				    random+=" "+app.nlp.vocab.r200[Math.floor(Math.random()*400)];
+			
+				app.chat.GetResponse(s+random, app.responses[app.curRes].intent, (res, id)=>{
+					let str="<b>Original response to id "+app.responses[app.curRes].id+"</b>:<br><i>"+app.responses[app.curRes].response+"</i>";
 					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
+//					if (id < 300)	col="#666";
 					$("#rescode").css("color",col);
-					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <i>vs. "+id+"</i>");
+					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <i>(coded as "+id+")</i>");
 					$("#oldres").html(str);
 					});
 			}
 		};
-
-
-/*
-		let i,k,o,v,intent="";
-		let hundreds=0,tens=0,dots=0,n=0;															// Remarks counter
-		let file=e.target.files[0];																	// Point at file
-		if (!file) 	return;																			// Quit if bad
-		let reader=new FileReader();																// Init reader
-		reader.readAsText(file);																	// Read file
-		reader.onload=(e)=>{ 																		// When loaded
-			
-			let nums=[]; nums["*100"]=0; nums["*200"]=0; nums["*300"]=0;	nums["*400"]=0;	nums["*500"]=0;	
-			let oks=[];  oks["*100"]=0; oks["*200"]=0;	oks["*300"]=0;	oks["*400"]=0;	oks["*500"]=0	;
-			let tots=[];
-			v=e.target.result.split("\n")
-			for (i=0;i<v.length;++i) {																// For each line
-				if (!v[i]) continue;
-				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
-				if (v[i].match(/^   /)) {
-					nums["*"+k]++;																	// Advance total count
-					app.chat.GetResponse(v[i].substr(5), k, (res, id)=>{
-						if (id == res.intent.name.substr(1))	oks["*"+id]++;
-						tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%";
-						tots["*200"]=oks["*200"]+"/"+nums["*200"]+"="+Math.floor(oks["*200"]/nums["*200"]*100)+"%";
-						tots["*300"]=oks["*300"]+"/"+nums["*300"]+"="+Math.floor(oks["*300"]/nums["*300"]*100)+"%";
-						tots["*400"]=oks["*400"]+"/"+nums["*400"]+"="+Math.floor(oks["*400"]/nums["*400"]*100)+"%";
-						tots["*500"]=oks["*500"]+"/"+nums["*500"]+"="+Math.floor(oks["*500"]/nums["*500"]*100)+"%";
-						trace(id, res.intent.name,res.text,tots)
-						})
-				}
-			}
-			return;
-	
-			this.csv=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
-			for (i=0;i<this.csv.length;++i) {														// For each line
-				for (k in this.csv[i]) if (!k)  delete this.csv[i][k];								// If empty field, delete it
-				if (this.csv[i].actor != "Teacher") {												// If a student response
-					if (i)	this.csv[i-1].response=this.csv[i].text;								// Add student response
-					this.csv.splice(i,1);															// Remove it
-					}
-				else{																				// Teacher remarks
-					++n;																			// Inc count
-					this.csv[i].response="";														// No respobse for teacher remaks
-					if (this.csv[i].code == this.csv[i].calc)								  ++dots;		// Pure match
-					if (Math.floor(this.csv[i].code) == Math.floor(this.csv[i].calc))		  ++tens;		// Tens match
-					if (Math.floor(this.csv[i].code/100) == Math.floor(this.csv[i].calc/100)) ++hundreds;	// Hundreds match
-					}
-				}
-			let str=`100s=${Math.round((hundreds/n)*100)}% | 
-					10s=${Math.round((tens/n)*100)}% | 
-					all=${Math.round((dots/n)*100)}%`;
-			$("#lz-stats").html(str.replace(/\t|\n|\r/g,""));										// Show stats
-			Sound("ding");																			// Ding
-			};
-*/
 	}
 
 	LoadConfig()																				// LOAD CONFIG FILE
@@ -212,8 +157,8 @@ class App {
 				.then(res => res.text())															// Get as text
 				.then(res =>{																		// Process																	
 					this.responses=[];																// Null array
-					d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
-					for (i=0;i<d.length;++i) if (d[i].student == "Chris") this.responses.push(d[i]); // Add if Chris
+					this.responses=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
+//					for (i=0;i<d.length;++i) if (d[i].student == "Chris") this.responses.push(d[i]); // Add if Chris
 				});
 			}
 

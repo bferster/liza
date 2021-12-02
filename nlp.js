@@ -94,7 +94,7 @@ class NLP {
 	}
 
 
-	CleanRemark(remark, response="")																	// CLEAN REMARK AND ADD TAGS & KEYWORDS
+	CleanRemark(remark, response="")																// CLEAN REMARK AND ADD TAGS & KEYWORDS
 	{
 		let str="";
 		remark=this.CleanText(remark);																	// Clean text

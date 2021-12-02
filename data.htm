@@ -105,20 +105,24 @@
 
 	function ParseData()																		// PARSE DATA AND SHOW DATA STATS
 	{
-		let i,o;
+		let i,o,kill;
 		let nRemarks=0, nResponses=0; 																// Counts
 		for (i=0;i<rawData.length;++i) {															// For each entry
+			kill=0;																					// Assume we keep it
 			o=rawData[i];																			// Point at line
+			if (!o.intent || (o.intent == 0))			kill=1;										// Cull no intent
+			if (o.intent < 180) 						kill=1;										// Cull intents 0-180
+			if ((o.intent > 181) && (o.intent < 250))	kill=1;										// Cull 181-300
+			if (kill) { rawData.splice(i,1);  continue;	}											// Remove it, if flagged
 			o.text=nlp.CleanText(o.text);															// Clean text
-			if (!o.intent)	continue;																// Skip no intents
 			if (o.speaker == "Teacher") {															// A remark
+				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
 				if (!o.clean_intent)				o.text=nlp.CleanText(o.text);					// No flag set
 				else if (o.clean_intent <= 0)		{ rawData.splice(i,1); continue; }				// Remove bad remark
 				else if (o.clean_intent == 1)		o.text=nlp.CleanText(o.clean_text);				// Get cleaned text			
 				else if (o.clean_intent == 2)		o.text=nlp.CleanText(o.revised);				// Get revised text			
-				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
 				++nRemarks;																			// Add to count											
-				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
+				if (!intents["r"+Math.floor(o.intent)]) {intents["r"+Math.floor(o.intent)]=[]; trace(o)}		// Create base intent holder
 				if (!intents["r"+o.intent]) intents["r"+o.intent]=[];								// Create full holder
 				intents["r"+Math.floor(o.intent)].push(i);											// Add base index
 				intents["r"+o.intent].push(i);														// Add full
@@ -217,6 +221,7 @@ return;
 //						str+=" | "+res.intent_ranking[2].name.substr(1);							// 3rd choice
 						str+=" | "+res.text;														// Text
 						report.push(str);															// Add to report
+						trace(tots);															// Show results
 						if (!--ins)	{																// If last
 							Sound("ding");															// Ding				
 							LoadingIcon(false);														// Show loading icon
@@ -271,10 +276,10 @@ return;
 		let level=$("#lz-series").val();															// Level of intents
 		let num=$("#lz-num").val();																	// Max per intent
 		
-		ints["bot_challenge"]=[]; 	 ints["addition"]=[]; 											// Built-ins
-		ints["bot_challenge"].push("    - are you a bot?"); ints["bot_challenge"].push("    - are you human?");
-		ints["bot_challenge"].push("    - am I talking to a bot?"); ints["bot_challenge"].push("    - am I talking to a human?");
-		ints["addition"].push("    - what is 2+2?"); ints["addition"].push("    - what does 2+2 equal?"); ints["addition"].push("    - what does 2+2 make?"); 
+//		ints["bot_challenge"]=[]; 	 ints["addition"]=[]; 											// Built-ins
+//		ints["bot_challenge"].push("    - are you a bot?"); ints["bot_challenge"].push("    - are you human?");
+//		ints["bot_challenge"].push("    - am I talking to a bot?"); ints["bot_challenge"].push("    - am I talking to a human?");
+//		ints["addition"].push("    - what is 2+2?"); ints["addition"].push("    - what does 2+2 equal?"); ints["addition"].push("    - what does 2+2 make?"); 
 		
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
@@ -287,7 +292,7 @@ return;
 			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder
 			if (o.speaker == "Teacher") {															// If remark
 				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
-				if (id < 300)	continue;															// Skip if uncoded
+				if (id < 100)	continue;															// Skip if uncoded
 				id="r"+id;																			// Prefix id
 				if (!ints[id]) ints[id]=[];															// Alloc intent holder
 				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
@@ -323,68 +328,19 @@ return;
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
 		if (mask&1 && (test > 0)) SaveTextAsFile("test-nlu.txt",str2);								// Write testing file
-
-		str="version: \"3.0\"\n\nstories:\n\n";														// STORIES header
-		str+="- story: addition\n  steps:\n";														// Add story header
-		str+="  - intent: addition\n  - action: utter_addition\n  - intent: why\n\  - action: utter_why\n\n";	// Add steps											
-		str+="- story: time\n  steps:\n";														
-		str+="  - intent: time\n  - action: time\n  - intent: why\n\  - action: utter_why\n\n";											
-		if (mask&2) SaveTextAsFile("stories.yml",str);												// Write file
-
-		for (k in sess)	{																			// For each session
-			c=0;																					// Reswt chunk counter
-			for (i=0;i<sess[k].length;++i) {														// For each event in session	
-				if (!(c%8)) str+="\n- story: "+k+"-"+c+"\n  steps:\n",c++;							// Add header
-				if (sess[k][i].match(/intent/)) {													// First intent
-					dupes=[];																		// Clear dupe storage
-					for (j=0;j<8;++j) {																// Look for last intent
-						if (sess[k][i+j] && !sess[k][i+j].match(/intent/)) break;					// Quit on action
-						if (sess[k][i+j])															// If valid
-							dupes.push({t:sess[k][i+j],i:sess[k][i+j].substr(13,5)});				// Add to dupe storage
-						}
-					dupes.sort((a,b)=>{ return b.i-a.i });											// Sort by biggest
-					str+=dupes[0] ? dupes[0].t : sess[k][i];										// Add intent
-					i+=j;																			// Skip ahead
-					if (sess[k][i]) str+=sess[k][i];												// Add action
-					++c;																			// Add to count
-					}
-				}
-			}
-		str="version: \"3.0\"\n\nsession_config:\n";												// Domain header
-		str+="  session_expiration_time: 60\n  carry_over_slots_to_new_session: true\n\nintents:\n";
-		for (k in ints)	str+="  - "+k+"\n";															// Add intent
-		str+="\nresponses:\n";																		// Responses header	
-		str+=`  utter_iamabot:\n  - text: "I am a bot, powered by LIZA."\n`;						// Bot response
-		str+=`  utter_addition:\n  - text: "The answer is 4."\n`;						
-		str+=`  - text: "Would you believe 22?"\n`;						
-		str+=`  - text: "I really don't care"\n`;						
-		str+=`  - text: "Would you believe 5?"\n`;
-		str+=`  utter_time:\n  - text: "Now is the time for all good men to come to the aid of their country."\n`;						
-		str+=`  - text: "Time to get going."\n`;						
-		str+=`  - text: "The time is now."\n`;						
-		str+=`  - text: "I don't know, but thanks for asking."\n`;						
-		str+=`  utter_why:\n  - text: "Because I know this stuff"\n`;
-		str+=`  - text: "I just guessed"\n`;
-
-		for (i=0;i<doms.length;++i) 	str+=doms[i];												// Add each remark in intent group
-		if (mask&4) SaveTextAsFile("domain.yml",str);												// Write file
-
-		let fields=["intent","speaker","type","turn","keys","text"];								// Field names
-		str=Papa.unparse(resps,{ header:true, skipEmptyLines:true, columns:fields });				// Make CSV using lib
-		if (mask&8) SaveTextAsFile("responses.csv",str);											// Write file
-		Sound("ding");																				// Sound
 	}
 
 	async function MakeSession()																// CREATE SESSION FILE
 	{
-		
 		let i=0,o,n=rawData.length,data=[];
 		let speaker,remark="",response="",intent,student;
 		while (i < n) {																				// For each item
 			o=rawData[i++];																			// Point at line
 			if (o.speaker == "Teacher") {															// If a teacher
-				remark=o.text+" ";																	// Add remark
-				intent=o.intent ? o.intent : intent													// Set last intent
+				if (!o.intent) continue;															// Skip uncodeds
+				if (o.intent < 300) continue;														// Skip low
+				remark+=o.text+" ";																	// Add remark
+				intent=o.intent;																	// Set last intent
 				}				
 			else{																					// A student
 				--i;
