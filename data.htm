@@ -113,7 +113,7 @@
 			if (!o.intent || (o.intent == 0))			kill=1;										// Cull no intent
 			if (o.intent < 180) 						kill=1;										// Cull intents 0-180
 			if ((o.intent > 181) && (o.intent < 250))	kill=1;										// Cull 181-300
-			if (kill) { rawData.splice(i,1);  continue;	}											// Remove it, if flagged
+//			if (kill) { rawData.splice(i,1);  continue;	}											// Remove it, if flagged
 			o.text=nlp.CleanText(o.text);															// Clean text
 			if (o.speaker == "Teacher") {															// A remark
 				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
@@ -122,7 +122,7 @@
 				else if (o.clean_intent == 1)		o.text=nlp.CleanText(o.clean_text);				// Get cleaned text			
 				else if (o.clean_intent == 2)		o.text=nlp.CleanText(o.revised);				// Get revised text			
 				++nRemarks;																			// Add to count											
-				if (!intents["r"+Math.floor(o.intent)]) {intents["r"+Math.floor(o.intent)]=[]; trace(o)}		// Create base intent holder
+				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
 				if (!intents["r"+o.intent]) intents["r"+o.intent]=[];								// Create full holder
 				intents["r"+Math.floor(o.intent)].push(i);											// Add base index
 				intents["r"+o.intent].push(i);														// Add full
@@ -283,7 +283,9 @@ return;
 		
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
+			if ((o.intent < 180) || ((o.intent > 181) && (o.intent < 250))) continue;				// Cull 181-300
 			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
+		trace(o.intent)
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
 			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
 			else							id=Math.floor(o.intent/100)*100;						// Cap at 100s
@@ -338,7 +340,6 @@ return;
 			o=rawData[i++];																			// Point at line
 			if (o.speaker == "Teacher") {															// If a teacher
 				if (!o.intent) continue;															// Skip uncodeds
-				if (o.intent < 300) continue;														// Skip low
 				remark+=o.text+" ";																	// Add remark
 				intent=o.intent;																	// Set last intent
 				}				
@@ -354,7 +355,7 @@ return;
 				remark=response="";
 				}
 			}
-		let fields=["id","intent","student","code","remark","response"];							// Field names
+		let fields=["id","intent","student","remark","response"];							// Field names
 		let str=Papa.unparse(data,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
 		SaveTextAsFile("responses.csv",str);														// Write file
 		Sound("ding");																				// Sound

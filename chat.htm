@@ -134,7 +134,7 @@ class App {
 				app.chat.GetResponse(s+random, app.responses[app.curRes].intent, (res, id)=>{
 					let str="<b>Original response to id "+app.responses[app.curRes].id+"</b>:<br><i>"+app.responses[app.curRes].response+"</i>";
 					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
-//					if (id < 300)	col="#666";
+					if (id < 300)	col="#666";
 					$("#rescode").css("color",col);
 					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <i>(coded as "+id+")</i>");
 					$("#oldres").html(str);
