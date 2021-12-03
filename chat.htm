@@ -73,13 +73,30 @@ class App {
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
 	{	
-		let k,i=1,file=e.target.files[0];															// Point at file
+		let k,d,i,o;
+		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
-		this.sres=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
-
+		d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
+		this.sres=[];																				// Fresh
+		for (i=0;i<d.length;++i) {																	// For each line
+			if (!d[i]["Student"])	continue;														// Skip if no student
+			o={};																					// Init object
+			k=d[i]["Student"].split(" ")[0];														// Getn first name
+			if (!this.sres[k]) this.sres[k]=[];														// Add base array
+			o.bakB=d[i]["Valued/Belonging (200/300"];												// Get factor
+			o.bakA=d[i]["Academic Language (400)"];													// Get factor
+			o.bakK=d[i]["Knowledge (400)"];															// Get factor
+			o.bakT=d[i]["Thinking (500)"];															// Get factor
+			o.bakU=d[i]["Understanding Level"];														// Get factor
+			o.text=d[i]["Response"];																// Get response
+			o.intent=d[i]["Type of Student Response"].substring(0,3);								// Get intent
+			o.type=d[i]["Type of Student Response"].substr(3);										// Get type
+			o.action=d[i]["Student Physical Action"];												// Get action
+			this.sres[k].push(o);																	// Add to list
+			}				
 		let str="<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center''>";
 		str+="<div id='lastres' class='co-bs' style='float:left'>Previous</div>";
 		str+="<div id='nextres' class='co-bs' style='float:right'>Next</div><br>";
@@ -87,7 +104,6 @@ class App {
 		str+="<div id='oldres'  style='font-size:14px'></div>";
 		$("#codingDiv").append(str+"</div>")
 			Sound("ding");																			// Ding
-			
 			$("#nextres").on("click",()=>{															// ON NEXT
 				let i,n=app.responses.length;
 				for (i=app.curRes+1;i<n;++i)														// Look for next
@@ -152,15 +168,15 @@ class App {
 				d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 						// Parse CSV using papa lib
 				for (i=0;i<d.length;++i) 															// For each line
 					 this.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 						// Add synonyms, keywords, keytags, vocab
-				});
-			fetch('data/responses.csv')																// Load file
-				.then(res => res.text())															// Get as text
-				.then(res =>{																		// Process																	
-					this.responses=[];																// Null array
-					this.responses=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papa lib
+			});
+		fetch('data/responses.csv')																	// Load file
+			.then(res => res.text())																// Get as text
+			.then(res =>{																			// Process																	
+				this.responses=[];																	// Null array
+				this.responses=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 			// Parse CSV using papa lib
 //					for (i=0;i<d.length;++i) if (d[i].student == "Chris") this.responses.push(d[i]); // Add if Chris
-				});
-			}
+			});
+		}
 
 	SetKeywords(data)																			// PROCESS KEYWORDS																	
 	{
