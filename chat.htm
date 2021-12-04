@@ -46,7 +46,7 @@
 	</style>
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv" style="display:none">
-		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
+		<div class="co-bs" id="lz-importData" style="margin:12px">Load responses</div>
 		&nbsp; &nbsp;<span id="lz-stats"></span>
 	<script>
 
@@ -62,7 +62,7 @@ class App {
 		this.curWho="Class";																		// Person being addressed
 		this.curKeys=[];																			// Currently active keys
 		this.keywords=[];																			// Keywords
-		this.responses=[];																			// Responses
+		this.session=[];																			// session
 		this.rescodes=[];																			// Response codes
 		this.chat=new Chat();																		// Alloc chat
 		this.LoadConfig();																			// Load config file
@@ -80,12 +80,12 @@ class App {
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 		d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
-		this.sres=[];																				// Fresh
+		this.responses=[];																			// Fresh
 		for (i=0;i<d.length;++i) {																	// For each line
 			if (!d[i]["Student"])	continue;														// Skip if no student
 			o={};																					// Init object
 			k=d[i]["Student"].split(" ")[0];														// Getn first name
-			if (!this.sres[k]) this.sres[k]=[];														// Add base array
+			if (!this.responses[k]) this.responses[k]=[];											// Add base array
 			o.bakB=d[i]["Valued/Belonging (200/300"];												// Get factor
 			o.bakA=d[i]["Academic Language (400)"];													// Get factor
 			o.bakK=d[i]["Knowledge (400)"];															// Get factor
@@ -95,7 +95,7 @@ class App {
 			o.intent=d[i]["Type of Student Response"].substring(0,3);								// Get intent
 			o.type=d[i]["Type of Student Response"].substr(3);										// Get type
 			o.action=d[i]["Student Physical Action"];												// Get action
-			this.sres[k].push(o);																	// Add to list
+			this.responses[k].push(o);																// Add to list
 			}				
 		let str="<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center''>";
 		str+="<div id='lastres' class='co-bs' style='float:left'>Previous</div>";
@@ -105,59 +105,75 @@ class App {
 		$("#codingDiv").append(str+"</div>")
 			Sound("ding");																			// Ding
 			$("#nextres").on("click",()=>{															// ON NEXT
-				let i,n=app.responses.length;
+				let i,n=app.session.length;
 				for (i=app.curRes+1;i<n;++i)														// Look for next
-					if (app.responses[i].intent > 300 && app.responses[i].remark)	break;			// If past 300, quit looking
+					if (app.session[i].intent > 300 && app.session[i].remark)	break;				// If past 300, quit looking
 				app.curRes=Math.min(i,n);															// Set spot							
 				showRes();																			// Show it
 				});
 
 			$("#lastres").on("click",()=>{															// ON PREVIOUS
-				app.curRes=Math.max(app.curRes-1,0);												// Back
+				for (i=app.curRes-1;i>=0;--i)														// Look for next
+					if (app.session[i].intent > 300 && app.session[i].remark)	break;				// If past 300, quit looking
+				app.curRes=Math.max(i,0);															// Back
 				showRes();																			// Show it
 				});
 
 			$("[id^=rcode-]").on("change",(e)=>{													// ON CHANGE CODE
 				let k=e.target.id.substr(6);														// Get genre
-				app.responses[app.curRes].code=k+"-"+$("#rcode-"+k).val();							// Set new code					
+				app.session[app.curRes].code=k+"-"+$("#rcode-"+k).val();							// Set new code					
 				$("#rcode-"+k).val(k);																// Reset
 				showRes();																			// Show it
 				});
 
 			$("#addres").on("change",(e)=>{															// ON ADD CODE
-				app.responses[app.curRes].code=$("#addres").val();									// Set new code					
+				app.session[app.curRes].code=$("#addres").val();									// Set new code					
 				$("#addres").val("");																// Reset
 				showRes();																			// Show it
 				});
 
 			$("#saveres").on("click",()=>{															// ON SAVE
 				let fields=["id","intent","student","code","remark","response"];					// Field names
-				str=Papa.unparse(app.responses,{ header:true, skipEmptyLines:true, columns:fields }); // Make CSV using lib
-		 		app.SaveTextAsFile("responses.csv",str);											// Write file
+				str=Papa.unparse(app.session,{ header:true, skipEmptyLines:true, columns:fields }); // Make CSV using lib
+		 		app.SaveTextAsFile("session.csv",str);											// Write file
 				Sound("ding");																		// Ding
 				});
 
 			function showRes() {																	// SHOW RES IN  CHAT WINDOW
-				$("#co-textDiv").html("<div class='co-textS'><b>TEACHER: </b>"+app.responses[app.curRes].remark+"</div>");	// Add remark
+				let o=app.session[app.curRes];														// Point at session line
+				$("#co-textDiv").html("<div class='co-textS'><b>TEACHER: </b>"+o.remark+"</div>");	// Add remark
 				$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
 				$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
-				$("#co-textDiv").append("<div class='co-textR'><b>"+app.responses[app.curRes].student.toUpperCase()+": </b>"+app.responses[app.curRes].response+"</div>");	// Add remark
-				let s=app.nlp.CleanRemark(app.responses[app.curRes].remark);
+				let s=app.nlp.CleanRemark(o.remark);
+
 				let random=" "+app.nlp.vocab.r100[Math.floor(Math.random()*500)];
 				    random+=" "+app.nlp.vocab.r100[Math.floor(Math.random()*500)];
 				    random+=" "+app.nlp.vocab.r200[Math.floor(Math.random()*400)];
-			
-				app.chat.GetResponse(s+random, app.responses[app.curRes].intent, (res, id)=>{
-					let str="<b>Original response to id "+app.responses[app.curRes].id+"</b>:<br><i>"+app.responses[app.curRes].response+"</i>";
+				
+				app.chat.RasaResponse(s,app.session[app.curRes].intent, (res, id)=>{
+					let str="<b>Original response to id "+app.session[app.curRes].id+"</b>:<br><i>"+app.session[app.curRes].response+"</i>";
 					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
 					if (id < 300)	col="#666";
 					$("#rescode").css("color",col);
 					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <i>(coded as "+id+")</i>");
 					$("#oldres").html(str);
+					str=app.GetResponse(s,o.student,res.intent.name.substr(1));
+					$("#co-textDiv").append("<div class='co-textR'><b>"+o.student.toUpperCase()+": </b>"+str+"</div>");	// Add response
 					});
 			}
 		};
 	}
+
+	GetResponse(remark, student, intent)														// GET STUDENT RESPONSE
+	{
+		let i,d=[];
+		let o=app.responses[student];																// Isolate student
+		for (i=0;i<o.length;++i)																	// For each responss
+			if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);							// Isolate matching intents
+		i=Math.floor(Math.random()*d.length);														// Pick random match 
+		return d[i].text;
+	}
+
 
 	LoadConfig()																				// LOAD CONFIG FILE
 	{	
@@ -169,12 +185,12 @@ class App {
 				for (i=0;i<d.length;++i) 															// For each line
 					 this.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 						// Add synonyms, keywords, keytags, vocab
 			});
-		fetch('data/responses.csv')																	// Load file
+		fetch('data/session.csv')																	// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
-				this.responses=[];																	// Null array
-				this.responses=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 			// Parse CSV using papa lib
-//					for (i=0;i<d.length;++i) if (d[i].student == "Chris") this.responses.push(d[i]); // Add if Chris
+				this.session=[];																	// Null array
+				d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 						// Parse CSV using papa lib
+					for (i=0;i<d.length;++i) if (d[i].student == "Farrah") this.session.push(d[i]); // Add if chosen student
 			});
 		}
 
@@ -198,7 +214,7 @@ class App {
 			if (typeof(app.nlp.whoSyns[v[i]]) == "string")											// A valid string
 				who=app.nlp.whoSyns[v[i]];															// Set who
 			}
-		v=this.responses["r"+intent];																// Point at responses to this intent
+		v=this.session["r"+intent];																// Point at session to this intent
 
 		if (v && keys.length) {																		// If a valid intent and some keys in remark
 			for (i=0;i<v.length;++i) {																// For each response
@@ -313,7 +329,7 @@ class Chat {
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
 				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
-				app.chat.GetResponse(s,null,(o)=>{														// Send to AI
+				app.chat.RasaResponse(s,null,(o)=>{														// Send to AI
 					let n=(o.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;							// Go to second choice
 					let intent=o.intent_ranking[n].name.substr(1);										// Get intent
 					let who=app.ParseRemark(intent,s);													// Parse remark for data
@@ -330,7 +346,7 @@ class Chat {
 			$("#co-revText").val("");																	// Clear input
 		}
 
-		GetResponse(msg, id, callback)																// GET RESPONSE FROM AI
+		RasaResponse(msg, id, callback)																// GET RESPONSE FROM AI
 		{
 			let xhttp=new XMLHttpRequest();																// Alloc hxmlhttp
 			xhttp.onreadystatechange = function() {														// ON STATE CHANGE

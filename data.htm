@@ -52,7 +52,7 @@
 // APP 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	let rawData=[], intents=[], responses=[], keyWords=[], vocab=[]; uvocab=[];
+	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
@@ -110,10 +110,6 @@
 		for (i=0;i<rawData.length;++i) {															// For each entry
 			kill=0;																					// Assume we keep it
 			o=rawData[i];																			// Point at line
-			if (!o.intent || (o.intent == 0))			kill=1;										// Cull no intent
-			if (o.intent < 180) 						kill=1;										// Cull intents 0-180
-			if ((o.intent > 181) && (o.intent < 250))	kill=1;										// Cull 181-300
-//			if (kill) { rawData.splice(i,1);  continue;	}											// Remove it, if flagged
 			o.text=nlp.CleanText(o.text);															// Clean text
 			if (o.speaker == "Teacher") {															// A remark
 				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
@@ -285,7 +281,6 @@ return;
 			o=rawData[i];																			// Point at it
 			if ((o.intent < 180) || ((o.intent > 181) && (o.intent < 250))) continue;				// Cull 181-300
 			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
-		trace(o.intent)
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
 			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
 			else							id=Math.floor(o.intent/100)*100;						// Cap at 100s
@@ -357,7 +352,7 @@ return;
 			}
 		let fields=["id","intent","student","remark","response"];							// Field names
 		let str=Papa.unparse(data,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
-		SaveTextAsFile("responses.csv",str);														// Write file
+		SaveTextAsFile("session.csv",str);														// Write file
 		Sound("ding");																				// Sound
 /*
 		let i,o,s,newint,session=[],texts=[],intents=[],startTime=0;
