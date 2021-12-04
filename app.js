@@ -174,16 +174,11 @@ class App  {
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
 		let i,r=[];
-		if (data.intent.name == "addition") {
+		if (text.match(/2 \+ 2|plus/i)) {
 			r=["The answer is 4 of course", "Would you believe 22?"]; 
 			i=Math.floor(Math.random()*r.length);
 			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
 			return r[i];
-			}
-		else if (data.intent.name == "bot_challenge") {
-			r[0]="I am Grace your AI assistant";
-			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[0]);	// Send response
-			return r[0];
 			}
 		return "";																					// No intent matched
 		}
