@@ -16,13 +16,15 @@ class NLP {
 		this.keyWords=[];																				// Keywords("")
 		this.keyTags=[];																				// Keywords keyed to intents ("")
 		this.vocab=[];																					// Unique vocab by intent ("")
+		this.AIhost="https://lizasim.com";																// AI host 
+		
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list
 			"yourself","yourselves","he","him","his","himself","she","her","hers","herself",
 			"it","its","it's","itself","they","them","their","theirs","themselves","this","that",
 			"these","those","am","is","are","was","were","be","been","have","has","had","having",
 			"do","does","doing","a","an","the","and","if","or","as","of","at","by","for","with","to",
 			"again","so","than","too","can","their","we're","gonna"];
-		}
+	}
 
 	Tokenize(text) 																					// TOKENIZE TEXT STRING
 	{
@@ -93,7 +95,6 @@ class NLP {
 		return res.join(' ').trim();																	// Put text back together
 	}
 
-
 	CleanRemark(remark, response="")																// CLEAN REMARK AND ADD TAGS & KEYWORDS
 	{
 		let str="";
@@ -111,7 +112,7 @@ class NLP {
 		let k,re,keys=[];
 		for (k in this.keyWords) {																		// For each keyword
 			re=new RegExp("\\b"+k+"\\b","i");															// Make regex
-			if (s.match(re)) keys.push(this.keyWords[k]);												// Add regular tag
+			if (s.match(re)) keys.push(this.keyWords[k]+"_k");											// Add regular tag
 			}																				
 		keys=[... new Set(keys)];																		// Make unique
 		return keys.join(", ");																			// Return keys, if any
@@ -126,7 +127,7 @@ class NLP {
 			if (s.match(re)) tags.push(this.keyTags[k]);												// Add tag
 			}																				
 		tags=[... new Set(tags)];																		// Make unique
-		for (i=4;i<=levels.length;++i) {																// For each level
+		for (i=3;i<=levels.length;++i) {																// For each level
 			for (j=0;j<this.vocab["r"+i*100].length;++j) {												// For each unique vocab word
 				re=new RegExp("\\b"+this.vocab["r"+i*100][j]+"\\b","i");								// Make regex
 				if (s.match(re)) levs.push(i-1);														// Add new entity(s)
@@ -134,7 +135,7 @@ class NLP {
 			}																				
 		if (levs.length) { 
 			levs.sort((a,b)=>{ return b-a }); 															// Top dog
-			tags.push("tag"+levels[levs[0]]);															// Add tags 
+			tags.push(levels[levs[0]]+"_k");															// Add tags 
 			};  				
 		return " "+tags.join(", ");																		// Return intent tags
 	}
@@ -149,6 +150,15 @@ class NLP {
 			}
 		keys=[... new Set(keys)];																		// Make unique
 		return keys.join(" ");																			// Return keys
+	}
+
+	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
+	{
+		 fetch(this.AIhost+":5005/model/parse", {														// Fetch data
+			method:"POST",																				// POST
+			body: JSON.stringify({text:msg})															// Payload	
+			})
+		.then(res => res.json()).then(res =>{ callback(res); })											// Return respons in callback
 	}
 
 	Compare(textA, textB)																			// HOW SIMILAR TWO STRINGS ARE

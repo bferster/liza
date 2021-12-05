@@ -80,7 +80,8 @@ class App  {
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papaparse lib
 				for (i=0;i<d.length;++i) {															// For each line
 					if (d[i].type == "student")  this.AddStudent(d[i]);								// Add student
-					if (d[i].type == "action") 	 app.nlp.AddSyns("action",d[i].id,d[i].text.split(",")); // Add action and its synonyms
+					if (d[i].type.match(/action|keyword|vocab|keytag/i))							// An anlp item 	
+						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add  data
 					if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);					// Add BB pic
 					if (d[i].type == "resource") this.resources.push({ lab:d[i].id, url:d[i].text }); // Add resource
 					}

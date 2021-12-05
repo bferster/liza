@@ -150,7 +150,8 @@ class App {
 				    random+=" "+app.nlp.vocab.r100[Math.floor(Math.random()*500)];
 				    random+=" "+app.nlp.vocab.r200[Math.floor(Math.random()*400)];
 				
-				app.chat.RasaResponse(s,app.session[app.curRes].intent, (res, id)=>{
+				app.nlp.InferIntent(s,(res)=>{
+					let id=app.session[app.curRes].intent;
 					let str="<b>Original response to id "+app.session[app.curRes].id+"</b>:<br><i>"+app.session[app.curRes].response+"</i>";
 					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
 					if (id < 300)	col="#666";
@@ -237,16 +238,6 @@ class App {
 		return text.toLowerCase().split(/ +/);														// Return tokenized lowercase array
 	}
 
-	GetRemark(msg)																				// GET REMARK FROM AI
-	{
-		fetch("http://localhost:5005/webhooks/rest/webhook", {										// Fetch data
-			method:"POST",
-			body: JSON.stringify({sender:"bill", message:msg})		
-			})
- 		.then(response => response.json())
-  		.then(data => console.log(data));		
-		}
-		
 	SaveTextAsFile(file, contents)																// SAVE TEXT TO LOCAL FILE
 	{
 		if (file.charAt(0) == "*") {																// If asking
@@ -329,7 +320,7 @@ class Chat {
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
 				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
-				app.chat.RasaResponse(s,null,(o)=>{														// Send to AI
+				app.nlp.InferIntent(s, (o)=>{															// Send to AI
 					let n=(o.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;							// Go to second choice
 					let intent=o.intent_ranking[n].name.substr(1);										// Get intent
 					let who=app.ParseRemark(intent,s);													// Parse remark for data
@@ -344,25 +335,6 @@ class Chat {
 					});
 				}
 			$("#co-revText").val("");																	// Clear input
-		}
-
-		RasaResponse(msg, id, callback)																// GET RESPONSE FROM AI
-		{
-			let xhttp=new XMLHttpRequest();																// Alloc hxmlhttp
-			xhttp.onreadystatechange = function() {														// ON STATE CHANGE
-				if (this.readyState == 4 && this.status == 200) {										// Valid response
-					let o=JSON.parse(this.response);													// Objectify
-					if (o.intent.name[0] == "r")														// If our intent
-						app.dots=o.intent.name[4] == "." ? true : false;								// Set dots flag
-					trace(o);																			// Log
-					if (callback) callback(o,id);														// Run callback
-						return;																			// Quit
-					}
-				};
-			xhttp.open("POST", "https://lizasim.com:5005/model/parse");									// Set url
-//			xhttp.open("POST", "http://localhost:5005/model/parse");									// Set url
-			xhttp.setRequestHeader("Content-Type", "application/json");									// Set type
-			xhttp.send(JSON.stringify({text:msg}));														// Set paqyload
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -445,8 +417,7 @@ class Chat {
 			$("#lz-tempFile").val("");																// Clear value		
 			});
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
-			if ((e.which == 84) && e.altKey && e.ctrlKey) {										// Test key (Ctrl+Alt+T)
-				GetTextBox("Remark", "Type remark", "", (s)=>{ app.GetRemark(s); } );
+			if ((e.which == 84) && e.altKey && e.ctrlKey) {											// Test key (Ctrl+Alt+T)
 				}
 			});
 

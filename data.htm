@@ -280,7 +280,7 @@ return;
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if ((o.intent < 180) || ((o.intent > 181) && (o.intent < 250))) continue;				// Cull 181-300
-\			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
+			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
 			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
 			else							id=Math.floor(o.intent/100)*100;						// Cap at 100s
