@@ -16,12 +16,12 @@ class App  {
 		this.startTime=new Date().getTime();														// Session start time
 		this.curClock=0;																			// Current clock time
 		this.sessionId="1";																			// Session id
-		this.responses=[];																			// Holds student responses
 		this.sessionData=[];																		// Holds session data
 		this.curStudent="";																			// Currently active student
+		this.lastResponse="";																		// Last response
 		this.inSim=false;																			// In simulation or not
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
-		this.resources=[];																			// Teacher resources
+		this.teacherResources=[];																	// Teacher resource documents
 
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
@@ -77,21 +77,31 @@ class App  {
 			.then(res =>{ 																				
 				let i;
 				this.students=[]
-				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV using papaparse lib
+				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV
 				for (i=0;i<d.length;++i) {															// For each line
 					if (d[i].type == "student")  this.AddStudent(d[i]);								// Add student
 					if (d[i].type.match(/action|keyword|vocab|keytag/i))							// An anlp item 	
 						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add  data
 					if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);					// Add BB pic
-					if (d[i].type == "resource") this.resources.push({ lab:d[i].id, url:d[i].text }); // Add resource
+					if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
 					}
 				this.curStudent=app.students[0].id;													// Pick first student
 				this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);						// Set right side
 				this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);						// Left 
-		
+				this.InitClassroom();																// Init classroom
+
+				fetch("data/session-67.csv")														// Load session file
+					.then(res =>  res.text())														// Get as text
+					.then(res =>{ this.sessionData=Papa.parse(res, { header:true, skipEmptyLines:true }).data; // Parse CSV
+					});
+				
+				fetch('data/responses.csv')															// Load response file
+					.then(res =>  res.text())														// Get as text
+					.then(res =>{ 																	// Process																			
+						let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;			// Parse CSV
+						this.nlp.AddResponses(d);													// Add responses
+						});
 			})	
-			.then(res =>{ this.LoadSession("data/session-67.csv"); })								// Load sample session	
-			.then(res =>{ this.LoadResponses("data/responses.csv"); });								// Load responses
 	}
 
 	AddStudent(d)																				// ADD STUDENT TO DATA
@@ -104,41 +114,6 @@ class App  {
 		o.tex="assets/"+o.id.toLowerCase()+"skin.png";												// Set skin
 		if (o.id != "Class") this.students.push(o);													// Add only students to students array
 		this.nlp.AddSyns("student",d.id,d.text.split(","));											// Add student synonyms
-	}
-
-	LoadSession(fileName)																		// LOAD SESSION FILE
-	{	
-		return fetch(fileName)																		// Load file
-			.then(res =>  res.text())																// Get as text
-			.then(res =>{ this.sessionData=Papa.parse(res, { header:true, skipEmptyLines:true }).data;}); // Parse CSV using papa lib
-	}
-	
-	LoadResponses(fileName)																		// LOAD RESPONSE FILE
-	{	
-		let i,o;
-		return fetch(fileName)																		// Load file
-			.then(res =>  res.text())																// Get as text
-			.then(res =>{ 																			// On loaded
-				let data=Papa.parse(res, { header:true, skipEmptyLines:true }).data;				// Parse CSV using papa lib
-				this.responses=[];																	// Clear array
-				let n=data.length;
-				n=200;
-				for (i=0;i<n;++i) {														// For each line
-					o=data[i];																		// Point at item
-					if (!this.responses[o.student])	this.responses[o.student]=[];					// Alloc new array
-					this.responses[o.student].push({ text:o.response, intent:o.intent});			// Add line to speaker											
-					}
-			this.InitClassroom();																	// Init classroom
-			});		
-	}
-
-	GetIntent(msg, callback)																	// GET INTENT FROM AI
-	{
-		return fetch("https://lizasim.com:5005/model/parse", {										// Fetch data
-			method:"POST",	body: JSON.stringify({text:msg})										// Payload	
-			})
-		.then(response => response.json())
- 		.then(data => callback(data))
 	}
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
@@ -159,7 +134,7 @@ class App  {
 			}
 		app.DoAction(act);																			// If a please + action mentioned, do it
 		if (!act) 																					// If no action happening
-			app.GetIntent(text,(res)=>{ 															// Get intent from AI
+			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				let r=app.GenerateResponse(text,res);												// Generate response
 				let intent=res.intent.name.substr(1);												// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
@@ -174,15 +149,18 @@ class App  {
 
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
-		let i,r=[];
-		if (text.match(/2 \+ 2|plus/i)) {
-			r=["The answer is 4 of course", "Would you believe 22?"]; 
-			i=Math.floor(Math.random()*r.length);
-			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+r[i]);	// Send response
-			return r[i];
+		let intent=data.intent.name.substr(1);														// Get intent
+		this.lastResponse="";																		// Clear last
+		if (text.match(/2 \+ 2|plus/i)) {															// Hard-code 2+2
+			let r=["The answer is 4 of course", "Would you believe 22?","The answer is 4","I don't know how to add yet", "Math is hard"]; // Choices
+			this.lastResponse=r[Math.floor(Math.random()*r.length)];								// Pick one
 			}
-		return "";																					// No intent matched
-		}
+		else if (intent > 100) 																		// If a high-enough level																						
+			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response
+		if (this.lastResponse) 																		// If one
+			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse); // Send response
+		return this.lastResponse;																	// Return it
+	}
 
 	DoAction(act)																				// PERFORM ACTION
 	{
@@ -272,7 +250,7 @@ class App  {
 			if ((v[3] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
 			else  												 app.voice.Talk(v[5],v[3]);			// Talk	
 			if (this.role != "Teacher" && v[3] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
-				this.GetIntent(v[5],(res)=>{ 														// Get intent from AI
+				this.nlp.InferIntent(v[5],(res)=>{ 													// Get intent from AI
 					let intent=res.intent.name.substr(1);											// Get intent
 					intent=isNaN(intent) ? 0 : intent;												// Validate
 					this.rp.curIntent=intent;														// Set current intent
@@ -386,7 +364,7 @@ class App  {
 		let trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
 		trsty+="onMouseOut='this.style.backgroundColor=\"#fff\"'";
 		str="<b>Choose a resource to view</b><hr>"
-		for (let i=0;i<this.resources.length;++i)  str+=`<div ${trsty} id="tres-${i}">${this.resources[i].lab}</div>`;
+		for (let i=0;i<this.teacherResources.length;++i)  str+=`<div ${trsty} id="tres-${i}">${this.teacherResources[i].lab}</div>`;
 		$("#resourcesDiv").html(str);																	// Add resources	
 
 		$("#trclose").on("click", (e)=>{																// ON CLOSE
@@ -395,7 +373,7 @@ class App  {
 				$("[id^=tres-]").on("click", (e)=>{														// ON CLICK RESOURCE
 					let id=e.target.id.substr(5);
 					let h=500;
-					let ifs="<iframe id='trIF' frameborder='0' src='"+this.resources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
+					let ifs="<iframe id='trIF' frameborder='0' src='"+this.teacherResources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
 					$("#resourcesDiv").html(ifs)
 					});
 				}	
@@ -404,7 +382,7 @@ class App  {
 		$("[id^=tres-]").on("click", (e)=>{																// ON CLICK RESOURCE
 			let id=e.target.id.substr(5);
 			let h=500;
-			let ifs="<iframe id='trIF' frameborder='0' src='"+this.resources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
+			let ifs="<iframe id='trIF' frameborder='0' src='"+this.teacherResources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
 			$("#resourcesDiv").html(ifs)
 			});
 		

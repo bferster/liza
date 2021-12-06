@@ -58,12 +58,8 @@ class App {
 
 	constructor()   																			// CONSTRUCTOR
 	{
-		this.csv=[];																				// Holds loaded session
 		this.curWho="Class";																		// Person being addressed
-		this.curKeys=[];																			// Currently active keys
-		this.keywords=[];																			// Keywords
 		this.session=[];																			// session
-		this.rescodes=[];																			// Response codes
 		this.chat=new Chat();																		// Alloc chat
 		this.LoadConfig();																			// Load config file
 		this.nlp=new NLP();																			// Load NLP
@@ -80,23 +76,7 @@ class App {
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 		d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
-		this.responses=[];																			// Fresh
-		for (i=0;i<d.length;++i) {																	// For each line
-			if (!d[i]["Student"])	continue;														// Skip if no student
-			o={};																					// Init object
-			k=d[i]["Student"].split(" ")[0];														// Getn first name
-			if (!this.responses[k]) this.responses[k]=[];											// Add base array
-			o.bakB=d[i]["Valued/Belonging (200/300"];												// Get factor
-			o.bakA=d[i]["Academic Language (400)"];													// Get factor
-			o.bakK=d[i]["Knowledge (400)"];															// Get factor
-			o.bakT=d[i]["Thinking (500)"];															// Get factor
-			o.bakU=d[i]["Understanding Level"];														// Get factor
-			o.text=d[i]["Response"];																// Get response
-			o.intent=d[i]["Type of Student Response"].substring(0,3);								// Get intent
-			o.type=d[i]["Type of Student Response"].substr(3);										// Get type
-			o.action=d[i]["Student Physical Action"];												// Get action
-			this.responses[k].push(o);																// Add to list
-			}				
+		this.nlp.AddResponses(d);																	// Load responses from file
 		let str="<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center''>";
 		str+="<div id='lastres' class='co-bs' style='float:left'>Previous</div>";
 		str+="<div id='nextres' class='co-bs' style='float:right'>Next</div><br>";
@@ -158,23 +138,12 @@ class App {
 					$("#rescode").css("color",col);
 					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <i>(coded as "+id+")</i>");
 					$("#oldres").html(str);
-					str=app.GetResponse(s,o.student,res.intent.name.substr(1));
+					str=app.nlp.GetResponse(s,o.student,res.intent.name.substr(1));
 					$("#co-textDiv").append("<div class='co-textR'><b>"+o.student.toUpperCase()+": </b>"+str+"</div>");	// Add response
 					});
 			}
 		};
 	}
-
-	GetResponse(remark, student, intent)														// GET STUDENT RESPONSE
-	{
-		let i,d=[];
-		let o=app.responses[student];																// Isolate student
-		for (i=0;i<o.length;++i)																	// For each responss
-			if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);							// Isolate matching intents
-		i=Math.floor(Math.random()*d.length);														// Pick random match 
-		return d[i].text;
-	}
-
 
 	LoadConfig()																				// LOAD CONFIG FILE
 	{	
@@ -194,42 +163,6 @@ class App {
 					for (i=0;i<d.length;++i) if (d[i].student == "Farrah") this.session.push(d[i]); // Add if chosen student
 			});
 		}
-
-	SetKeywords(data)																			// PROCESS KEYWORDS																	
-	{
-		let i,v,o;
-		for (i=0;i<data.length;++i) {																// For each line
-			o=data[i];																				// Point at line
-			if (o.type != "keywords")	continue;													// Only keywords	
-			this.keywords=o.text.toLowerCase().split(",");											// Array of keywords
-		}
-	}
-
-	ParseRemark(intent, text)																	// PARSE DATA FROM REMARK
-	{
-		let i,j,s,o,who="";
-		let keys=[];																				// Clear current keys array
-		let v=app.Tokenize(text);																	// Tokenize incoming text	
-		for (i=0;i<v.length;++i) {																	// For each word
-			if (this.keywords.includes(v[i])) keys.push(v[i]);										// Add to current keys list					
-			if (typeof(app.nlp.whoSyns[v[i]]) == "string")											// A valid string
-				who=app.nlp.whoSyns[v[i]];															// Set who
-			}
-		v=this.session["r"+intent];																// Point at session to this intent
-
-		if (v && keys.length) {																		// If a valid intent and some keys in remark
-			for (i=0;i<v.length;++i) {																// For each response
-				s=0;																				// Reset count	
-				v[i].keyScore=0;																	// Reset key score
-				o=v[i].keywords;																	// Point at keywords
-				for (j=0;j<o.length;++j)															// For each key in response
-					if (keys.includes(o[j]))	++s;												// Add to count
-				v[i].keyScore=s/keys.length;														// Calc key score
-				}
-			v.sort((a, b) => a.keyScore < b.keyScore);												// Sort by key score
-		}
-		return who;																					// Return last who encountered
-	}
 
 	Tokenize(text) 																				// TOKENIZE TEXT
 	{
@@ -309,13 +242,6 @@ class Chat {
 		{
 			let origIntent="",origResponse="";
 			let s=$("#co-revText").val();																// Get text textbox
-			if (!s && app.csv) { 																		// If getting from CSV file
-				s=app.csv[0].text;																		// Get text
-				origIntent=app.csv[0].code ? app.csv[0].code : "not coded";								// Get original intent
-				if (!app.dots) origIntent=Math.floor(origIntent);										// Just looking at whole numbes
-				origResponse=app.csv[0].response;														// Get original response
-				app.csv.shift(); 																		// Next remark
-				}									
 			if (s) {																					// If something there
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
@@ -323,7 +249,7 @@ class Chat {
 				app.nlp.InferIntent(s, (o)=>{															// Send to AI
 					let n=(o.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;							// Go to second choice
 					let intent=o.intent_ranking[n].name.substr(1);										// Get intent
-					let who=app.ParseRemark(intent,s);													// Parse remark for data
+					let who=app.nlp.GetWho(s);															// Parse remark for data
 					if (who) app.curWho=who;															// Set latrest person mentioned
 					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
 					Intent </b>${intent} - ${Math.round(o.intent_ranking[n].confidence*100)}%`;			// Main line

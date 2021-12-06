@@ -1,23 +1,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // NLP 
- 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 class NLP {																																										
 
 	constructor()   																				// CONSTRUCTOR
 	{
-		this.syns=[];																					// Synonyms (loaded externally via config file)
 		this.whoSyns=[];																				// Who synonyms ("")
 		this.actSyns=[];																				// Action synonyms ("")
 		this.keyWords=[];																				// Keywords("")
 		this.keyTags=[];																				// Keywords keyed to intents ("")
 		this.vocab=[];																					// Unique vocab by intent ("")
 		this.AIhost="https://lizasim.com";																// AI host 
-		
+		this.responses=[];																				// Response file
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list
 			"yourself","yourselves","he","him","his","himself","she","her","hers","herself",
 			"it","its","it's","itself","they","them","their","theirs","themselves","this","that",
@@ -32,7 +28,7 @@ class NLP {
 		return r ? r : [];																				// Return list or empty array
 	}
 
-	AddSyns(type, word, syns)																		// SET SYNONYMS ARRAY
+	AddSyns(type, word, syns)																		// SET SYNONYM/TAG ARRAYS
 	{
 		let i;
 		if (type == "vocab") {																			// Vocab list
@@ -45,7 +41,6 @@ class NLP {
 			else if (type == "action")	this.actSyns[syns[i]]=word;										// Add actions
 			else if (type == "keyword")	this.keyWords[syns[i]]=word;									// Add keywords
 			else if (type == "keytag")	this.keyTags[syns[i]]=word;										// Add keytags
-//			else						this.syns[syns[i]]=word;										// Add general synonym
 		}
 	}
 	
@@ -107,6 +102,38 @@ class NLP {
 		return str.replace(/  /g," ")																	// Remove extra spaces and return
 	}
 
+	AddResponses(d)																					// ADD RRSPONSES FROM CSV DATA
+	{
+		let i,k,o;
+		this.responses=[];																				// Fresh
+		for (i=0;i<d.length;++i) {																		// For each line
+			if (!d[i]["Student"])	continue;															// Skip if no student
+			o={};																						// Init object
+			k=d[i]["Student"].split(" ")[0];															// Get first name
+			if (!this.responses[k]) this.responses[k]=[];												// Add base array
+			o.B=d[i]["Valued/Belonging (200/300"];														// Get factor
+			o.A=d[i]["Academic Language (400)"];														// Get factor
+			o.K=d[i]["Knowledge (400)"];																// Get factor
+			o.T=d[i]["Thinking (500)"];																	// Get factor
+			o.U=d[i]["Understanding Level"];															// Get factor
+			o.text=d[i]["Response"];																	// Get response
+			o.intent=d[i]["Type of Student Response"].substring(0,3);									// Get intent
+			o.type=d[i]["Type of Student Response"].substr(3);											// Get type
+			o.action=d[i]["Student Physical Action"];													// Get action
+			this.responses[k].push(o);																	// Add to list
+		}
+	}
+
+	GetResponse(remark, student, intent)															// GET STUDENT RESPONSE
+	{
+		let i,d=[];
+		let o=app.nlp.responses[student];																// Isolate student
+		for (i=0;i<o.length;++i)																		// For each responss
+			if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);								// Isolate matching intents
+		i=Math.floor(Math.random()*d.length);															// Pick random match 
+		return d[i].text;
+	}
+
 	GetKeywords(s)																					//  ADD KEYWORDS
 	{
 		let k,re,keys=[];
@@ -161,6 +188,7 @@ class NLP {
 		.then(res => res.json()).then(res =>{ callback(res); })											// Return respons in callback
 	}
 
+/*	
 	Compare(textA, textB)																			// HOW SIMILAR TWO STRINGS ARE
 	{
 		let dict={};
@@ -357,10 +385,6 @@ class NLP {
 		
 	return w;
 	}
-
-
-	StopWords(text)
-	{
-	}
+*/
 
 } // NLP class closure
