@@ -1,10 +1,10 @@
 type,id,text,data
-student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,ability=.5,color=#076290,"
-student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,ability=.5,color=#e26d33,"
-student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=female,ability=.5,color=#9b4286,"
-student,Oliver,"oliver,liver","sex=male,ability=.5,color=#734325,"
-student,Chris,"chris,crisp,christ","sex=male,ability=.5,color=#b1233c,"
-student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,ability=.5,color=#cccccc,"
+student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,"
+student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,"
+student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,"
+student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,"
+student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,"
+student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,,b=1,a=2,k=3,t=4,u=3,color=#cccccc,"
 resource,Teacher prep,assets/prep.pdf
 resource,Student facing,assets/student.pdf
 resource,Strategy supports,assets/supports.pdf

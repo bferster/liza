@@ -106,14 +106,21 @@ class App  {
 
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
-		let seatNum=this.students.length;															// Get seat
-		let o={ fidget:0, s:15, seat:seatNum, src:"assets/body2.dae" };								// Basic info
-		o.id=d.id;																					// Name
-		o.sex=d.data.match(/sex=(.+?)\W/)[1];														// Get sex
-		o.color=d.data.match(/color=(.+?)\W/)[1];													// Get color
-		o.tex="assets/"+o.id.toLowerCase()+"skin.png";												// Set skin
-		if (o.id != "Class") this.students.push(o);													// Add only students to students array
-		this.nlp.AddSyns("student",d.id,d.text.split(","));											// Add student synonyms
+		try {
+			let seatNum=this.students.length;														// Get seat
+			let o={ fidget:0, s:15, seat:seatNum, src:"assets/body2.dae" };							// Basic info
+			o.id=d.id;																				// Name
+			o.sex=d.data.match(/sex=(.+?)\W/)[1];													// Get sex
+			o.b=d.data.match(/b=(.+?)\D/)[1]-0;														// Get variant B
+			o.a=d.data.match(/a=(.+?)\D/)[1]-0;														// Get variant A
+			o.k=d.data.match(/k=(.+?)\D/)[1]-0;														// Get variant K
+			o.t=d.data.match(/t=(.+?)\D/)[1]-0;														// Get variant T
+			o.u=d.data.match(/u=(.+?)\D/)[1]-0;														// Get variant U
+			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
+			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set skin
+			if (o.id != "Class") this.students.push(o);												// Add only students to students array
+			this.nlp.AddSyns("student",d.id,d.text.split(","));										// Add student synonyms
+		} catch(e) { trace(e) }																		// Catch error
 	}
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
@@ -140,26 +147,61 @@ class App  {
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				if (intent) {																		// If an intent detected
 					let s=app.fb.intentLabels[intent/100];											// Get intent label
-					s+=intent ? " - "+intent : "";													// Add number
-					Prompt(s);																		// Show in prompt area
+					s+=intent ? " "+intent : "";													// Add number
+					s+=addVariant(r.b,"Belonging");													// Add variant for B
+					s+=addVariant(r.a,"Academic");													// A
+					s+=addVariant(r.k,"Knowledge");													// K
+					s+=addVariant(r.t,"Thinking");													// T
+					Prompt(s,10);																	// Show in prompt area
 					}	
-				trace(res,r)
-				});
+				trace(res,r.text)
+			});
+
+		function addVariant(v, label)	{															// ADD VARIANT STATUS TO PROMPT
+			let str=" ";		
+			if (!v)	return "";																		// Nothing to add
+			let a=v.match(/^\d+/)[0];																// Get amt
+			if (!a || (a == "0"))	return "";														// No change
+			let col=a < 0 ? "#99000" : "#00aa00";													// Set color
+			let amt=a > 0 ? "+"+a : a;																// Set amt
+			str+=" | <span style='color:"+col+"'>"+label+amt+"</span>";								// Add it 
+			return str;																				// Return markup
+			}
 		}
 
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
 		let intent=data.intent.name.substr(1);														// Get intent
-		this.lastResponse="";																		// Clear last
+		this.lastResponse={ text:""};																// Clear last
 		if (text.match(/2 \+ 2|plus/i)) {															// Hard-code 2+2
 			let r=["The answer is 4 of course", "Would you believe 22?","The answer is 4","I don't know how to add yet", "Math is hard"]; // Choices
-			this.lastResponse=r[Math.floor(Math.random()*r.length)];								// Pick one
+			this.lastResponse.text=r[Math.floor(Math.random()*r.length)];							// Pick one
 			}
 		else if (intent > 100) 																		// If a high-enough level																						
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response
-		if (this.lastResponse) 																		// If one
-			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse); // Send response
+		if (this.lastResponse.text) {																// If one
+			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
+			this.UpdateVariance(this.curStudent,this.lastResponse);									// Update student variance
+			}
 		return this.lastResponse;																	// Return it
+	}
+
+	UpdateVariance(student, res)																	// UPDATE STUDENT VARIANCE FROM RESPONSE
+	{
+		student=app.students.findIndex((s)=>{ return student == s.id });								// Convert to index
+		let o=app.students[student];																	// Point at student
+		o.b=Math.max(Math.min(o.b+getVariant(res.b),9),0);												// Set variant B 0-9
+		o.a=Math.max(Math.min(o.a+getVariant(res.a),9),0);												// A
+		o.k=Math.max(Math.min(o.k+getVariant(res.k),9),0);												// K
+		o.t=Math.max(Math.min(o.t+getVariant(res.t),9),0);												// T
+		o.u=Math.max(Math.min(o.u+getVariant(res.u),9),0);												// U
+
+		function getVariant(v) {																		// GET VARIENT FROM RESPONSE
+			if (!v)						return 0;														// Not set
+			let x=v.match(/^\d+/)[0];																	// Get amt
+			if (!x || (x == "0"))		return 0;														// No change
+			else						return x-0;														// Return change
+		}
 	}
 
 	DoAction(act)																				// PERFORM ACTION

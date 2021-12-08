@@ -111,11 +111,11 @@ class NLP {
 			o={};																						// Init object
 			k=d[i]["Student"].split(" ")[0];															// Get first name
 			if (!this.responses[k]) this.responses[k]=[];												// Add base array
-			o.B=d[i]["Valued/Belonging (200/300"];														// Get factor
-			o.A=d[i]["Academic Language (400)"];														// Get factor
-			o.K=d[i]["Knowledge (400)"];																// Get factor
-			o.T=d[i]["Thinking (500)"];																	// Get factor
-			o.U=d[i]["Understanding Level"];															// Get factor
+			o.b=d[i]["Valued/Belonging (200/300"];														// Get factor
+			o.a=d[i]["Academic Language (400)"];														// Get factor
+			o.k=d[i]["Knowledge (400)"];																// Get factor
+			o.t=d[i]["Thinking (500)"];																	// Get factor
+			o.u=d[i]["Understanding Level"];															// Get factor
 			o.text=d[i]["Response"];																	// Get response
 			o.intent=d[i]["Type of Student Response"].substring(0,3);									// Get intent
 			o.type=d[i]["Type of Student Response"].substr(3);											// Get type
@@ -131,7 +131,7 @@ class NLP {
 		for (i=0;i<o.length;++i)																		// For each responss
 			if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);								// Isolate matching intents
 		i=Math.floor(Math.random()*d.length);															// Pick random match 
-		return d[i].text;
+		return d[i];																					// Return response object
 	}
 
 	GetKeywords(s)																					//  ADD KEYWORDS
