@@ -136,7 +136,7 @@ class App {
 					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
 					if (id < 300)	col="#666";
 					$("#rescode").css("color",col);
-					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <i>(coded as "+id+")</i>");
+					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <span style='font-size:14px'> @"+Math.round(res.intent_ranking[0].confidence*100)+"% &nbsp;--&nbsp; coded as </span><b>"+id+"</b>");
 					$("#oldres").html(str);
 					str=app.nlp.GetResponse(s,o.student,res.intent.name.substr(1));
 					$("#co-textDiv").append("<div class='co-textR'><b>"+o.student.toUpperCase()+": </b>"+str+"</div>");	// Add response
@@ -252,9 +252,9 @@ class Chat {
 					let who=app.nlp.GetWho(s);															// Parse remark for data
 					if (who) app.curWho=who;															// Set latrest person mentioned
 					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
-					Intent </b>${intent} - ${Math.round(o.intent_ranking[n].confidence*100)}%`;			// Main line
+					Intent </b><i>(${intent} - ${Math.round(o.intent_ranking[n].confidence*100)}%)</i> `; // Main line
 					if (origIntent)		res+=` vs. <span style="color:#${(origIntent == intent) ? "009900" : "990000"}">${origIntent}</span>`;
-//					if (origResponse)	res+=" -><i>&quot;"+origResponse+"&quot;</i>";					// Add response
+					res+=app.nlp.GetResponse(o.text,app.curWho,intent);									// Add student response									
 					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
 					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
