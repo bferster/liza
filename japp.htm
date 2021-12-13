@@ -36,8 +36,8 @@
 		options.interfaceConfigOverwrite["TOOLBAR_BUTTONS"].push("security");
 		}
 	const api = new JitsiMeetExternalAPI(domain, options);
-	api.executeCommand('displayName',v[1] ? v[1] : "");
-	window.addEventListener("unload",  ()=>{ api.dispose();	});
+	window.addEventListener("unload", ()=>{ api.dispose();	});
+	window.addEventListener("load",   ()=>{ api.executeCommand('displayName',v[1] ? v[1] : ""); 	});
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
 	{
