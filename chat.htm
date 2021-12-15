@@ -58,7 +58,7 @@ class App {
 
 	constructor()   																			// CONSTRUCTOR
 	{
-		this.curWho="Class";																		// Person being addressed
+		this.curWho="Jazmin";																		// Person being addressed
 		this.session=[];																			// session
 		this.chat=new Chat();																		// Alloc chat
 		this.LoadConfig();																			// Load config file
@@ -69,80 +69,14 @@ class App {
 
 	ImportCSV(e)																				// IMPORT SESSION FROM CSV
 	{	
-		let k,d,i,o;
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
-		d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
-		this.nlp.AddResponses(d);																	// Load responses from file
-		let str="<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center''>";
-		str+="<div id='lastres' class='co-bs' style='float:left'>Previous</div>";
-		str+="<div id='nextres' class='co-bs' style='float:right'>Next</div><br>";
-		str+="<p id='rescode'   style='font-size:20px'></p>";
-		str+="<div id='oldres'  style='font-size:14px'></div>";
-		$("#codingDiv").append(str+"</div>")
-			Sound("ding");																			// Ding
-			$("#nextres").on("click",()=>{															// ON NEXT
-				let i,n=app.session.length;
-				for (i=app.curRes+1;i<n;++i)														// Look for next
-					if (app.session[i].intent > 300 && app.session[i].remark)	break;				// If past 300, quit looking
-				app.curRes=Math.min(i,n);															// Set spot							
-				showRes();																			// Show it
-				});
-
-			$("#lastres").on("click",()=>{															// ON PREVIOUS
-				for (i=app.curRes-1;i>=0;--i)														// Look for next
-					if (app.session[i].intent > 300 && app.session[i].remark)	break;				// If past 300, quit looking
-				app.curRes=Math.max(i,0);															// Back
-				showRes();																			// Show it
-				});
-
-			$("[id^=rcode-]").on("change",(e)=>{													// ON CHANGE CODE
-				let k=e.target.id.substr(6);														// Get genre
-				app.session[app.curRes].code=k+"-"+$("#rcode-"+k).val();							// Set new code					
-				$("#rcode-"+k).val(k);																// Reset
-				showRes();																			// Show it
-				});
-
-			$("#addres").on("change",(e)=>{															// ON ADD CODE
-				app.session[app.curRes].code=$("#addres").val();									// Set new code					
-				$("#addres").val("");																// Reset
-				showRes();																			// Show it
-				});
-
-			$("#saveres").on("click",()=>{															// ON SAVE
-				let fields=["id","intent","student","code","remark","response"];					// Field names
-				str=Papa.unparse(app.session,{ header:true, skipEmptyLines:true, columns:fields }); // Make CSV using lib
-		 		app.SaveTextAsFile("session.csv",str);											// Write file
-				Sound("ding");																		// Ding
-				});
-
-			function showRes() {																	// SHOW RES IN  CHAT WINDOW
-				let o=app.session[app.curRes];														// Point at session line
-				$("#co-textDiv").html("<div class='co-textS'><b>TEACHER: </b>"+o.remark+"</div>");	// Add remark
-				$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
-				$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
-				let s=app.nlp.CleanRemark(o.remark);
-
-				let random=" "+app.nlp.vocab.r100[Math.floor(Math.random()*500)];
-				    random+=" "+app.nlp.vocab.r100[Math.floor(Math.random()*500)];
-				    random+=" "+app.nlp.vocab.r200[Math.floor(Math.random()*400)];
-				
-				app.nlp.InferIntent(s,(res)=>{
-					let id=app.session[app.curRes].intent;
-					let str="<b>Original response to id "+app.session[app.curRes].id+"</b>:<br><i>"+app.session[app.curRes].response+"</i>";
-					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
-					if (id < 300)	col="#666";
-					$("#rescode").css("color",col);
-					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <span style='font-size:14px'> @"+Math.round(res.intent_ranking[0].confidence*100)+"% &nbsp;--&nbsp; coded as </span><b>&nbsp;"+id+"</b>");
-					$("#oldres").html(str);
-					str=app.nlp.GetResponse(s,o.student,res.intent.name.substr(1)).text;
-					$("#co-textDiv").append("<div class='co-textR'><b>"+o.student.toUpperCase()+": </b>"+str+"</div>");	// Add response
-					});
-			}
-		};
+			let d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
+			this.nlp.AddResponses(d);																// Load responses from file
+			};
 	}
 
 	LoadConfig()																				// LOAD CONFIG FILE
@@ -155,7 +89,13 @@ class App {
 				for (i=0;i<d.length;++i) 															// For each line
 					 this.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 						// Add synonyms, keywords, keytags, vocab
 			});
-		fetch('data/session.csv')																	// Load file
+		fetch('data/responses.csv')																	// Load responses file
+			.then(res => res.text())																// Get as text
+			.then(res =>{																			// Process																	
+				d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;						// Parse CSV using papa lib
+				this.nlp.AddResponses(d);															// Load responses from file
+			});
+		fetch('data/session.csv')																	// Load session file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
 				this.session=[];																	// Null array
@@ -228,7 +168,13 @@ class Chat {
 					<img id='co-revTextBut'src='img/sendtext.png' style='vertical-align:-7px;margin-left:12px;cursor:pointer'>
 					</div>	
 				</div>
-				<div id="codingDiv"></div>`;
+				<div id="codingDiv">
+					<div style='position:absolute;left:calc(50% - 172px);top:670px;width:344px;text-align:center'>
+					<div id='lastres' class='co-bs' style='float:left'>Previous</div>
+					<div id='nextres' class='co-bs' style='float:right'>Next</div><br>
+					<p id='rescode'   style='font-size:20px'></p>
+					<div id='oldres'  style='font-size:14px'></div
+				</div></div>`;
 			$("body").append(str.replace(/\t|\n|\r/g,""));												// Add chatbox
 			
 			$("#co-revText").focus();																	// Focus on input
@@ -246,21 +192,16 @@ class Chat {
 				$("#co-textDiv").append("<div class='co-textS'>"+s+"</div>");							// Add to triangle 
 				$("#co-textDiv").append("<div class='co-textSA'></div>");								// Add to display 
 				$("#co-textDiv").scrollTop(10000);														// Scroll to bottom
-				app.nlp.InferIntent(s, (o)=>{															// Send to AI
-					let n=(o.intent_ranking[0].name == "nlu_fallback") ? 1 : 0;							// Go to second choice
-					let intent=o.intent_ranking[n].name.substr(1);										// Get intent
+
+				app.nlp.InferIntent(s,(res)=>{
 					let who=app.nlp.GetWho(s);															// Parse remark for data
-					if (who) app.curWho=who;															// Set latrest person mentioned
-					let res=`<span style="font-weight:600">${app.curWho.toUpperCase()}</span>: 
-					Intent </b><i>(${intent} - ${Math.round(o.intent_ranking[n].confidence*100)}%)</i> `; // Main line
-					if (origIntent)		res+=` vs. <span style="color:#${(origIntent == intent) ? "009900" : "990000"}">${origIntent}</span>`;
-					res+=app.nlp.GetResponse(o.text,app.curWho,intent).text;							// Add student response									
-					$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
-					$("#co-textDiv").append("<div class='co-textR'>"+res+"</div><br>");					// Add message
+					if (who) app.curWho=who;															// Set latest person mentioned
+					let str=app.nlp.GetResponse(s,app.curWho,res.intent.name.substr(1)).text;
+					$("#co-textDiv").append("<div class='co-textR'><b>"+app.curWho.toUpperCase()+": </b> ("+res.intent.name.substr(1)+") "+str+"</div>");	// Add response
 					$("#co-textDiv").scrollTop(10000);													// Scroll to bottom
 					});
-				}
-			$("#co-revText").val("");																	// Clear input
+				$("#co-revText").val("");																// Clear input
+			}
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -346,7 +287,46 @@ class Chat {
 			if ((e.which == 84) && e.altKey && e.ctrlKey) {											// Test key (Ctrl+Alt+T)
 				}
 			});
-	});
+
+			$("#nextres").on("click",()=>{															// ON NEXT
+				let i,n=app.session.length;
+				for (i=app.curRes+1;i<n;++i)														// Look for next
+					if (app.session[i].intent > 300 && app.session[i].remark)	break;				// If past 300, quit looking
+				app.curRes=Math.min(i,n);															// Set spot							
+				showRes();																			// Show it
+				});
+
+			$("#lastres").on("click",()=>{															// ON PREVIOUS
+				for (i=app.curRes-1;i>=0;--i)														// Look for next
+					if (app.session[i].intent > 300 && app.session[i].remark)	break;				// If past 300, quit looking
+				app.curRes=Math.max(i,0);															// Back
+				showRes();																			// Show it
+				});
+
+			function showRes() {																	// SHOW RES IN  CHAT WINDOW
+				let o=app.session[app.curRes];														// Point at session line
+				$("#co-textDiv").html("<div class='co-textS'><b>TEACHER: </b>"+o.remark+"</div>");	// Add remark
+				$("#co-textDiv").append("<div class='co-textSA'></div>");							// Add to display 
+				$("#co-textDiv").append("<div class='co-textRA'></div>");							// Add triangle
+				let s=app.nlp.CleanRemark(o.remark);
+
+				app.nlp.InferIntent(s,(res)=>{
+					let id=app.session[app.curRes].intent;
+					let str="<b>Original response to id "+app.session[app.curRes].id+"</b>:<br><i>"+app.session[app.curRes].response+"</i>";
+					let col=Math.floor(id/100)*100 == res.intent.name.substr(1) ? "#009900" : "#990000";
+					if (id < 300)	col="#666";
+					$("#rescode").css("color",col);
+					$("#rescode").html("<b>"+res.intent.name.substr(1)+"</b> <span style='font-size:14px'> @"+Math.round(res.intent_ranking[0].confidence*100)+"% &nbsp;--&nbsp; coded as </span><b>&nbsp;"+id+"</b>");
+					$("#oldres").html(str);
+					str=app.nlp.GetResponse(s,o.student,res.intent.name.substr(1)).text;
+					$("#co-textDiv").append("<div class='co-textR'><b>"+o.student.toUpperCase()+": </b>"+str+"</div>");	// Add response
+					});
+				}
+
+
+
+
+		});
 	
 // HELPERS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 

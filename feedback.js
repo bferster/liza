@@ -270,16 +270,16 @@ class ResponsePanel  {
 		function fillList(tab) {																	// FILL RESPONSE LIST
 			let o,i,str="";
 			if (app.role == "Coach") return;														// Not in coach role
-			let n=Math.floor(app.responses[app.role].length/4);										// Number to fill
+			let n=Math.floor(app.nlp.responses[app.role].length/4);									// Number to fill
 			for (i=tab*n;i<tab*n+n;++i) {															// For each of a student's possible responses
-				o=app.responses[app.role][i];														// Point at it
+				o=app.nlp.responses[app.role][i];													// Point at it
 				str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:18px;cursor:pointer;vertical-align:-4px"> ${o.text}</p>`;
 				}
 			$("#lz-rplist").html(str);																// Add responses
 
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.responses[app.role][id].text);
+				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.nlp.responses[app.role][id].text);
 				});
 			}
 

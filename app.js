@@ -89,19 +89,20 @@ class App  {
 				this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);						// Set right side
 				this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);						// Left 
 				this.InitClassroom();																// Init classroom
-
-				fetch("data/session-67.csv")														// Load session file
-					.then(res =>  res.text())														// Get as text
-					.then(res =>{ this.sessionData=Papa.parse(res, { header:true, skipEmptyLines:true }).data; // Parse CSV
-					});
-				
-				fetch('data/responses.csv')															// Load response file
-					.then(res =>  res.text())														// Get as text
-					.then(res =>{ 																	// Process																			
-						let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;			// Parse CSV
-						this.nlp.AddResponses(d);													// Add responses
-						});
 			})	
+
+		fetch('data/responses.csv')																	// Load response file
+			.then(res =>  res.text())																// Get as text
+			.then(res =>{ 																			// Process																			
+				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV
+				this.nlp.AddResponses(d);															// Add responses
+				if (this.role != "Teacher")	this.rp.Draw();											// Show response menu if not teacher
+			});
+
+		fetch("data/session-67.csv")																// Load session file
+			.then(res =>  res.text())																// Get as text
+			.then(res =>{ this.sessionData=Papa.parse(res, { header:true, skipEmptyLines:true }).data; // Parse CSV
+			});
 	}
 
 	AddStudent(d)																				// ADD STUDENT TO DATA
@@ -173,11 +174,7 @@ class App  {
 	{
 		let intent=data.intent.name.substr(1);														// Get intent
 		this.lastResponse={ text:""};																// Clear last
-		if (text.match(/2 \+ 2|plus/i)) {															// Hard-code 2+2
-			let r=["The answer is 4 of course", "Would you believe 22?","The answer is 4","I don't know how to add yet", "Math is hard"]; // Choices
-			this.lastResponse.text=r[Math.floor(Math.random()*r.length)];							// Pick one
-			}
-		else if (intent > 100) 																		// If a high-enough level																						
+		if (intent > 100) 																			// If a high-enough level																						
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response
 		if (this.lastResponse.text) {																// If one
 			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
@@ -341,7 +338,6 @@ class App  {
 		for (i=0;i<10;++i)																			// For each desk
 			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/deskskin.png" : 0xdddddd} );	// Add desk
 		this.LoadModels();										  									// Load 3D models
-		if (this.role != "Teacher")	this.rp.Draw();													// Show response menu if not teacher
 	}
 
 	LoadModels() 																				// LOAD 3D MODELS

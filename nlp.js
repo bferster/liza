@@ -126,8 +126,14 @@ class NLP {
 
 	GetResponse(remark, student, intent)															// GET STUDENT RESPONSE
 	{
-		let i,d=[];
+		let i,d=[],res={ text:"", intent:0 };
+		if (remark.match(/2 \+ 2|plus/i)) {																// Hard-code 2+2
+			let r=["The answer is 4 of course", "Would you believe 22?","The answer is 4","I don't know how to add yet", "Math is hard"]; // Choices
+			res.text=r[Math.floor(Math.random()*r.length)];												// Pick one
+			return res;																					// Return it
+			}
 		let o=app.nlp.responses[student];																// Isolate student
+		if (!o || (student == "Class"))	return res;														// Null response
 		for (i=0;i<o.length;++i)																		// For each responss
 			if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);								// Isolate matching intents
 		i=Math.floor(Math.random()*d.length);															// Pick random match 
