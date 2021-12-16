@@ -45,7 +45,7 @@
 		.lz-confirm {		position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 							border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							}
-		.lz-popup {			position: absolute;  width: auto; padding: 12px; left: calc(50% - 100px); top: calc(50% - 50px);
+		.lz-popup {			position: absolute;  width: auto; max-width:200px; padding: 12px; left: calc(50% - 100px); top: calc(50% - 50px);
 							border-radius: 8px; background-color: #eee; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; 
 							font-size: 14px; text-align:center; display: none;
 							}
@@ -150,8 +150,9 @@
 		</div>
 	</div>
 	<div id="controllerDiv" class="lz-controller">
-		<div id="startBut" class="lz-startBut">START</div>
-		<input id="talkInput" type="text" class="lz-is" style="margin-left:12px;vertical-align:8px" placeholder="Type a remark">
+		<div id="startBut" class="lz-startBut">TEACH</div>
+		<img id="restartBut" src="img/restart.png" style="margin-left:6px;cursor:pointer" title="Restart class">
+		<input id="talkInput" type="text" class="lz-is" style="margin-left:6px;vertical-align:8px" placeholder="Type remark">
 		<span id="promptSpan" style="margin-left:8px;color:#fff;font-weight:bold;vertical-align:8px"></span>
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
@@ -284,9 +285,9 @@ var isMobile=false;																					// Flag for mobile devices
 	{
 		Sound("ding");																					// Ding sound
 		$("#confirmBoxDiv").remove();																	// Remove 
-		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");														
-		var str="<img src='img/lizalogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
-		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add dialog												
+		var str="<img src='img/lizalogo.png' width='64'>";												// Logo							
+		str+="<span style='font-size:16px;float:right;color:#b9220a;margin-top:6px'><b>"+title+"</b></span><br>"; // Title
 		str+="<p>"+content+"<p>";
 		str+="<div style='float:right'><div id='confirmOK' class='lz-bs'>OK</div>";
 		str+="<div id='confirmCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";

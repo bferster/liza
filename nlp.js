@@ -132,7 +132,11 @@ class NLP {
 			res.text=r[Math.floor(Math.random()*r.length)];												// Pick one
 			return res;																					// Return it
 			}
+		if (remark.match(/equipment/i) && remark.match(/scientist/i) && remark.match(/discover/i)) {	// If initial remark
+			intent=100;																					// Repeat initial remark
+			}
 		let o=app.nlp.responses[student];																// Isolate student
+		trace(intent)
 		if (!o || (student == "Class"))	return res;														// Null response
 		for (i=0;i<o.length;++i)																		// For each responss
 			if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);								// Isolate matching intents

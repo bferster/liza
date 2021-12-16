@@ -13,8 +13,8 @@ class App  {
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
-		this.startTime=new Date().getTime();														// Session start time
-		this.curClock=0;																			// Current clock time
+		this.trt=0;																					// Total running time
+		this.totTime=7*60*1000	;																	// Session time in ms (7 mins)
 		this.sessionId="1";																			// Session id
 		this.sessionData=[];																		// Holds session data
 		this.curStudent="";																			// Currently active student
@@ -22,6 +22,7 @@ class App  {
 		this.inSim=false;																			// In simulation or not
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
+		this.initialPrompt="";																		// Initial prompt
 
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
@@ -37,26 +38,43 @@ class App  {
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
-			if (v[i] && v[i].match(/s=/)) this.sessionId=v[i].substr(2) 							// Get session	
+			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substr(2) 							// Get session	
 			}
 		$("#resourceBut").on("click", ()=> { this.ShowResources();  });								// ON RESOURCES	
-		$("#settingsBut").on("click",  ()=> { this.Settings();  });									// ON SETTINGS
-		$("#helpBut").on("click",      ()=> { ShowHelp(); });										// ON HELP
-		$("#startBut").on("click",     ()=> { 														// ON START 
+		$("#settingsBut").on("click", ()=> { this.Settings();  });									// ON SETTINGS
+		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
+		$("#startBut").on("click",    ()=> { 														// ON START 
+			let now=new Date().getTime();															// Get now
+			if (this.inSim) this.trt+=now-this.startTime;											// If in sim already, add to trt
+			else{
+				this.startTime=now;																	// Set start				
+				if (this.trt == 0)	PopUp(this.initialPrompt,10);									// Prompt teacher
+				}
 			this.inSim=!this.inSim;																	// Toggle sim flag
-			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
+			$("#startBut").html(this.inSim ? "PAUSE" : "TEACH");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
-			else 						this.voice.StopListening();;								// Off						
-			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|START|"+this.inSim);  // Send sim status
+			else 						this.voice.StopListening();									// Off						
+			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|START|"+this.inSim+"|"+this.trt);  // Send sim status
 			});									
+		$("#restartBut").on("click",  ()=> { 														// ON RESTART 
+			this.inSim=false;																		// Toggle sim flag
+			if (this.inSim) this.trt+=new now-this.startTime;										// If in sim already, add to trt
+			$("#startBut").html("TEACH");															// Set label					
+			$("#startBut").css("background-color", "#27ae60");										// Set color						
+			this.voice.StopListening();																// Off						
+			ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ // Are you sure?
+				if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|RESTART|"+this.trt);  // Send sim status
+				this.trt=0;																			// No elapsed time
+				});									
+			});	
 		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
 			$("#lz-feedbar").remove();																// Remove feedback panel
 			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
 			$("#blackboardDiv").css("top",h+"px");													// Set top
 			$("#blackboardDiv").css("display") == "none" ? 1 : 0;									// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
-			}); 
+			});
 		$("#slideBut").on("click", (e)=> { 															// ON SLIDE
 			if (e.shiftKey)	this.bb.ShowSlide(-1);													// Last slide
 			else			this.bb.ShowSlide(1);													// Next slide
@@ -84,6 +102,7 @@ class App  {
 						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add  data
 					if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);					// Add BB pic
 					if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
+					if (d[i].type == "prompt")   this.initialPrompt=d[i].text;						// Add initial prompt
 					}
 				this.curStudent=app.students[0].id;													// Pick first student
 				this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);						// Set right side
@@ -174,7 +193,7 @@ class App  {
 	{
 		let intent=data.intent.name.substr(1);														// Get intent
 		this.lastResponse={ text:""};																// Clear last
-		if (intent > 100) 																			// If a high-enough level																						
+		if (intent > 49) 																			// If a high-enough level																						
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response
 		if (this.lastResponse.text) {																// If one
 			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response

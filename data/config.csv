@@ -5,6 +5,7 @@ student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=f
 student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,"
 student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,,b=1,a=2,k=3,t=4,u=3,color=#cccccc,"
+prompt,initial,"<b>Ask students</b>: &quot;What equipment did scientists use to discover water on the moon?&quot;"
 resource,Teacher prep,assets/prep.pdf
 resource,Student facing,assets/student.pdf
 resource,Strategy supports,assets/supports.pdf
@@ -37,7 +38,6 @@ action,twistLeft,"twist left,spin left,turn left",
 action,write,"write,right,rite",
 action,wave,"wave",
 action,read,"read,reed,red,re-read,reread",
-prompt,q1,"What equipment did scientists use to discover water on the moon?"
 keyword,space,"nasa,base,sun,moon,rover,mars,land,earth,pole,ship,ships,lunar,orbiter,shuttle,tank,tanks,mask,masks,suit,crater,craters,spaceship,fuel,rocket,rockets"
 keyword,text,"story,sentence,sentences,prompt,paragraph,book,article,essay,passage,section,sections,word,words,headings,information,vocabulary"
 keyword,tool,"microscope,machine,machinery,equipment,gizmo,gadget,mechanism,device,utensil,binocular,binoculars"

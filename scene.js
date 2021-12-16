@@ -146,9 +146,11 @@ class Scene {
 		this.scene.add(app.clockHand);																// Add to scene		
 	}
 
-	SetClock(degree)																			// SET CLOCK ANGLE
+	SetClock(now)																				// SET CLOCK 
 	{
-		app.clockHand.rotation.z=((degree-90)%360)*Math.PI/-180;									// Rotate hand
+		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
+		let pct=(app.trt+(now-app.startTime))/app.totTime;											// Calc angle
+		app.clockHand.rotation.z=((pct*360-90)%360)*Math.PI/-180;									// Rotate hand
 	}
 
 	AddModel(o)																					// ADD MODEL TO SCENE
@@ -388,7 +390,7 @@ class Scene {
 			if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );			// Render outline
 			else					app.sc.renderer.render(app.sc.scene,app.sc.camera);				// Render scene
 			app.sc.lastTime=now;																	// Then is now
-			app.sc.SetClock(app.curClock+=.1);														// Advance clock	
+			app.sc.SetClock(now);																	// Advance clock	
 			}
 		requestAnimationFrame(app.sc.Render);														// Recurse
 	}
