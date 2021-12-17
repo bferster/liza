@@ -136,10 +136,11 @@ class NLP {
 			intent=100;																					// Repeat initial remark
 			}
 		let o=app.nlp.responses[student];																// Isolate student
-		trace(intent)
 		if (!o || (student == "Class"))	return res;														// Null response
-		for (i=0;i<o.length;++i)																		// For each responss
-			if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);								// Isolate matching intents
+		for (i=0;i<o.length;++i) {																		// For each responss
+			if ((intent%100) && (intent == o[i].intent)) 		d.push(o[i]);							// Add sub intent
+			else if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);							// Add full intent
+			}
 		i=Math.floor(Math.random()*d.length);															// Pick random match 
 		return d[i];																					// Return response object
 	}
