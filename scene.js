@@ -146,10 +146,8 @@ class Scene {
 		this.scene.add(app.clockHand);																// Add to scene		
 	}
 
-	SetClock(now)																				// SET CLOCK 
+	SetClock(pct)																				// SET CLOCK 
 	{
-		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
-		let pct=(app.trt+(now-app.startTime))/app.totTime;											// Calc angle
 		app.clockHand.rotation.z=((pct*360-90)%360)*Math.PI/-180;									// Rotate hand
 	}
 
@@ -390,8 +388,9 @@ class Scene {
 			if (app.sc.outliner) 	app.sc.outliner.render(app.sc.scene, app.sc.camera );			// Render outline
 			else					app.sc.renderer.render(app.sc.scene,app.sc.camera);				// Render scene
 			app.sc.lastTime=now;																	// Then is now
-			app.sc.SetClock(now);																	// Advance clock	
-			}
+			let pct=app.SetSessionTiming(now)/app.totTime;											// Set session timng	
+			app.sc.SetClock(pct);																	// Set wall clock
+		}
 		requestAnimationFrame(app.sc.Render);														// Recurse
 	}
 

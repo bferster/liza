@@ -13,10 +13,12 @@ class App  {
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
-		this.trt=0;																					// Total running time
-		this.totTime=7*60*1000	;																	// Session time in ms (7 mins)
+		this.trt=0;																					// Total running time in seconds
+		this.totTime=0;																				// Session time in seconds
 		this.sessionId="1";																			// Session id
 		this.sessionData=[];																		// Holds session data
+		this.eventTriggers=[];																		// Holds event triggers
+		this.nextTrigger={time:100000, type:""};													// Next trigger to look for
 		this.curStudent="";																			// Currently active student
 		this.lastResponse="";																		// Last response
 		this.inSim=false;																			// In simulation or not
@@ -45,28 +47,29 @@ class App  {
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			let now=new Date().getTime();															// Get now
-			if (this.inSim) this.trt+=now-this.startTime;											// If in sim already, add to trt
+			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else{
 				this.startTime=now;																	// Set start				
 				if (this.trt == 0)	PopUp(this.initialPrompt,10);									// Prompt teacher
 				}
 			this.inSim=!this.inSim;																	// Toggle sim flag
-			$("#startBut").html(this.inSim ? "PAUSE" : "TEACH");									// Set label					
+			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
 			else 						this.voice.StopListening();									// Off						
 			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|START|"+this.inSim+"|"+this.trt);  // Send sim status
 			});									
-		$("#restartBut").on("click",  ()=> { 														// ON RESTART 
+		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
 			this.inSim=false;																		// Toggle sim flag
-			if (this.inSim) this.trt+=new now-this.startTime;										// If in sim already, add to trt
-			$("#startBut").html("TEACH");															// Set label					
+			if (this.inSim) this.trt+=new (now-this.startTime/1000);								// If in sim already, add to trt
+			$("#startBut").html("START");															// Set label					
 			$("#startBut").css("background-color", "#27ae60");										// Set color						
 			this.voice.StopListening();																// Off						
-			ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ // Are you sure?
-				if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|RESTART|"+this.trt);  // Send sim status
-				this.trt=0;																			// No elapsed time
-				});									
+			if (e.type == "click")																	// Only if actually clicked
+				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
+					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|RESTART|"+this.trt);  	// Send sim status
+					this.trt=0;																		// No elapsed time
+					});									
 			});	
 		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
 			$("#lz-feedbar").remove();																// Remove feedback panel
@@ -93,22 +96,38 @@ class App  {
 		fetch('data/config.csv')																	// Load file
 			.then(res =>  res.text())																// Get as text
 			.then(res =>{ 																				
-				let i;
+				let i,o,v;
 				this.students=[]
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV
 				for (i=0;i<d.length;++i) {															// For each line
 					if (d[i].type == "student")  this.AddStudent(d[i]);								// Add student
-					if (d[i].type.match(/action|keyword|vocab|keytag/i))							// An anlp item 	
+					else if (d[i].type.match(/action|keyword|vocab|keytag/i))						// An nlp item 	
 						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add  data
-					if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);					// Add BB pic
-					if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
-					if (d[i].type == "prompt")   this.initialPrompt=d[i].text;						// Add initial prompt
+					else if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);			// Add BB pic
+					else if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
+					else if (d[i].type == "prompt")   this.initialPrompt=d[i].text;					// Add initial prompt
+					else if (d[i].type == "session")  {												// Session settings
+						this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];							// Get total session time in seconds
+						}
+					else if (d[i].type == "trigger") {												// Session settings
+						o={type:d[i].id, done:0 };													// Set type
+						if ((v=d[i].text.match(/type=(.+?)\W/i)))	o.type=v[1];					// Get type
+						if ((v=d[i].text.match(/when=(.+?)\W/i)))	o.when=v[1]-0;					// When
+						if ((v=d[i].text.match(/who=(.+?)\W/i)))	o.who=v[1];						// Who
+						if ((v=d[i].text.match(/do=\[(.+?)\]/i)))	o.do=v[1];						// Do
+						this.eventTriggers.push(o);													// Add to trigger list
+						}
 					}
 				this.curStudent=app.students[0].id;													// Pick first student
 				this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);						// Set right side
 				this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);						// Left 
 				this.InitClassroom();																// Init classroom
-			})	
+				for (i=0;i<this.eventTriggers.length;++i) 											// For each trigger
+					if (this.eventTriggers[i].type == "time") {										// A time event
+						this.nextTrigger=this.eventTriggers[i];										// Point to it
+						break;																		// Quit looking
+						}
+			});	
 
 		fetch('data/responses.csv')																	// Load response file
 			.then(res =>  res.text())																// Get as text
@@ -122,6 +141,37 @@ class App  {
 			.then(res =>  res.text())																// Get as text
 			.then(res =>{ this.sessionData=Papa.parse(res, { header:true, skipEmptyLines:true }).data; // Parse CSV
 			});
+	}
+
+	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
+	{
+		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
+		now=app.trt+(now-app.startTime)/1000;														// Calc elapsed time in session
+		if (now >= app.totTime) {																	// Add done
+			Sound("ding");																			// Ding
+			PopUp("Your Teaching with Grace session is over!");										// Popup
+			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
+			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|DONE|"+now);  	// Send sim status
+			}
+		if (now >= this.nextTrigger.when) 	this.HandleEventTrigger(this.nextTrigger);				// Handel event trigger
+		return now;																					// Return elapsed time in seconds
+	}
+
+	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
+	{
+		let i,s;
+		if (e.done)	return;																			// Already handled
+		e.done=1;																					// Flag it done
+		let student=e.who;																			// Get speaker
+		if (student == "current") student=this.curStudent;											// Use current student
+		let v=e.do.split("+");																		// Split do items
+		for (i=0;i<v.length;++i) {																	// For each do item
+			if (v[i].match(/say:/i)) {																// SAY
+				s=v[i].substring(4);																// Get text or intent
+				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s).text;							// Get from response file with intent
+				this.ws.send(this.sessionId+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 			// Talk
+				}
+			}
 	}
 
 	AddStudent(d)																				// ADD STUDENT TO DATA

@@ -5,7 +5,9 @@ student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=f
 student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,"
 student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,,b=1,a=2,k=3,t=4,u=3,color=#cccccc,"
-prompt,initial,"<b>Ask students</b>: &quot;What equipment did scientists use to discover water on the moon?&quot;"
+session,session,"trt=300,"
+trigger,time,"who=Luis,when=30,interupt=1,do=[say:150+action:wave],"
+prompt,initial,"<b>Ask students</b>:<br><br>I’ve called you together to improve your responses and draw attention to your thinking about the question. <br><br>What equipment did scientists use to discover water on the moon?"
 resource,Teacher prep,assets/prep.pdf
 resource,Student facing,assets/student.pdf
 resource,Strategy supports,assets/supports.pdf
