@@ -68,8 +68,8 @@ class App  {
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
 					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|RESTART|"+this.trt);  	// Send sim status
-					this.trt=0;																		// No elapsed time
-					});									
+					this.StartSession();															// Start session
+				});									
 			});	
 		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
 			$("#lz-feedbar").remove();																// Remove feedback panel
@@ -118,15 +118,9 @@ class App  {
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
 					}
-				this.curStudent=app.students[0].id;													// Pick first student
-				this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);						// Set right side
-				this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);						// Left 
+				
 				this.InitClassroom();																// Init classroom
-				for (i=0;i<this.eventTriggers.length;++i) 											// For each trigger
-					if (this.eventTriggers[i].type == "time") {										// A time event
-						this.nextTrigger=this.eventTriggers[i];										// Point to it
-						break;																		// Quit looking
-						}
+				this.StartSession();																// Start session
 			});	
 
 		fetch('data/responses.csv')																	// Load response file
@@ -143,6 +137,25 @@ class App  {
 			});
 	}
 
+	StartSession()																				// START/RESTART SESSION
+	{
+		let i;
+		this.trt=0;																					// At start
+		this.inSim=false;																			// Not in simulation
+		this.lastResponse="";																		// Last response
+		this.pickMeQuestion="";																		// Whole class 'pick me' question
+		this.curStudent=app.students[0].id;															// Pick first student
+		this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);								// Set right side
+		this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);								// Left 
+		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
+			this.eventTriggers[i].done=0;															// Reset done	
+			if (this.eventTriggers[i].type == "time") {												// A time event
+				this.nextTrigger=this.eventTriggers[i];												// Point to next trigger 
+				break;																				// Quit looking
+				}
+			}
+	}
+
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
 	{
 		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
@@ -153,7 +166,7 @@ class App  {
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
 			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|DONE|"+now);  	// Send sim status
 			}
-		if (now >= this.nextTrigger.when) 	this.HandleEventTrigger(this.nextTrigger);				// Handel event trigger
+		if (now >= this.nextTrigger.when) 	this.HandleEventTrigger(this.nextTrigger);				// Handle event trigger
 		return now;																					// Return elapsed time in seconds
 	}
 
@@ -170,6 +183,10 @@ class App  {
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s).text;							// Get from response file with intent
 				this.ws.send(this.sessionId+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 			// Talk
+				}
+			else if (v[i].match(/act:/i)) {															// ACT
+				s=v[i].substring(4);																// Get text or intent
+				app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+student+"|"+s); 						// Animate
 				}
 			}
 	}
@@ -394,9 +411,9 @@ class App  {
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
 		this.seqs["wave"]="handUp,.6,handRight,.5,3";
+		this.seqs["interrupt"]="handUp,.6,handRight,.5,handUp,.6,handRight,.5,startUp,.5,1";
 		this.seqs["write"]="write1,.6,write2,.7,write1,.8,write2,.5,write1,.7,write2,.4,write1,.8,write2,.7,startUp,1,1";
 		this.seqs["read"]="readS,1,readL,1,readR,1,readL,1,readR,1,readL,1,readR,1,readL,1,readR,1,headCenter,1,startUp,.5,1";
-
 		this.seqs["nodYes"]="headBack,.4,headDown,.3,headUp,.3,2";
 		this.seqs["nodNo"]="headLeft,.3,headRight,.3,headCenter,.3,2";
 		this.seqs["headUp"]="headUp,1";			this.seqs["headDown"]="headDown,1";			
