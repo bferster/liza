@@ -14,8 +14,11 @@ class App  {
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
 		this.trt=0;																					// Total running time in seconds
+		this.startTime;																				// Start of session in ms
+		this.curTime=0;																				// Time in session in seconds
 		this.totTime=0;																				// Session time in seconds
 		this.sessionId="1";																			// Session id
+		this.activityId="1";																		// Activity id
 		this.sessionData=[];																		// Holds session data
 		this.eventTriggers=[];																		// Holds event triggers
 		this.nextTrigger={time:100000, type:""};													// Next trigger to look for
@@ -39,8 +42,9 @@ class App  {
 		this.multi=window.location.search.match(/role=/i) ? true : false;							// Multi-player mode
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 		for (let i=0;i<v.length;++i) {																// For each param
-			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substr(6).toLowerCase();  // Get role	
-			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substr(2) 							// Get session	
+			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
+			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session	
+			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get session	
 			}
 		$("#resourceBut").on("click", ()=> { this.ShowResources();  });								// ON RESOURCES	
 		$("#settingsBut").on("click", ()=> { this.Settings();  });									// ON SETTINGS
@@ -48,7 +52,7 @@ class App  {
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			let now=new Date().getTime();															// Get now
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
-			else{
+			else{																					// Not in sim
 				this.startTime=now;																	// Set start				
 				if (this.trt == 0)	PopUp(this.initialPrompt,10);									// Prompt teacher
 				}
@@ -57,7 +61,7 @@ class App  {
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
 			else 						this.voice.StopListening();									// Off						
-			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|START|"+this.inSim+"|"+this.trt);  // Send sim status
+			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|START|"+this.inSim);  // Send sim status
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
 			this.inSim=false;																		// Toggle sim flag
@@ -67,7 +71,7 @@ class App  {
 			this.voice.StopListening();																// Off						
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
-					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|RESTART|"+this.trt);  	// Send sim status
+					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|RESTART");  	// Send sim status
 					this.StartSession();															// Start session
 				});									
 			});	
@@ -82,7 +86,7 @@ class App  {
 			if (e.shiftKey)	this.bb.ShowSlide(-1);													// Last slide
 			else			this.bb.ShowSlide(1);													// Next slide
 			}); 
-		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
+		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 81) && e.ctrlKey)	{													// Test key (Ctrl+Q)
@@ -159,15 +163,15 @@ class App  {
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
 	{
 		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
-		now=app.trt+(now-app.startTime)/1000;														// Calc elapsed time in session
-		if (now >= app.totTime) {																	// Add done
+		this.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
+		if (this.curTime >= app.totTime) {															// Add done
 			Sound("ding");																			// Ding
 			PopUp("Your Teaching with Grace session is over!");										// Popup
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
-			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.role+"|DONE|"+now);  	// Send sim status
+			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|DONE");  		// Send sim status
 			}
-		if (now >= this.nextTrigger.when) 	this.HandleEventTrigger(this.nextTrigger);				// Handle event trigger
-		return now;																					// Return elapsed time in seconds
+		if (this.curTime >= this.nextTrigger.when) 	this.HandleEventTrigger(this.nextTrigger);		// Handle event trigger
+		return this.curTime;																		// Return elapsed time in seconds
 	}
 
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
@@ -182,11 +186,11 @@ class App  {
 			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s).text;							// Get from response file with intent
-				this.ws.send(this.sessionId+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 			// Talk
+				this.ws.send(this.sessionId+"|"+this.curTime+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 	// Talk
 				}
 			else if (v[i].match(/act:/i)) {															// ACT
 				s=v[i].substring(4);																// Get text or intent
-				app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+student+"|"+s); 						// Animate
+				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+student+"|"+s); 		// Animate
 				}
 			}
 	}
@@ -217,7 +221,7 @@ class App  {
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher")	talkingTo="Teacher";											// Always to teach, unless teacher
 		let act=app.nlp.GetAction(text);															// Set action
-		app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);			// Send remark
+		app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);	// Send remark
 		if (app.pickMeQuestion) {																	// If a pick me question was last asked
 			text=app.pickMeQuestion;																// Send previou question
 			app.pickMeQuestion="";																	// Clear it
@@ -230,7 +234,7 @@ class App  {
 		if (!act) 																					// If no action happening
 			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				let r=app.GenerateResponse(text,res);												// Generate response
-				let intent=res.intent.name.substr(1);												// Get intent
+				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				if (intent) {																		// If an intent detected
 					let s=app.fb.intentLabels[intent/100];											// Get intent label
@@ -258,12 +262,12 @@ class App  {
 
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
-		let intent=data.intent.name.substr(1);														// Get intent
+		let intent=data.intent.name.substring(1);														// Get intent
 		this.lastResponse={ text:""};																// Clear last
 		if (intent > 49) 																			// If a high-enough level																						
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response
 		if (this.lastResponse.text) {																// If one
-			this.ws.send(this.sessionId+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
+			this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
 			this.UpdateVariance(this.curStudent,this.lastResponse);									// Update student variance
 			}
 		return this.lastResponse;																	// Return it
@@ -292,7 +296,7 @@ class App  {
 		let i;
 		if (!act) return;																			// Quit if no act spec's
 		if (act.match(/pickme:/)) {																	// Asking to pick
-			this.pickMeQuestion=act.substr(7);														// Save question
+			this.pickMeQuestion=act.substring(7);													// Save question
 			app.curStudent="Class";																	// Address whole class
 			act="wave";																				// Wave
 			}
@@ -308,7 +312,7 @@ class App  {
 			else if (act == "nextSlide")	app.bb.ShowSlide(1);									// Next slide
 			else if (act == "lastSlide")	app.bb.ShowSlide(-1);									// Last
 			else if (act == "firstSlide")	app.bb.ShowSlide(0,0);									// Restart
-			else 							app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+student+"|"+act); 	// Send response
+			else 							app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+student+"|"+act); 	// Send response
 			}					
 	}
 
@@ -349,7 +353,7 @@ class App  {
 		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
 		this.ws.onopen=()=> { 																		// ON OPEN
 			console.log('connected'); 																// Showconnected
-			this.ws.send(this.sessionId+"|"+this.role+"|INIT");										// Init																	
+			this.ws.send(this.sessionId+"|0|"+this.role+"|INIT");									// Init																	
 			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
 			++this.secs;																			// Another second 
 			if (this.retryWS) {																		// If reconnecting to websocket
@@ -371,23 +375,23 @@ class App  {
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
-		if (v[2] == "TALK") {																		// TALK
-			if ((v[3] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
-			else  												 app.voice.Talk(v[5],v[3]);			// Talk	
-			if (this.role != "Teacher" && v[3] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
-				this.nlp.InferIntent(v[5],(res)=>{ 													// Get intent from AI
-					let intent=res.intent.name.substr(1);											// Get intent
+		if (v[3] == "TALK") {																		// TALK
+			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
+			else  												 app.voice.Talk(v[6],v[4]);			// Talk	
+			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
+				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
+					let intent=res.intent.name.substring(1);										// Get intent
 					intent=isNaN(intent) ? 0 : intent;												// Validate
 					this.rp.curIntent=intent;														// Set current intent
 					if (v[4]) app.curStudent=v[4];													// Set new active student 
-					this.rp.Draw(v[5],app.curStudent);												// Redraw response panel
+					this.rp.Draw(v[6],app.curStudent);												// Redraw response panel
 					});
 				}
 			}
-		else if ((v[2] == "CHAT") && (this.role == v[3])) {	Sound("ding"); Bubble(v[4],5,bx); }		// CHAT
-		else if (v[2] == "ACT")  	app.sc.StartAnimation(v[3],app.seqs[v[4]]);						// ACT
-		else if (v[2] == "VIDEO")  	{ if (!$("#lz-videoChat").length) this.VideoChat();	}			// VIDEO
-		else if (v[2] == "PICTURE") app.bb.SetPic(v[4],true,"",v[3]); 								// PICTURE
+		else if (v[3] == "ACT")  	app.sc.StartAnimation(v[4],app.seqs[v[5]]);						// ACT
+		else if (v[3] == "VIDEO")  	{ if (!$("#lz-videoChat").length) this.VideoChat();	}			// VIDEO
+		else if (v[3] == "PICTURE") app.bb.SetPic(v[5],true,"",v[4]); 								// PICTURE
+		else if ((v[3] == "CHAT") && (this.role == v[4])) {	Sound("ding"); Bubble(v[5],5,bx); }		// CHAT
 	}
 
 	InitClassroom()																				// INIT CLASSROOM
@@ -495,7 +499,7 @@ class App  {
 			if ($("#trIF").length) {
 				$("#resourcesDiv").html(str);															// If a resource, put back file list
 				$("[id^=tres-]").on("click", (e)=>{														// ON CLICK RESOURCE
-					let id=e.target.id.substr(5);
+					let id=e.target.id.substring(5);													// Set id
 					let h=500;
 					let ifs="<iframe id='trIF' frameborder='0' src='"+this.teacherResources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
 					$("#resourcesDiv").html(ifs)
@@ -504,7 +508,7 @@ class App  {
 			else $('#lz-resources').remove();															// Remove whole dialog
 			});
 		$("[id^=tres-]").on("click", (e)=>{																// ON CLICK RESOURCE
-			let id=e.target.id.substr(5);
+			let id=e.target.id.substring(5);
 			let h=500;
 			let ifs="<iframe id='trIF' frameborder='0' src='"+this.teacherResources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
 			$("#resourcesDiv").html(ifs)

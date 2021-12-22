@@ -18,17 +18,10 @@
 	node socketserver.js
 
 	npm install forever
-	cd ~/htdocs | forever stopall | forever start socketserver.js | forever logs | sudo cat /home/bitnami/.forever/<id>.log
+	cd ~/htdocs/go | forever stopall | forever start ws.js | forever logs | sudo cat /home/bitnami/.forever/<id>.log
 	open port:8080
 
-	ID|SENDER|OP|DATA-0 ... DATA-N
-	------------------------------
-	1|Luis|INIT
-	1|Luis|TALK|Luis|Teacher|Hello, I am Luis
-	1|Luis|ACT|Luis|standUp
-	1|Luis|CHAT|All|on
-	1|Luis|VIDEO|All|on
-	1|Luis|PICTURE|0|Lunar orbiter
+	ID|TIME|SENDER|OP|DATA-0 ... DATA-N
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
@@ -54,19 +47,19 @@
 			message=msg.toString();																// Get as string
 			trace('In:', message.substr(0,128));												// Log
 			let v=message.split("|");															// Get params
-			if (v[2] == "INIT") { 																// No id 
+			if (v[3] == "INIT") { 																// No id 
 				webSocket.meetingId=v[0];														// Set meeting id
 				webSocket.senderId=v[1];														// Set sender id
-				str=v[0]+" "+v[1]+" -> "+req.socket.remoteAddress.substr(7);					// Add id, and IP
+				str=v[0]+" "+v[2]+" -> "+req.socket.remoteAddress.substring(7);					// Add id, and IP
 				console.log("Meeting: "+str);													// Log client
 				}
-			if (v[2] == "TALK") 	  	Broadcast(v[0], message);								// Broadcast TALK to everyone connected
-			else if (v[2] == "ACT")		Broadcast(v[0], message);								// ACT 
-			else if (v[2] == "CHAT")	Broadcast(v[0], message);								// CHAT
-			else if (v[2] == "VIDEO")	Broadcast(v[0], message);								// VIDEO
-			else if (v[2] == "PICTURE") Broadcast(v[0], message);								// PICTURE
-			else if (v[2] == "AUDIO") 	Broadcast(v[0], message,true);							// AUDIO
-			else if (v[2] == "START") ;															// START
+			if (v[3] == "TALK") 	  	Broadcast(v[0], message);								// Broadcast TALK to everyone connected
+			else if (v[3] == "ACT")		Broadcast(v[0], message);								// ACT 
+			else if (v[3] == "CHAT")	Broadcast(v[0], message);								// CHAT
+			else if (v[3] == "VIDEO")	Broadcast(v[0], message);								// VIDEO
+			else if (v[3] == "PICTURE") Broadcast(v[0], message);								// PICTURE
+			else if (v[3] == "AUDIO") 	Broadcast(v[0], message,true);							// AUDIO
+			else if (v[3] == "START") ;															// START
 			});
 		} catch(e) { console.log(e) }
 	});

@@ -239,7 +239,7 @@ class ResponsePanel  {
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 
 		$("#lz-chat").on("change", ()=> {															// ON MESSAGE TEACHER
-			app.ws.send(app.sessionId+"|"+app.role+"|CHAT|Teacher|<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val()); // Send message
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|CHAT|Teacher|<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val()); // Send message
 			let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;		// Bubble center
 			Bubble("<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val(),5,bx);					// Show
 			$("#lz-chat").val("");																	// Clear input
@@ -257,7 +257,7 @@ class ResponsePanel  {
 
 		$("#lzSeqs").on("change", ()=> {															// ON RUN SEQUENCE
 			if (app.role == "Coach") return;														// Not in coach role
-			app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
 			$("#lzSeqs").prop("selectedIndex",0);													// Reset pulldowns
 			});
 
@@ -279,7 +279,7 @@ class ResponsePanel  {
 
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.nlp.responses[app.role][id].text);
+				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.nlp.responses[app.role][id].text);
 				});
 			}
 
