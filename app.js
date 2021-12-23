@@ -25,6 +25,7 @@ class App  {
 		this.curStudent="";																			// Currently active student
 		this.lastResponse="";																		// Last response
 		this.inSim=false;																			// In simulation or not
+		this.said="";																				// Current remark
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
 		this.initialPrompt="";																		// Initial prompt
@@ -41,7 +42,7 @@ class App  {
 		this.LoadFiles();																			// Load config and other files
 		this.bb=new Blackboard();																	// Alloc Blackboard (must be before Scene)	
 		this.sc=new Scene("mainDiv");																// Alloc new Scene		
-		this.voice=new Voice(this.OnPhrase);														// Alloc TTS/STT
+		this.voice=new Voice();																		// Alloc and capture results
 		this.fb=new Feedback();																		// Alloc Feedback	
 		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
@@ -59,6 +60,8 @@ class App  {
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
+			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
+			else 						this.voice.StopListening();									// Off						
 			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|START|"+this.inSim);  // Send sim status
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
@@ -66,6 +69,7 @@ class App  {
 			if (this.inSim) this.trt+=new (now-this.startTime/1000);								// If in sim already, add to trt
 			$("#startBut").html("START");															// Set label					
 			$("#startBut").css("background-color", "#27ae60");										// Set color						
+			this.voice.StopListening();																// STT off						
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
 					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|RESTART");  	// Send sim status
@@ -86,19 +90,22 @@ class App  {
 		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$(window).on("keydown",function(e) {														// HANDLE KEY DOWN
+
 			if (e.which == 32) {																	// Spacebar
-				if (e.target.type == "text")	return false;										// Not in a text input
+				if (e.target.type == "text")	return true;										// If in a text input, quit
+				if (e.originalEvent.repeat)		return false;										// Only 1st one
 				if (!app.inSim) {																	// If not in a session
 					PopUp("Please START the session to talk to the class"); 						// Prompt
 					return;																			// Quit
 					}
-				if (!app.voice.listening) app.voice.Listen();										// Turn on speech recognition, if not already on
+				app.said="";																		// Clear spoken cache
 				}
 			});
 		$(window).on("keyup",function(e) {															// HANDLE KEY UP
 			if (e.which == 32) {																	// Spacebar
-				if (e.target.type != "text")	return false;										// Not in a text input
-				app.voice.StopListening();															// Stop listening					
+				if (e.target.type == "text")	return true;										// If in a text input, quit
+				if (app.inSim)					setTimeout(()=>{ app.OnPhrase(app.said); },1000); 	// React to remark if in sim
+				app.said="";																		// Clear spoken cache
 				}
 			});
 	}
@@ -241,7 +248,7 @@ class App  {
 			}
 		app.DoAction(act);																			// If a please + action mentioned, do it
 		if (!act) 																					// If no action happening
-			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
+		app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				let r=app.GenerateResponse(text,res);												// Generate response
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
