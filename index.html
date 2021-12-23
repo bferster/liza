@@ -153,7 +153,7 @@
 		<div id="startBut" class="lz-startBut">START</div>
 		<img id="restartBut" src="img/restart.png" style="margin-left:6px;cursor:pointer" title="Restart class">
 		<input id="talkInput" type="text" class="lz-is" style="margin-left:6px;vertical-align:8px" placeholder="Type remark">
-		<span id="promptSpan" style="margin-left:16px;color:#000;vertical-align:8px">PRESS SPACEBAR TO TALK TO CLASS</span>
+		<span id="promptSpan" style="margin-left:16px;color:#333;vertical-align:8px">PRESS SPACEBAR TO TALK</span>
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="resourceBut" src="img/scriptbut.gif" title="View teacher resources" style="cursor:pointer;margin-right:16px;float:right">
@@ -372,7 +372,7 @@ var isMobile=false;																					// Flag for mobile devices
 			$("#promptSpan").fadeIn(200);																// Fade in
 		else{																							// Popping up	
 			$("#promptSpan").fadeIn(500).delay(secs ? secs*1000 : 5000)									// Animate in
-				.fadeOut(500,()=>{ $("#promptSpan").html("PRESS SPACEBAR TO TALK TO CLASS") })			// Fade out
+				.fadeOut(500,()=>{ $("#promptSpan").html("PRESS SPACEBAR TO TALK") })					// Fade out
 				.fadeIn(500); 																			// Fade in directions		
 			}
 	}

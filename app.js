@@ -89,7 +89,7 @@ class App  {
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text")	return false;										// Not in a text input
 				if (!app.inSim) {																	// If not in a session
-					PopUp("Please start the session to talk to the class"); 						// Prompt
+					PopUp("Please START the session to talk to the class"); 						// Prompt
 					return;																			// Quit
 					}
 				if (!app.voice.listening) app.voice.Listen();										// Turn on speech recognition, if not already on
@@ -118,10 +118,11 @@ class App  {
 					else if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);			// Add BB pic
 					else if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
 					else if (d[i].type == "prompt")   this.initialPrompt=d[i].text;					// Add initial prompt
+					else if (d[i].type == "seat")  	  this.sc.AddSeat(d[i]);						// Add seat position
 					else if (d[i].type == "session")  {												// Session settings
 						this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];							// Get total session time in seconds
 						}
-					else if (d[i].type == "trigger") {												// Session settings
+				else if (d[i].type == "trigger") {											// Session settings
 						o={type:d[i].id, done:0 };													// Set type
 						if ((v=d[i].text.match(/type=(.+?)\W/i)))	o.type=v[1];					// Get type
 						if ((v=d[i].text.match(/when=(.+?)\W/i)))	o.when=v[1]-0;					// When

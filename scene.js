@@ -6,21 +6,7 @@ class Scene {
 
 	constructor(div)																			// CONSTRUCTOR
 	{
-		this.seats=[ { x: 120, y:100,  z:0, r:0 },   { x:  0,  y:100,  z:0, r:0   },				// Seat locations
-					 { x:-120, y:100,  z:0, r:-10 }, { x:-120, y:-100, z:0, r:0 },
-					 { x:   0, y:-100, z:0, r:0 },   { x: 120, y:-100, z:0, r:30  } ];
-
-	 	this.seats=[ { x: 200, y:110,  z:0, r:-25 },												// Horseshoe seating												
-			   		 { x: 100, y:70,   z:0, r:-15 },				
-					 { x:0,    y:50,   z:0, r:0 },
-					 { x:-100, y:75,   z:0, r:15 },
-					 { x:-200, y:110,  z:0, r:25 },
-					 { x: -200, y:-100, z:0, r:0 },   
-					 { x: -100, y:-100, z:0, r:0 },   
-					 { x:   0, y:-100, z:0, r:0 },   
-					 { x: 100, y:-100, z:0, r:0 },   
-					 { x: 200, y:-100, z:0, r:30 } ];
-
+		this.seats=[];
 		this.lastTime=0;																			// Used to throttle rendring
 		this.cartoonScene=window.location.search.match(/real/i) ? false : true;						// Render scene as cartoon?	   		
 		this.models=[];																				// Holds models
@@ -202,6 +188,16 @@ class Scene {
 			if (o.sex) object.position.z-=12,object.ozp-=12;
 			_this.scene.add(object);																// Add model to scene
 		}
+	}
+
+	AddSeat(o)																					// ADD SEAT POSITION
+	{
+		let i=o.id-0,v;
+		this.seats[i]={};																			// Add obj
+		if ((v=o.text.match(/x=(.+?)\W/i)))	this.seats[i].x=v[1]-0;									// Get X
+		if ((v=o.text.match(/y=(.+?)\W/i)))	this.seats[i].y=v[1]-0;									// Y
+		if ((v=o.text.match(/z=(.+?)\W/i)))	this.seats[i].z=v[1]-0;									// Z
+		if ((v=o.text.match(/r=(.+?)\W/i)))	this.seats[i].r=v[1]-0;									// R
 	}
 
 	SetBone(model, bone, x, y, z)																// ROTATE A BONE
