@@ -1,0 +1,43 @@
+type,id,text,data
+student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=1,"
+student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=2,"
+student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=3,"
+student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,"
+student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,"
+student,Mihyun,"mihyun,meyon,neon,beyond","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=6,"
+student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
+session,session,"trt=300,"
+prompt,initial,"<b>Ask students</b>:<br><br>I’ve called you together to improve your responses and draw attention to your thinking about the question. <br><br>What equipment did scientists use to discover water on the moon?"
+resource,Teacher prep,assets/prep.pdf
+resource,Student facing,assets/student.pdf
+resource,Strategy supports,assets/supports.pdf
+picture,Question,assets/Discussion.png
+picture,Math lesson,assets/ImportantWords.png
+picture,Lunar orbiter,assets/rover.png
+picture,Important words,assets/ImportantWords.png
+picture,Misleading words,assets/MisleadingWords.png
+action,firstSlide,"begin slide,start slide",
+action,nextSlide,"advance side,next side,nextSlide slide",
+action,lastSlide,"back side,back slide,last slide,last side,previous slide,previous side",
+action,nextSlide,"next side,next slide,advance slide,advance side",
+action,sleep,"sleep,snooze",
+action,headCenter,"eyes front,head center",
+action,headRight,head right,
+action,headLeft,head left,
+action,headUp,"head up,raise head,raise your head",
+action,headDown,"head down,look down,lower head,lower your head",
+action,headRight,"head right,head to the right",
+action,fidgetStop,"stop fidget,stop squirm",
+action,fidget,fidget,
+action,armDown,"arm down,hand down,arms down,hands down",
+action,armUp,"arm up,hand up,arms up,hands up",
+action,nodNo,"nod no,disagree",
+action,nodYes,"nod yes,agree",
+action,standUp,"stand,stand up,rise",
+action,sit,"setup,sit down,sit up,wake up",
+action,twistRight,"twist right,spin right,turn right",
+action,twistLeft,"twist left,spin left,turn left",
+action,write,"write,right,rite",
+action,wave,"wave",
+action,wave2,"interrupt",
+action,read,"read,reed,red,re-read,reread",

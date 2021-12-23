@@ -46,7 +46,7 @@ class Voice {
 			this.recognition.continuous=false;															// Continual recognition off
 			this.recognition.lang="en-US";																// US English
 			this.recognition.interimResults=true
-			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };		// ON STT END RE-LISTEN	IF IN SIM											
+//			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };		// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 
 			this.recognition.onresult=(e)=> { 															// On some speech recognized

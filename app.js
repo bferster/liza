@@ -29,6 +29,13 @@ class App  {
 		this.teacherResources=[];																	// Teacher resource documents
 		this.initialPrompt="";																		// Initial prompt
 
+		this.multi=window.location.search.match(/role=/i) ? true : false;							// Multi-player mode
+		let v=window.location.search.substring(1).split("&");						   				// Get query string
+		for (let i=0;i<v.length;++i) {																// For each param
+			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
+			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session	
+			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get session	
+			}
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
 		this.LoadFiles();																			// Load config and other files
@@ -39,13 +46,6 @@ class App  {
 		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
 
-		this.multi=window.location.search.match(/role=/i) ? true : false;							// Multi-player mode
-		let v=window.location.search.substring(1).split("&");						   				// Get query string
-		for (let i=0;i<v.length;++i) {																// For each param
-			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
-			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session	
-			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get session	
-			}
 		$("#resourceBut").on("click", ()=> { this.ShowResources();  });								// ON RESOURCES	
 		$("#settingsBut").on("click", ()=> { this.Settings();  });									// ON SETTINGS
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
@@ -59,8 +59,6 @@ class App  {
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
-			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
-			else 						this.voice.StopListening();									// Off						
 			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|START|"+this.inSim);  // Send sim status
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
@@ -68,7 +66,6 @@ class App  {
 			if (this.inSim) this.trt+=new (now-this.startTime/1000);								// If in sim already, add to trt
 			$("#startBut").html("START");															// Set label					
 			$("#startBut").css("background-color", "#27ae60");										// Set color						
-			this.voice.StopListening();																// Off						
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
 					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|RESTART");  	// Send sim status
@@ -88,16 +85,27 @@ class App  {
 			}); 
 		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
-		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
-			if ((e.which == 81) && e.ctrlKey)	{													// Test key (Ctrl+Q)
-				app.OnPhrase("student want focus exactly what question asking answer completely");
+		$(window).on("keydown",function(e) {														// HANDLE KEY DOWN
+			if (e.which == 32) {																	// Spacebar
+				if (e.target.type == "text")	return false;										// Not in a text input
+				if (!app.inSim) {																	// If not in a session
+					PopUp("Please start the session to talk to the class"); 						// Prompt
+					return;																			// Quit
+					}
+				if (!app.voice.listening) app.voice.Listen();										// Turn on speech recognition, if not already on
+				}
+			});
+		$(window).on("keyup",function(e) {															// HANDLE KEY UP
+			if (e.which == 32) {																	// Spacebar
+				if (e.target.type != "text")	return false;										// Not in a text input
+				app.voice.StopListening();															// Stop listening					
 				}
 			});
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE
 	{	
-		fetch('data/config.csv')																	// Load file
+		fetch('data/config-'+this.activityId+'.csv')												// Load file
 			.then(res =>  res.text())																// Get as text
 			.then(res =>{ 																				
 				let i,o,v;
@@ -127,7 +135,7 @@ class App  {
 				this.StartSession();																// Start session
 			});	
 
-		fetch('data/responses.csv')																	// Load response file
+		fetch('data/responses-'+this.activityId+'.csv')												// Load response file
 			.then(res =>  res.text())																// Get as text
 			.then(res =>{ 																			// Process																			
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV
@@ -198,8 +206,7 @@ class App  {
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		try {
-			let seatNum=this.students.length;														// Get seat
-			let o={ fidget:0, s:15, seat:seatNum, src:"assets/body2.dae" };							// Basic info
+			let o={ fidget:0, s:15, src:"assets/body2.dae" };										// Basic info
 			o.id=d.id;																				// Name
 			o.sex=d.data.match(/sex=(.+?)\W/)[1];													// Get sex
 			o.b=d.data.match(/b=(.+?)\D/)[1]-0;														// Get variant B
@@ -207,6 +214,7 @@ class App  {
 			o.k=d.data.match(/k=(.+?)\D/)[1]-0;														// Get variant K
 			o.t=d.data.match(/t=(.+?)\D/)[1]-0;														// Get variant T
 			o.u=d.data.match(/u=(.+?)\D/)[1]-0;														// Get variant U
+			o.seat=d.data.match(/seat=(.+?)\D/)[1]-0;												// Get seat
 			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
 			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set skin
 			if (o.id != "Class") this.students.push(o);												// Add only students to students array
@@ -262,7 +270,7 @@ class App  {
 
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
-		let intent=data.intent.name.substring(1);														// Get intent
+		let intent=data.intent.name.substring(1);													// Get intent
 		this.lastResponse={ text:""};																// Clear last
 		if (intent > 49) 																			// If a high-enough level																						
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response

@@ -82,14 +82,14 @@ class App {
 	LoadConfig()																				// LOAD CONFIG FILE
 	{	
 		let i,d;
-		fetch('data/config.csv')																	// Load file
+		fetch('data/config-1.csv')																	// Load file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
 				d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 						// Parse CSV using papa lib
 				for (i=0;i<d.length;++i) 															// For each line
 					 this.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 						// Add synonyms, keywords, keytags, vocab
 			});
-		fetch('data/responses.csv')																	// Load responses file
+		fetch('data/responses-1.csv')																// Load responses file
 			.then(res => res.text())																// Get as text
 			.then(res =>{																			// Process																	
 				d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;						// Parse CSV using papa lib

@@ -146,14 +146,14 @@
 			You need to click the green START button to start speaking.<br><br>
 			<b>There is more information in the help (?) button at the bottom of the screen.</b>
 			<br><br><br>
-			<div style="font-size:11px">&copy; 2021 StageTools </div>
+			<div style="font-size:11px">&copy; 2022 StageTools </div>
 		</div>
 	</div>
 	<div id="controllerDiv" class="lz-controller">
 		<div id="startBut" class="lz-startBut">START</div>
 		<img id="restartBut" src="img/restart.png" style="margin-left:6px;cursor:pointer" title="Restart class">
 		<input id="talkInput" type="text" class="lz-is" style="margin-left:6px;vertical-align:8px" placeholder="Type remark">
-		<span id="promptSpan" style="margin-left:8px;color:#fff;font-weight:bold;vertical-align:8px"></span>
+		<span id="promptSpan" style="margin-left:8px;color:#fff;vertical-align:8px">PRESS SPACEBAR TO TALK TO CLASS</span>
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="resourceBut" src="img/scriptbut.gif" title="View teacher resources" style="cursor:pointer;margin-right:16px;float:right">
@@ -368,10 +368,13 @@ var isMobile=false;																					// Flag for mobile devices
 	{
 		var str="";
 		$("#promptSpan").html(msg);																		// Add message
-		if (secs == "on") 																				// If on	
+		if (secs == "on") 																				// If always on	
 			$("#promptSpan").fadeIn(200);																// Fade in
-		else																							// Popping up	
-			$("#promptSpan").fadeIn(500).delay(secs ? secs*1000 : 5000).fadeOut(500);					// Animate in and out		
+		else{																							// Popping up	
+			$("#promptSpan").fadeIn(500).delay(secs ? secs*1000 : 5000)									// Animate in
+				.fadeOut(500,()=>{ $("#promptSpan").html("PRESS SPACEBAR TO TALK TO CLASS") })			// Fade out
+				.fadeIn(500); 																			// Fade in directions		
+			}
 	}
 
 	function trace(msg, p1, p2, p3, p4)																// CONSOLE 
