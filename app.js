@@ -63,6 +63,7 @@ class App  {
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
 			else 						this.voice.StopListening();									// Off						
 			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|START|"+this.inSim);  // Send sim status
+			Prompt(this.inSim ? "PRESS AND HOLD SPACEBAR TO TALK" : "CLICK START TO RESUME SESSION","on");	 // Directions
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
 			this.inSim=false;																		// Toggle sim flag
@@ -73,6 +74,7 @@ class App  {
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
 					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|RESTART");  	// Send sim status
+					Prompt("CLICK START TO BEGIN NEW SESSION","on");	 							// Directions
 					this.StartSession();															// Start session
 				});									
 			});	
