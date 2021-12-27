@@ -1,4 +1,3 @@
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // NLP 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +13,7 @@ class NLP {
 		this.vocab=[];																					// Unique vocab by intent ("")
 		this.AIhost="https://lizasim.com";																// AI host 
 		this.responses=[];																				// Response file
-		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list
+		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list (unused)
 			"yourself","yourselves","he","him","his","himself","she","her","hers","herself",
 			"it","its","it's","itself","they","them","their","theirs","themselves","this","that",
 			"these","those","am","is","are","was","were","be","been","have","has","had","having",
@@ -44,17 +43,20 @@ class NLP {
 		}
 	}
 	
-	GetWho(text, both)																				// GET WHO IN TEXT
+	GetWho(text, both=false, all=false)																// GET WHO IN TEXT
 	{
 		let i,syn,who=both ? ":" : "";
+		if (all) who=[];																				// Get them all
 		let v=this.Tokenize(text);																		// Tokenize	
 		for (i=0;i<v.length;++i) {																		// For each token
 			syn=this.whoSyns[v[i].toLowerCase()];														// Get synonym
-			if (typeof(syn) == "string") 																// A valid string
-				who=syn+(both ? ":"+v[i] : "");															// Set canonical who[:trigger word]
+			if (typeof(syn) == "string") {																// A valid string
+				if (all) who.push(syn);																	// Add to people mentioned
+				else 	 who=syn+(both ? ":"+v[i] : "");												// Set 1 canonical who[:trigger word]
+				}
 			}
-		return who;																						// Return last trigger:who 
-	}
+		return who;																						// Return last trigger:who
+                                                                                           	}
 
 	GetAction(text)																					// GET ACTION FROM TEXT
 	{

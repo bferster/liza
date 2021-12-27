@@ -34,8 +34,8 @@ class App  {
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
-			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session	
-			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get session	
+			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session id
+			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get activity id	
 			}
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
@@ -123,15 +123,13 @@ class App  {
 				for (i=0;i<d.length;++i) {															// For each line
 					if (d[i].type == "student")  this.AddStudent(d[i]);								// Add student
 					else if (d[i].type.match(/action|keyword|vocab|keytag/i))						// An nlp item 	
-						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add  data
+						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add nlp data
 					else if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);			// Add BB pic
 					else if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
 					else if (d[i].type == "prompt")   this.initialPrompt=d[i].text;					// Add initial prompt
 					else if (d[i].type == "seat")  	  this.sc.AddSeat(d[i]);						// Add seat position
-					else if (d[i].type == "session")  {												// Session settings
-						this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];							// Get total session time in seconds
-						}
-				else if (d[i].type == "trigger") {											// Session settings
+					else if (d[i].type == "session")  this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];	// Session settings
+					else if (d[i].type == "trigger") {												// Triggers
 						o={type:d[i].id, done:0 };													// Set type
 						if ((v=d[i].text.match(/type=(.+?)\W/i)))	o.type=v[1];					// Get type
 						if ((v=d[i].text.match(/when=(.+?)\W/i)))	o.when=v[1]-0;					// When
@@ -140,7 +138,6 @@ class App  {
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
 					}
-				
 				this.InitClassroom();																// Init classroom
 				this.StartSession();																// Start session
 			});	
@@ -186,7 +183,7 @@ class App  {
 			Sound("ding");																			// Ding
 			PopUp("Your Teaching with Grace session is over!");										// Popup
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
-			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|DONE");  		// Send sim status
+			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|DONE");  // Send sim status
 			}
 		if (this.curTime >= this.nextTrigger.when) 	this.HandleEventTrigger(this.nextTrigger);		// Handle event trigger
 		return this.curTime;																		// Return elapsed time in seconds
@@ -234,6 +231,7 @@ class App  {
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
+		if (!text)					return;															// Quit if nothing said
 		let talkingTo=app.nlp.GetWho(text);															// Get student menitioned, if any
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
@@ -248,9 +246,9 @@ class App  {
 			app.DoAction("sit");																	// Arms down	
 			app.curStudent=t;																		// Restore currnt student
 			}
-		app.DoAction(act);																			// If a please + action mentioned, do it
+		app.DoAction(act,text);																		// If a please + action mentioned, do it
 		if (!act) 																					// If no action happening
-		app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
+			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				let r=app.GenerateResponse(text,res);												// Generate response
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
@@ -266,7 +264,7 @@ class App  {
 				trace(res,r.text)
 			});
 
-		function addVariant(v, label)	{															// ADD VARIANT STATUS TO PROMPT
+		function addVariant(v, label)	{														// ADD VARIANT STATUS TO PROMPT
 			let str=" ";		
 			if (!v)	return "";																		// Nothing to add
 			let a=v.match(/^\d+/)[0];																// Get amt
@@ -291,25 +289,25 @@ class App  {
 		return this.lastResponse;																	// Return it
 	}
 
-	UpdateVariance(student, res)																	// UPDATE STUDENT VARIANCE FROM RESPONSE
+	UpdateVariance(student, res)																// UPDATE STUDENT VARIANCE FROM RESPONSE
 	{
-		student=app.students.findIndex((s)=>{ return student == s.id });								// Convert to index
-		let o=app.students[student];																	// Point at student
-		o.b=Math.max(Math.min(o.b+getVariant(res.b),9),0);												// Set variant B 0-9
-		o.a=Math.max(Math.min(o.a+getVariant(res.a),9),0);												// A
-		o.k=Math.max(Math.min(o.k+getVariant(res.k),9),0);												// K
-		o.t=Math.max(Math.min(o.t+getVariant(res.t),9),0);												// T
-		o.u=Math.max(Math.min(o.u+getVariant(res.u),9),0);												// U
+		student=app.students.findIndex((s)=>{ return student == s.id });							// Convert to index
+		let o=app.students[student];																// Point at student
+		o.b=Math.max(Math.min(o.b+getVariant(res.b),9),0);											// Set variant B 0-9
+		o.a=Math.max(Math.min(o.a+getVariant(res.a),9),0);											// A
+		o.k=Math.max(Math.min(o.k+getVariant(res.k),9),0);											// K
+		o.t=Math.max(Math.min(o.t+getVariant(res.t),9),0);											// T
+		o.u=Math.max(Math.min(o.u+getVariant(res.u),9),0);											// U
 
-		function getVariant(v) {																		// GET VARIENT FROM RESPONSE
-			if (!v)						return 0;														// Not set
-			let x=v.match(/^\d+/)[0];																	// Get amt
-			if (!x || (x == "0"))		return 0;														// No change
-			else						return x-0;														// Return change
+		function getVariant(v) {																	// GET VARIENT FROM RESPONSE
+			if (!v)						return 0;													// Not set
+			let x=v.match(/^\d+/)[0];																// Get amt
+			if (!x || (x == "0"))		return 0;													// No change
+			else						return x-0;													// Return change
 		}
 	}
 
-	DoAction(act)																				// PERFORM ACTION
+	DoAction(act, remark)																		// PERFORM ACTION
 	{
 		let i;
 		if (!act) return;																			// Quit if no act spec's
@@ -318,12 +316,23 @@ class App  {
 			app.curStudent="Class";																	// Address whole class
 			act="wave";																				// Wave
 			}
+		if (act == "pair") {																		// If pairing
+			let who=this.nlp.GetWho(remark,false,true);												// Get student's mentioned											
+			if (who && app.curStudent == who[0]) 	return;											// Quit if only 1 student mentioned
+			let seat1=who[0] ? app.students.find(x => x.id == who[0]).seat : 0;						// Get mentioned seat number
+			let seat2=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get current student seat number
+			animateIt(who[0],"twist"+((seat1 < seat2) ? "Right" : "Left"));							// Animate mentioned	
+			animateIt(app.curStudent,"twist"+((seat1 < seat2) ? "Left" : "Right"));					// Animate current
+			return;																					// Quit	
+			}
+
 		if (app.curStudent == "Class") 																// If the whole class
 			for (i=0;i<app.students.length;++i)														// For each student
-				animateIt(app.students[i].id);														// Animate them									
+				animateIt(app.students[i].id,act);													// Animate them									
 		else																						// Just one
-			animateIt(app.curStudent);																// Animate that one	
-		function animateIt(student) {																// ANIMATE STUDENT
+			animateIt(app.curStudent,act);															// Animate that one	
+
+		function animateIt(student, act) {															// ANIMATE STUDENT
 			let seat=student ? app.students.find(x => x.id == student).seat : 0;					// Get seat number
 			if (act == "fidget")			app.students[seat].fidget=1;							// Fidget								
 			else if (act == "fidgetStop")	app.students[seat].fidget=0;							// Off	
@@ -492,11 +501,11 @@ class App  {
 			});
 	}
 
-	ShowResources()
+	ShowResources()																				// SHOW TEACHER RESOUCES
 	{
-		if ($("#lz-resources").length) {																	// If already up, bring it down
+		if ($("#lz-resources").length) {															// If already up, bring it down
 			$("#lz-resources").hide("slide",{ direction:"down", complete: ()=>{ $("#lz-resources").remove(); } }); // Slide down
-			return;																						// Quit																					
+			return;																					// Quit																					
 			}
 		let str=`<div class="lz-dialog" id="lz-resources" 
 		style="background-color:#ccc;width:50%;overflow:hidden;display:none;padding:8px 8px 0 8px;left:calc(50% - 32px)">

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
-// VOICE
+// VOICE (SST / TTS(
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Voice {																				 
@@ -45,7 +45,6 @@ class Voice {
 			this.recognition=new SpeechRecognition();													// Init STT
 			this.recognition.continuous=false;															// Continual recognition off
 			this.recognition.lang="en-US";																// US English
-//			this.recognition.interimResults=true
 			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };							// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
 			this.recognition.onresult=(e)=> { app.said+=" "+e.results[0][0].transcript;	 };				// On some speech recognized, add
