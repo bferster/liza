@@ -51,6 +51,7 @@ class App  {
 		$("#settingsBut").on("click", ()=> { this.Settings();  });									// ON SETTINGS
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
 		$("#startBut").on("click",    ()=> { 														// ON START 
+			if (this.role != "Teacher") return;														// Only for teacher
 			let now=new Date().getTime();															// Get now
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else{																					// Not in sim
@@ -58,22 +59,23 @@ class App  {
 				if (this.trt == 0)	PopUp(this.initialPrompt,10);									// Prompt teacher
 				}
 			this.inSim=!this.inSim;																	// Toggle sim flag
-			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
-			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
 			else 						this.voice.StopListening();									// Off						
-			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|START|"+this.inSim);  // Send sim status
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim);  		// Send sim status
+			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
+			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
+
 			Prompt(this.inSim ? "PRESS AND HOLD SPACEBAR TO TALK" : "CLICK START TO RESUME SESSION","on");	 // Directions
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
+			if (this.role != "Teacher") return;														// Only for teacher
 			this.inSim=false;																		// Toggle sim flag
-			if (this.inSim) this.trt+=new (now-this.startTime/1000);								// If in sim already, add to trt
 			$("#startBut").html("START");															// Set label					
 			$("#startBut").css("background-color", "#27ae60");										// Set color						
 			this.voice.StopListening();																// STT off						
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
-					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|RESTART");  	// Send sim status
+					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|RESTART");  	// Send sim status
 					Prompt("CLICK START TO BEGIN NEW SESSION","on");	 							// Directions
 					this.StartSession();															// Start session
 				});									
@@ -89,7 +91,7 @@ class App  {
 			if (e.shiftKey)	this.bb.ShowSlide(-1);													// Last slide
 			else			this.bb.ShowSlide(1);													// Next slide
 			}); 
-		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
+		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$(window).on("keydown",function(e) {														// HANDLE KEY DOWN
 
@@ -183,7 +185,7 @@ class App  {
 			Sound("ding");																			// Ding
 			PopUp("Your Teaching with Grace session is over!");										// Popup
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
-			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|DONE");  // Send sim status
+			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|DONE");  // Send sim status
 			}
 		if (this.curTime >= this.nextTrigger.when) 	this.HandleEventTrigger(this.nextTrigger);		// Handle event trigger
 		return this.curTime;																		// Return elapsed time in seconds
@@ -201,11 +203,11 @@ class App  {
 			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s).text;							// Get from response file with intent
-				this.ws.send(this.sessionId+"|"+this.curTime+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 	// Talk
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 	// Talk
 				}
 			else if (v[i].match(/act:/i)) {															// ACT
 				s=v[i].substring(4);																// Get text or intent
-				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+student+"|"+s); 		// Animate
+				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|ACT|"+student+"|"+s); 		// Animate
 				}
 			}
 	}
@@ -237,7 +239,7 @@ class App  {
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher")	talkingTo="Teacher";											// Always to teach, unless teacher
 		let act=app.nlp.GetAction(text);															// Set action
-		app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);	// Send remark
+		app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);	// Send remark
 		if (app.pickMeQuestion) {																	// If a pick me question was last asked
 			text=app.pickMeQuestion;																// Send previou question
 			app.pickMeQuestion="";																	// Clear it
@@ -283,7 +285,7 @@ class App  {
 		if (intent > 49) 																			// If a high-enough level																						
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response
 		if (this.lastResponse.text) {																// If one
-			this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
 			this.UpdateVariance(this.curStudent,this.lastResponse);									// Update student variance
 			}
 		return this.lastResponse;																	// Return it
@@ -339,7 +341,7 @@ class App  {
 			else if (act == "nextSlide")	app.bb.ShowSlide(1);									// Next slide
 			else if (act == "lastSlide")	app.bb.ShowSlide(-1);									// Last
 			else if (act == "firstSlide")	app.bb.ShowSlide(0,0);									// Restart
-			else 							app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+student+"|"+act); 	// Send response
+			else 							app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|ACT|"+student+"|"+act); 	// Send response
 			}					
 	}
 
@@ -419,6 +421,19 @@ class App  {
 		else if (v[3] == "VIDEO")  	{ if (!$("#lz-videoChat").length) this.VideoChat();	}			// VIDEO
 		else if (v[3] == "PICTURE") app.bb.SetPic(v[5],true,"",v[4]); 								// PICTURE
 		else if ((v[3] == "CHAT") && (this.role == v[4])) {	Sound("ding"); Bubble(v[5],5,bx); }		// CHAT
+		else if (v[3] == "RESTART")  {																// RESTART
+			$("#startBut").html("START");															// Set label					
+			$("#startBut").css("background-color", "#27ae60");										// Set color
+			this.StartSession();																	// Start session										
+			}
+		else if (v[3] == "START")  {																// START
+			let now=new Date().getTime();															// Get now
+			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
+			else			this.startTime=now;														// Reset start
+			this.inSim=v[4] == "true";
+			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
+			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
+			}  
 	}
 
 	InitClassroom()																				// INIT CLASSROOM

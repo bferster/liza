@@ -59,7 +59,8 @@
 			else if (v[3] == "VIDEO")	Broadcast(v[0], message);								// VIDEO
 			else if (v[3] == "PICTURE") Broadcast(v[0], message);								// PICTURE
 			else if (v[3] == "AUDIO") 	Broadcast(v[0], message,true);							// AUDIO
-			else if (v[3] == "START") ;															// START
+			else if (v[3] == "START")   Broadcast(v[0], message);								// START
+			else if (v[3] == "RESTART") Broadcast(v[0], message);								// RESTART
 			});
 		} catch(e) { console.log(e) }
 	});
