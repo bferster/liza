@@ -21,7 +21,7 @@ class App  {
 		this.activityId="1";																		// Activity id
 		this.sessionData=[];																		// Holds session data
 		this.eventTriggers=[];																		// Holds event triggers
-		this.nextTrigger={time:100000, type:""};													// Next trigger to look for
+		this.nextTrigger={id:0, time:100000, type:""};												// Next trigger to look for
 		this.curStudent="";																			// Currently active student
 		this.lastResponse="";																		// Last response
 		this.inSim=false;																			// In simulation or not
@@ -29,8 +29,9 @@ class App  {
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
 		this.initialPrompt="";																		// Initial prompt
-
+		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.multi=window.location.search.match(/role=/i) ? true : false;							// Multi-player mode
+		
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
@@ -140,6 +141,7 @@ class App  {
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
 					}
+				this.eventTriggers.sort((a,b)=>{ return a.when-b.when });							// Sort by time											
 				this.InitClassroom();																// Init classroom
 				this.StartSession();																// Start session
 			});	
@@ -165,6 +167,7 @@ class App  {
 		this.inSim=false;																			// Not in simulation
 		this.lastResponse="";																		// Last response
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
+		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.curStudent=app.students[0].id;															// Pick first student
 		this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);								// Set right side
 		this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);								// Left 
@@ -182,7 +185,6 @@ class App  {
 		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
 		this.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
 		if (this.curTime >= app.totTime) {															// Add done
-			Sound("ding");																			// Ding
 			PopUp("Your Teaching with Grace session is over!");										// Popup
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
 			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|DONE");  // Send sim status
@@ -198,19 +200,31 @@ class App  {
 		e.done=1;																					// Flag it done
 		let student=e.who;																			// Get speaker
 		if (student == "current") student=this.curStudent;											// Use current student
+		if (student == "random")  student=this.students[Math.floor(Math.random()*this.students.length)].id;	// Get random student
 		let v=e.do.split("+");																		// Split do items
 		for (i=0;i<v.length;++i) {																	// For each do item
 			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s).text;							// Get from response file with intent
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 	// Talk
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 
 				}
 			else if (v[i].match(/act:/i)) {															// ACT
-				s=v[i].substring(4);																// Get text or intent
-				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|ACT|"+student+"|"+s); 		// Animate
+				s=v[i].substring(4);																// Get text
+				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|ACT|"+student+"|"+s); 	
+				}
+			else if (v[i].match(/end:/i)) {															// END
+				s=this.remarkLevels.indexOf(Math.max(...this.remarkLevels));
+				s=app.nlp.GetResponse("",student,710+s*10).text;									// Get from response file with intent
+					this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 
 				}
 			}
-	}
+		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
+			if (this.eventTriggers[i].type == "time" && !this.eventTriggers[i].done) {				// Am undone time event
+				this.nextTrigger=this.eventTriggers[i];												// Point to next trigger 
+				break;																				// Quit looking
+				}
+			}
+		}
 
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
@@ -281,6 +295,7 @@ class App  {
 	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
 	{
 		let intent=data.intent.name.substring(1);													// Get intent
+		this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
 		this.lastResponse={ text:""};																// Clear last
 		if (intent > 49) 																			// If a high-enough level																						
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response
