@@ -21,6 +21,7 @@ class App  {
 		this.activityId="1";																		// Activity id
 		this.sessionData=[];																		// Holds session data
 		this.eventTriggers=[];																		// Holds event triggers
+		this.variance=[];																			// Holds variance data
 		this.nextTrigger={id:0, time:100000, type:""};												// Next trigger to look for
 		this.curStudent="";																			// Currently active student
 		this.lastResponse="";																		// Last response
@@ -140,8 +141,11 @@ class App  {
 						if ((v=d[i].text.match(/do=\[(.+?)\]/i)))	o.do=v[1];						// Do
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
+					else if (d[i].type == "variance") {												// Variance
+						if (d[i].id == "labels")	this.variance.labels=d[i].text.split(",");		// Get labels
+						}					
 					}
-				this.eventTriggers.sort((a,b)=>{ return a.when-b.when });							// Sort by time											
+				this.eventTriggers.sort((a,b)=>{ return a.when-b.when });							// Sort events by time											
 				this.InitClassroom();																// Init classroom
 				this.StartSession();																// Start session
 			});	
@@ -271,10 +275,10 @@ class App  {
 				if (intent) {																		// If an intent detected
 					let s=app.fb.intentLabels[intent/100];											// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
-					s+=addVariant(r.b,"Belonging");													// Add variant for B
-					s+=addVariant(r.a,"Academic");													// A
-					s+=addVariant(r.k,"Knowledge");													// K
-					s+=addVariant(r.t,"Thinking");													// T
+					s+=addVariant(r.b,app.variance.labels[0]);										// Add variant for B
+					s+=addVariant(r.a,app.variance.labels[1]);										// A
+					s+=addVariant(r.k,app.variance.labels[2]);										// K
+					s+=addVariant(r.t,app.variance.labels[3]);										// T
 					Prompt(s,10);																	// Show in prompt area
 					}	
 				trace(res,r.text)
