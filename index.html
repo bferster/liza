@@ -364,6 +364,17 @@ var isMobile=false;																					// Flag for mobile devices
 		$("#bubbleDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);						// Animate in and out		
 	}
 
+	function WhoAmI(msg, time, x, y)																// TIMED ID BUBBLE
+	{
+		$("#bubbleDiv").remove();																		// Kill old one, if any
+		var str="<div id='bubbleDiv' style='position:absolute;font-weight:bold;font-family:Chalk;font-size:24px;color:#666;";
+		if (x)	str+="left:"+x+"px;";
+		if (y)	str+="top:"+y+"px";
+		str+="'>"+msg+"</div>"; 
+		$("body").append(str);																			// Add popup to body
+		$("#bubbleDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);						// Animate in and out		
+	}
+
 	function Prompt(msg, secs)																		// TIMED PROMPT
 	{
 		var str="";

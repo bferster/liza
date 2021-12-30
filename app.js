@@ -425,7 +425,11 @@ class App  {
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[3] == "TALK") {																		// TALK
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
-			else  												 app.voice.Talk(v[6],v[4]);			// Talk	
+			else {																					// Student talk	
+				app.voice.Talk(v[6],v[4]);															// Talk		
+				let p=app.sc.GetScreenPos(app.sc.models[v[4]].model);								// Get pos of student
+				WhoAmI(v[4],3,p.x-30,p.y+50);														// Show name
+				}
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
 				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
 					let intent=res.intent.name.substring(1);										// Get intent
