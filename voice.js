@@ -76,6 +76,7 @@ class Voice {
 			return;
 			}
 		try{																							// Try
+			this.tts.rate=1.1;																			// Set voice speed rate
 			if (who != "Teacher") 		this.talking=who;												// Trigger mouth animation if a student
 			speechSynthesis.cancel();																	// Clear current speech queue			
 			if (app.inSim) this.StopListening();														// Stop listening
