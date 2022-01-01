@@ -328,7 +328,7 @@ class App  {
 		}
 	}
 
-	DoAction(act, remark)																		// PERFORM ACTION
+	DoAction(act, remark)																		// PERFORM STUDENT ACTION
 	{
 		let i;
 		if (!act) return;																			// Quit if no act spec's
@@ -346,7 +346,6 @@ class App  {
 			animateIt(app.curStudent,"twist"+((seat1 < seat2) ? "Left" : "Right"));					// Animate current
 			return;																					// Quit	
 			}
-
 		if (app.curStudent == "Class") 																// If the whole class
 			for (i=0;i<app.students.length;++i)														// For each student
 				animateIt(app.students[i].id,act);													// Animate them									
@@ -425,11 +424,7 @@ class App  {
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[3] == "TALK") {																		// TALK
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
-			else {																					// Student talk	
-				app.voice.Talk(v[6],v[4]);															// Talk		
-				let p=app.sc.GetScreenPos(app.sc.models[v[4]].model);								// Get pos of student
-				WhoAmI(v[4],3,p.x-30,p.y+50);														// Show name
-				}
+			else 												 app.voice.Talk(v[6],v[4]);			// Talk		
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
 				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
 					let intent=res.intent.name.substring(1);										// Get intent

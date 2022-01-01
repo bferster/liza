@@ -34,6 +34,7 @@ class Voice {
 				if (app.inSim) this.Listen();															// Resume listening
 				this.talking=0;  																		// Stop talking animation
 				let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
+				$("#responseTextDiv").fadeOut(300);														// Fade out response bubble
 				if (app.curStudent)																		// A valid student
 					app.sc.SetBone(app.students[snum],"mouth",0,0,0); 									// Neutral mouth 
 				};	
@@ -77,7 +78,10 @@ class Voice {
 			}
 		try{																							// Try
 			this.tts.rate=1.1;																			// Set voice speed rate
-			if (who != "Teacher") 		this.talking=who;												// Trigger mouth animation if a student
+			if (who != "Teacher") {																		// Student talking
+				this.talking=who;																		// Trigger mouth animation if a student
+				this.ShowSpeakerText(who,text);															// Show text underneath student										
+				}
 			speechSynthesis.cancel();																	// Clear current speech queue			
 			if (app.inSim) this.StopListening();														// Stop listening
 			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice
@@ -86,8 +90,18 @@ class Voice {
 			else if (who == "female") 	this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
 			this.tts.text=text;																			// Set text
 			speechSynthesis.speak(this.tts);															// Speak
-			}
+		}
 		catch(e) { trace("Speech error",e) };															// Catch
+	}
+
+	ShowSpeakerText(student, msg)																	// SHOW SPEAKER'S TEXT
+	{
+		$("#responseTextDiv").remove();					                                   				// Kill old one, if any
+		let p=app.sc.GetScreenPos(app.sc.models[student].model);										// Get pos of student
+		var str="<div id='responseTextDiv' style='position:absolute;font-size:14px;width:150px;text-align:center;";
+		str+="left:"+(p.x-75)+"px;top:"+(p.y+60)+"px'><b>"+student+"</b><br>"+msg+"</div>"; 			// Position and set msg
+		$("body").append(str);																			// Add popup to body
+		$("#responseTextDiv").fadeIn(500);																// Animate in	
 	}
 
 }  // VOICE CLOSURE
