@@ -105,9 +105,8 @@ class Blackboard  {
 		for (var i=0;i<this.pics.length;++i) 	str+="<div"+trsty+"id='BBpic-'+i>"+this.pics[i].lab+"</div>"
 		$("#blackboardDiv").append(str+"</div");														// Add popup	
 
-		$("[id^=BBpic-]").on("click", function(){														// ON CLICK PIC
-			app.bb.SetPic($(this).text(),true)
-			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.role+"|PICTURE|"+app.bb.curSide+"|"+$(this).text());	// Send pic change
+		$("[id^=BBpic-]").on("click", function() {														// ON CLICK PIC
+			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+this.role+"|PICTURE|"+app.bb.curSide+"|"+$(this).text());	// Send pic change
 			});
 	}
 

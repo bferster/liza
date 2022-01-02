@@ -212,7 +212,6 @@ var isMobile=false;																					// Flag for mobile devices
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",(e)=> {																// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				app.ws.send(app.sessionId+"|"+app.role+"|ACT|"+app.role+"|standUp");	
 				}
 			});
 	});	
