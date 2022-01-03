@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
+		<title>Session manager</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="lib/papaparse.min.js"></script>
+	</head>
+	<style>
+		body { 	font-family:Segoe UI,Verdana,Geneva,sans-serif;font-size:16px; margin:20px; }
+		.lz-is 		{	border-radius:16px; padding:0 8px; height: 24px; border:1px solid #999; font-size: 13px; text-align:center; }
+		.lz-bs 		{	display:inline-block; border-radius:16px; padding:0 16px; border:1px solid #999; font-size: 13px; 
+						cursor:pointer; z-index:2; padding-bottom:1px; color:#000; background-color: #eee; font-weight:600; }
+		.lz-confirm {	position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
+						border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; }
+
+	</style>
+	<body>
+
+		<div style="width:66%;margin:0 auto;text-align:center">
+			<img src="img/lizalogo.png" style="width:25%">
+			<span style="font-size:24px;vertical-align:12px"><b><i> session</b></i></span>
+			<hr>
+			Session Id <input type="input" class="lz-is" style="width:40px" value="2" id="lz-id"/>
+			<hr>
+			<div class="lz-bs" id="lz-fetchSession">Get Session</div>
+			&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-clearSession">Clear session</div>
+			<hr>
+		</div>
+	
+<script>
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// APP
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class App  {																					
+
+	constructor(id)   																			// CONSTRUCTOR
+	{
+		this.retryWS;																		
+		this.secs=0;																				
+		this.ws;
+		this.pollTimer;
+		this.InitSocketServer();																	// Init socket server
+		this.sessionId=2;
+	}
+
+	InitSocketServer()																			// INIT SOCKET SERVER
+	{
+		this.retryWS=false;																			// Reconnecting to web socket
+		this.secs=0;																				// Time
+		if (window.location.host == "localhost") this.ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
+		else									 this.ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
+		this.ws.onmessage=(e)=>{ this.SocketIn(e); };												// ON INCOMING MESSAGE
+		this.ws.onclose=()=>   { console.log('disconnected'); this.ws=null; this.retryWS=true; Sound("delete") };		// ON CLOSE
+		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
+		this.ws.onopen=()=> { 																		// ON OPEN
+			console.log('connected'); 																// Showconnected
+			this.ws.send("0|0|ADMIN|INIT");															// Init																	
+			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
+			++this.secs;																			// Another second 
+			if (this.retryWS) {																		// If reconnecting to websocket
+				if (window.location.host == "localhost") this.ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
+				else									 this.ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
+				this.ws.onmessage=(e)=>{ this.SocketIn(e); };										// ON INCOMING MESSAGE
+				this.ws.onclose=()=>   { this.retryWS=true; console.log('disconnected'); };			// ON CLOSE
+				this.ws.onopen=()=>    { console.log('re-connected'); };							// ON OPEN  
+				this.retryWS=false;																	// Not retrying	anymore
+				}
+			},1000)
+		}
+	}
+
+	SocketIn(event)																				// A WEBSOCKET MESSAGE FROM NODE WS SERVER
+	{
+		if (!event.data)			 return;														// Quit if no data
+		let v=event.data.split("|");																// Get params
+		if (v[3] == "FETCH") {																		// FETCH
+			trace(v[5])	
+			SaveTextAsFile("sessiondata-"+v[4]+".csv",v[5]);										// Write file
+			}
+		else if (v[3] == "CLEAR") {																	// CLEAR
+			Sound("delete")
+			trace("Cleared")	
+			}
+	}
+} // App class closure
+
+
+$(document).ready(function() {								           						// ON PAGE LOADED
+	let app=new App();
+	$("#lz-fetchSession").on("click",()=>{														// ON FETCH SESSION
+		app.ws.send("0|0.0|ADMIN|FETCH|"+$("#lz-id").val());  									// Fetch session data
+	 	});							
+	 $("#lz-clearSession").on("click",()=>{														// ON CLEAR SESSION
+		ConfirmBox("Are you sure?", "This will clear the session forever.", ()=>{ 				// Are you sure?
+			app.ws.send("0|0.0|ADMIN|CLEAR|"+$("#lz-id").val());  								// Clear session data
+			});
+	 	});							
+});
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// HELPERS 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+function trace(msg, p1, p2, p3, p4)																// CONSOLE 
+	{
+		if (p4 != undefined)
+			console.log(msg,p1,p2,p3,p4);
+		else if (p3 != undefined)
+			console.log(msg,p1,p2,p3);
+		else if (p2 != undefined)
+			console.log(msg,p1,p2);
+		else if (p1 != undefined)
+			console.log(msg,p1);
+		else
+			console.log(msg);
+	}
+
+	function Sound(sound, mute)																		// PLAY SOUND
+	{
+		var snd=new Audio();																			// Init audio object
+		if (sound.match(/\.mp3/i))		snd=new Audio(sound)											// If an MP3 file
+		else							snd=new Audio("img/"+sound+".mp3");								// Use built in mp3
+		if (!mute)	{																					// If not initing or muting	
+			snd.volume=100/100;																			// Set volume
+			snd.play();																					// Play it
+			}
+		}
+
+	function SaveTextAsFile(file, contents)															// SAVE TEXT TO LOCAL FILE
+	{
+		if (file.charAt(0) == "*") {																	// If asking
+			GetTextBox("Type file name","", file.substr(1), (s)=>{ SaveTextAsFile(s, contents); });		// Ask for name
+			return;																						// Quit
+			}
+		var textFileAsBlob=new Blob([contents], {type:'text/plain'});
+		var downloadLink=document.createElement("a");
+		downloadLink.download=file;
+		downloadLink.innerHTML="Download File";
+		downloadLink.href=window.URL.createObjectURL(textFileAsBlob);
+	    downloadLink.onclick=()=>{ downloadLink.remove(); };
+		downloadLink.style.display="none";
+		downloadLink.id="tdll";
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+	}
+
+	function GetTextBox(title, content, def, callback)											// GET TEXT LINE BOX
+	{
+		$("#confirmBoxDiv").remove();																	// Remove 
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add box								
+		var str="<img src='img/lizalogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
+		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
+		str+="<p>"+content+"<p>";
+		str+="<p><input class='lz-is' style='width:75%' type='text' id='gtBoxTt' value='"+def+"'></p>";
+		str+="<div id='dialogOK' class='lz-bs'>OK</div>";
+		str+="<div id='dialogCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
+		$("#confirmBoxDiv").html(str);																	// Add to div
+		$("#gtBoxTt").focus();																			// Focus on button
+		$("#gtBoxTt").on("change", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ONE ENTER
+		$("#dialogOK").on("click", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ON OK 
+		$("#dialogCancel").on("click", function() {	$("#confirmBoxDiv").remove(); });								// ON CANCEL
+		}
+
+	function LoadingIcon(mode)																	// SHOW/HIDE LOADING ICON		
+	{
+		if (!mode) {																				// If hiding
+			$("#lz-loadingIcon").remove();															// Remove it
+			return;																					// Quit
+			}
+		let str="<div id='lz-loadingIcon' style='position:absolute;top:calc(50% - 64px);left:calc(50% - 64px);z-index:5000;text-align:center'>";
+		str+="<img src='img/loading.gif' width='128'>";												// Img
+		str+="<div id='lz-loadingIconText' style='margin-top:-78px;color:#999'></div></div>";		// Progress
+		$("body").append(str);																		// Add icon to container
+	}
+
+	function ConfirmBox(title, content, callback, callback2)										// CONFIRMATION BOX
+	{
+		Sound("ding");																					// Ding sound
+		$("#confirmBoxDiv").remove();																	// Remove 
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add dialog												
+		var str="<img src='img/lizalogo.png' width='64'>";												// Logo							
+		str+="<span style='font-size:16px;float:right;color:#b9220a;margin-top:6px'><b>"+title+"</b></span><br>"; // Title
+		str+="<p>"+content+"<p>";
+		str+="<div style='float:right'><div id='confirmOK' class='lz-bs'>OK</div>";
+		str+="<div id='confirmCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
+		$("#confirmBoxDiv").html(str);	
+	
+		$("#confirmOK").on("click", function() {														// ON OK BUT
+				$("#confirmBoxDiv").remove();															// Remove 
+				if (callback)	callback();																// If callback defined, run it
+				});
+
+		$("#confirmCancel").on("click", function() {													// ON CANCEL BUT
+				$("#confirmBoxDiv").remove();															// Remove 
+				if (callback2)	callback2();															// If callback defined, run it
+				Sound("delete");																		// Delete sound
+				});
+	}
+	
+</script>
+</body>
+</html>
+

@@ -63,6 +63,7 @@ class App  {
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
 			else 						this.voice.StopListening();									// Off						
+			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim);  		// Send sim status
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
@@ -393,7 +394,7 @@ class App  {
 		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
 		this.ws.onopen=()=> { 																		// ON OPEN
 			console.log('connected'); 																// Showconnected
-			this.ws.send(this.sessionId+"|0|"+this.role+"|INIT");									// Init																	
+			this.ws.send(this.sessionId+"|0.00|"+this.role+"|INIT");								// Init																	
 			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
 			++this.secs;																			// Another second 
 			if (this.retryWS) {																		// If reconnecting to websocket

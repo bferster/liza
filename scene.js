@@ -483,13 +483,13 @@ class Scene {
 		pos.project(this.camera);																	// Project pos
 		pos.x=(pos.x*w)+w;																			// In screen coords X
 		pos.y=-(pos.y*h)+h;																			// Y
-		if (app.multi)	pos.x+=w*.3;																// Adjust for multi view shifting
+		if (app.role != "Teacher")	pos.x+=w*.3;													// Adjust for multi view shifting
 		return pos;																					// Return pos
 	}
 
 	GetModelPos(x,y)																			// GET SCREEN POS OF 3D OBJECT
 	{	
-		if (app.multi)	x-=window.innerWidth*.15;													// Adjust for multi view shifting
+		if (app.role != "Teacher")	x-=window.innerWidth*.15;										// Adjust for multi view shifting
 		this.mouse.x=(x/ this.renderer.domElement.clientWidth)*2-1;									// Get x 0-1
 		this.mouse.y=-(y/this.renderer.domElement.clientHeight)*2+1;								// Y
 		this.raycaster.setFromCamera(this.mouse,this.camera);										// Cast ray
