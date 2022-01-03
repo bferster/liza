@@ -489,6 +489,7 @@ class Scene {
 
 	GetModelPos(x,y)																			// GET SCREEN POS OF 3D OBJECT
 	{	
+		if (app.multi)	x-=window.innerWidth*.15;													// Adjust for multi view shifting
 		this.mouse.x=(x/ this.renderer.domElement.clientWidth)*2-1;									// Get x 0-1
 		this.mouse.y=-(y/this.renderer.domElement.clientHeight)*2+1;								// Y
 		this.raycaster.setFromCamera(this.mouse,this.camera);										// Cast ray
