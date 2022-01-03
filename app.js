@@ -89,10 +89,6 @@ class App  {
 			$("#blackboardDiv").css("display") == "none" ? 1 : 0;									// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			});
-		$("#slideBut").on("click", (e)=> { 															// ON SLIDE
-			if (e.shiftKey)	this.bb.ShowSlide(-1);													// Last slide
-			else			this.bb.ShowSlide(1);													// Next slide
-			}); 
 		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$(window).on("keydown",function(e) {														// HANDLE KEY DOWN
@@ -356,9 +352,6 @@ class App  {
 			let seat=student ? app.students.find(x => x.id == student).seat : 0;					// Get seat number
 			if (act == "fidget")			app.students[seat].fidget=1;							// Fidget								
 			else if (act == "fidgetStop")	app.students[seat].fidget=0;							// Off	
-			else if (act == "nextSlide")	app.bb.ShowSlide(1);									// Next slide
-			else if (act == "lastSlide")	app.bb.ShowSlide(-1);									// Last
-			else if (act == "firstSlide")	app.bb.ShowSlide(0,0);									// Restart
 			else 							app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|ACT|"+student+"|"+act); 	// Send response
 			}					
 	}
@@ -409,14 +402,16 @@ class App  {
 				this.ws.onmessage=(e)=>{ this.SocketIn(e); };										// ON INCOMING MESSAGE
 				this.ws.onclose=()=>   { this.retryWS=true; console.log('disconnected'); };			// ON CLOSE
 				this.ws.onopen=()=>    { console.log('re-connected'); };							// ON OPEN  
-				this.retryWS=false;																	// Not retrying	
+				this.retryWS=false;																	// Not retrying	anymore
 				}
 			},1000)
 		}
 	}
 
-	SocketIn(event)																				// A WEBSOCKET MESSAGE
+	SocketIn(event)																				// A WEBSOCKET MESSAGE FROM NODE WS SERVER
 	{
+		// sessionId | curTime | fromId | op | ...
+
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center

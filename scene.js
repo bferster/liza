@@ -483,6 +483,7 @@ class Scene {
 		pos.project(this.camera);																	// Project pos
 		pos.x=(pos.x*w)+w;																			// In screen coords X
 		pos.y=-(pos.y*h)+h;																			// Y
+		if (app.multi)	pos.x+=w*.3;																// Adjust for multi view shifting
 		return pos;																					// Return pos
 	}
 
