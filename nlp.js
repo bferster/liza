@@ -139,7 +139,7 @@ class NLP {
 			}
 		let o=app.nlp.responses[student];																// Isolate student
 		if (!o || (student == "Class"))	return res;														// Null response
-		for (i=0;i<o.length;++i) {																		// For each responss
+		for (i=0;i<o.length;++i) {																		// For each response
 			if ((intent%100) && (intent == o[i].intent)) 		d.push(o[i]);							// Add sub intent
 			else if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);							// Add full intent
 			}
@@ -199,7 +199,7 @@ class NLP {
 
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
-		 fetch(this.AIhost+":5005/model/parse", {														// Fetch data
+		fetch(this.AIhost+":5005/model/parse", {														// Fetch data
 			method:"POST",																				// POST
 			body: JSON.stringify({text:msg})															// Payload	
 			})

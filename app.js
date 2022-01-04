@@ -67,7 +67,6 @@ class App  {
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim);  		// Send sim status
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
-
 			Prompt(this.inSim ? "PRESS AND HOLD SPACEBAR TO TALK" : "CLICK START TO RESUME SESSION","on");	 // Directions
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
@@ -129,7 +128,9 @@ class App  {
 					else if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
 					else if (d[i].type == "prompt")   this.initialPrompt=d[i].text;					// Add initial prompt
 					else if (d[i].type == "seat")  	  this.sc.AddSeat(d[i]);						// Add seat position
-					else if (d[i].type == "session")  this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];	// Session settings
+					else if (d[i].type == "session") {												// Session settings
+						this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];							// Get trt
+						}
 					else if (d[i].type == "trigger") {												// Triggers
 						o={type:d[i].id, done:0 };													// Set type
 						if ((v=d[i].text.match(/type=(.+?)\W/i)))	o.type=v[1];					// Get type
