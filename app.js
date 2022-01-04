@@ -216,7 +216,7 @@ class App  {
 			else if (v[i].match(/end:/i)) {															// END
 				s=this.remarkLevels.indexOf(Math.max(...this.remarkLevels));
 				s=app.nlp.GetResponse("",student,710+s*10).text;									// Get from response file with intent
-					this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 
 				}
 			}
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
@@ -254,7 +254,6 @@ class App  {
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher")	talkingTo="Teacher";											// Always to teach, unless teacher
 		let act=app.nlp.GetAction(text);															// Set action
-		app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);	// Send remark
 		if (app.pickMeQuestion) {																	// If a pick me question was last asked
 			text=app.pickMeQuestion;																// Send previou question
 			app.pickMeQuestion="";																	// Clear it
@@ -269,6 +268,7 @@ class App  {
 				let r=app.GenerateResponse(text,res);												// Generate response
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
+				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				if (intent) {																		// If an intent detected
 					let s=app.fb.intentLabels[intent/100];											// Get intent label
 					s+=intent ? " "+intent : "";													// Add number

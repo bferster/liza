@@ -4,7 +4,12 @@
 	const fs = require('fs');
 	const WebSocket = require('ws');
 	const os = require("os");	
-	let local=os.hostname().match(/^bill|desktop/i);
+	
+	let webSocketServer;																		// Holds socket server	
+	let local=os.hostname().match(/^bill|desktop/i);											// Running on localhost?
+	let sessionData=[];																			// Holds session data
+	let sessionChanged=[];																		// Holds session data change st
+	LoadSessionData();																			// Load session data from disc
 
 /* SOCKET SERVER  ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +27,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 	
-	let sessionData=[];																			// Holds session data
-	let webSocketServer;																		// Holds socket server	
 	if (!local) {																				// If on web
 		const server = https.createServer({														// Create an https server
 			cert: fs.readFileSync("/opt/bitnami/apache/conf/www.lizasim.com.crt"),				// Point at cert
@@ -33,11 +36,12 @@
 		server.listen(8080);																	// Listen on port 8080
 		}
 	else webSocketServer = new WebSocket.Server({ port:8080 });									// Open in debug
+	setInterval(()=>{ SaveSessionData(); },1000*60*60);											// 60 minute timer
 	
-	webSocketServer.on('connection', (webSocket, req) => {									// ON CONNECTION
-	try{
+try{
+	webSocketServer.on('connection', (webSocket, req) => {										// ON CONNECTION
 		let d=new Date();																		// Get UTC time
-		d=new Date(d.getTime()+(-3600000*4));													// Get UTC-5 time	
+		d=new Date(d.getTime()+(-3600000*5));													// Get UTC-5 time	
 		let str=d.toLocaleDateString()+" -- "+d.toLocaleTimeString()+" -> "+ req.socket.remoteAddress.substring(7);
 		console.log(`Connect: (${webSocketServer.clients.size}) ${str}`);						// Log connect
 		webSocket.on('message', (msg) => {														// ON MESSAGE
@@ -46,19 +50,19 @@
 			trace('In:', message.substr(0,128));												// Log
 			let v=message.split("|");															// Get params
 			let s="s"+v[0];																		// Data array name
+			if (!sessionData[s] && (v[0] > 0)) sessionData[s]=[];								// Alloc array, if not admin			
 			if (v[3] == "INIT") {																// INIT
 				webSocket.meetingId=v[0];														// Set meeting id
 				webSocket.senderId=v[1];														// Set sender id
-				}
-			if (!sessionData[s]) sessionData[s]=[];												// Alloc array			
-			if (v[3] == "INIT") {																// INIT
 				v[4]=d.toLocaleDateString();													// Add day
 				v[5]=d.toLocaleTimeString();													// Add time					
 				v[6]=req.socket.remoteAddress.substring(7);										// Add IP
 				}
 			if (v[6]) v[6]=`"${v[6]}"`;															// Quote for CSV
-			sessionData[s].push(v);																// Add event
-			
+			if (v[0] > 0) {																		// Not admin
+				sessionData[s].push(v);															// Add event
+				sessionChanged[s]=true;															// Set changed
+				}
 			if (v[3] == "TALK") 	  	Broadcast(v[0], message);								// Broadcast TALK to everyone connected
 			else if (v[3] == "ACT")		Broadcast(v[0], message);								// ACT 
 			else if (v[3] == "CHAT")	Broadcast(v[0], message);								// CHAT
@@ -70,13 +74,49 @@
 			else if (v[3] == "FETCH") 	ActOnSessionData(v,webSocket);							// FETCH DATA
 			else if (v[3] == "CLEAR") 	ActOnSessionData(v,webSocket);							// CLEAR DATA
 			});
-		} catch(e) { console.log(e) }
-	});
+		});
+} catch(e) { console.log(e) }
 	
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ACTIONS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function SaveSessionData()																// SAVE SESSION DATA TO DISC
+	{
+		let s;
+		let d=new Date();																		// Get UTC time
+		d=new Date(d.getTime()+(-3600000*4));													// Get UTC-5 time	
+		trace("Saving to disc at "+d.toLocaleDateString()+" -- "+d.toLocaleTimeString());		// Log
+		for (s in sessionData) {																// For each session
+			try{																				// Try
+			if (sessionChanged[s]) {															// If new data
+				fs.writeFile('data/sessions/'+s+'.json',JSON.stringify(sessionData[s]), err =>{	// Write file
+					if (err) 	console.error(err);												// Show error
+					else 		{ sessionChanged[s]=false; trace("Saved "+s); }					// Log
+					})
+				}
+			} catch(e) { trace(e); }															// Catch
+		}
+	}
+
+	function LoadSessionData()																// GET SESSION DATA FROM DISC
+	{
+		let s,data;
+		sessionData=[];																			// Reset session data
+		sessionChanged=[];																		// Reset change status
+		try{																					// Try
+			fs.readdir("data/sessions/", function (err, files) {								// Get files
+			if (err) return console.log('Unable to scan directory: ' + err);					// On error
+			files.forEach(function (file) {														// For each one found
+				data=fs.readFileSync("data/sessions/"+file,"utf8");								// Get data
+				s=file.replace(/\.json/i,"");													// Get raw filename
+				sessionData[s]=JSON.parse(data);												// Copy data to struct
+				trace("Loaded session: "+s+".json");											// Log
+				});
+			});
+		} catch(e) { trace(e); }															// Catch
+	}
 
 	function ActOnSessionData(d, client)														// ACT ON SESSION DATA
 	{
