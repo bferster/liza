@@ -4,7 +4,7 @@ student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u
 student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=3,"
 student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,"
 student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,"
-student,Mihyun,"mihyun,meyon,neon,beyond","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=0,"
+student,Sharleen,"sharleen,charlene,shar,","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=0,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
 session,session,"trt=300,"
 seat,0,"x=250,y=125,z=0,r=-25,"
@@ -57,4 +57,5 @@ keyrule,1010,"book|books|reading,like|enjoy|prefer",
 keyrule,1020,"fiction,nonfiction|non-fiction",
 keyrule,1030,"favorite|best,read,school|class",
 keyrule,1040,"write|draw|list,names|character|characters",
-keyrule,100,"equipment,scientist|scientists,discover",
+keyrule,1101,"2,\+|plus|and,2",
+                                                                                   

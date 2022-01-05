@@ -122,7 +122,7 @@ class App  {
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data; 					// Parse CSV
 				for (i=0;i<d.length;++i) {															// For each line
 					if (d[i].type == "student")  this.AddStudent(d[i]);								// Add student
-					else if (d[i].type.match(/action|keyword|vocab|keytag/i))						// An nlp item 	
+					else if (d[i].type.match(/action|keyword|vocab|keytag|keyrule/i))				// An nlp item 	
 						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add nlp data
 					else if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);			// Add BB pic
 					else if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource

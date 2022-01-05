@@ -6,11 +6,12 @@ class NLP {
 
 	constructor()   																				// CONSTRUCTOR
 	{
-		this.whoSyns=[];																				// Who synonyms ("")
-		this.actSyns=[];																				// Action synonyms ("")
-		this.keyWords=[];																				// Keywords("")
-		this.keyTags=[];																				// Keywords keyed to intents ("")
-		this.vocab=[];																					// Unique vocab by intent ("")
+		this.whoSyns=[];																				// Who synonyms
+		this.actSyns=[];																				// Action synonyms
+		this.keyWords=[];																				// Keywords
+		this.keyTags=[];																				// Keywords keyed to intents 
+		this.keyRules=[];																				// Keeyword matching rules
+		this.vocab=[];																					// Unique vocab by intent 
 		this.AIhost="https://lizasim.com";																// AI host 
 		this.responses=[];																				// Response file
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list (unused)
@@ -33,6 +34,10 @@ class NLP {
 		if (type == "vocab") {																			// Vocab list
 			if (!this.vocab[word])	this.vocab[word]=[];												// Add holder
 			this.vocab[word].push(...syns);																// Add words
+			return;	
+			}																							// Quit
+		else if (type == "keyrule") {																	// Key rule
+			this.keyRules.push({ intent: word, ands:syns });											// Add rule
 			return;																						// Quit
 			}	
 		for (i=0;i<syns.length;++i) {																	// For each syn
@@ -40,7 +45,7 @@ class NLP {
 			else if (type == "action")	this.actSyns[syns[i]]=word;										// Add actions
 			else if (type == "keyword")	this.keyWords[syns[i]]=word;									// Add keywords
 			else if (type == "keytag")	this.keyTags[syns[i]]=word;										// Add keytags
-		}
+			}
 	}
 	
 	GetWho(text, both=false, all=false)																// GET WHO IN TEXT
@@ -56,7 +61,7 @@ class NLP {
 				}
 			}
 		return who;																						// Return last trigger:who
-                                                                                           	}
+ 	}
 
 	GetAction(text)																					// GET ACTION FROM TEXT
 	{
@@ -106,7 +111,7 @@ class NLP {
 
 	AddResponses(d)																					// ADD RRSPONSES FROM CSV DATA
 	{
-		let i,k,o;
+		let i,n,k,o;
 		this.responses=[];																				// Fresh
 		for (i=0;i<d.length;++i) {																		// For each line
 			if (!d[i]["Student"])	continue;															// Skip if no student
@@ -119,8 +124,11 @@ class NLP {
 			o.t=d[i]["Thinking (500)"];																	// Get factor
 			o.u=d[i]["Understanding Level"];															// Get factor
 			o.text=d[i]["Response"];																	// Get response
-			o.intent=d[i]["Type of Student Response"].substring(0,3);									// Get intent
-			o.type=d[i]["Type of Student Response"].substr(3);											// Get type
+			if (d[i]["Type of Student Response"]) {														// A response
+				n=isNaN(d[i]["Type of Student Response"].charAt(4)) ? 3 : 4;							// Intent length
+				o.intent=d[i]["Type of Student Response"].substring(0,n);								// Get intent
+				o.type=d[i]["Type of Student Response"].substring(n);									// Get type
+				}
 			o.action=d[i]["Student Physical Action"];													// Get action
 			this.responses[k].push(o);																	// Add to list
 		}
@@ -128,15 +136,9 @@ class NLP {
 
 	GetResponse(remark, student, intent)															// GET STUDENT RESPONSE
 	{
-		let i,d=[],res={ text:"", intent:0 };
-		if (remark.match(/2 \+ 2|plus/i)) {																// Hard-code 2+2
-			let r=["The answer is 4 of course", "Would you believe 22?","The answer is 4","I don't know how to add yet", "Math is hard"]; // Choices
-			res.text=r[Math.floor(Math.random()*r.length)];												// Pick one
-			return res;																					// Return it
-			}
-		if (remark.match(/equipment/i) && remark.match(/scientist/i) && remark.match(/discover/i)) {	// If initial remark
-			intent=100;																					// Repeat initial remark
-			}
+		let i,d=[],res={ intent:0, text:"" };
+		if (!remark)											return res;								// No remark
+		intent=this.MatchKeyRule(remark,intent) 														// Reset intent if a keyword match
 		let o=app.nlp.responses[student];																// Isolate student
 		if (!o || (student == "Class"))	return res;														// Null response
 		for (i=0;i<o.length;++i) {																		// For each response
@@ -149,7 +151,21 @@ class NLP {
 			else if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);							// Add full intent
 			}
 		i=Math.floor(Math.random()*d.length);															// Pick random match 
-		return d[i];																					// Return response object
+		return d[i] ? d[i] : res;																		// Return response object
+	}
+
+	MatchKeyRule(remark, originalIntent) 															// CHECK FOR MATCH AGAINST RULES
+	{
+		let i,j,n,re;
+		for (i=0;i<this.keyRules.length;++i) {															// For each rule
+			n=0;																						// Reset num matched
+			for (j=0;j<this.keyRules[i].ands.length;++j) {												// For each clause
+				re=new RegExp(this.keyRules[i].ands[j],"i");											// Make regex
+				if (remark.match(re))	++n;															// Add to count if a match
+				}
+			if (n >= this.keyRules[i].ands.length)	return this.keyRules[i].intent;						// Return intent if a complete match 
+			}
+		return originalIntent;																			// Return original intennt given
 	}
 
 	GetKeywords(s)																					//  ADD KEYWORDS
