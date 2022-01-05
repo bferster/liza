@@ -111,7 +111,7 @@ class NLP {
 
 	AddResponses(d)																					// ADD RRSPONSES FROM CSV DATA
 	{
-		let i,n,k,o;
+		let i,k,o;
 		this.responses=[];																				// Fresh
 		for (i=0;i<d.length;++i) {																		// For each line
 			if (!d[i]["Student"])	continue;															// Skip if no student
@@ -124,11 +124,8 @@ class NLP {
 			o.t=d[i]["Thinking (500)"];																	// Get factor
 			o.u=d[i]["Understanding Level"];															// Get factor
 			o.text=d[i]["Response"];																	// Get response
-			if (d[i]["Type of Student Response"]) {														// A response
-				n=isNaN(d[i]["Type of Student Response"].charAt(4)) ? 3 : 4;							// Intent length
-				o.intent=d[i]["Type of Student Response"].substring(0,n);								// Get intent
-				o.type=d[i]["Type of Student Response"].substring(n);									// Get type
-				}
+			if (d[i]["Type of Student Response"]) o.type=d[i]["Type of Student Response"].substring(3);	// Get type
+			o.intent=d[i]["Intent"];																	// Get intent
 			o.action=d[i]["Student Physical Action"];													// Get action
 			this.responses[k].push(o);																	// Add to list
 		}
@@ -136,8 +133,8 @@ class NLP {
 
 	GetResponse(remark, student, intent)															// GET STUDENT RESPONSE
 	{
+		
 		let i,d=[],res={ intent:0, text:"" };
-		if (!remark)											return res;								// No remark
 		intent=this.MatchKeyRule(remark,intent) 														// Reset intent if a keyword match
 		let o=app.nlp.responses[student];																// Isolate student
 		if (!o || (student == "Class"))	return res;														// Null response
@@ -157,6 +154,7 @@ class NLP {
 	MatchKeyRule(remark, originalIntent) 															// CHECK FOR MATCH AGAINST RULES
 	{
 		let i,j,n,re;
+		if (!remark) return originalIntent;																// Return original intent given
 		for (i=0;i<this.keyRules.length;++i) {															// For each rule
 			n=0;																						// Reset num matched
 			for (j=0;j<this.keyRules[i].ands.length;++j) {												// For each clause
@@ -165,7 +163,7 @@ class NLP {
 				}
 			if (n >= this.keyRules[i].ands.length)	return this.keyRules[i].intent;						// Return intent if a complete match 
 			}
-		return originalIntent;																			// Return original intennt given
+		return originalIntent;																			// Return original intent given
 	}
 
 	GetKeywords(s)																					//  ADD KEYWORDS
