@@ -10,7 +10,7 @@
 	</head>
 	<style>
 		body { 	font-family:Segoe UI,Verdana,Geneva,sans-serif;font-size:16px; margin:20px; }
-		.lz-is 		{	border-radius:16px; padding:0 8px; height: 24px; border:1px solid #999; font-size: 13px; text-align:center; }
+		.lz-is 		{	border-radius:16px; padding:0 8px; height:24px; border:1px solid #999; font-size: 13px; text-align:center; }
 		.lz-bs 		{	display:inline-block; border-radius:16px; padding:0 16px; border:1px solid #999; font-size: 13px; 
 						cursor:pointer; z-index:2; padding-bottom:1px; color:#000; background-color: #eee; font-weight:600; }
 		.lz-confirm {	position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
@@ -23,9 +23,14 @@
 			<img src="img/lizalogo.png" style="width:25%">
 			<span style="font-size:24px;vertical-align:12px"><b><i> session</b></i></span>
 			<hr>
-			Session Id <input type="input" class="lz-is" style="width:40px" value="1" id="lz-id"/>
+			Session &nbsp;
+			<select id="lz-select" class="lz-is" style="height:26px">
+			<option>Choose</option>
+			</select>
+			&nbsp; &nbsp;<input type="input" class="lz-is" style="width:40px" value="1" id="lz-id"/>
 			<hr>
-			<div class="lz-bs" id="lz-fetchSession">Get Session</div>
+			<div class="lz-bs" id="lz-fetchSession">View Session</div>
+			&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-saveSession">Save session to CSV</div>
 			&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-clearSession">Clear session</div>
 			<hr>
 		<div id="lz-data" style="text-align:left;max-height:500px"></div>
@@ -38,6 +43,8 @@
 // APP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+let app;
+
 class App  {																					
 
 	constructor(id)   																			// CONSTRUCTOR
@@ -45,8 +52,10 @@ class App  {
 		this.retryWS;																		
 		this.secs=0;																				
 		this.ws;
+		this.saveSession=false;
 		this.pollTimer;
 		this.InitSocketServer();																	// Init socket server
+		this.file=[];
 		this.sessionId=1;
 	}
 
@@ -61,7 +70,8 @@ class App  {
 		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
 		this.ws.onopen=()=> { 																		// ON OPEN
 			console.log('connected'); 																// Showconnected
-			this.ws.send("0|0|ADMIN|INIT");															// Init																	
+			this.ws.send("0|0|ADMIN|SESSSIONINIT");													// Init																	
+			this.ws.send("0|0|ADMIN|SESSIONLIST");													// Get list of files																
 			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
 			++this.secs;																			// Another second 
 			if (this.retryWS) {																		// If reconnecting to websocket
@@ -80,7 +90,7 @@ class App  {
 	{
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
-		if (v[3] == "FETCH") {																		// FETCH
+		if (v[3] == "SESSIONFETCH") {																// FETCH
 			trace(v[5])	
 			let vv=v[5].split("\n")
 			let str="<br>"
@@ -89,26 +99,39 @@ class App  {
 				else							 str+=vv[i]+"<br>";
 				}
 			$("#lz-data").html(str);
-			SaveTextAsFile("sessiondata-"+v[4]+".csv",v[5]);										// Write file
+			if (app.saveSession)				 SaveTextAsFile("sessiondata-"+v[4]+".csv",v[5]);	// Write file
 			}
-		else if (v[3] == "CLEAR") {																	// CLEAR
+		else if (v[3] == "SESSIONCLEAR") {															// CLEAR
 			Sound("delete")
 			trace("Cleared")	
+			}
+		else if (v[3] == "SESSIONLIST") {															// LIST
+			v=v[4].split(",");																		// Get files
+			for (let i=0;i<v.length;++i) 															// For each
+					$("#lz-select").append("<option>"+v[i]+"</option>");							// Add to select
 			}
 	}
 } // App class closure
 
-
 $(document).ready(function() {								           							// ON PAGE LOADED
-	let app=new App();
+	app=new App();
 	$("#lz-fetchSession").on("click",()=>{															// ON FETCH SESSION
-		app.ws.send("0|0.0|ADMIN|FETCH|"+$("#lz-id").val());  										// Fetch session data
+		app.saveSession=false;																		// Don't save
+		app.ws.send("0|0.0|ADMIN|SESSIONFETCH|"+$("#lz-id").val());  								// Fetch session data
+	 	});							
+	 $("#lz-saveSession").on("click",()=>{															// ON SAVE SESSION
+		app.saveSession=true;																		// Don't save
+		app.ws.send("0|0.0|ADMIN|SESSIONFETCH|"+$("#lz-id").val());  								// Fetch session data
 	 	});							
 	 $("#lz-clearSession").on("click",()=>{															// ON CLEAR SESSION
 		ConfirmBox("Are you sure?", "This will clear the session forever.", ()=>{ 					// Are you sure?
-			app.ws.send("0|0.0|ADMIN|CLEAR|"+$("#lz-id").val());  									// Clear session data
+			app.ws.send("0|0.0|ADMIN|SESSIONCLEAR|"+$("#lz-id").val());  							// Clear session data and remove file
 			});
-	 	});							
+	 	});
+	$("#lz-select").on("change",()=>{																// ON SELECT SESSION
+		if ($("#lz-select").val() != "Choose") 														// Not choose
+			$("#lz-id").val($("#lz-select").val());													// Set session
+		});							
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

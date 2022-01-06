@@ -58,7 +58,7 @@ class App  {
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else{																					// Not in sim
 				this.startTime=now;																	// Set start				
-				if (this.trt == 0)	PopUp(this.initialPrompt,10);									// Prompt teacher
+				if ((this.trt == 0) && this.initialPrompt)	PopUp(this.initialPrompt,10);			// Prompt teacher
 				}
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
@@ -213,6 +213,10 @@ class App  {
 			else if (v[i].match(/act:/i)) {															// ACT
 				s=v[i].substring(4);																// Get text
 				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|ACT|"+student+"|"+s); 	
+				}
+			else if (v[i].match(/prompt:/i)) {														// PROMPT
+				s=v[i].substring(7);																// Get text
+				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|PROMPT|"+s); 	// Send prompt	
 				}
 			else if (v[i].match(/end:/i)) {															// END
 				s=this.remarkLevels.indexOf(Math.max(...this.remarkLevels));
@@ -395,7 +399,7 @@ class App  {
 		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
 		this.ws.onopen=()=> { 																		// ON OPEN
 			console.log('connected'); 																// Showconnected
-			this.ws.send(this.sessionId+"|0.00|"+this.role+"|INIT");								// Init																	
+			this.ws.send(this.sessionId+"|"+this.activityId+"|"+this.role+"|INIT");					// Init																	
 			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
 			++this.secs;																			// Another second 
 			if (this.retryWS) {																		// If reconnecting to websocket
@@ -432,11 +436,11 @@ class App  {
 					});
 				}
 			}
-		else if (v[3] == "ACT")  	app.sc.StartAnimation(v[4],app.seqs[v[5]]);						// ACT
+		else if (v[3] == "ACT")  	{ app.sc.StartAnimation(v[4],app.seqs[v[5]]); }					// ACT
 		else if (v[3] == "VIDEO")  	{ if (!$("#lz-videoChat").length) this.VideoChat();	}			// VIDEO
-		else if (v[3] == "PICTURE") app.bb.SetPic(v[5],true,"",v[4]); 								// PICTURE
-		else if ((v[3] == "CHAT") && (this.role == v[4])) {	Sound("ding"); Bubble(v[5],5,bx); }		// CHAT
-		else if (v[3] == "RESTART")  {																// RESTART
+		else if (v[3] == "PROMPT") 	{ PopUp(v[4],8); Sound("ding"); }								// PROMPT
+		else if (v[3] == "PICTURE") { app.bb.SetPic(v[5],true,"",v[4]); }							// PICTURE
+		else if (v[3] == "RESTART") {																// RESTART
 			$("#startBut").html("START");															// Set label					
 			$("#startBut").css("background-color", "#27ae60");										// Set color
 			this.StartSession();																	// Start session										
@@ -449,6 +453,7 @@ class App  {
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			}  
+		else if ((v[3] == "CHAT") && (this.role == v[4])) {	Sound("ding"); Bubble(v[5],5,bx); }		// CHAT
 	}
 
 	InitClassroom()																				// INIT CLASSROOM

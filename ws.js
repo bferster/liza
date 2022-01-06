@@ -63,16 +63,8 @@ try{
 				sessionData[s].push(v);															// Add event
 				sessionChanged[s]=true;															// Set changed
 				}
-			if (v[3] == "TALK") 	  	Broadcast(v[0], message);								// Broadcast TALK to everyone connected
-			else if (v[3] == "ACT")		Broadcast(v[0], message);								// ACT 
-			else if (v[3] == "CHAT")	Broadcast(v[0], message);								// CHAT
-			else if (v[3] == "VIDEO")	Broadcast(v[0], message);								// VIDEO
-			else if (v[3] == "PICTURE") Broadcast(v[0], message);								// PICTURE
-			else if (v[3] == "AUDIO") 	Broadcast(v[0], message,true);							// AUDIO
-			else if (v[3] == "START")   Broadcast(v[0], message);								// START
-			else if (v[3] == "RESTART") Broadcast(v[0], message);								// RESTART
-			else if (v[3] == "FETCH") 	ActOnSessionData(v,webSocket);							// FETCH DATA
-			else if (v[3] == "CLEAR") 	ActOnSessionData(v,webSocket);							// CLEAR DATA
+			if (v[3].match(/^SESSION/)) ActOnSessionData(v,webSocket);							// Session data actions
+			else 						Broadcast(v[0], message);								// Broadcast to everyone
 			});
 		});
 } catch(e) { console.log(e) }
@@ -121,21 +113,28 @@ try{
 	function ActOnSessionData(d, client)														// ACT ON SESSION DATA
 	{
 		try{
-			if (d[3] == "FETCH") {																// Get session data
+			if (d[3] == "SESSIONFETCH") {														// Get session data
 				let o=sessionData["s"+d[4]];													// Point at data
 				if (!o)	return;																	// No data found
-				let msg="0|0.0|ADMIN|FETCH|"+d[4]+"|";											// Data header
+				let msg="0|0.0|ADMIN|SESSIONFETCH|"+d[4]+"|";									// Data header
 				msg+="session,time,actor,what,d1,d2,d3,d4\n";									// CSV header
 				msg+=o.join("\n");																// Data split by CRs
 				SendData(client,msg);															// Send to caller
 				}
-			if (d[3] == "CLEAR") {																// Clear session data
+			if (d[3] == "SESSIONCLEAR") {														// Clear session data
 				let o=sessionData["s"+d[4]];													// Point at data
 				if (!o)	return;																	// No data found
-				let msg="0|0.0|ADMIN|CLEAR|"+d[4];												// Make message
+				let msg="0|0.0|ADMIN|SESSIONCLEAR|"+d[4];										// Make message
+				fs.unlinkSync("data/sessions/s"+d[4]+".json");									// Delete it
 				sessionData["s"+d[4]]=[];														// Clear data
 				SendData(client,msg);															// Send to caller
 				}
+			if (d[3] == "SESSIONLIST") {														// Get sessions on disk
+				let msg="0|0.0|ADMIN|SESSIONLIST|";												// Make message
+				for (let k in sessionData)	msg+=k.substring(1)+",";							// Add to list
+				SendData(client,msg.substring(0,msg.length-1));									// Send to caller
+				}
+
 		} catch(e) { console.log(e) }
 	}
 
