@@ -113,26 +113,28 @@ class App  {
 	}
 } // App class closure
 
-$(document).ready(function() {								           							// ON PAGE LOADED
-	app=new App();
-	$("#lz-fetchSession").on("click",()=>{															// ON FETCH SESSION
-		app.saveSession=false;																		// Don't save
-		app.ws.send("0|0.0|ADMIN|SESSIONFETCH|"+$("#lz-id").val());  								// Fetch session data
-	 	});							
-	 $("#lz-saveSession").on("click",()=>{															// ON SAVE SESSION
-		app.saveSession=true;																		// Don't save
-		app.ws.send("0|0.0|ADMIN|SESSIONFETCH|"+$("#lz-id").val());  								// Fetch session data
-	 	});							
-	 $("#lz-clearSession").on("click",()=>{															// ON CLEAR SESSION
-		ConfirmBox("Are you sure?", "This will clear the session forever.", ()=>{ 					// Are you sure?
-			app.ws.send("0|0.0|ADMIN|SESSIONCLEAR|"+$("#lz-id").val());  							// Clear session data and remove file
+	$(document).ready(function() {								           						// ON PAGE LOADED
+		app=new App();
+		$("#lz-fetchSession").on("click",()=>{														// ON FETCH SESSION
+			app.saveSession=false;																	// Don't save
+			app.ws.send("0|0.0|ADMIN|SESSIONFETCH|"+$("#lz-id").val());  							// Fetch session data
+			});							
+		$("#lz-saveSession").on("click",()=>{														// ON SAVE SESSION
+			app.saveSession=true;																	// Don't save
+			app.ws.send("0|0.0|ADMIN|SESSIONFETCH|"+$("#lz-id").val());  							// Fetch session data
+			});							
+		$("#lz-clearSession").on("click",()=>{														// ON CLEAR SESSION
+			ConfirmBox("Are you sure?", "This will clear the session forever.", ()=>{ 				// Are you sure?
+				app.ws.send("0|0.0|ADMIN|SESSIONCLEAR|"+$("#lz-id").val());  						// Clear session data and remove file
+				});
 			});
-	 	});
-	$("#lz-select").on("change",()=>{																// ON SELECT SESSION
-		if ($("#lz-select").val() != "Choose") 														// Not choose
-			$("#lz-id").val($("#lz-select").val());													// Set session
-		});							
-});
+		$("#lz-select").on("change",()=>{															// ON SELECT SESSION
+			if ($("#lz-select").val() != "Choose") 													// Not choose
+				$("#lz-id").val($("#lz-select").val());												// Set session
+			app.saveSession=false;																	// Don't save
+			app.ws.send("0|0.0|ADMIN|SESSIONFETCH|"+$("#lz-id").val());  							// Fetch session data
+			});							
+	});
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS 
