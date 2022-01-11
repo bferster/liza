@@ -131,11 +131,14 @@ class NLP {
 		}
 	}
 
-	GetResponse(remark, student, intent)															// GET STUDENT RESPONSE
+	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
 	{
-		
 		let i,d=[],res={ intent:0, text:"" };
-		intent=this.MatchKeyRule(remark,intent) 														// Reset intent if a keyword match
+		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
+		if (intent == "ANDYOU") {																		// Ask another student same question as before
+			student=app.curStudent;																		// Redirect to new student
+			intent=lastIntent;																			// Use last intent
+			}
 		let o=app.nlp.responses[student];																// Isolate student
 		if (!o || (student == "Class"))	return res;														// Null response
 		for (i=0;i<o.length;++i) {																		// For each response

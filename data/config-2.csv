@@ -56,6 +56,9 @@ keyrule,1010,"book|books|reading,like|enjoy|prefer",
 keyrule,1020,"fiction,nonfiction|non-fiction",
 keyrule,1030,"favorite|best,read,school|class",
 keyrule,1040,"write|draw|list,names|character|characters",
+keyrule,ANDYOU,"how|what,about,you",
+keyrule,ANDYOU,"what,you,think|say",
+keyrule,ANDYOU,"lets|let's,hear,from",
 keyrule,1101,"2,\+|plus|and,2",
 
                                                                                    

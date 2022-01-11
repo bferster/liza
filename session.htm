@@ -91,11 +91,10 @@ class App  {
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
 		if (v[3] == "SESSIONFETCH") {																// FETCH
-			trace(v[5])	
 			let vv=v[5].split("\n")
 			let str="<br>"
 			for (let i=1;i<vv.length;++i) {	
-				if (vv[i].match(/Teacher,INIT/)) str+="<b>"+vv[i]+"<br></b>";
+				if (vv[i].match(/,INIT,/)) str+="<b>"+vv[i]+"<br></b>";
 				else							 str+=vv[i]+"<br>";
 				}
 			$("#lz-data").html(str);
@@ -125,7 +124,9 @@ class App  {
 			});							
 		$("#lz-clearSession").on("click",()=>{														// ON CLEAR SESSION
 			ConfirmBox("Are you sure?", "This will clear the session forever.", ()=>{ 				// Are you sure?
-				app.ws.send("0|0.0|ADMIN|SESSIONCLEAR|"+$("#lz-id").val());  						// Clear session data and remove file
+				GetTextBox("Type password","","",(pw)=>{											// Ask for password
+					app.ws.send("0|0.0|ADMIN|SESSIONCLEAR|"+$("#lz-id").val()+"|"+pw);  			// Clear session data and remove file if p/w matches
+					});
 				});
 			});
 		$("#lz-select").on("change",()=>{															// ON SELECT SESSION

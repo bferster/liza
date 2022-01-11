@@ -122,6 +122,7 @@ try{
 				SendData(client,msg);															// Send to caller
 				}
 			if (d[3] == "SESSIONCLEAR") {														// Clear session data
+				if (d[5] != "7001") { trace("Bad password"); return; }							// Quit on wrong p/w								
 				let o=sessionData["s"+d[4]];													// Point at data
 				if (!o)	return;																	// No data found
 				let msg="0|0.0|ADMIN|SESSIONCLEAR|"+d[4];										// Make message

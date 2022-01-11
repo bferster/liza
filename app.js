@@ -25,7 +25,9 @@ class App  {
 		this.nextTrigger={id:0, time:100000, type:""};												// Next trigger to look for
 		this.curStudent="";																			// Currently active student
 		this.lastResponse="";																		// Last response
+		this.lastRemark="";																			// Last remark
 		this.inSim=false;																			// In simulation or not
+		this.inRemark=false;																		// Teacher talking flag
 		this.said="";																				// Current remark
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
@@ -92,7 +94,6 @@ class App  {
 		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$(window).on("keydown",function(e) {														// HANDLE KEY DOWN
-
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (e.originalEvent.repeat)		return false;										// Only 1st one
@@ -100,6 +101,7 @@ class App  {
 					PopUp("Please START the session to talk to the class"); 						// Prompt
 					return;																			// Quit
 					}
+				this.inRemark=true;																	// Teacher is talking
 				app.said="";																		// Clear spoken cache
 				}
 			});
@@ -108,6 +110,7 @@ class App  {
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (app.inSim)					setTimeout(()=>{ app.OnPhrase(app.said); },1000); 	// React to remark if in sim
 				app.said="";																		// Clear spoken cache
+				this.inRemark=false;																// Teacher is not talking
 				}
 			});
 	}
@@ -198,6 +201,7 @@ class App  {
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
 	{
 		let i,s;
+		if (this.inRemark)	return;																	// Not while teacher is talking
 		if (e.done)	return;																			// Already handled
 		e.done=1;																					// Flag it done
 		let student=e.who;																			// Get speaker
@@ -270,9 +274,10 @@ class App  {
 		app.DoAction(act,text);																		// If a please + action mentioned, do it
 		if (!act) 																					// If no action happening
 			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
-				let r=app.GenerateResponse(text,res);												// Generate response
+				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
+				let r=app.GenerateResponse(text,intent);											// Generate response
 				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				if (intent) {																		// If an intent detected
 					let s=app.fb.intentLabels[intent/100];											// Get intent label
@@ -298,13 +303,13 @@ class App  {
 			}
 		}
 
-	GenerateResponse(text, data)																// RESPOND TO TEACHER REMARK
+	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
-		let intent=data.intent.name.substring(1);													// Get intent
 		this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
+		let lastIntent=this.lastResponse.intent;													// Save last intent
 		this.lastResponse={ text:""};																// Clear last
 		if (intent > 49) 																			// If a high-enough level																						
-			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent);						// Get response
+			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent,lastIntent);			// Get response
 		if (this.lastResponse.text) {																// If one
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
 			this.UpdateVariance(this.curStudent,this.lastResponse);									// Update student variance
