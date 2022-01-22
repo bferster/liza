@@ -19,6 +19,7 @@ class Feedback {
 
 	OnClick(e) 																					// ON SCREEN CLICK
 	{
+		$("#talkInput").blur();																		// Set focus away from inputs				
 		if (e.target.localName != "canvas")	return;													// React only to canvas hits
 		clearInterval(app.fb.interval);																// Clear timer
 		$("#lz-feedbar").remove();																	// Remove old one
@@ -226,7 +227,7 @@ class ResponsePanel  {
 				<span id="lztab-0" class="lz-rptab">LANGUAGE</span>
 				<span id="lztab-1" class="lz-rptab">EVIDENCE</span> 
 				<span id="lztab-2" class="lz-rptab">THINKING</span> 
-				<span id="lztab-3" class="lz-rptab" style="width:calc(25% - 4px)">FEEDBACK</span> 
+				<span id="lztab-3" class="lz-rptab" style="width:calc(25% - 4px)">GOAL</span> 
 				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:-var(--maxvh)" : ""}"></div>
 				</div>
 				<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">

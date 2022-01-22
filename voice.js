@@ -33,10 +33,11 @@ class Voice {
 			this.tts.onend=()=> { 																		// ON TALKING END
 				if (app.inSim) this.Listen();															// Resume listening
 				this.talking=0;  																		// Stop talking animation
-				let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get seat number
+				if (app.curStudent) { 																	// If a student defined
+					let o=app.students.find(x => x.id == app.curStudent);								// Point at student
+					if (o)	app.sc.SetBone(app.students[o.seat],"mouth",0,0,0); 						// Neutral mouth 
+					}
 				$("#responseTextDiv").fadeOut(300);														// Fade out response bubble
-				if (app.curStudent)																		// A valid student
-					app.sc.SetBone(app.students[snum],"mouth",0,0,0); 									// Neutral mouth 
 				};	
 
 			} catch(e) { trace("TTS error",e) };														// On error

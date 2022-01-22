@@ -188,14 +188,16 @@ class App  {
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
 	{
 		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
-		this.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
-		if (this.curTime >= app.totTime) {															// Add done
+		app.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
+		if (app.multi)	 return app.curTime;														// No timed events in multiplayer mode
+	
+		if (app.curTime >= app.totTime) {															// Add done
 			PopUp("Your Teaching with Grace session is over!");										// Popup
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
-			if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|DONE");  // Send sim status
+			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|DONE");  // Send sim status
 			}
-		if (this.curTime >= this.nextTrigger.when) 	this.HandleEventTrigger(this.nextTrigger);		// Handle event trigger
-		return this.curTime;																		// Return elapsed time in seconds
+		if (app.curTime >= app.nextTrigger.when) 	app.HandleEventTrigger(app.nextTrigger);		// Handle event trigger
+		return app.curTime;																			// Return elapsed time in seconds
 	}
 
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
@@ -277,8 +279,8 @@ class App  {
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
-				let r=app.GenerateResponse(text,intent);											// Generate response
 				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
+				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent) {																		// If an intent detected
 					let s=app.fb.intentLabels[intent/100];											// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
@@ -308,7 +310,7 @@ class App  {
 		this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
 		let lastIntent=this.lastResponse.intent;													// Save last intent
 		this.lastResponse={ text:""};																// Clear last
-		if (intent > 49) 																			// If a high-enough level																						
+		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent,lastIntent);			// Get response
 		if (this.lastResponse.text) {																// If one
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
@@ -429,6 +431,7 @@ class App  {
 
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[3] == "TALK") {																		// TALK
+			if ((this.role == v[5]) && (this.role != "Teacher"))	Sound("ding");					// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
 			else 												 app.voice.Talk(v[6],v[4]);			// Talk		
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
@@ -436,7 +439,7 @@ class App  {
 					let intent=res.intent.name.substring(1);										// Get intent
 					intent=isNaN(intent) ? 0 : intent;												// Validate
 					this.rp.curIntent=intent;														// Set current intent
-					if (v[4]) app.curStudent=v[4];													// Set new active student 
+					if (v[4]) app.curStudent=v[5];													// Set new active student 
 					this.rp.Draw(v[6],app.curStudent);												// Redraw response panel
 					});
 				}
