@@ -21,9 +21,9 @@ trigger,time,"who=random,when=1,do=[say:600+act:interrupt],"
 trigger,time,"who=Luis,when=30,do=[say:150+act:interrupt],"
 trigger,time,"who=random,when=300,do=[end:],"
 prompt,initial,"<b>Ask students</b>:<br><br>I’ve called you together to improve your responses and draw attention to your thinking about the question. <br><br>What equipment did scientists use to discover water on the moon?"
-resource,Teacher prep,assets/prep.pdf
-resource,Student facing,assets/student.pdf
-resource,Strategy supports,assets/supports.pdf
+resource,Scene Overview,assets/overview.pdf
+resource,Student Task Materials,assets/student.pdf
+resource,Teaching Strategy Support,assets/supports.pdf
 picture,Question,assets/Discussion.png
 picture,Important vocabulary,assets/ImportantWords.png
 picture,Lunar orbiter,assets/rover.png

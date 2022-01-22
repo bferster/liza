@@ -240,7 +240,7 @@ class Scene {
 			}
 		let snum=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;			// Get seat number
 		var str="<div id='poseEditor' class='lz-dialog' style='display:none'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
+		str+="<img src='img/smlogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>pose editor</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#poseEditor\").remove();'><br><br>";
 		str+="<table>";
 		str+="<tr><td>Student: </td><td>"+MakeSelect("beModel",false,[]);									// Model id

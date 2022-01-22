@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Liza chat</title>
+		<title>Chat</title>
 		<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -158,7 +158,7 @@ class Chat {
 		{
 			$("#co-chat").remove();                                                                 // Close chat if open
 			let str=`<div id='co-chat' class='co-chat'>
-				<img src="img/lizalogo64.png"><br>
+				<img src="img/logo.png" width="64"><br>
 				<div id="co-textDiv" 
 				style="height:calc(100% - 88px);overflow-x:hidden;overflow-y:auto;background-color:#fff;
 				margin-top:8px;border:1px solid #999;border-radius:8px;padding:4px 4px"></div>														
@@ -370,7 +370,7 @@ class Chat {
 		$("#confirmBoxDiv").remove();																	// Remove 
 		$("body").append("<div class='co-confirm' id='confirmBoxDiv' style='text-align:center'></div>");// Add box								
 		if (x != undefined)		$("#confirmBoxDiv").css({ left:x+"px", top:y+"px" });					// Position if set
-		let str="<img src='img/lisalogo.png' width='64'/><br>";											// Logo					
+		let str="<img src='img/smlogo.png' width='64'/><br>";											// Logo					
 		str+="<p style='font-size:14px; color:#666'><b>"+title+"</b></p>";
 		str+="<p>"+content+"<p>";
 		str+="<p><input class='co-is' style='width:95%' type='text' id='co-revText' value='"+def+"'>";

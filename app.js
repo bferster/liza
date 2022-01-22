@@ -372,7 +372,7 @@ class App  {
 	VideoChat()																					// OPEN VIDEO CHAT
 	{
 		$("#lz-videoChat").remove(); 																// Remove old one
-		let link="japp.htm?LizaChat~Session~"+app.sessionId+"&"+app.role;							// Make link
+		let link="japp.htm?GraceChat~Session~"+app.sessionId+"&"+app.role;							// Make link
 		let str=`<div id="lz-videoChat" style="position:absolute;background-color:#999;
 			width:75%;height:${$(window).width()*.5625*.75}px;top:50px;left:12.5%;display:none">
 			<span id="co-ift"style="cursor:pointer;margin-left:4px;float:left;pointer-events:auto;color:#fff">Minimize window</span>
@@ -522,7 +522,7 @@ class App  {
 			return;																					// Quit																					
 			}
 		var str="<div id='settingsEditor' class='lz-dialog' style='display:none;left:calc(100vw - 648px) '>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>settings</span>";	
+		str+="<img src='img/smlogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>settings</span>";	
 		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#settingsEditor\").remove();'><br><br>";
 		str+="<table>";
 		str+="<tr><td>Pose editor</td><td><div id='setPose'class='lz-bs'>Set</div></td></tr>";
@@ -552,7 +552,7 @@ class App  {
 			}
 		let str=`<div class="lz-dialog" id="lz-resources" 
 		style="background-color:#ccc;width:50%;overflow:hidden;display:none;padding:8px 8px 0 8px;left:calc(50% - 32px)">
-		&nbsp;<img src="img/lizalogo.png" style="vertical-align:-6px" width="64">
+		&nbsp;<img src="img/smlogo.png" style="vertical-align:-6px" width="64">
 		<img id="trclose" src="img/closedot.gif" style="float:right">	
 		<span style="font-size:18px;margin:7px 0 0 12px">Teacher resources</span>
 		<div id='resourcesDiv' style='height:50vh;width:calc(100% - 32px);background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div> 
@@ -564,14 +564,14 @@ class App  {
 		str="<b>Choose a resource to view</b><hr>"
 		for (let i=0;i<this.teacherResources.length;++i)  str+=`<div ${trsty} id="tres-${i}">${this.teacherResources[i].lab}</div>`;
 		$("#resourcesDiv").html(str);																	// Add resources	
+		let ph=window.innerHeight/2;																	// Size of page
 
 		$("#trclose").on("click", (e)=>{																// ON CLOSE
 			if ($("#trIF").length) {
 				$("#resourcesDiv").html(str);															// If a resource, put back file list
 				$("[id^=tres-]").on("click", (e)=>{														// ON CLICK RESOURCE
 					let id=e.target.id.substring(5);													// Set id
-					let h=500;
-					let ifs="<iframe id='trIF' frameborder='0' src='"+this.teacherResources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
+					let ifs="<iframe id='trIF' frameborder='0' src='"+this.teacherResources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+ph+"px;width:calc(100% + 32px);margin:-16px''></iframe>";	// Load in iframe
 					$("#resourcesDiv").html(ifs)
 					});
 				}	
@@ -579,8 +579,7 @@ class App  {
 			});
 		$("[id^=tres-]").on("click", (e)=>{																// ON CLICK RESOURCE
 			let id=e.target.id.substring(5);
-			let h=500;
-			let ifs="<iframe id='trIF' frameborder='0' src='"+this.teacherResources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+h+"px;width:100%'></iframe>";	// Load in iframe
+			let ifs="<iframe id='trIF' frameborder='0' src='"+this.teacherResources[id].url+"#page=0?toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0' style='height:"+ph+"px;width:calc(100% + 32px);margin:-16px'></iframe>";	// Load in iframe
 			$("#resourcesDiv").html(ifs)
 			});
 		

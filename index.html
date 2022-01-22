@@ -130,9 +130,9 @@
 	
 	<div id="mainDiv" class="lz-main"></div>
 	<div id="splashDiv" class="lz-splash">
-		<img src="img/lizalogo.png" style='width:20%;opacity:.66;' alt=""><br>
+		<img src="img/logo.png" style='width:20%;opacity:.66;' alt=""><br>
 		<br><p style="color:#000;font-size:14px"><em>A tool for engaging teachers in interactive discourse<br>for learning and practicing goal-directed behaviors and techniques.</em></p>
-		<br><div id="splashBut"  class="lz-bs" style="font-size:14px" onclick='app.voice.Talk("Welcome to Lysa","Teacher")'>Enter session</div><br><br>
+		<br><div id="splashBut"  class="lz-bs" style="font-size:14px" onclick='app.voice.Talk("Welcome to Teaching with Grace","Teacher")'>Enter session</div><br><br>
 		<div style='color:#000'><br>
 			<b>This demo ONLY runs in the Chrome Desktop Browser</b><br><br>
 			You can ask:<br><br>
@@ -224,7 +224,7 @@ var isMobile=false;																					// Flag for mobile devices
 			}
 		var h=window.innerHeight;
 		var str="<div id='helpDiv' class='lz-dialog'style='height:"+(h-106)+"px;overflow:hidden;display:none;;left:calc(100vw - 646px)'>";
-		str+="<img src='img/lizalogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
+		str+="<img src='img/smlogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
 		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
 		str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vTXAsMJ-YlQaNtT49RtKvEnT5v5Xzz-TKPyVlo2px-23vDt-4lZFB7JujSKyDXs38hiSMISQoulYXB5/pub?embedded=true' ";
 		str+="style='border: 1px solid #999;width:100%;height:"+(h-154)+"px' scrolling='yes'></iframe></div>";
@@ -267,7 +267,7 @@ var isMobile=false;																					// Flag for mobile devices
 		$("#confirmBoxDiv").remove();																	// Remove 
 		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add box								
 		if (x != undefined)		$("#confirmBoxDiv").css({ left:x+"px", top:y+"px" });					// Position if set
-		var str="<img src='img/lizalogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
+		var str="<img src='img/logo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
 		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
 		str+="<p>"+content+"<p>";
 		str+="<p><input class='lz-is' style='width:75%' type='text' id='gtBoxTt' value='"+def+"'></p>";
@@ -285,7 +285,7 @@ var isMobile=false;																					// Flag for mobile devices
 		Sound("ding");																					// Ding sound
 		$("#confirmBoxDiv").remove();																	// Remove 
 		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add dialog												
-		var str="<img src='img/lizalogo.png' width='64'>";												// Logo							
+		var str="<img src='img/smlogo.png' width='64'>";												// Logo							
 		str+="<span style='font-size:16px;float:right;color:#b9220a;margin-top:6px'><b>"+title+"</b></span><br>"; // Title
 		str+="<p>"+content+"<p>";
 		str+="<div style='float:right'><div id='confirmOK' class='lz-bs'>OK</div>";
@@ -324,7 +324,7 @@ var isMobile=false;																					// Flag for mobile devices
 			}
 		let str=`<div id="lz-slideUp" class="lz-dialog" 
 		style="background-color:#ccc;width:324px;overflow:hidden;display:none;padding:8px;left:${x}px">
-		&nbsp;<img src="img/lizalogo.png" style="vertical-align:-6px;width:64px">
+		&nbsp;<img src="img/smlogo.png" style="vertical-align:-6px;width:64px">
 		<span style="font-size:18px;margin-left:8px;padding-bottom:30p">${title}</span>
 		<img src="img/closedot.gif"' style="float:right" onclick='$("#lz-slideUp").remove()'>	
 		<div style="height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px">
