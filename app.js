@@ -583,7 +583,7 @@ class App  {
 			$("#resourcesDiv").html(ifs)
 			});
 		
-		var h=window.innerHeight-$("#lz-resources").height()-62;										// Calc top
+		var h=window.innerHeight-$("#lz-resources").height()-86;										// Calc top
 		$("#lz-resources").css("top",h+"px");															// Set top
 		$("#lz-resources").show("slide",{ direction:"down" });											// Slide up
 		$("#lz-resources").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } );	// Don't move orbiter
