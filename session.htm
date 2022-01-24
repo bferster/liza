@@ -20,8 +20,7 @@
 	<body>
 
 		<div style="width:66%;margin:0 auto;text-align:center">
-			<img src="img/logo.png" style="width:25%">
-			<span style="font-size:24px;vertical-align:12px"><b><i> session</b></i></span>
+			<img src="img/logo.png" style="width:20%">
 			<hr>
 			Session &nbsp;
 			<select id="lz-select" class="lz-is" style="height:26px">
@@ -91,13 +90,18 @@ class App  {
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
 		if (v[3] == "SESSIONFETCH") {																// FETCH
-			let vv=v[5].split("\n")
-			let str="<br>"
-			for (let i=1;i<vv.length;++i) {	
-				if (vv[i].match(/,INIT,/)) str+="<b>"+vv[i]+"<br></b>";
-				else							 str+=vv[i]+"<br>";
+			let j,i,fv;
+			let vv=v[5].split("\n");																// Get data lines
+			let str="<table style='border-spacing:0'>";												// Table header
+			for (i=1;i<vv.length;++i) {																// For each data line
+				fv=vv[i].split(",");																// Get fields
+				if (vv[i].match(/,INIT,/)) 	str+="<tr style='font-weight:bold'>";					// Start INIT row bold
+				else					   	str+="<tr>";											// Start regular row
+				for (j=1;j<6;++j) 			str+="<td style='padding-right:20px'>"+fv[j]+"</td>";	// Make row
+				fv.splice(0,6);																		// Remove start
+				str+="<td>"+fv.join(",").replace(/"/g,"")+"</td></tr>";								// Get last, less quotes
 				}
-			$("#lz-data").html(str);
+			$("#lz-data").html(str+"</table>");														// Set div
 			if (app.saveSession)				 SaveTextAsFile("sessiondata-"+v[4]+".csv",v[5]);	// Write file
 			}
 		else if (v[3] == "SESSIONCLEAR") {															// CLEAR

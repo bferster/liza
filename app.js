@@ -97,7 +97,7 @@ class App  {
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (e.originalEvent.repeat)		return false;										// Only 1st one
-				if (!app.inSim) {																	// If not in a session
+				if (!app.inSim && (app.role == "Teacher")) {										// If a teacher not in a session
 					PopUp("Please START the session to talk to the class"); 						// Prompt
 					return;																			// Quit
 					}
@@ -113,6 +113,7 @@ class App  {
 				this.inRemark=false;																// Teacher is not talking
 				}
 			});
+	
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE
@@ -169,13 +170,14 @@ class App  {
 	{
 		let i;
 		this.trt=0;																					// At start
-		this.inSim=false;																			// Not in simulation
+		this.inSim=(this.role != "Teacher");															// Not in simulation if a teacher
 		this.lastResponse="";																		// Last response
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.curStudent=app.students[0].id;															// Pick first student
 		this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);								// Set right side
 		this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);								// Left 
+//		if (this.role != "Teacher") this.voice.Listen()												// Turn on speech recognition, if student
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
 			this.eventTriggers[i].done=0;															// Reset done	
 			if (this.eventTriggers[i].type == "time") {												// A time event
@@ -263,7 +265,11 @@ class App  {
 		let talkingTo=app.nlp.GetWho(text);															// Get student menitioned, if any
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
-		if (app.role != "Teacher")	talkingTo="Teacher";											// Always to teach, unless teacher
+		if (app.role != "Teacher") {																// Not the teacher talking
+			app.ws.send(app.sessionId+"|"+(app.curTime).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text+"|0");	// Send remark
+			return;
+			}
+		talkingTo="Teacher";											// Always to teach, unless teacher
 		let act=app.nlp.GetAction(text);															// Set action
 		if (app.pickMeQuestion) {																	// If a pick me question was last asked
 			text=app.pickMeQuestion;																// Send previou question
