@@ -4,12 +4,30 @@
 	const fs = require('fs');
 	const WebSocket = require('ws');
 	const os = require("os");	
-	
+	const dialogflow = require('@google-cloud/dialogflow');
 	let webSocketServer;																		// Holds socket server	
 	let local=os.hostname().match(/^bill|desktop/i);											// Running on localhost?
 	let sessionData=[];																			// Holds session data
 	let sessionChanged=[];																		// Holds session data change st
+	const dialogCredentials=JSON.parse(fs.readFileSync("../config/liza-1-dialogflow.json"));	// Dialogflow credentials
 	LoadSessionData();																			// Load session data from disc
+
+/*
+	const detectIntent = async (q)=> {															// 																				
+		const config={ credentials:{ private_key: dialogCredentials.private_key,client_email: dialogCredentials.client_email }};
+		const sessionClient=new dialogflow.SessionsClient(config);
+		const sessionPath=sessionClient.projectAgentSessionPath(dialogCredentials.project_id, "123456789");
+		const request={ session: sessionPath, queryInput:{ text: { text:q, languageCode:"en-US" }}};
+		const responses = await sessionClient.detectIntent(request);
+		console.log(responses[0].queryResult.intent.displayName);
+		}
+ 
+	async function doit() {	
+		await detectIntent("student that's right weren't wrong");
+	 	}
+
+	doit()	
+*/
 
 /* SOCKET SERVER  ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,6 +82,7 @@ try{
 				sessionChanged[s]=true;															// Set changed
 				}
 			if (v[3].match(/^SESSION/)) ActOnSessionData(v,webSocket);							// Session data actions
+			if (v[3].match(/^TOKEN/)) 	GetToken(v,webSocket);									// Get a token
 			else 						Broadcast(v[0], message);								// Broadcast to everyone
 			});
 		});
@@ -121,7 +140,7 @@ try{
 				msg+=o.join("\n");																// Data split by CRs
 				SendData(client,msg);															// Send to caller
 				}
-			if (d[3] == "SESSIONCLEAR") {														// Clear session data
+			else if (d[3] == "SESSIONCLEAR") {													// Clear session data
 				if (d[5] != "7001") { trace("Bad password"); return; }							// Quit on wrong p/w								
 				let o=sessionData["s"+d[4]];													// Point at data
 				if (!o)	return;																	// No data found
@@ -130,7 +149,7 @@ try{
 				sessionData["s"+d[4]]=[];														// Clear data
 				SendData(client,msg);															// Send to caller
 				}
-			if (d[3] == "SESSIONLIST") {														// Get sessions on disk
+			else if (d[3] == "SESSIONLIST") {													// Get sessions on disk
 				let msg="0|0.0|ADMIN|SESSIONLIST|";												// Make message
 				for (let k in sessionData)	msg+=k.substring(1)+",";							// Add to list
 				SendData(client,msg.substring(0,msg.length-1));									// Send to caller
@@ -138,6 +157,18 @@ try{
 
 		} catch(e) { console.log(e) }
 	}
+
+	function GetToken(d, client)															// GET A TOKEN
+	{
+		try{
+			if (d[3] == "DIALOGFLOW") {															// Get session data
+				let msg="0|0.0|TOKEN|DIALOGFLOW|myTokenData";									// Data header
+				SendData(client,msg);															// Send to caller
+			}
+
+		} catch(e) { console.log(e) }
+	}
+
 
 	function SendData(client, data) 														// SEND DATA TO CLIENT
 	{

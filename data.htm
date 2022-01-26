@@ -26,7 +26,6 @@
 
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/logo.png" style="width:25%">
-			<span style="font-size:24px;vertical-align:12px"><b><i> dataparser</b></i></span>
 			<hr>
 			Dataset: <select class="co-is" id="lz-dataset">
 				<option>Newdata</option><option>Cleaned</option><option>Original</option>><option>Testdata</option>
@@ -76,6 +75,9 @@
 				GetTextBox("Type intent","","",(s)=>{ WitTrainIntent(s); });	
 				}
 			});
+
+//GetDialogFlow("keyword")																// SEND REMARK TO DIALOGFLOW
+
 		});
 
 	function LoadConfig(dataset="Newdata")														// LOAD CONFIG FILE
@@ -325,7 +327,36 @@ return;
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
 		if (mask&1 && (test > 0)) SaveTextAsFile("test-nlu.txt",str2);								// Write testing file
+/*		DIALOGFLOW	
+
+	for (k in ints)	{																			// For each intent
+			str="[\n";
+			ints[k]=[... new Set(ints[k])];															// Make unique
+			for (i=0;i<Math.min(ints[k].length,num);++i) { 											// Add each remark in intent group
+				ss=ints[k][i].slice(6,-1);															// Remove yaml header
+				ss=ss.replace(/"/g,"");																// No quotes
+				ss=ss.replace(/'/g,"\\u0027");														// Escape apos
+				str+=`{ "data": [{ "text": "${ss}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
+				}
+			str=str.slice(0,-2)+"\n]";
+			SaveTextAsFile(k.substr(1)+"_usersays_en.json",str);													// Write file
+		}
+*/
 	}
+
+	function GetDialogFlow(remark)																// SEND REMARK TO DIALOGFLOW
+	{
+		const url="https://dialogflow.googleapis.com/v2/projects/liza-100s-mmhi/agent/sessions/123456789:detectIntent";		// URL
+		let token="".replace(/-X-/g,"");					// Get token
+		let body={"query_input":{"text":{"text":remark,"language_code":"en-US"}}};					// Make body
+		trace(body)
+		fetch(url,{ method:"POST",
+			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
+			  body: JSON.stringify(body)
+			  })	
+	  	.then(res => res.json()).then(res =>{ trace(res); })
+	}
+
 
 	async function MakeSession()																// CREATE SESSION FILE
 	{
