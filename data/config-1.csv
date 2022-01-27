@@ -5,7 +5,7 @@ student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","sex=f
 student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=3,"
 student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
-session,session,"trt=330,"
+session,data,"trt=330,"
 seat,0,"x=200,y=110,z=0,r=-25,"
 seat,1,"x=100,y=70,z=0,r=-15,"																							
 seat,2,"x=0,y=50,z=0,r=0,"

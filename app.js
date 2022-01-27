@@ -29,6 +29,7 @@ class App  {
 		this.inSim=false;																			// In simulation or not
 		this.inRemark=false;																		// Teacher talking flag
 		this.said="";																				// Current remark
+		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
 		this.initialPrompt="";																		// Initial prompt
@@ -133,7 +134,12 @@ class App  {
 					else if (d[i].type == "prompt")   this.initialPrompt=d[i].text;					// Add initial prompt
 					else if (d[i].type == "seat")  	  this.sc.AddSeat(d[i]);						// Add seat position
 					else if (d[i].type == "session") {												// Session settings
-						this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];							// Get trt
+						if (d[i].id == "data")		  this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];	// Get trt
+						}
+					else if (d[i].type == "dialogflow") {											// Dialogflow settings
+						if (d[i].id == "key")		  this.df.key=d[i].text;						// Add params
+						if (d[i].id == "id")		  this.df.id=d[i].text;							// Add params
+						if (d[i].id == "email")		  this.df.email=d[i].text;						// Add params
 						}
 					else if (d[i].type == "trigger") {												// Triggers
 						o={type:d[i].id, done:0 };													// Set type
@@ -170,7 +176,7 @@ class App  {
 	{
 		let i;
 		this.trt=0;																					// At start
-		this.inSim=(this.role != "Teacher");															// Not in simulation if a teacher
+		this.inSim=(this.role != "Teacher");														// Not in simulation if a teacher
 		this.lastResponse="";																		// Last response
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.remarkLevels=[0,0,0,0,0];																// Remarks per level

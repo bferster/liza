@@ -76,7 +76,7 @@
 				}
 			});
 
-//GetDialogFlow("keyword")																// SEND REMARK TO DIALOGFLOW
+GetDialogFlow("keyword")																// SEND REMARK TO DIALOGFLOW
 
 		});
 
@@ -347,7 +347,7 @@ return;
 	function GetDialogFlow(remark)																// SEND REMARK TO DIALOGFLOW
 	{
 		const url="https://dialogflow.googleapis.com/v2/projects/liza-100s-mmhi/agent/sessions/123456789:detectIntent";		// URL
-		let token="".replace(/-X-/g,"");					// Get token
+		let token="ya29.A0ARrd-X-aM8XVgL5jZ-j7uhM6QUF6YvDK7lqU_vMGBN2WWkaQ5_UZeb_Fk8AZMSKt5MvCsCeC1EvG1xGj9BMik6Dwd-X-9pzw5norfHk6MYT6KdHFC7ntrbQnogfLBLAXDiRnV03lXRMny6avSd-X-UjfdjOHeLOjR8Cl84R6sRtEb8LI-_NgRxOEYTMc6CjpEe-X-W_6JW3TklMiAe7c-Pm7RtpEQl-X-QmaE7o3Fo80atsPKlC-EmdBLJWb_s".replace(/-X-/g,"");					// Get token
 		let body={"query_input":{"text":{"text":remark,"language_code":"en-US"}}};					// Make body
 		trace(body)
 		fetch(url,{ method:"POST",

@@ -5,29 +5,12 @@
 	const WebSocket = require('ws');
 	const os = require("os");	
 	const dialogflow = require('@google-cloud/dialogflow');
+
 	let webSocketServer;																		// Holds socket server	
 	let local=os.hostname().match(/^bill|desktop/i);											// Running on localhost?
 	let sessionData=[];																			// Holds session data
 	let sessionChanged=[];																		// Holds session data change st
-	const dialogCredentials=JSON.parse(fs.readFileSync("../config/liza-1-dialogflow.json"));	// Dialogflow credentials
 	LoadSessionData();																			// Load session data from disc
-
-/*
-	const detectIntent = async (q)=> {															// 																				
-		const config={ credentials:{ private_key: dialogCredentials.private_key,client_email: dialogCredentials.client_email }};
-		const sessionClient=new dialogflow.SessionsClient(config);
-		const sessionPath=sessionClient.projectAgentSessionPath(dialogCredentials.project_id, "123456789");
-		const request={ session: sessionPath, queryInput:{ text: { text:q, languageCode:"en-US" }}};
-		const responses = await sessionClient.detectIntent(request);
-		console.log(responses[0].queryResult.intent.displayName);
-		}
- 
-	async function doit() {	
-		await detectIntent("student that's right weren't wrong");
-	 	}
-
-	doit()	
-*/
 
 /* SOCKET SERVER  ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,6 +19,7 @@
 	npm install os
 	npm install ws
 	node socketserver.js
+	npm install @google-cloud/dialogflow
 
 	npm install forever
 	cd ~/htdocs/go | forever stopall | forever start ws.js | forever logs | sudo cat /home/bitnami/.forever/<id>.log
@@ -82,7 +66,7 @@ try{
 				sessionChanged[s]=true;															// Set changed
 				}
 			if (v[3].match(/^SESSION/)) ActOnSessionData(v,webSocket);							// Session data actions
-			if (v[3].match(/^TOKEN/)) 	GetToken(v,webSocket);									// Get a token
+			if (v[3].match(/^INFER/)) 	InferIntent(v,webSocket);								// Infer intent from remark
 			else 						Broadcast(v[0], message);								// Broadcast to everyone
 			});
 		});
@@ -158,14 +142,26 @@ try{
 		} catch(e) { console.log(e) }
 	}
 
-	function GetToken(d, client)															// GET A TOKEN
+	function InferIntent(d, client)															// INFER INTENT FROM REMARK
 	{
 		try{
-			if (d[3] == "DIALOGFLOW") {															// Get session data
-				let msg="0|0.0|TOKEN|DIALOGFLOW|myTokenData";									// Data header
-				SendData(client,msg);															// Send to caller
+			if (d[1] == "DIALOGFLOW") {															// Get session data
+				const detectIntent = async (q)=> {																																												
+					d[6]=d[6].replace(/-X-|\"/g,"");											// Remove obfuscators
+					d[6]=d[6].replace(/\\n/g,"\n");												// Convert to true LFs
+					q=q.trim();												
+					const config={ credentials:{ private_key:d[6],client_email:d[5] }};			// Make config
+					const sessionClient=new dialogflow.SessionsClient(config);					// Start session
+					const sessionPath=sessionClient.projectAgentSessionPath(d[4],"123456789");	// Make path
+					const request={ session: sessionPath, queryInput:{ text: { text:q, languageCode:"en-US" }}};	// Make request
+					const responses = await sessionClient.detectIntent(request);				// Detect
+					let msg=d[0]+"|DIALOGFLOW|r"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+q;	// return data
+					SendData(client, msg);														// Send back 
+					trace(msg)
+					}
+				async function infer() { await detectIntent(d[7]); }							// Async function
+				infer();																		// Do it
 			}
-
 		} catch(e) { console.log(e) }
 	}
 
@@ -200,3 +196,4 @@ function trace(msg, p1, p2, p3, p4)
 	else if (p1 != undefined)	console.log(msg,p1);
 	else						console.log(msg);
 }	
+
