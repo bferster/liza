@@ -34,6 +34,8 @@
 		.lz-controller {	position: fixed; top: calc(100% - 39px); left:0; background-color: #aaa; border: 1px solid #999;
 							padding:6px 12px; width: calc(100% - 24px); height:25px; display:none; user-select:none;
 							}
+		.lz-feedbackbar {	position: fixed; top: calc(100% - 64px); left:0; width:calc(100% - 16px); text-align:right;user-select:none;
+							}
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							padding:16px; border-radius: 16px; width: 600px;
 							}
@@ -151,6 +153,7 @@
 		<img id="writeBut" src="img/drawbut.gif" title="Blackboard" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="videoBut" src="img/zoom.png" title="Video chat" style="cursor:pointer;margin-right:16px;float:right">
 	</div>
+	<div id="feedbackDiv" class="lz-feedbackbar"></div>
 	<div id='blackboardDiv' class='lz-blackboard'>
 		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer;margin-bottom:12px;margin-top:-12px" title="Draw"><br>
 		<img id="BB-EraseBut" src="img/eraser-icon.png" style="cursor:pointer;margin-bottom:12px" title="Erase"><br>

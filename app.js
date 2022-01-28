@@ -112,6 +112,7 @@ class App  {
 				if (app.inSim)					setTimeout(()=>{ app.OnPhrase(app.said); },1000); 	// React to remark if in sim
 				app.said="";																		// Clear spoken cache
 				this.inRemark=false;																// Teacher is not talking
+				Prompt("PRESS AND HOLD SPACEBAR TO TALK","on");										// Restore prompt
 				}
 			});
 	
@@ -268,14 +269,13 @@ class App  {
 	OnPhrase(text) 																				// ON PHRASE UTTERED
 	{
 		if (!text)					return;															// Quit if nothing said
-		let talkingTo=app.nlp.GetWho(text);															// Get student menitioned, if any
+		let talkingTo=app.nlp.GetWho(text);															// Get student mentioned, if any
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher") {																// Not the teacher talking
 			app.ws.send(app.sessionId+"|"+(app.curTime).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text+"|0");	// Send remark
 			return;
 			}
-		talkingTo="Teacher";											// Always to teach, unless teacher
 		let act=app.nlp.GetAction(text);															// Set action
 		if (app.pickMeQuestion) {																	// If a pick me question was last asked
 			text=app.pickMeQuestion;																// Send previou question
@@ -294,13 +294,14 @@ class App  {
 				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent) {																		// If an intent detected
-					let s=app.fb.intentLabels[intent/100];											// Get intent label
+					let s=app.curStudent+"'s response: ";											// Student name
+					s+=app.fb.intentLabels[intent/100];												// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
 					s+=addVariant(r.b,app.variance.labels[0]);										// Add variant for B
 					s+=addVariant(r.a,app.variance.labels[1]);										// A
 					s+=addVariant(r.k,app.variance.labels[2]);										// K
 					s+=addVariant(r.t,app.variance.labels[3]);										// T
-					Prompt(s,10);																	// Show in prompt area
+					$("#feedbackDiv").html(s);														// Show in feedback area
 					}	
 				trace(res,r.text)
 			});
@@ -443,7 +444,7 @@ class App  {
 
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
 		if (v[3] == "TALK") {																		// TALK
-			if ((this.role == v[5]) && (this.role != "Teacher"))	Sound("ding");					// Alert student they are being talked to
+			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
 			else 												 app.voice.Talk(v[6],v[4]);			// Talk		
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
@@ -451,7 +452,7 @@ class App  {
 					let intent=res.intent.name.substring(1);										// Get intent
 					intent=isNaN(intent) ? 0 : intent;												// Validate
 					this.rp.curIntent=intent;														// Set current intent
-					if (v[4]) app.curStudent=v[5];													// Set new active student 
+					if (v[5]) app.curStudent=v[5];													// Set new active student 
 					this.rp.Draw(v[6],app.curStudent);												// Redraw response panel
 					});
 				}

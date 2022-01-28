@@ -37,7 +37,7 @@ class Voice {
 					let o=app.students.find(x => x.id == app.curStudent);								// Point at student
 					if (o)	app.sc.SetBone(app.students[o.seat],"mouth",0,0,0); 						// Neutral mouth 
 					}
-				$("#responseTextDiv").fadeOut(300);														// Fade out response bubble
+				$("#responseTextDiv").delay(3000).fadeOut(300);											// Fade out response bubble
 				};	
 
 			} catch(e) { trace("TTS error",e) };														// On error
@@ -46,10 +46,11 @@ class Voice {
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.recognition=new SpeechRecognition();													// Init STT
 			this.recognition.continuous=false;															// Continual recognition off
+			this.recognition.interimResults=true;														// Return interim results
 			this.recognition.lang="en-US";																// US English
 			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };							// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
-			this.recognition.onresult=(e)=> { app.said+=" "+e.results[0][0].transcript;	 };				// On some speech recognized, add
+			this.recognition.onresult=(e)=> { app.said=e.results[0][0].transcript;$("#promptSpan").fadeIn(); $("#promptSpan").html(app.said); };	// On some speech recognized, add
 			} catch(e) { trace("Voice error",e) };														// On error
 		}
 

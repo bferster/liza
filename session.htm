@@ -32,7 +32,7 @@
 			&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-saveSession">Save session to CSV</div>
 			&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-clearSession">Clear session</div>
 			<hr>
-		<div id="lz-data" style="text-align:left;max-height:500px"></div>
+		<div id="lz-data" style="text-align:left;height:66vh;overflow-y:auto"></div>
 		</div>
 	
 <script>
@@ -102,6 +102,7 @@ class App  {
 				str+="<td>"+fv.join(",").replace(/"/g,"")+"</td></tr>";								// Get last, less quotes
 				}
 			$("#lz-data").html(str+"</table>");														// Set div
+			$("#lz-data").scrollTop(10000);	
 			if (app.saveSession)				 SaveTextAsFile("sessiondata-"+v[4]+".csv",v[5]);	// Write file
 			}
 		else if (v[3] == "SESSIONCLEAR") {															// CLEAR
