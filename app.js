@@ -8,6 +8,7 @@ class App  {
 	{
 		app=this;
 		this.role="Teacher";																		// User's role in simulation
+		this.strings=[];																			// Config strings
 		this.poses=[];																				// Holds poses
 		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
@@ -32,7 +33,6 @@ class App  {
 		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
-		this.initialPrompt="";																		// Initial prompt
 		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.multi=window.location.search.match(/role=/i) ? true : false;							// Multi-player mode
 		
@@ -61,7 +61,7 @@ class App  {
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else{																					// Not in sim
 				this.startTime=now;																	// Set start				
-				if ((this.trt == 0) && this.initialPrompt)	PopUp(this.initialPrompt,10);			// Prompt teacher
+				if ((this.trt == 0) && this.strings.initial) PopUp(this.strings.initial,10);		// Prompt teacher
 				}
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
@@ -132,7 +132,7 @@ class App  {
 						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add nlp data
 					else if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);			// Add BB pic
 					else if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
-					else if (d[i].type == "prompt")   this.initialPrompt=d[i].text;					// Add initial prompt
+					else if (d[i].type == "string")   this.strings[d[i].id]=d[i].text;				// Strings
 					else if (d[i].type == "seat")  	  this.sc.AddSeat(d[i]);						// Add seat position
 					else if (d[i].type == "session") {												// Session settings
 						if (d[i].id == "data")		  this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];	// Get trt

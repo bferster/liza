@@ -124,9 +124,11 @@ class NLP {
 			o.t=d[i]["Thinking (500)"];																	// Get factor
 			o.u=d[i]["Understanding Level"];															// Get factor
 			o.text=d[i]["Response"];																	// Get response
-			if (d[i]["Type of Student Response"]) o.type=d[i]["Type of Student Response"].substring(3);	// Get type
+			o.label=d[i]["Response category"];															// Get response category
+			if (d[i]["Type of Student Response"]) o.type=d[i]["Type of Student Response"];				// Get type
 			o.intent=d[i]["Intent"];																	// Get intent
 			o.action=d[i]["Student Physical Action"];													// Get action
+			o.index=this.responses[k].length;															// Add index
 			this.responses[k].push(o);																	// Add to list
 		}
 	}

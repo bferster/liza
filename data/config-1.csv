@@ -16,11 +16,11 @@ seat,6,"x=-100,y=-100,z=0,r=0,"
 seat,7,"x=0,y=-100,z=0,r=0,"
 seat,8,"x=100,y=-100,z=0,r=0,"
 seat,9,"x=200,y=-100,z=0,r=30,"
-variance,labels,"Belonging,Academic,Knowledge,Thinking"											
+string,multi,"Explain,Value,Discover,Reflect,Other"											
+string,initial,"<b>Ask students</b>:<br><br>I’ve called you together to improve your responses and draw attention to your thinking about the question. <br><br>What equipment did scientists use to discover water on the moon?"
 trigger,time,"who=random,when=1,do=[say:600+act:interrupt],"
 trigger,time,"who=Luis,when=30,do=[say:150+act:interrupt],"
 trigger,time,"who=random,when=300,do=[end:],"
-prompt,initial,"<b>Ask students</b>:<br><br>I’ve called you together to improve your responses and draw attention to your thinking about the question. <br><br>What equipment did scientists use to discover water on the moon?"
 resource,Scene Overview,assets/overview.pdf
 resource,Student Task Materials,assets/student.pdf
 resource,Teaching Strategy Support,assets/supports.pdf

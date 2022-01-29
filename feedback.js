@@ -213,6 +213,7 @@ class ResponsePanel  {
 		app.sc.Resize();																			// Resize renderer
 		app.sc.SetCamera(0,200,600,0,0,0);															// Reset camera	
 		$("#lz-rpback").remove();																	// Remove old one
+		let v=app.strings.multi.split(",");																	// Point at labels
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px">
@@ -224,10 +225,11 @@ class ResponsePanel  {
 				<div style="margin:12px 0;width:100%">
 					<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
 				</div>
-				<span id="lztab-0" class="lz-rptab">LANGUAGE</span>
-				<span id="lztab-1" class="lz-rptab">EVIDENCE</span> 
-				<span id="lztab-2" class="lz-rptab">THINKING</span> 
-				<span id="lztab-3" class="lz-rptab" style="width:calc(25% - 4px)">GOAL</span> 
+				<span id="lztab-${v[0]}" class="lz-rptab">${v[0]}</span>
+				<span id="lztab-${v[1]}" class="lz-rptab">${v[1]}</span> 
+				<span id="lztab-${v[2]}" class="lz-rptab">${v[2]}</span> 
+				<span id="lztab-${v[3]}" class="lz-rptab">${v[3]}</span> 
+				<span id="lztab-${v[4]}" class="lz-rptab">${v[4]}</span> 
 				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:-var(--maxvh)" : ""}"></div>
 				</div>
 				<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">
@@ -253,7 +255,7 @@ class ResponsePanel  {
 			fillList(id);																			// Fill list
 			});
 		
-		$("#lztab-0").trigger("click");																// Fill list (must be after handler)
+		$("#lztab-"+v[0]).trigger("click");															// Fill list (must be after handler)
 			if (window.location.search.match(/role=coach/i)) addRoles();							// Add sudent roles if coach
 
 		$("#lzSeqs").on("change", ()=> {															// ON RUN SEQUENCE
@@ -269,13 +271,18 @@ class ResponsePanel  {
 			});
 	
 		function fillList(tab) {																	// FILL RESPONSE LIST
-			let o,i,str="";
+			let i,v=[],str="",last="";
 			if (app.role == "Coach") return;														// Not in coach role
-			let n=Math.floor(app.nlp.responses[app.role].length/4);									// Number to fill
-			for (i=tab*n;i<tab*n+n;++i) {															// For each of a student's possible responses
-				o=app.nlp.responses[app.role][i];													// Point at it
-				str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:18px;cursor:pointer;vertical-align:-4px"> ${o.text}</p>`;
-				}
+			let n=app.nlp.responses[app.role].length;												// Number of responses for student
+			let o=app.nlp.responses[app.role];														// Point at it
+
+			for (i=0;i<n;++i) if (tab == o[i].label) v.push(o.slice(i,i+1)[0]);						// Add to array if a label match
+			v.sort((a,b)=> a.type < b.type ? 1 : -1);	 											// Sort by type
+			for (i=0;i<v.length;++i) {																// For each match
+				if (v[i].type != last)	str+=`<p><b>${v[i].type}</b></p>`; 							// Add new section head	
+				last=v[i].type;																		// Then is now	
+				str+=`<p><img id="resp-${v[i].index}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px"> ${v[i].text}</p>`; // add response
+				}		
 			$("#lz-rplist").html(str);																// Add responses
 
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
