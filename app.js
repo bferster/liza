@@ -181,7 +181,6 @@ class App  {
 		this.curStudent=app.students[0].id;															// Pick first student
 		this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);								// Set right side
 		this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);								// Left 
-//		if (this.role != "Teacher") this.voice.Listen()												// Turn on speech recognition, if student
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
 			this.eventTriggers[i].done=0;															// Reset done	
 			if (this.eventTriggers[i].type == "time") {												// A time event
