@@ -50,7 +50,10 @@ class Voice {
 			this.recognition.lang="en-US";																// US English
 			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };							// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
-			this.recognition.onresult=(e)=> { app.said=e.results[0][0].transcript;$("#promptSpan").fadeIn(); $("#promptSpan").html(app.said); };	// On some speech recognized, add
+			this.recognition.onresult=(e)=> { 															// On some speech recognized, add
+				app.said=e.results[0][0].transcript;													// Get text
+				$("#promptSpan").html(app.inRemark ? app.said : "PRESS AND HOLD SPACEBAR TO TALK"); 	// Show partial text
+				};
 			} catch(e) { trace("Voice error",e) };														// On error
 		}
 

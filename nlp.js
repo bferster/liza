@@ -219,7 +219,7 @@ class NLP {
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
 		if (app.df.id) 
-			app.ws.send("0|DIALOGFLOW|"+app.role+"|INFER|"+app.df.id+"|"+app.df.email+"|"+app.df.key+"|"+msg);  // Ask for inference
+			app.ws.send(app.sessionId+"|DIALOGFLOW|ADMIN|INFER|"+app.df.id+"|"+app.df.email+"|"+app.df.key+"|"+msg);  	// Ask for inference
 		else{
 			fetch(this.AIhost+":5005/model/parse", {														// Fetch data
 				method:"POST",																				// POST

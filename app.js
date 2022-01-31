@@ -94,25 +94,25 @@ class App  {
 			});
 		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
-		$(window).on("keydown",function(e) {														// HANDLE KEY DOWN
+		$(window).on("keydown", (e) => {															// HANDLE KEY DOWN
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (e.originalEvent.repeat)		return false;										// Only 1st one
-				if (!app.inSim && (app.role == "Teacher")) {										// If a teacher not in a session
+				if (!this.inSim && (this.role == "Teacher")) {										// If a teacher not in a session
 					PopUp("Please START the session to talk to the class"); 						// Prompt
 					return;																			// Quit
 					}
+				Prompt("","on");																	// Prompt visible
+				if (this.multi) this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+this.curStudent+"|1"); // Alert others to talking
 				this.inRemark=true;																	// Teacher is talking
-				app.said="";																		// Clear spoken cache
 				}
 			});
-		$(window).on("keyup",function(e) {															// HANDLE KEY UP
+		$(window).on("keyup", (e)=> {																// HANDLE KEY UP
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text")	return true;										// If in a text input, quit
-				if (app.inSim)					setTimeout(()=>{ app.OnPhrase(app.said); },1000); 	// React to remark if in sim
-				app.said="";																		// Clear spoken cache
+				if (this.inSim)					setTimeout(()=>{ app.OnPhrase(this.said); },1000); 	// React to remark if in sim
 				this.inRemark=false;																// Teacher is not talking
-				Prompt("PRESS AND HOLD SPACEBAR TO TALK","on");										// Restore prompt
+				if (this.multi) this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+this.curStudent+"|0"); // Alert others to not talking
 				}
 			});
 	
@@ -150,9 +150,6 @@ class App  {
 						if ((v=d[i].text.match(/do=\[(.+?)\]/i)))	o.do=v[1];						// Do
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
-					else if (d[i].type == "variance") {												// Variance
-						if (d[i].id == "labels")	this.variance.labels=d[i].text.split(",");		// Get labels
-						}					
 					}
 				this.eventTriggers.sort((a,b)=>{ return a.when-b.when });							// Sort events by time											
 				this.InitClassroom();																// Init classroom
@@ -196,9 +193,9 @@ class App  {
 
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
 	{
-		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
-		app.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
-		if (app.multi)	 return app.curTime;														// No timed events in multiplayer mode
+		if (!app.inSim)	 			now=app.startTime;												// Don't set based on now if not in sim
+		if (this.role == "Teacher")	app.curTime=app.trt+(now-app.startTime)/1000;					// Calc elapsed time in session
+		if (app.multi)	 			return app.curTime;												// No timed events in multiplayer mode
 	
 		if (app.curTime >= app.totTime) {															// Add done
 			PopUp("Your Teaching with Grace session is over!");										// Popup
@@ -293,14 +290,15 @@ class App  {
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
-				if (intent) {																		// If an intent detected
+				if (intent >= 300) {																// If an intent detected
 					let s=app.curStudent+"'s response: ";											// Student name
+					let v=app.strings.variance.split(",");											// Get variance labels
 					s+=app.fb.intentLabels[intent/100];												// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
-					s+=addVariant(r.b,app.variance.labels[0]);										// Add variant for B
-					s+=addVariant(r.a,app.variance.labels[1]);										// A
-					s+=addVariant(r.k,app.variance.labels[2]);										// K
-					s+=addVariant(r.t,app.variance.labels[3]);										// T
+					s+=addVariant(r.b,v[0]);														// Add variant for B
+					s+=addVariant(r.a,v[1]);														// A
+					s+=addVariant(r.k,v[2]);														// K
+					s+=addVariant(r.t,v[3]);														// T
 					$("#feedbackDiv").html(s);														// Show in feedback area
 					}	
 				trace(res,r.text)
@@ -441,9 +439,11 @@ class App  {
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
-
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
-		if (v[3] == "TALK") {																		// TALK
+		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
+		if (v[3] == "SPEAKING") 																	// SPEAKING
+			$("#promptSpan").html((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");	 // Show status				
+		else if (v[3] == "TALK") {																	// TALK
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
 			else 												 app.voice.Talk(v[6],v[4]);			// Talk		

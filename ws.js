@@ -61,13 +61,13 @@ try{
 				v[6]=req.socket.remoteAddress.substring(7);										// Add IP
 				}
 			if (v[6]) v[6]=`"${v[6]}"`;															// Quote for CSV
-			if (v[0] > 0) {																		// Not admin
+			if (v[2] != "ADMIN") {																// Not admin
 				sessionData[s].push(v);															// Add event
 				sessionChanged[s]=true;															// Set changed
 				}
-			if (v[3].match(/^SESSION/)) ActOnSessionData(v,webSocket);							// Session data actions
-			if (v[3].match(/^INFER/)) 	InferIntent(v,webSocket);								// Infer intent from remark
-			else 						Broadcast(v[0], message);								// Broadcast to everyone
+			if (v[3].match(/^SESSION/)) 	ActOnSessionData(v,webSocket);						// Session data actions
+			else if (v[3] =="INFER") 		InferIntent(v,webSocket);							// Infer intent from remark
+			else 							Broadcast(v[0], message);							// Broadcast to everyone
 			});
 		});
 } catch(e) { console.log(e) }

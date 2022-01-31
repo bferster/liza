@@ -95,6 +95,7 @@ class App  {
 			let str="<table style='border-spacing:0'>";												// Table header
 			for (i=1;i<vv.length;++i) {																// For each data line
 				fv=vv[i].split(",");																// Get fields
+				trace(fv)
 				if (vv[i].match(/,INIT,/)) 	str+="<tr style='font-weight:bold'>";					// Start INIT row bold
 				else					   	str+="<tr>";											// Start regular row
 				for (j=1;j<6;++j) 			str+="<td style='padding-right:20px'>"+fv[j]+"</td>";	// Make row
@@ -102,7 +103,7 @@ class App  {
 				str+="<td>"+fv.join(",").replace(/"/g,"")+"</td></tr>";								// Get last, less quotes
 				}
 			$("#lz-data").html(str+"</table>");														// Set div
-			$("#lz-data").scrollTop(10000);	
+			$("#lz-data").scrollTop(100000);	
 			if (app.saveSession)				 SaveTextAsFile("sessiondata-"+v[4]+".csv",v[5]);	// Write file
 			}
 		else if (v[3] == "SESSIONCLEAR") {															// CLEAR
