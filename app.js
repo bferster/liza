@@ -103,7 +103,7 @@ class App  {
 					return;																			// Quit
 					}
 				Prompt("","on");																	// Prompt visible
-				if (this.multi) this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+this.curStudent+"|1"); // Alert others to talking
+				if (this.multi) this.ws.send(this.sessionId+"|"+this.curTime+"|ADMIN|SPEAKING|"+this.role+"|"+this.curStudent+"|1"); // Alert others to talking
 				this.inRemark=true;																	// Teacher is talking
 				}
 			});
@@ -112,7 +112,7 @@ class App  {
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (this.inSim)					setTimeout(()=>{ app.OnPhrase(this.said); },1000); 	// React to remark if in sim
 				this.inRemark=false;																// Teacher is not talking
-				if (this.multi) this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+this.curStudent+"|0"); // Alert others to not talking
+				if (this.multi) this.ws.send(this.sessionId+"|"+this.curTime+"|ADMIN|SPEAKING|"+this.role+"|"+this.curStudent+"|0"); // Alert others to not talking
 				}
 			});
 	
@@ -269,7 +269,7 @@ class App  {
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher") {																// Not the teacher talking
-			app.ws.send(app.sessionId+"|"+(app.curTime).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text+"|0");	// Send remark
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text+"|0");	// Send remark
 			return;
 			}
 		let act=app.nlp.GetAction(text);															// Set action
@@ -456,7 +456,13 @@ class App  {
 					});
 				}
 			}
-		else if (v[3] == "ACT")  	{ app.sc.StartAnimation(v[4],app.seqs[v[5]]); }					// ACT
+		else if (v[3] == "ACT")	{																	// ACT										
+			if (v[5] == "fidget") {																	// Fidget
+				let seat=v[4] ? app.students.find(x => x.id == v[4]).seat : 0;						// Get seat number
+				app.students[seat].fidget=1-app.students[seat].fidget;								// Toggle fidget								
+				}
+			else	app.sc.StartAnimation(v[4],app.seqs[v[5]]); 									// Start animation									
+			}
 		else if (v[3] == "VIDEO")  	{ if (!$("#lz-videoChat").length) this.VideoChat();	}			// VIDEO
 		else if (v[3] == "PROMPT") 	{ PopUp(v[4],8); Sound("ding"); }								// PROMPT
 		else if (v[3] == "PICTURE") { app.bb.SetPic(v[5],true,"",v[4]); }							// PICTURE

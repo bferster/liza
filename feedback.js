@@ -224,6 +224,11 @@ class ResponsePanel  {
 				</div>
 				<div style="margin:12px 0;width:100%">
 					<select id="lzSeqs" class="lz-is" style="float:left;width:auto"></select>
+					<div id="lzSit"		class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Sit</div>
+					<div id="lzWave"	class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Wave</div>
+					<div id="lzNo"		class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">No</div>
+					<div id="lzYes"		class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Yes</div>
+					<div id="lzFidget"	class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Fidget</div>
 				</div>
 				<span id="lztab-${v[0]}" class="lz-rptab">${v[0]}</span>
 				<span id="lztab-${v[1]}" class="lz-rptab">${v[1]}</span> 
@@ -258,6 +263,22 @@ class ResponsePanel  {
 		$("#lztab-"+v[0]).trigger("click");															// Fill list (must be after handler)
 			if (window.location.search.match(/role=coach/i)) addRoles();							// Add sudent roles if coach
 
+		$("#lzFidget").on("click", ()=> {															// ON FIDGET
+			$("#lzFidget").html($("#lzFidget").html() == "Fidget" ? "Stop it " : "Fidget");			// Toggle label
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|fidget");		// Send action to server
+			});
+		$("#lzYes").on("click", ()=> {																// ON YES
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|nodYes");		// Send action to server
+			});
+		$("#lzNo").on("click", ()=> {																// ON NO
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|nodNo");		// Send action to server
+			});
+		$("#lzWave").on("click", ()=> {																// ON WAVE
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|interrupt");	// Send action to server
+			});
+		$("#lzSit").on("click", ()=> {																// ON SIT
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|sit");		// Send action to server
+			});
 		$("#lzSeqs").on("change", ()=> {															// ON RUN SEQUENCE
 			if (app.role == "Coach") return;														// Not in coach role
 			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
