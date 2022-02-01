@@ -14,49 +14,78 @@ class Feedback {
 		this.data=null;																				// Pointer to session data to show
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
-		this.intentLabels=["Intent","General","Ask","Value","Correct","Think"];						// Intent labels
+		this.intentLabels=["Feedback","General","Ask","Value","Correct","Think"];					// Intent labels
 	}
 
 	OnClick(e) 																					// ON SCREEN CLICK
 	{
 		$("#talkInput").blur();																		// Set focus away from inputs				
 		if (e.target.localName != "canvas")	return;													// React only to canvas hits
-		clearInterval(app.fb.interval);																// Clear timer
-		$("#lz-feedbar").remove();																	// Remove old one
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point
 		if (o.object.name == "body") {																// If a student
-			app.curStudent=o.object.parent.parent.name;												// Set name (body2 is 2 deep)
-			app.fb.Draw(app.sessionData);															// Show feedback
-		}
+			app.curStudent=o.object.parent.parent.name;												// Set name (body is 2 deep)
+			let p=app.sc.GetScreenPos(app.sc.models[app.curStudent].model);							// Get pos of student
+			app.fb.DrawVariance(p.x-75,p.y+60,[-1,2,1,0]);											// Show variance
+			}
 	}
+
+	DrawVariance(x, y, v, wid=15)																// SHOW STUDENT VARIANCE
+	{
+		let i,j,c=[];
+		for (i=0;i<4;++i) {
+			if (v[i] == -1)		c[i]=1;
+			else if (v[i] == 1)	c[i]=6;
+			else if (v[i] == 2)	c[i]=14;
+			else 				c[i]=16;
+			}		
+		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
+		let labs=["Value","Language","Knowledge","Thinking"];
+		$("#lz-variance").remove();																	// Remove old one
+		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px"><table>`;	// Header	
+		for (i=0;i<4;++i) {																			// For each row
+			str+="<tr>";																			// Start row
+			for (j=0;j<4;++j) {																		// For each column
+				str+="<td";																			// Start column
+				if (!j)	str+=" style='border-right:1px solid #999'";								// Add border
+				str+=`><div id="vdot${i}${j}" style="border-radius:100px;border:1px solid ${cols[i]}60`;// Add dot frame
+				if ((1<<j)&c[i] ) str+=`;background-color:${cols[i]}`;								// Color it?
+				str+=`;width:${wid}px;height:${wid}px"></div></td>`;								// Finish dot
+				}
+			str+=`<td style='padding-left:8px;color:${cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
+			}
+		str+=`</tr></table></div>`;
+		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
+		}
+
+//		str+=`<tr><td colspan="5" style="font-size:11px;color:#999"><div>Show trend? <input type="checkbox" id="lz-trendVar"></td></div></tr></table></div>`;
 
 	Draw(data)																					// DRAW FEEDBACK PANEL
 	{
+		let i;
 		this.data=data;																				// Point at data to display
 		this.maxTime=this.data[data.length-1].time;													// Get TRT	
 		$("#lz-feedbar").remove();																	// Remove old one
 		var str=`<div id="lz-feedbar" class="lz-feedbar"> 
-		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-feedbar").remove()'>
+		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-feedbar").remove();clearInterval(app.fb.interval);$("#lz-variance").remove();'>
 		<div class='lz-feedback'>
-			<div style="width:250px;margin:4px 0 0 16px;"> 
-				<b style="font-family:Chalk;font-size:48px">${app.curStudent}</b>
-				<table style="font-family:Segoe UI,Verdana,Geneva,sans-serif;font-size:13px">
-				<tr><td>Value/belonging</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td>Academic language &nbsp;</td><td style="width:100px"><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td>Evidence</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td>Thinking</td><td><div class="lz-chartbar" style="width:${Math.random()*40+60}px";></div></td></tr>
-				<tr><td colspan='2'><br><div class="lz-bs" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</div></td></tr>
-				</table>
-			</div>
-			<div style="flex-grow:6">
-				<svg width="100%" height="100%">${this.DrawMovesGraph()}</svg>
-			</div>
+			<div style="width:225px;margin:16px 0 0 16px"> 
+				<select class="lz-is" id="lz-chooseStudent" style="width:160px"></select>
+				</div>
+		<svg width="100%" height="100%">${this.DrawMovesGraph()}</svg>
 		</div>
 		<div id="sliderLine" class="lz-sliderline"></div>
 		<div id="sliderTime" class="lz-slidertime"></div>
 		<div id="timeSlider" class="lz-timeslider"></div>
 		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 62px);top:184px;width:18px;cursor:pointer">`;
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
+		for (i=0;i<app.students.length;++i) 														// For each student
+			$("#lz-chooseStudent").append(`<option>${app.students[i].id}</option`);					// Add to choser
+			$("#lz-chooseStudent").val(app.curStudent);												// Point at current student	
+		
+		
+		let v=[2,-1,3,1]
+		
+		app.fb.DrawVariance(24,window.innerHeight-195,v);											// Show variance
 
 		if (isMobile) $("#lz-feedbar").css("top",window.innerHeight-256+"px");						// IOS issue
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
@@ -81,7 +110,12 @@ class Feedback {
 			let id=e.target.id.substr(6);															// Get id
 			app.voice.Talk(this.data[id].text,this.data[id].actor);									// Speak
 		});
-		
+
+		$("#lz-chooseStudent").change(()=> {														// ON CHANGE STUDENT
+			 app.curStudent=$("#lz-chooseStudent").val(); 											// Set new student
+			 this.Draw(data);																		// Redraw
+			});
+
 		$("#playerButton").click(()=> {	this.Play(); });											// On play click
 
 		$("#timeSlider").slider({																	// Init timeslider
@@ -110,7 +144,7 @@ class Feedback {
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
 	{
 		let i,o,x,col,y=31,str="";
-		let wid=$(window).width()-350;																// Size of graph
+		let wid=$(window).width()-290;																// Size of graph
 		clearInterval(this.interval);																// Clear timer
 		const getPixFromTime=(time)=>{ return time/this.maxTime*(wid-67)+62; };						// CONVERT TIME TO PIXELS
 
@@ -196,7 +230,7 @@ class ResponsePanel  {
 	constructor()   																			// CONSTRUCTOR
 	{
 		this.curIntent=0;
-		this.intentDescs=["No intent found",
+		this.intentDescs=["Nothing yet...",
 						  "Low information remark or compliment that has a low impact",
 					   	  "Explains the text or question with or without reference to the text",
 						  "Values specific element of response related to a reading or thinking skill",
@@ -204,7 +238,7 @@ class ResponsePanel  {
 						  "Aware of thought processes to plan, monitor, adjust, and reflect on learning actions" ];
 	}
 
-	Draw(remark="Nothing",student="Nobody")														// DRAW
+	Draw(remark="Nothing yet...",student="student")												// DRAW
 	{
 		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
 		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number

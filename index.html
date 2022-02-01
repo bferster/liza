@@ -74,7 +74,7 @@
 							}
 		.lz-timeback { 		position:absolute;width:calc(100% - 32px); height:68px; left:0; top:0; background-color:#fff; border-radius:8px; margin:16px 16px 0 16px;
 							}
-		.lz-timeslider {	position:absolute;background:#ccc; height:3px; border:none; display:inline-block; width:calc(100% - 412px); top:190px; left:335px; 
+		.lz-timeslider {	position:absolute;background:#ccc; height:3px; border:none; display:inline-block; width:calc(100% - 352px); top:190px; left:275px; 
 							}
 		.lz-timeslider.ui-slider .ui-slider-handle { 
 							height:30px; width:8px; margin-top:-8px; background:#27ae60; border:none; cursor:pointer; 
@@ -87,10 +87,10 @@
 							margin-left:6px;
 							}
 		.lz-feedbar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(var(--maxvh) - 256px); user-select:none;
-							background-color:#aaa; border-radius: 12px 12px 0 0; height:218px;  
+							background-color:#aaa; height:218px;  
 							}
 		.lz-feedback { 		display:flex; flex-direction: row; width:calc(100% - 16px); height:208px; margin: 8px; 
-							background-color:#fff; border-radius:8px; color:#333; 
+							background-color:#fff; border-radius:5px; color:#333; 
 							}
 		.lz-chartbar { 		height:16px; background-color:#86d698; 
 							}
@@ -109,7 +109,6 @@
 		.lz-startBut {		cursor:pointer; color:#fff; text-align:center; border-radius:8px; display:inline-block;
 							font-size:14px; background-color:#27ae60; padding:3px 0; vertical-align:7px; width:80px;
 							} 
-
 		.lz-is {			border-radius:16px; padding:0 8px; width:250px; height: 24px;
 							border:1px solid #999; font-size: 13px;
 							}
@@ -132,7 +131,7 @@
 	
 	<div id="mainDiv" class="lz-main"></div>
 	<div id="splashDiv" class="lz-splash">
-		<img src="img/logo.png" style='width:25%;opacity:.66;' alt=""><br>
+		<img src="img/logo.png" style='width:25%' alt="logo"><br>
 		<br><p style="color:#000;font-size:14px"><em>An Augmented Classroom for Practice-based Teacher Learning.</em></p>
 		<br><div id="splashBut"  class="lz-bs" style="font-size:14px" onclick='app.voice.Talk("Welcome to Grace","Teacher")'>Enter classroom</div><br><br>
 		<div style='color:#000'><br>
@@ -148,9 +147,9 @@
 		<input id="talkInput" type="text" class="lz-is" style="margin-left:6px;vertical-align:8px" placeholder="Type remark">
 		<span id="promptSpan" style="margin-left:16px;color:#333;vertical-align:8px">CLICK START TO BEGIN SESSION</span>
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
-		<img id="settingsBut" src="img/settingsbut.gif" title="Settings" style="cursor:pointer;margin-right:16px;float:right">
-		<img id="resourceBut" src="img/scriptbut.gif" title="View teacher resources" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="feedbackBut" src="img/graphbut.png" title="Feedback" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="writeBut" src="img/drawbut.gif" title="Blackboard" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="resourceBut" src="img/scriptbut.gif" title="View teacher resources" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="videoBut" src="img/zoom.png" title="Video chat" style="cursor:pointer;margin-right:16px;float:right">
 	</div>
 	<div id="feedbackDiv" class="lz-feedbackbar"></div>

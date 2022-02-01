@@ -26,6 +26,15 @@
 	open port:8080
 
 	ID|TIME|SENDER|OP|DATA-0 ... DATA-N
+	
+	RASA:
+	
+	cd ~/htdocs/rasa
+	
+	
+	ps -ef (kill PID) to remove
+	nohup rasa run -m models --enable-api --cors "*" --ssl-certificate /opt/bitnami/letsencrypt/certificates/www.lizasim.com.crt --ssl-keyfile /opt/bitnami/letsencrypt/certificates/www.lizasim.com.key --port 5006?
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 	

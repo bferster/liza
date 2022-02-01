@@ -53,7 +53,7 @@ class App  {
 		this.Draw();																				// Start 
 
 		$("#resourceBut").on("click", ()=> { this.ShowResources();  });								// ON RESOURCES	
-		$("#settingsBut").on("click", ()=> { this.Settings();  });									// ON SETTINGS
+		$("#feedbackBut").on("click", ()=> { this.fb.Draw(this.sessionData);  });					// ON FEEDBACK
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			if (this.role != "Teacher") return;														// Only for teacher
@@ -92,7 +92,7 @@ class App  {
 			$("#blackboardDiv").css("display") == "none" ? 1 : 0;									// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			});
-		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
+		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
 		$(window).on("keydown", (e) => {															// HANDLE KEY DOWN
 			if (e.which == 32) {																	// Spacebar
@@ -290,29 +290,14 @@ class App  {
 				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent >= 300) {																// If an intent detected
-					let s=app.curStudent+"'s response: ";											// Student name
-					let v=app.strings.variance.split(",");											// Get variance labels
+					let s=app.curStudent+"'s response to remark : ";											// Student name
 					s+=app.fb.intentLabels[intent/100];												// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
-					s+=addVariant(r.b,v[0]);														// Add variant for B
-					s+=addVariant(r.a,v[1]);														// A
-					s+=addVariant(r.k,v[2]);														// K
-					s+=addVariant(r.t,v[3]);														// T
 					$("#feedbackDiv").html(s);														// Show in feedback area
 					}	
-				trace(res,r.text)
+			trace(res,r.text)
 			});
 
-		function addVariant(v, label)	{														// ADD VARIANT STATUS TO PROMPT
-			let str=" ";		
-			if (!v)	return "";																		// Nothing to add
-			let a=v.match(/^\d+/)[0];																// Get amt
-			if (!a || (a == "0"))	return "";														// No change
-			let col=a < 0 ? "#99000" : "#00aa00";													// Set color
-			let amt=a > 0 ? "+"+a : a;																// Set amt
-			str+=" | <span style='color:"+col+"'>"+label+amt+"</span>";								// Add it 
-			return str;																				// Return markup
-			}
 		}
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
@@ -331,13 +316,21 @@ class App  {
 
 	UpdateVariance(student, res)																// UPDATE STUDENT VARIANCE FROM RESPONSE
 	{
-		student=app.students.findIndex((s)=>{ return student == s.id });							// Convert to index
-		let o=app.students[student];																// Point at student
-		o.b=Math.max(Math.min(o.b+getVariant(res.b),9),0);											// Set variant B 0-9
-		o.a=Math.max(Math.min(o.a+getVariant(res.a),9),0);											// A
-		o.k=Math.max(Math.min(o.k+getVariant(res.k),9),0);											// K
-		o.t=Math.max(Math.min(o.t+getVariant(res.t),9),0);											// T
-		o.u=Math.max(Math.min(o.u+getVariant(res.u),9),0);											// U
+		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
+		let v=[]
+		let o=app.students[stuIndex];																// Point at student
+		v.push(getVariant(res.b));																	// Get B
+		v.push(getVariant(res.a));																	// A
+		v.push(getVariant(res.k));																	// K
+		v.push(getVariant(res.t));																	// T
+		v.push(getVariant(res.u));																	// U
+		res.bakt=v;																					// Save in last responsw
+		app.fb.DrawVariance(window.innerWidth-175,window.innerHeight-165,v);						// Show variance
+		o.b=Math.max(Math.min(o.b+v[0],9),0);														// Set variant trend B 0-9
+		o.a=Math.max(Math.min(o.a+v[1],9),0);														// A
+		o.k=Math.max(Math.min(o.k+v[2],9),0);														// K
+		o.t=Math.max(Math.min(o.t+v[4],9),0);														// T
+		o.u=Math.max(Math.min(o.u+v[5],9),0);														// U
 
 		function getVariant(v) {																	// GET VARIENT FROM RESPONSE
 			if (!v)						return 0;													// Not set
