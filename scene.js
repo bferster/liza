@@ -443,7 +443,8 @@ class Scene {
 	{
 		var i,j,k,b,o,v;
 		var cbs=[],rad,bs;
-		if (!seqs)	return;																			// Quit of no seqs
+		if (!seqs)	return;																			// Quit if no seqs
+		if (!this.models[modelName]) return;														// Quit if no model
 		seqs=seqs.split(",");																		// Get parts
 		var repeat=seqs[seqs.length-1];																// Last element is repeat
 		if (!seqs.length%2)	repeat=1;																// If omitted, do it one time

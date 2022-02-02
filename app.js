@@ -246,14 +246,14 @@ class App  {
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		try {
-			let o={ fidget:0, s:15, src:"assets/body2.dae" };										// Basic info
+			let o={ fidget:0, s:15, var:[], src:"assets/body2.dae" };								// Basic info
 			o.id=d.id;																				// Name
 			o.sex=d.data.match(/sex=(.+?)\W/)[1];													// Get sex
-			o.b=d.data.match(/b=(.+?)\D/)[1]-0;														// Get variant B
-			o.a=d.data.match(/a=(.+?)\D/)[1]-0;														// Get variant A
-			o.k=d.data.match(/k=(.+?)\D/)[1]-0;														// Get variant K
-			o.t=d.data.match(/t=(.+?)\D/)[1]-0;														// Get variant T
-			o.u=d.data.match(/u=(.+?)\D/)[1]-0;														// Get variant U
+			o.var[0]=d.data.match(/b=(.+?)\D/)[1]-0;												// Get variant B
+			o.var[1]=d.data.match(/a=(.+?)\D/)[1]-0;														// A
+			o.var[2]=d.data.match(/k=(.+?)\D/)[1]-0;														// K
+			o.var[3]=d.data.match(/t=(.+?)\D/)[1]-0;														// T
+			o.var[4]=d.data.match(/u=(.+?)\D/)[1]-0;														// U
 			o.seat=d.data.match(/seat=(.+?)\D/)[1]-0;												// Get seat
 			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
 			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set skin
@@ -290,7 +290,7 @@ class App  {
 				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent >= 300) {																// If an intent detected
-					let s=app.curStudent+"'s response to remark : ";											// Student name
+					let s=app.curStudent+"'s response to remark: ";									// Student name
 					s+=app.fb.intentLabels[intent/100];												// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
 					$("#feedbackDiv").html(s);														// Show in feedback area
@@ -302,7 +302,7 @@ class App  {
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
-		this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
+		                                                                      this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
 		let lastIntent=this.lastResponse.intent;													// Save last intent
 		this.lastResponse={ text:""};																// Clear last
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
@@ -316,28 +316,13 @@ class App  {
 
 	UpdateVariance(student, res)																// UPDATE STUDENT VARIANCE FROM RESPONSE
 	{
+		let i;
 		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
-		let v=[]
 		let o=app.students[stuIndex];																// Point at student
-		v.push(getVariant(res.b));																	// Get B
-		v.push(getVariant(res.a));																	// A
-		v.push(getVariant(res.k));																	// K
-		v.push(getVariant(res.t));																	// T
-		v.push(getVariant(res.u));																	// U
-		res.bakt=v;																					// Save in last responsw
-		app.fb.DrawVariance(window.innerWidth-175,window.innerHeight-165,v);						// Show variance
-		o.b=Math.max(Math.min(o.b+v[0],9),0);														// Set variant trend B 0-9
-		o.a=Math.max(Math.min(o.a+v[1],9),0);														// A
-		o.k=Math.max(Math.min(o.k+v[2],9),0);														// K
-		o.t=Math.max(Math.min(o.t+v[4],9),0);														// T
-		o.u=Math.max(Math.min(o.u+v[5],9),0);														// U
-
-		function getVariant(v) {																	// GET VARIENT FROM RESPONSE
-			if (!v)						return 0;													// Not set
-			let x=v.match(/^\d+/)[0];																// Get amt
-			if (!x || (x == "0"))		return 0;													// No change
-			else						return x-0;													// Return change
-		}
+		o.var=[];																					// Reset variance
+		o.bakt=res.bakt.slice();																	// Copy bakt of last response in student
+		app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt);					// Show variance
+		for (i=0;i<5;++i) o.var[i]=Math.max(Math.min(o.var[i]+o.bakt[i],9),0);						// Set variant *trend* B 0-9
 	}
 
 	DoAction(act, remark)																		// PERFORM STUDENT ACTION

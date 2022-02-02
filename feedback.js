@@ -25,7 +25,9 @@ class Feedback {
 		if (o.object.name == "body") {																// If a student
 			app.curStudent=o.object.parent.parent.name;												// Set name (body is 2 deep)
 			let p=app.sc.GetScreenPos(app.sc.models[app.curStudent].model);							// Get pos of student
-			app.fb.DrawVariance(p.x-75,p.y+60,[-1,2,1,0]);											// Show variance
+			let stuIndex=app.students.findIndex((s)=>{ return app.curStudent == s.id });			// Get index
+			let v=app.students[stuIndex].bakt;														// Point at student
+			app.fb.DrawVariance(p.x-75,p.y+60,v ? v : [ 0,0,0,0,0]);								// Show variance, if any
 			}
 	}
 
@@ -57,8 +59,6 @@ class Feedback {
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
 		}
 
-//		str+=`<tr><td colspan="5" style="font-size:11px;color:#999"><div>Show trend? <input type="checkbox" id="lz-trendVar"></td></div></tr></table></div>`;
-
 	Draw(data)																					// DRAW FEEDBACK PANEL
 	{
 		let i;
@@ -70,6 +70,8 @@ class Feedback {
 		<div class='lz-feedback'>
 			<div style="width:225px;margin:16px 0 0 16px"> 
 				<select class="lz-is" id="lz-chooseStudent" style="width:160px"></select>
+				<div style="margin-top:106px"><i>View as a trend?</i> <input type="checkbox" id="lz-trendVar"></div>
+				<div class="lz-bs" style="background-color:#999;margin-top:11px; width:auto" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</div>
 				</div>
 		<svg width="100%" height="100%">${this.DrawMovesGraph()}</svg>
 		</div>
@@ -80,12 +82,12 @@ class Feedback {
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		for (i=0;i<app.students.length;++i) 														// For each student
 			$("#lz-chooseStudent").append(`<option>${app.students[i].id}</option`);					// Add to choser
-			$("#lz-chooseStudent").val(app.curStudent);												// Point at current student	
+		$("#lz-chooseStudent").val(app.curStudent);													// Point at current student	
 		
 		
 		let v=[2,-1,3,1]
 		
-		app.fb.DrawVariance(24,window.innerHeight-195,v);											// Show variance
+		app.fb.DrawVariance(27,window.innerHeight-190,v);											// Show variance
 
 		if (isMobile) $("#lz-feedbar").css("top",window.innerHeight-256+"px");						// IOS issue
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter

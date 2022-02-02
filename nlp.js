@@ -109,20 +109,20 @@ class NLP {
 		return str.replace(/  /g," ")																	// Remove extra spaces and return
 	}
 
-	AddResponses(d)																					// ADD RRSPONSES FROM CSV DATA
+	AddResponses(d)																					// ADD RESPONSES FROM CSV DATA
 	{
 		let i,k,o;
 		this.responses=[];																				// Fresh
 		for (i=0;i<d.length;++i) {																		// For each line
 			if (!d[i]["Student"])	continue;															// Skip if no student
-			o={};																						// Init object
+			o={ bakt:[]};																				// Init object
 			k=d[i]["Student"].split(" ")[0];															// Get first name
 			if (!this.responses[k]) this.responses[k]=[];												// Add base array
-			o.b=d[i]["Valued/Belonging (200/300"];														// Get factor
-			o.a=d[i]["Academic Language (400)"];														// Get factor
-			o.k=d[i]["Knowledge (400)"];																// Get factor
-			o.t=d[i]["Thinking (500)"];																	// Get factor
-			o.u=d[i]["Understanding Level"];															// Get factor
+			o.bakt[0]=getVariant(d[i]["Valued/Belonging (200/300"]);									// Get B factor
+			o.bakt[1]=getVariant(d[i]["Academic Language (400)"]);										// A
+			o.bakt[2]=getVariant(d[i]["Knowledge (400)"]);												// K
+			o.bakt[3]=getVariant(d[i]["Thinking (500)"]);												// T
+			o.bakt[4]=getVariant(d[i]["Understanding Level"]);											// U
 			o.text=d[i]["Response"];																	// Get response
 			o.label=d[i]["Response category"];															// Get response category
 			if (d[i]["Type of Student Response"]) o.type=d[i]["Type of Student Response"];				// Get type
@@ -130,7 +130,16 @@ class NLP {
 			o.action=d[i]["Student Physical Action"];													// Get action
 			o.index=this.responses[k].length;															// Add index
 			this.responses[k].push(o);																	// Add to list
+			}
+
+		function getVariant(v) {																		// GET VARIENT FROM RESPONSE
+			if (!v)						return 0;														// Not set
+			let x=v.match(/^\-*\d+/)[0];																// Get amt
+			if (!x || (x == "0"))		return 0;														// No change
+			else						return x-0;														// Return change
 		}
+
+
 	}
 
 	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
