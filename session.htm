@@ -95,7 +95,6 @@ class App  {
 			let str="<table style='border-spacing:0'>";												// Table header
 			for (i=1;i<vv.length;++i) {																// For each data line
 				fv=vv[i].split(",");																// Get fields
-				trace(fv)
 				if (vv[i].match(/,INIT,/)) 	str+="<tr style='font-weight:bold'>";					// Start INIT row bold
 				else					   	str+="<tr>";											// Start regular row
 				for (j=1;j<6;++j) 			str+="<td style='padding-right:20px'>"+fv[j]+"</td>";	// Make row
@@ -129,10 +128,8 @@ class App  {
 			app.ws.send("0|0.0|ADMIN|SESSIONFETCH|"+$("#lz-id").val());  							// Fetch session data
 			});							
 		$("#lz-clearSession").on("click",()=>{														// ON CLEAR SESSION
-			ConfirmBox("Are you sure?", "This will clear the session forever.", ()=>{ 				// Are you sure?
-				GetTextBox("Type password","","",(pw)=>{											// Ask for password
-					app.ws.send("0|0.0|ADMIN|SESSIONCLEAR|"+$("#lz-id").val()+"|"+pw);  			// Clear session data and remove file if p/w matches
-					});
+			GetTextBox("Clear session","<div style='color:#990000'><b>This will clear the session forever!</b></div><br>Type password:<br>","",(pw)=>{ // Ask for password
+				app.ws.send("0|0.0|ADMIN|SESSIONCLEAR|"+$("#lz-id").val()+"|"+pw);  				// Clear session data and remove file if p/w matches
 				});
 			});
 		$("#lz-select").on("change",()=>{															// ON SELECT SESSION
@@ -194,8 +191,8 @@ class App  {
 	{
 		$("#confirmBoxDiv").remove();																// Remove 
 		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");						// Add box								
-		var str="<img src='img/smlogo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
-		str+="<span style='font-size:14px; color:#666'><b>"+title+"</b></span><br><br>";
+		var str="<img src='img/smlogo.png' width='64'>&nbsp;&nbsp;";								
+		str+="<span style='font-size:14px;float:right;margin-top:20px;color:#666'><b>"+title+"</b></span><br>";
 		str+="<p>"+content+"<p>";
 		str+="<p><input class='lz-is' style='width:75%' type='text' id='gtBoxTt' value='"+def+"'></p>";
 		str+="<div id='dialogOK' class='lz-bs'>OK</div>";

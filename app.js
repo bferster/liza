@@ -9,6 +9,7 @@ class App  {
 		app=this;
 		this.role="Teacher";																		// User's role in simulation
 		this.strings=[];																			// Config strings
+		this.sessionLog=[];																			// Session log
 		this.poses=[];																				// Holds poses
 		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
@@ -172,6 +173,7 @@ class App  {
 	{
 		let i;
 		this.trt=0;																					// At start
+		this.sessionLog=[];																			// Clear session log
 		this.inSim=(this.role != "Teacher");														// Not in simulation if a teacher
 		this.lastResponse="";																		// Last response
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
@@ -216,8 +218,9 @@ class App  {
 		for (i=0;i<v.length;++i) {																	// For each do item
 			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
-				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s).text;							// Get from response file with intent
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 
+				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s);								// Get response from intent
+				else			s={ text:s, bakt:[0,0,0,0,0] };										// Explicit text
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
 				}
 			else if (v[i].match(/act:/i)) {															// ACT
 				s=v[i].substring(4);																// Get text
@@ -228,9 +231,9 @@ class App  {
 				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|PROMPT|"+s); 	// Send prompt	
 				}
 			else if (v[i].match(/end:/i)) {															// END
-				s=this.remarkLevels.indexOf(Math.max(...this.remarkLevels));
-				s=app.nlp.GetResponse("",student,710+s*10).text;									// Get from response file with intent
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s); 
+				s=this.remarkLevels.indexOf(Math.max(...this.remarkLevels));						// Get remark levels
+				s=app.nlp.GetResponse("",student,710+s*10);											// Get response from intent
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
 				}
 			}
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
@@ -285,7 +288,7 @@ class App  {
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
-				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);	// Send remark
+				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent >= 300) {																// If an intent detected
 					let s=app.curStudent+"'s response to remark: ";									// Student name
@@ -412,8 +415,9 @@ class App  {
 
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
-		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
+		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
+		this.LogEvent(v);																			// Log event
 		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
 		if (v[3] == "SPEAKING") 																	// SPEAKING
 			$("#promptSpan").html((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");	 // Show status				
@@ -448,7 +452,7 @@ class App  {
 			$("#startBut").css("background-color", "#27ae60");										// Set color
 			this.StartSession();																	// Start session										
 			}
-		else if (v[3] == "START")  {																// START
+		else if (v[3] == "START")  {				                                                												// START
 			let now=new Date().getTime();															// Get now
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else			this.startTime=now;														// Reset start
@@ -457,6 +461,21 @@ class App  {
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			}  
 		else if ((v[3] == "CHAT") && (this.role == v[4])) {	Sound("ding"); Bubble(v[5],5,bx); }		// CHAT
+	}
+
+	LogEvent(e)																					// ADD EVENT TO LOG
+	{
+		let o={ to:"", data:"", text:""};															// Event stub
+		if (e[2] == "ADMIN")	return;																// Ignore admin
+		o.time=e[1];	o.from=e[2];	o.what=e[3];												// Add basics
+		if (e[3] == "START") 			o.data=e[4];												// START
+		else if (e[3] == "ACT") 		o.from=e[4],o.data=e[5];									// ACT 																			
+		else if (e[3] == "PIC") 		o.data=`${e[4]}:${e[5]}`;									// PIC 																			
+		else if (e[3] == "TALK") {																	// TALK 
+			o.to=e[5];	o.text=e[6];	o.from=e[4];	o.data=e[7];								// Talking to, what they said, from, intent or BAKT variance																		
+			o.what=(o.from == "Teacher") ? "REMARK" : "RESPONSE";									// Type of talk
+			}
+		this.sessionLog.push(o);																	// Add to session log
 	}
 
 	InitClassroom()																				// INIT CLASSROOM
