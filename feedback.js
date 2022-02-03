@@ -24,10 +24,10 @@ class Feedback {
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point
 		if (o.object.name == "body") {																// If a student
 			app.curStudent=o.object.parent.parent.name;												// Set name (body is 2 deep)
-			let p=app.sc.GetScreenPos(app.sc.models[app.curStudent].model);							// Get pos of student
 			let stuIndex=app.students.findIndex((s)=>{ return app.curStudent == s.id });			// Get index
-			let v=app.students[stuIndex].bakt;														// Point at student
-			app.fb.DrawVariance(p.x-75,p.y+60,v ? v : [ 0,0,0,0,0]);								// Show variance, if any
+			if (!(o=app.students[stuIndex]))  return;										        // Point at student
+			app.voice.ShowSpeakerText(app.curStudent,o.lastResponse ? o.lastResponse : "");			// Show response text
+			app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt ? o.bakt : [0,0,0,0,0]); // Show variance
 			}
 	}
 
@@ -40,28 +40,29 @@ class Feedback {
 			else if (v[i] == 2)	c[i]=14;
 			else 				c[i]=16;
 			}		
+	
 		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
 		let labs=["Value","Language","Knowledge","Thinking"];
 		$("#lz-variance").remove();																	// Remove old one
 		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px"><table>`;	// Header	
 		for (i=0;i<4;++i) {																			// For each row
-			str+="<tr>";																			// Start row
+		str+="<tr>";																				// Start row
 			for (j=0;j<4;++j) {																		// For each column
 				str+="<td";																			// Start column
 				if (!j)	str+=" style='border-right:1px solid #999'";								// Add border
-				str+=`><div id="vdot${i}${j}" style="border-radius:100px;border:1px solid ${cols[i]}60`;// Add dot frame
+				str+=`><div id="vdot${i}${j}" class="lz-vardot": style="border:1px solid ${cols[i]}60`;// Add dot frame
 				if ((1<<j)&c[i] ) str+=`;background-color:${cols[i]}`;								// Color it?
-				str+=`;width:${wid}px;height:${wid}px"></div></td>`;								// Finish dot
+				str+=`;width:${wid}px;height:${wid}px">${(c[i] == 1) ? "-" : ""}</div></td>`;		// Finish dot
 				}
 			str+=`<td style='padding-left:8px;color:${cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
 			}
 		str+=`</tr></table></div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
-		}
+	}
 
 	Draw(data)																					// DRAW FEEDBACK PANEL
 	{
-		let i;
+		let i,o;
 		this.data=data;																				// Point at data to display
 		this.maxTime=this.data[data.length-1].time;													// Get TRT	
 		$("#lz-feedbar").remove();																	// Remove old one
@@ -80,15 +81,12 @@ class Feedback {
 		<div id="timeSlider" class="lz-timeslider"></div>
 		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 62px);top:184px;width:18px;cursor:pointer">`;
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
+
 		for (i=0;i<app.students.length;++i) 														// For each student
 			$("#lz-chooseStudent").append(`<option>${app.students[i].id}</option`);					// Add to choser
 		$("#lz-chooseStudent").val(app.curStudent);													// Point at current student	
-		
-		
-		let v=[2,-1,3,1]
-		
-		app.fb.DrawVariance(27,window.innerHeight-190,v);											// Show variance
-
+		o=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 			// Point at student data
+		app.fb.DrawVariance(27,window.innerHeight-190,o.bakt ? o.bakt :[0,0,0,0,0]);				// Show variance
 		if (isMobile) $("#lz-feedbar").css("top",window.innerHeight-256+"px");						// IOS issue
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 	
@@ -249,7 +247,7 @@ class ResponsePanel  {
 		app.sc.Resize();																			// Resize renderer
 		app.sc.SetCamera(0,200,600,0,0,0);															// Reset camera	
 		$("#lz-rpback").remove();																	// Remove old one
-		let v=app.strings.multi.split(",");																	// Point at labels
+		let v=app.strings.multi.split(",");															// Point at labels
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px">

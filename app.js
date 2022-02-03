@@ -26,7 +26,7 @@ class App  {
 		this.variance=[];																			// Holds variance data
 		this.nextTrigger={id:0, time:100000, type:""};												// Next trigger to look for
 		this.curStudent="";																			// Currently active student
-		this.lastResponse="";																		// Last response
+		this.lastIntent="";																			// Last intent
 		this.lastRemark="";																			// Last remark
 		this.inSim=false;																			// In simulation or not
 		this.inRemark=false;																		// Teacher talking flag
@@ -175,7 +175,6 @@ class App  {
 		this.trt=0;																					// At start
 		this.sessionLog=[];																			// Clear session log
 		this.inSim=(this.role != "Teacher");														// Not in simulation if a teacher
-		this.lastResponse="";																		// Last response
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.curStudent=app.students[0].id;															// Pick first student
@@ -290,6 +289,7 @@ class App  {
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
+				this.lastIntent=intent;																// Save last intent
 				if (intent >= 300) {																// If an intent detected
 					let s=app.curStudent+"'s response to remark: ";									// Student name
 					s+=app.fb.intentLabels[intent/100];												// Get intent label
@@ -304,13 +304,12 @@ class App  {
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
 		this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
-		let lastIntent=this.lastResponse.intent;													// Save last intent
-		this.lastResponse={ text:""};																// Clear last
+		let res={ text:"", intent:0, bakt:[0,0,0,0,0]};												// Clear res
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
-			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent,lastIntent);			// Get response
-		if (this.lastResponse.text) 																// If one
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text+"|"+this.lastResponse.bakt.join(",")); // Send response
-		return this.lastResponse;																	// Return it
+			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
+		if (res.text) 																				// If one
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")); // Send response
+		return res;																					// Return it
 	}
 
 	UpdateVariance(student, bakt)																// UPDATE STUDENT VARIANCE FROM RESPONSE
@@ -320,9 +319,8 @@ class App  {
 		let o=app.students[stuIndex];																// Point at student
 		if (!o)	return;																				// Quit if not a student
 		o.var=[];																					// Reset variance
-		o.bakt=bakt.slice();																		// Copy bakt of last response in student
-		app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt);					// Show variance
-		for (i=0;i<5;++i) o.var[i]=Math.max(Math.min(o.var[i]+o.bakt[i],9),0);						// Set variant *trend* B 0-9
+		app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt);						// Show variance
+		for (i=0;i<5;++i) o.var[i]=Math.max(Math.min(o.var[i]+bakt[i],9),0);						// Set variant *trend* B 0-9
 	}
 
 	DoAction(act, remark)																		// PERFORM STUDENT ACTION
@@ -412,7 +410,7 @@ class App  {
 	SocketIn(event)																				// A WEBSOCKET MESSAGE FROM NODE WS SERVER
 	{
 		// sessionId | curTime | fromId | op | ...
-
+		let o;
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
 		if (v[0] != this.sessionId)	return;															// Quit if wrong session
@@ -426,6 +424,12 @@ class App  {
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
 			else 						app.voice.Talk(v[6],v[4]);									// Talk		
+			if ((o=app.students[app.students.findIndex((s)=>{ return v[4] == s.id })])) {			// Point at student data
+				o.lastIntent=this.lastIntent;														// Set intent													
+				o.lastRemark=this.lastRemark;														// Set remark													
+				o.lastResponse=v[6]																	// Set response
+				o.bakt=v[7].split(",");																// Set variance
+				}
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
 				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
 					let intent=res.intent.name.substring(1);										// Get intent
