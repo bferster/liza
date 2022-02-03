@@ -58,11 +58,9 @@ class App  {
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			if (this.role != "Teacher") return;														// Only for teacher
 			let now=new Date().getTime();															// Get now
-			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
-			else{																					// Not in sim
-				this.startTime=now;																	// Set start				
-				if ((this.trt == 0) && this.strings.initial) PopUp(this.strings.initial,10);		// Prompt teacher
-				}
+			if (this.strings.initial && (this.trt == 0)) PopUp(this.strings.initial,10);			// Prompt teacher
+			if (this.inSim) 			this.trt+=(now-this.startTime)/1000;						// If in sim already, add to trt
+			else						this.startTime=now;											// Not in sim, set start				
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
 			else 						this.voice.StopListening();									// Off						
@@ -269,7 +267,7 @@ class App  {
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher") {																// Not the teacher talking
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text+"|0");	// Send remark
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
 			return;
 			}
 		let act=app.nlp.GetAction(text);															// Set action
@@ -287,7 +285,7 @@ class App  {
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
-				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
+				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent >= 300) {																// If an intent detected
 					let s=app.curStudent+"'s response to remark: ";									// Student name
@@ -302,25 +300,24 @@ class App  {
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
-		                                                                      this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
+		this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
 		let lastIntent=this.lastResponse.intent;													// Save last intent
 		this.lastResponse={ text:""};																// Clear last
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			this.lastResponse=app.nlp.GetResponse(text,this.curStudent,intent,lastIntent);			// Get response
-		if (this.lastResponse.text) {																// If one
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text); // Send response
-			this.UpdateVariance(this.curStudent,this.lastResponse);									// Update student variance
-			}
+		if (this.lastResponse.text) 																// If one
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+this.lastResponse.text+"|"+this.lastResponse.bakt.join(",")); // Send response
 		return this.lastResponse;																	// Return it
 	}
 
-	UpdateVariance(student, res)																// UPDATE STUDENT VARIANCE FROM RESPONSE
+	UpdateVariance(student, bakt)																// UPDATE STUDENT VARIANCE FROM RESPONSE
 	{
 		let i;
 		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
 		let o=app.students[stuIndex];																// Point at student
+		if (!o)	return;																				// Quit if not a student
 		o.var=[];																					// Reset variance
-		o.bakt=res.bakt.slice();																	// Copy bakt of last response in student
+		o.bakt=bakt.slice();																		// Copy bakt of last response in student
 		app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt);					// Show variance
 		for (i=0;i<5;++i) o.var[i]=Math.max(Math.min(o.var[i]+o.bakt[i],9),0);						// Set variant *trend* B 0-9
 	}
@@ -421,9 +418,10 @@ class App  {
 		if (v[3] == "SPEAKING") 																	// SPEAKING
 			$("#promptSpan").html((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");	 // Show status				
 		else if (v[3] == "TALK") {																	// TALK
+			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0]);							// Update variance
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
-			else 												 app.voice.Talk(v[6],v[4]);			// Talk		
+			else 						app.voice.Talk(v[6],v[4]);									// Talk		
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
 				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
 					let intent=res.intent.name.substring(1);										// Get intent
@@ -435,6 +433,7 @@ class App  {
 				}
 			}
 		else if (v[3] == "ACT")	{																	// ACT										
+			if ((v[4] == "Teacher") || (v[4] == "Coach")) return;									// Only for students
 			if (v[5] == "fidget") {																	// Fidget
 				let seat=v[4] ? app.students.find(x => x.id == v[4]).seat : 0;						// Get seat number
 				app.students[seat].fidget=1-app.students[seat].fidget;								// Toggle fidget								

@@ -344,7 +344,7 @@ class ResponsePanel  {
 
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.nlp.responses[app.role][id].text);
+				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.nlp.responses[app.role][id].text+"|"+app.nlp.responses[app.role][id].bakt.join(","));
 				});
 			}
 
