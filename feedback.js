@@ -11,7 +11,6 @@ class Feedback {
 		this.curStart=0;																			// Start in msecs
 		this.startPlay;																				// When play started in msecs
 		this.interval=null;																			// Timer
-		this.data=null;																				// Pointer to session data to show
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
 		this.intentLabels=["Feedback","General","Ask","Value","Correct","Think"];					// Intent labels
@@ -60,11 +59,10 @@ class Feedback {
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
 	}
 
-	Draw(data)																					// DRAW FEEDBACK PANEL
+	Draw()																						// DRAW FEEDBACK PANEL
 	{
 		let i,o;
-		this.data=data;																				// Point at data to display
-		this.maxTime=this.data[data.length-1].time;													// Get TRT	
+		this.maxTime=app.totTime*1000;																// Get TRT in msecs
 		$("#lz-feedbar").remove();																	// Remove old one
 		var str=`<div id="lz-feedbar" class="lz-feedbar"> 
 		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-feedbar").remove();clearInterval(app.fb.interval);$("#lz-variance").remove();'>
@@ -94,12 +92,12 @@ class Feedback {
 			let col;
 			let id=e.target.id.substr(6);
 			let p=$("#lzDot-"+id).position()
-			let o=this.data[id];																	// Point at element
+			let o=app.sessionLog[id];																// Point at element
 			$("#lz-dlg").remove();																	// Clear exiting
-			if (o.actor == "Teacher") col="#0099ffc";												// Teacher color
-			else					  col=app.students.find(x => x.id == o.actor).color;			// Student color
+			if (o.from == "Teacher") col="#0099ffc";												// Teacher color
+			else					 col=app.students.find(x => x.id == o.from).color;				// Student color
 			let str=`<div id="lz-dlg" style="position:absolute;top:${p.top-12}px;left:${p.left+6}px">
-				<div class="lz-textR" style="background-color:${col}">${o.actor+": "+o.text}</div><br>
+				<div class="lz-textR" style="background-color:${col}">${o.from+": "+o.text}</div><br>
 				<div class="lz-textRA" style="border-top-color:${col}"></div></div>`;
 			$("body").append(str.replace(/\t|\n|\r/g,""));											// Add chat
 			$("#lz-dlg").css("top",p.top-$("#lz-dlg").height()+"px");								// Position atop dot
@@ -108,12 +106,14 @@ class Feedback {
 	
 		$("[id^=lzDot-]").on("click",(e)=>{ 														// CLICK ON DOT TO SPEAK
 			let id=e.target.id.substr(6);															// Get id
-			app.voice.Talk(this.data[id].text,this.data[id].actor);									// Speak
+			let o=app.sessionLog[id];																// Point at dot
+			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-190,o.data ? o.data :[0,0,0,0,0]); // Show variance
+//			app.voice.Talk(app.sessionLog[id].text,o.from);											// Speak
 		});
 
 		$("#lz-chooseStudent").change(()=> {														// ON CHANGE STUDENT
 			 app.curStudent=$("#lz-chooseStudent").val(); 											// Set new student
-			 this.Draw(data);																		// Redraw
+			 this.Draw();																			// Redraw
 			});
 
 		$("#playerButton").click(()=> {	this.Play(); });											// On play click
@@ -143,10 +143,10 @@ class Feedback {
 
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
 	{
-		let i,o,x,col,y=31,str="";
+		let i,o,x,col=0,y=31,str="";
 		let wid=$(window).width()-290;																// Size of graph
 		clearInterval(this.interval);																// Clear timer
-		const getPixFromTime=(time)=>{ return time/this.maxTime*(wid-67)+62; };						// CONVERT TIME TO PIXELS
+		const getPixFromTime=(time)=>{ return time*1000/this.maxTime*(wid-67)+62; };				// CONVERT TIME TO PIXELS
 
 		for (i=0;i<5;++i) {																			// For each grid line
 			str+=`<text x="0" y="${y+4}" fill="#999">${this.intentLabels[5-i]}</text>						
@@ -156,24 +156,30 @@ class Feedback {
 			}
 		str+=`<path style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" d="`;
 		y=5*31+31;
-		for (i=0;i<this.data.length;i++) {															// For each event
-			o=this.data[i];																			// Point at it
+		for (i=0;i<app.sessionLog.length;i++) {														// For each event
+			o=app.sessionLog[i];																	// Point at it
+			if ((o.what != "RESPONSE") && (o.what != "REMARK")) 		continue;					// Skip unless talking
+			if ((o.what == "RESPONSE") && (o.from != app.curStudent))	continue;					// Not this student, but keep teachers
+			if ((o.what == "REMARK") && (o.from != app.curStudent))	continue;					// Not this student, but keep teachers
 			x=getPixFromTime(o.time).toFixed(2);													// Get x pos
-			if (o.actor == "Teacher") y=((5-Math.max(Math.floor(o.code/100),1))*31+31).toFixed(2);	// If a teacher, get y 5-1
-			if (i == 0) str+="M "+x+" "+y;															// Move there
-			else 		str+=" L "+x+" "+y;															// Add point
+			if (o.what == "REMARK")  y=((5-Math.max(Math.floor(o.data/100),1))*31+31).toFixed(2);	// If a teacher, get y 5-1
+			if (col == 0) 	str+="M "+x+" "+y,col++;												// Move there
+			else 			str+=" L "+x+" "+y;														// Add point
+			trace(o.from,x,y)
 			}
 		str+=`"/>`;																					// Close path
 		y=1;
-		for (i=0;i<this.data.length;i++) {															// For each event
-			o=this.data[i];																			// Point at it
+		for (i=0;i<app.sessionLog.length;i++) {														// For each event
+			o=app.sessionLog[i];																	// Point at it
 			x=getPixFromTime(o.time);																// Get x pos
 			col="#ccc";																				// Teacher is gray
-			if (o.actor == "Teacher")   y=5-Math.max(Math.floor(o.code/100),1);						// If a teacher, get y 5-1
-			else						col=app.students.find(x => x.id == o.actor).color;			// Get shirt color
-			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
+			if (o.what == "REMARK")			y=5-Math.max(Math.floor(o.data/100),1);					// If a teacher, get y 5-1
+			else if (o.what == "RESPONSE")	col=app.students.find(x => x.id == o.from).color;		// Get shirt color
+			if ((o.what == "REMARK") || (o.what == "RESPONSE"))										// Someone spoke
+				str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
 			}
-		return str;																					// Return graph markup
+
+			return str;																					// Return graph markup
 		}	
 
 		ShowText()
@@ -203,13 +209,15 @@ class Feedback {
 						}													
 					else{																				// If playing
 						now=pct*this.maxTime+this.curStart;												// Start point
-						for (i=0;i<this.data.length;i++) 												// For each event
-							if (this.data[i].time-0 <= now)												// Past now
+						for (i=0;i<app.sessionLog.length;i++) {											// For each event
+							if ((app.sessionLog[i].what != "REMARK") && (app.sessionLog[i].what != "RESPONSE")) continue;	// Only talking
+							if (app.sessionLog[i].time-0 <= now)										// Past now
 								move=i;																	// Set current move 
+							}
 						if (move != this.curMove) {														// A new move
-							if (this.data[move].actor == "Teacher")	who="Teacher";						// Teacher's voice
-							else									who=this.data[move].actor;			// Student voice
-							app.voice.Talk(this.data[move].text,who);									// Speak
+							if (app.sessionLog[move].from == "Teacher")	who="Teacher";					// Teacher's voice
+							else										who=app.sessionLog[move].from;	// Student voice
+							app.voice.Talk(app.sessionLog[move].text,who);								// Speak
 							this.curMove=move;															// Set current move
 							}
 						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there

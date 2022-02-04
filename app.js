@@ -8,6 +8,8 @@ class App  {
 	{
 		app=this;
 		this.role="Teacher";																		// User's role in simulation
+		this.sessionId="1";																			// Session id
+		this.activityId="1";																		// Activity id
 		this.strings=[];																			// Config strings
 		this.sessionLog=[];																			// Session log
 		this.poses=[];																				// Holds poses
@@ -19,9 +21,6 @@ class App  {
 		this.startTime;																				// Start of session in ms
 		this.curTime=0;																				// Time in session in seconds
 		this.totTime=0;																				// Session time in seconds
-		this.sessionId="1";																			// Session id
-		this.activityId="1";																		// Activity id
-		this.sessionData=[];																		// Holds session data
 		this.eventTriggers=[];																		// Holds event triggers
 		this.variance=[];																			// Holds variance data
 		this.nextTrigger={id:0, time:100000, type:""};												// Next trigger to look for
@@ -53,8 +52,8 @@ class App  {
 		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
 
-		$("#resourceBut").on("click", ()=> { this.ShowResources();  });								// ON RESOURCES	
-		$("#feedbackBut").on("click", ()=> { this.fb.Draw(this.sessionData);  });					// ON FEEDBACK
+		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
+		$("#feedbackBut").on("click", ()=> { this.fb.Draw(); });									// ON FEEDBACK
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			if (this.role != "Teacher") return;														// Only for teacher
@@ -161,11 +160,6 @@ class App  {
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV
 				this.nlp.AddResponses(d);															// Add responses
 				if (this.role != "Teacher")	this.rp.Draw();											// Show response menu if not teacher
-			});
-
-		fetch("data/session-67.csv")																// Load session file
-			.then(res =>  res.text())																// Get as text
-			.then(res =>{ this.sessionData=Papa.parse(res, { header:true, skipEmptyLines:true }).data; // Parse CSV
 			});
 	}
 
@@ -428,7 +422,7 @@ class App  {
 				o.lastIntent=this.lastIntent;														// Set intent													
 				o.lastRemark=this.lastRemark;														// Set remark													
 				o.lastResponse=v[6]																	// Set response
-				o.bakt=v[7].split(",");																// Set variance
+				o.bakt=v[7] ? v[7].split(",") : [0,0,0,0,0];										// Set variance
 				}
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
 				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
@@ -456,7 +450,7 @@ class App  {
 			$("#startBut").css("background-color", "#27ae60");										// Set color
 			this.StartSession();																	// Start session										
 			}
-		else if (v[3] == "START")  {				                                                												// START
+		else if (v[3] == "START")  {				                                               	// START
 			let now=new Date().getTime();															// Get now
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else			this.startTime=now;														// Reset start
