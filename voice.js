@@ -45,15 +45,12 @@ class Voice {
 		try {																							// Try
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.recognition=new SpeechRecognition();													// Init STT
-			this.recognition.continuous=false;															// Continual recognition off
-			this.recognition.interimResults=true;														// Return interim results
+			this.recognition.continuous=false;															// Continual recognition on
+			this.recognition.interimResults=false;														// Return interim results
 			this.recognition.lang="en-US";																// US English
 			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };							// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
-			this.recognition.onresult=(e)=> { 															// On some speech recognized, add
-				app.said=e.results[0][0].transcript;													// Get text
-				$("#promptSpan").html(app.inRemark ? app.said : "PRESS AND HOLD SPACEBAR TO TALK"); 	// Show partial text
-				};
+			this.recognition.onresult=(e)=>{ app.said+=" "+e.results[0][0].transcript; };				// On some speech recognized, add
 			} catch(e) { trace("Voice error",e) };														// On error
 		}
 
@@ -88,7 +85,7 @@ class Voice {
 				this.ShowSpeakerText(who,text);															// Show text underneath student										
 				}
 			speechSynthesis.cancel();																	// Clear current speech queue			
-			if (app.inSim) this.StopListening();														// Stop listening
+			if (app.inSim) 				this.StopListening();											// Stop listening
 			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice
 			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex
 			if (who == "male")			this.tts.voice=this.voices[this.maleVoice];						// Set male voice

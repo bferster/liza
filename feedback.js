@@ -6,7 +6,7 @@ class Feedback {
 
 	constructor()																				// CONSTRUCTOR
 	{
-		document.addEventListener( 'mousedown', this.OnClick, false );
+		document.addEventListener('mousedown', this.OnClick, false);								// ON MOUSEDOWN call onClick()
 		this.curTime=0;																				// Current time in session in ms
 		this.curStart=0;																			// Start in msecs
 		this.startPlay;																				// When play started in msecs
@@ -108,8 +108,7 @@ class Feedback {
 			let id=e.target.id.substr(6);															// Get id
 			let o=app.sessionLog[id];																// Point at dot
 			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-190,o.data ? o.data :[0,0,0,0,0]); // Show variance
-//			app.voice.Talk(app.sessionLog[id].text,o.from);											// Speak
-		});
+			});
 
 		$("#lz-chooseStudent").change(()=> {														// ON CHANGE STUDENT
 			 app.curStudent=$("#lz-chooseStudent").val(); 											// Set new student
@@ -160,12 +159,12 @@ class Feedback {
 			o=app.sessionLog[i];																	// Point at it
 			if ((o.what != "RESPONSE") && (o.what != "REMARK")) 		continue;					// Skip unless talking
 			if ((o.what == "RESPONSE") && (o.from != app.curStudent))	continue;					// Not this student, but keep teachers
-			if ((o.what == "REMARK") && (o.from != app.curStudent))	continue;					// Not this student, but keep teachers
+			if ((o.what == "REMARK") && (o.to != app.curStudent))		continue;					// Only remarks to this student
 			x=getPixFromTime(o.time).toFixed(2);													// Get x pos
 			if (o.what == "REMARK")  y=((5-Math.max(Math.floor(o.data/100),1))*31+31).toFixed(2);	// If a teacher, get y 5-1
+			trace(o.data,y)
 			if (col == 0) 	str+="M "+x+" "+y,col++;												// Move there
 			else 			str+=" L "+x+" "+y;														// Add point
-			trace(o.from,x,y)
 			}
 		str+=`"/>`;																					// Close path
 		y=1;
@@ -178,8 +177,7 @@ class Feedback {
 			if ((o.what == "REMARK") || (o.what == "RESPONSE"))										// Someone spoke
 				str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
 			}
-
-			return str;																					// Return graph markup
+		return str;																					// Return graph markup
 		}	
 
 		ShowText()

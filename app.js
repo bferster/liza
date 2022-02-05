@@ -27,6 +27,7 @@ class App  {
 		this.curStudent="";																			// Currently active student
 		this.lastIntent="";																			// Last intent
 		this.lastRemark="";																			// Last remark
+		this.talkTime=0;																			// Calc talk time
 		this.inSim=false;																			// In simulation or not
 		this.inRemark=false;																		// Teacher talking flag
 		this.said="";																				// Current remark
@@ -100,20 +101,28 @@ class App  {
 					PopUp("Please START the session to talk to the class"); 						// Prompt
 					return;																			// Quit
 					}
-				Prompt("","on");																	// Prompt visible
-				if (this.multi) this.ws.send(this.sessionId+"|"+this.curTime+"|ADMIN|SPEAKING|"+this.role+"|"+this.curStudent+"|1"); // Alert others to talking
+				Prompt("Remember to speak clearly","on");											// Prompt
+				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
+				this.ws.send(this.sessionId+"|"+(this.curTime-0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
 				this.inRemark=true;																	// Teacher is talking
-				}
+				this.talkTime=new Date().getTime();													// Time when talking started 
+				this.said="";																		// Clear spoken cache
+			}
 			});
 		$(window).on("keyup", (e)=> {																// HANDLE KEY UP
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text")	return true;										// If in a text input, quit
-				if (this.inSim)					setTimeout(()=>{ app.OnPhrase(this.said); },1000); 	// React to remark if in sim
+				if (this.inSim)	 setTimeout(()=>{ 													// React to remark if in sim
+					this.talkTime=(new Date().getTime()-this.talkTime)/1000							// Compute talk time in seconds
+					Prompt(this.said,3); 															// Show text 
+					app.OnPhrase(this.said);														// React to remark
+					app.said=""; 																	// Clear cache
+					},1000); 																		// Wait a second
 				this.inRemark=false;																// Teacher is not talking
-				if (this.multi) this.ws.send(this.sessionId+"|"+this.curTime+"|ADMIN|SPEAKING|"+this.role+"|"+this.curStudent+"|0"); // Alert others to not talking
+				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
+				if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
 				}
 			});
-	
 	}
 
 	LoadFiles()																					// LOAD CONFIG FILE
@@ -169,6 +178,8 @@ class App  {
 		this.trt=0;																					// At start
 		this.sessionLog=[];																			// Clear session log
 		this.inSim=(this.role != "Teacher");														// Not in simulation if a teacher
+		if (this.multi && this.inSim)	this.voice.Listen()											// Turn on speech recognition for students
+
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.curStudent=app.students[0].id;															// Pick first student
@@ -263,7 +274,7 @@ class App  {
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher") {																// Not the teacher talking
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
+			app.ws.send(app.sessionId+"|"+(app.curTime.toFixed(2)-app.talkTime)+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
 			return;
 			}
 		let act=app.nlp.GetAction(text);															// Set action
@@ -281,7 +292,7 @@ class App  {
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
-				app.ws.send(app.sessionId+"|"+(app.curTime-.02).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
+				app.ws.send(app.sessionId+"|"+(app.curTime.toFixed(2)-app.talkTime)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				this.lastIntent=intent;																// Save last intent
 				if (intent >= 300) {																// If an intent detected
@@ -292,7 +303,6 @@ class App  {
 					}	
 			trace(res,r.text)
 			});
-
 		}
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
@@ -403,7 +413,6 @@ class App  {
 
 	SocketIn(event)																				// A WEBSOCKET MESSAGE FROM NODE WS SERVER
 	{
-		// sessionId | curTime | fromId | op | ...
 		let o;
 		if (!event.data)			 return;														// Quit if no data
 		let v=event.data.split("|");																// Get params
@@ -411,8 +420,9 @@ class App  {
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 		this.LogEvent(v);																			// Log event
 		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
-		if (v[3] == "SPEAKING") 																	// SPEAKING
-			$("#promptSpan").html((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");	 // Show status				
+		if (v[3] == "SPEAKING") {																	// SPEAKING
+			$("#promptSpan").html((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");	// Show status				
+			}	
 		else if (v[3] == "TALK") {																	// TALK
 			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0]);							// Update variance
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
