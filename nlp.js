@@ -123,6 +123,7 @@ class NLP {
 			o.bakt[2]=getVariant(d[i]["Knowledge (400)"]);												// K
 			o.bakt[3]=getVariant(d[i]["Thinking (500)"]);												// T
 			o.bakt[4]=getVariant(d[i]["Understanding Level"]);											// U
+			o.bakt[5]=d[i]["Intent"];																	// Intent
 			o.text=d[i]["Response"];																	// Get response
 			o.label=d[i]["Response category"];															// Get response category
 			if (d[i]["Type of Student Response"]) o.type=d[i]["Type of Student Response"];				// Get type

@@ -473,15 +473,16 @@ class App  {
 
 	LogEvent(e)																					// ADD EVENT TO LOG
 	{
-		let o={ to:"", data:"", text:""};															// Event stub
-		if (e[2] == "ADMIN")	return;																// Ignore admin
+		let o={ to:"", data:"", text:"", intent:""};												// Event stub
+		if (e[2] == "ADMIN")			return;														// Ignore admin
 		o.time=e[1];	o.from=e[2];	o.what=e[3];												// Add basics
 		if (e[3] == "START") 			o.data=e[4];												// START
 		else if (e[3] == "ACT") 		o.from=e[4],o.data=e[5];									// ACT 																			
 		else if (e[3] == "PIC") 		o.data=`${e[4]}:${e[5]}`;									// PIC 																			
 		else if (e[3] == "TALK") {																	// TALK 
-			o.to=e[5];	o.text=e[6];	o.from=e[4];	o.data=e[7];								// Talking to, what they said, from, intent or BAKT variance																		
-			o.what=(o.from == "Teacher") ? "REMARK" : "RESPONSE";									// Type of talk
+			o.to=e[5];	o.text=e[6];	o.from=e[4];												// Talking to, what they said, from																		
+			if (o.from == "Teacher")	{ o.what="REMARK";   o.intent=e[7]; }						// Set intent for teacher
+			else						{ o.what="RESPONSE"; o.intent=this.lastIntent; o.data=e[7]; } // Set bakt for response
 			}
 		this.sessionLog.push(o);																	// Add to session log
 	}

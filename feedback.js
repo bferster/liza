@@ -39,7 +39,6 @@ class Feedback {
 			else if (v[i] == 2)	c[i]=14;
 			else 				c[i]=16;
 			}		
-	
 		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
 		let labs=["Value","Language","Knowledge","Thinking"];
 		$("#lz-variance").remove();																	// Remove old one
@@ -107,7 +106,7 @@ class Feedback {
 		$("[id^=lzDot-]").on("click",(e)=>{ 														// CLICK ON DOT TO SPEAK
 			let id=e.target.id.substr(6);															// Get id
 			let o=app.sessionLog[id];																// Point at dot
-			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-190,o.data ? o.data :[0,0,0,0,0]); // Show variance
+			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-190,o.data ? o.data.split(",") : [0,0,0,0,0]); // Show variance
 			});
 
 		$("#lz-chooseStudent").change(()=> {														// ON CHANGE STUDENT
@@ -160,9 +159,9 @@ class Feedback {
 			if ((o.what != "RESPONSE") && (o.what != "REMARK")) 		continue;					// Skip unless talking
 			if ((o.what == "RESPONSE") && (o.from != app.curStudent))	continue;					// Not this student, but keep teachers
 			if ((o.what == "REMARK") && (o.to != app.curStudent))		continue;					// Only remarks to this student
+			if (o.intent > 599)											continue;					// Too high
 			x=getPixFromTime(o.time).toFixed(2);													// Get x pos
-			if (o.what == "REMARK")  y=((5-Math.max(Math.floor(o.data/100),1))*31+31).toFixed(2);	// If a teacher, get y 5-1
-			trace(o.data,y)
+			y=((5-Math.max(Math.floor(o.intent/100),1))*31+31).toFixed(2);							// Get y 5-1 from intent
 			if (col == 0) 	str+="M "+x+" "+y,col++;												// Move there
 			else 			str+=" L "+x+" "+y;														// Add point
 			}
@@ -172,7 +171,7 @@ class Feedback {
 			o=app.sessionLog[i];																	// Point at it
 			x=getPixFromTime(o.time);																// Get x pos
 			col="#ccc";																				// Teacher is gray
-			if (o.what == "REMARK")			y=5-Math.max(Math.floor(o.data/100),1);					// If a teacher, get y 5-1
+			if (o.what == "REMARK")			y=5-Math.max(Math.floor(o.intent/100),1);					// If a teacher, get y 5-1
 			else if (o.what == "RESPONSE")	col=app.students.find(x => x.id == o.from).color;		// Get shirt color
 			if ((o.what == "REMARK") || (o.what == "RESPONSE"))										// Someone spoke
 				str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
@@ -193,8 +192,8 @@ class Feedback {
 			else{																						// If not playing, start
 				Sound("click");																			// Click sound							
 				$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
-				this.startPlay=new Date().getTime();													// Set start in sseconds
-				let off=(this.curTime-this.curStart)/this.maxTime;			 							// Get offset from start
+				this.startPlay=new Date().getTime();													// Set start in msecs
+				let off=((this.curTime-this.curStart)/this.maxTime);			 						// Get offset from start
 				this.interval=setInterval(()=> {														// Start timer
 					let i,move=0,who="";																// Active move
 					let now=new Date().getTime()-this.startPlay;										// Get time 0-maxtime
@@ -209,13 +208,14 @@ class Feedback {
 						now=pct*this.maxTime+this.curStart;												// Start point
 						for (i=0;i<app.sessionLog.length;i++) {											// For each event
 							if ((app.sessionLog[i].what != "REMARK") && (app.sessionLog[i].what != "RESPONSE")) continue;	// Only talking
-							if (app.sessionLog[i].time-0 <= now)										// Past now
+							if (app.sessionLog[i].time*1000 <= now)										// Past now (now in msecs, time in secs)
 								move=i;																	// Set current move 
 							}
 						if (move != this.curMove) {														// A new move
-							if (app.sessionLog[move].from == "Teacher")	who="Teacher";					// Teacher's voice
-							else										who=app.sessionLog[move].from;	// Student voice
-							app.voice.Talk(app.sessionLog[move].text,who);								// Speak
+							let o=app.sessionLog[move];													// Point at event
+							app.voice.Talk(o.text,(o.from == "Teacher") ? "Teacher" : o.from);			// Speak
+							if (o.what == "RESPONSE")													// If a response
+								app.fb.DrawVariance(27,window.innerHeight-190,o.data ? o.data.split(",") : [0,0,0,0,0]);// Show variance
 							this.curMove=move;															// Set current move
 							}
 						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there
