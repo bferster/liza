@@ -159,22 +159,22 @@ class Feedback {
 			if ((o.what != "RESPONSE") && (o.what != "REMARK")) 		continue;					// Skip unless talking
 			if ((o.what == "RESPONSE") && (o.from != app.curStudent))	continue;					// Not this student, but keep teachers
 			if ((o.what == "REMARK") && (o.to != app.curStudent))		continue;					// Only remarks to this student
-			if (o.intent > 599)											continue;					// Too high
+			if (o.intent > 599)											o.intent=100;				// Too high
 			x=getPixFromTime(o.time).toFixed(2);													// Get x pos
 			y=((5-Math.max(Math.floor(o.intent/100),1))*31+31).toFixed(2);							// Get y 5-1 from intent
 			if (col == 0) 	str+="M "+x+" "+y,col++;												// Move there
 			else 			str+=" L "+x+" "+y;														// Add point
 			}
 		str+=`"/>`;																					// Close path
-		y=1;
+		y=4;
 		for (i=0;i<app.sessionLog.length;i++) {														// For each event
 			o=app.sessionLog[i];																	// Point at it
+			if ((o.what != "RESPONSE") && (o.what != "REMARK")) 		continue;					// Skip unless talking
+			if (o.intent > 599)											o.intent=100;				// Too high
 			x=getPixFromTime(o.time);																// Get x pos
-			col="#ccc";																				// Teacher is gray
-			if (o.what == "REMARK")			y=5-Math.max(Math.floor(o.intent/100),1);					// If a teacher, get y 5-1
-			else if (o.what == "RESPONSE")	col=app.students.find(x => x.id == o.from).color;		// Get shirt color
-			if ((o.what == "REMARK") || (o.what == "RESPONSE"))										// Someone spoke
-				str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
+			y=5-Math.max(Math.floor(o.intent/100),1).toFixed(2);									// Get y 5-1 from intent
+			col=(o.what == "RESPONSE") ? col=app.students.find(x => x.id == o.from).color : "#ccc"	// Set color
+			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
 			}
 		return str;																					// Return graph markup
 		}	

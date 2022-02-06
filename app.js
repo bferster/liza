@@ -17,8 +17,8 @@ class App  {
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
-		this.trt=0;																					// Total running time in seconds
 		this.startTime;																				// Start of session in ms
+		this.trt=0;																					// Total running time in seconds
 		this.curTime=0;																				// Time in session in seconds
 		this.totTime=0;																				// Session time in seconds
 		this.eventTriggers=[];																		// Holds event triggers
@@ -177,9 +177,7 @@ class App  {
 		let i;
 		this.trt=0;																					// At start
 		this.sessionLog=[];																			// Clear session log
-		this.inSim=(this.role != "Teacher");														// Not in simulation if a teacher
-		if (this.multi && this.inSim)	this.voice.Listen()											// Turn on speech recognition for students
-
+		this.inSim=false;																			// Not in simulation
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.curStudent=app.students[0].id;															// Pick first student
@@ -196,10 +194,9 @@ class App  {
 
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
 	{
-		if (!app.inSim)	 			now=app.startTime;												// Don't set based on now if not in sim
-		if (this.role == "Teacher")	app.curTime=app.trt+(now-app.startTime)/1000;					// Calc elapsed time in session
-		if (app.multi)	 			return app.curTime;												// No timed events in multiplayer mode
-	
+		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
+		app.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
+		if (app.multi)	return app.curTime;															// No timed events in multiplayer mode
 		if (app.curTime >= app.totTime) {															// Add done
 			PopUp("Your Teaching with Grace session is over!");										// Popup
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
@@ -274,7 +271,7 @@ class App  {
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher") {																// Not the teacher talking
-			app.ws.send(app.sessionId+"|"+(app.curTime.toFixed(2)-app.talkTime)+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
+			app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
 			return;
 			}
 		let act=app.nlp.GetAction(text);															// Set action
@@ -292,7 +289,7 @@ class App  {
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
-				app.ws.send(app.sessionId+"|"+(app.curTime.toFixed(2)-app.talkTime)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
+				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				this.lastIntent=intent;																// Save last intent
 				if (intent >= 300) {																// If an intent detected
@@ -464,7 +461,11 @@ class App  {
 			let now=new Date().getTime();															// Get now
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else			this.startTime=now;														// Reset start
-			this.inSim=v[4] == "true";
+			this.inSim=v[4] == "true";																// Set flag
+			if (this.role != "Teacher")	{															// If a non-teacher
+				if (this.inSim)	 this.voice.Listen();												// Turn on speech recognition
+				else			 this.voice.StopListening();											// Turn off
+				}
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			}  
