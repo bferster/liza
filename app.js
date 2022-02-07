@@ -558,7 +558,7 @@ class App  {
 		this.LogEvent(v);																			// Log event
 		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
 		if (v[3] == "SPEAKING") {																	// SPEAKING
-			$("#promptSpan").html((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");	// Show status				
+			Prompt((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");		// Show status				
 			}	
 		else if (v[3] == "TALK") {																	// TALK
 			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0]);							// Update variance

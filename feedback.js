@@ -89,8 +89,8 @@ class Feedback {
 	
 		$("[id^=lzDot-]").on("mouseover",(e)=>{ 													// Show chat if over
 			let col;
-			let id=e.target.id.substr(6);
-			let p=$("#lzDot-"+id).position()
+			let id=e.target.id.substr(6);															// Get id
+			let p=$("#lzDot-"+id).position();														// Get pos
 			let o=app.sessionLog[id];																// Point at element
 			$("#lz-dlg").remove();																	// Clear exiting
 			if (o.from == "Teacher") col="#0099ffc";												// Teacher color
@@ -236,6 +236,7 @@ class ResponsePanel  {
 	constructor()   																			// CONSTRUCTOR
 	{
 		this.curIntent=0;
+		this.curTab="";																				// Currently open tab
 		this.intentDescs=["Nothing yet...",
 						  "Low information remark or compliment that has a low impact",
 					   	  "Explains the text or question with or without reference to the text",
@@ -254,6 +255,7 @@ class ResponsePanel  {
 		app.sc.SetCamera(0,200,600,0,0,0);															// Reset camera	
 		$("#lz-rpback").remove();																	// Remove old one
 		let v=app.strings.multi.split(",");															// Point at labels
+		if (!this.curTab) this.curTab=v[0];															// Init to 1st tab
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px">
@@ -294,13 +296,13 @@ class ResponsePanel  {
 			});
 		
 		$("[id^=lztab-]").on("click", (e)=> { 														// ON TAB CLICK
-			let id=e.target.id.substr(6);															// Get id
+			this.curTab=e.target.id.substr(6);														// Get id
 			$("[id^=lztab-]").css({"font-weight":"200","color":"#666","border-bottom":"1px solid #999"});	// Revert
 			$("#lztab-"+id).css({"font-weight":"700","color":"#333","border-bottom":"none"});		// Highlight
-			fillList(id);																			// Fill list
+			fillList(this.curTab);																	// Fill list
 			});
 		
-		$("#lztab-"+v[0]).trigger("click");															// Fill list (must be after handler)
+		$("#lztab-"+this.curTab).trigger("click");													// Fill list (must be after handler)
 			if (window.location.search.match(/role=coach/i)) addRoles();							// Add sudent roles if coach
 
 		$("#lzFidget").on("click", ()=> {															// ON FIDGET
