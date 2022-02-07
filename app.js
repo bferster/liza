@@ -92,7 +92,18 @@ class App  {
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			});
 		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
-		$("#talkInput").on("change", function() { app.OnPhrase( $(this).val()), $(this).val("") });	// On enter, act on text typed
+		$("#talkInput").on("keydown", ()=> { 														// ON ENTER OF TEXT
+			if (($("#talkInput").val().length == 1) && this.inSim) {								// If first key struck while in sim
+				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
+				this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1|TEXT"); // Alert others to talking
+				this.talkTime=new Date().getTime();													// Get time 
+				}
+			});
+		$("#talkInput").on("change", ()=> { 														// ON ENTER OF TEXT
+			this.talkTime=(new Date().getTime()-this.talkTime)/1000;								// Compute talk time in seconds
+			if (this.inSim)	this.OnPhrase($("#talkInput").val());									// Act on text, if in sim
+			$("#talkInput").val("");																// Clear text
+			});	
 		$(window).on("keydown", (e) => {															// HANDLE KEY DOWN
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text")	return true;										// If in a text input, quit
@@ -103,7 +114,7 @@ class App  {
 					}
 				Prompt("Remember to speak clearly","on");											// Prompt
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
-				this.ws.send(this.sessionId+"|"+(this.curTime-0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
+				this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
 				this.inRemark=true;																	// Teacher is talking
 				this.talkTime=new Date().getTime();													// Time when talking started 
 				this.said="";																		// Clear spoken cache
@@ -113,14 +124,14 @@ class App  {
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (this.inSim)	 setTimeout(()=>{ 													// React to remark if in sim
-					this.talkTime=(new Date().getTime()-this.talkTime)/1000							// Compute talk time in seconds
+					this.talkTime=(new Date().getTime()-this.talkTime)/1000;						// Compute talk time in seconds
 					Prompt(this.said,3); 															// Show text 
 					app.OnPhrase(this.said);														// React to remark
 					app.said=""; 																	// Clear cache
 					},1000); 																		// Wait a second
 				this.inRemark=false;																// Teacher is not talking
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
-				if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
+				if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
 				}
 			});
 	}
@@ -408,86 +419,6 @@ class App  {
 		}
 	}
 
-	SocketIn(event)																				// A WEBSOCKET MESSAGE FROM NODE WS SERVER
-	{
-		let o;
-		if (!event.data)			 return;														// Quit if no data
-		let v=event.data.split("|");																// Get params
-		if (v[0] != this.sessionId)	return;															// Quit if wrong session
-		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
-		this.LogEvent(v);																			// Log event
-		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
-		if (v[3] == "SPEAKING") {																	// SPEAKING
-			$("#promptSpan").html((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");	// Show status				
-			}	
-		else if (v[3] == "TALK") {																	// TALK
-			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0]);							// Update variance
-			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
-			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
-			else 						app.voice.Talk(v[6],v[4]);									// Talk		
-			if ((o=app.students[app.students.findIndex((s)=>{ return v[4] == s.id })])) {			// Point at student data
-				o.lastIntent=this.lastIntent;														// Set intent													
-				o.lastRemark=this.lastRemark;														// Set remark													
-				o.lastResponse=v[6]																	// Set response
-				o.bakt=v[7] ? v[7].split(",") : [0,0,0,0,0];										// Set variance
-				}
-			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
-				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
-					let intent=res.intent.name.substring(1);										// Get intent
-					intent=isNaN(intent) ? 0 : intent;												// Validate
-					this.rp.curIntent=intent;														// Set current intent
-					if (v[5]) app.curStudent=v[5];													// Set new active student 
-					this.rp.Draw(v[6],app.curStudent);												// Redraw response panel
-					});
-				}
-			}
-		else if (v[3] == "ACT")	{																	// ACT										
-			if ((v[4] == "Teacher") || (v[4] == "Coach")) return;									// Only for students
-			if (v[5] == "fidget") {																	// Fidget
-				let seat=v[4] ? app.students.find(x => x.id == v[4]).seat : 0;						// Get seat number
-				app.students[seat].fidget=1-app.students[seat].fidget;								// Toggle fidget								
-				}
-			else	app.sc.StartAnimation(v[4],app.seqs[v[5]]); 									// Start animation									
-			}
-		else if (v[3] == "VIDEO")  	{ if (!$("#lz-videoChat").length) this.VideoChat();	}			// VIDEO
-		else if (v[3] == "PROMPT") 	{ PopUp(v[4],8); Sound("ding"); }								// PROMPT
-		else if (v[3] == "PICTURE") { app.bb.SetPic(v[5],true,"",v[4]); }							// PICTURE
-		else if (v[3] == "RESTART") {																// RESTART
-			$("#startBut").html("START");															// Set label					
-			$("#startBut").css("background-color", "#27ae60");										// Set color
-			this.StartSession();																	// Start session										
-			}
-		else if (v[3] == "START")  {				                                               	// START
-			let now=new Date().getTime();															// Get now
-			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
-			else			this.startTime=now;														// Reset start
-			this.inSim=v[4] == "true";																// Set flag
-			if (this.role != "Teacher")	{															// If a non-teacher
-				if (this.inSim)	 this.voice.Listen();												// Turn on speech recognition
-				else			 this.voice.StopListening();											// Turn off
-				}
-			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
-			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
-			}  
-		else if ((v[3] == "CHAT") && (this.role == v[4])) {	Sound("ding"); Bubble(v[5],5,bx); }		// CHAT
-	}
-
-	LogEvent(e)																					// ADD EVENT TO LOG
-	{
-		let o={ to:"", data:"", text:"", intent:""};												// Event stub
-		if (e[2] == "ADMIN")			return;														// Ignore admin
-		o.time=e[1];	o.from=e[2];	o.what=e[3];												// Add basics
-		if (e[3] == "START") 			o.data=e[4];												// START
-		else if (e[3] == "ACT") 		o.from=e[4],o.data=e[5];									// ACT 																			
-		else if (e[3] == "PIC") 		o.data=`${e[4]}:${e[5]}`;									// PIC 																			
-		else if (e[3] == "TALK") {																	// TALK 
-			o.to=e[5];	o.text=e[6];	o.from=e[4];												// Talking to, what they said, from																		
-			if (o.from == "Teacher")	{ o.what="REMARK";   o.intent=e[7]; }						// Set intent for teacher
-			else						{ o.what="RESPONSE"; o.intent=this.lastIntent; o.data=e[7]; } // Set bakt for response
-			}
-		this.sessionLog.push(o);																	// Add to session log
-	}
-
 	InitClassroom()																				// INIT CLASSROOM
 	{
 		let i;
@@ -612,5 +543,94 @@ class App  {
 		$("#lz-resources").show("slide",{ direction:"down" });											// Slide up
 		$("#lz-resources").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 	}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SOCKET
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	SocketIn(event)																				// A WEBSOCKET MESSAGE FROM NODE WS SERVER
+	{
+		let o;
+		if (!event.data)			 return;														// Quit if no data
+		let v=event.data.split("|");																// Get params
+		if (v[0] != this.sessionId)	return;															// Quit if wrong session
+		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
+		this.LogEvent(v);																			// Log event
+		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
+		if (v[3] == "SPEAKING") {																	// SPEAKING
+			$("#promptSpan").html((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");	// Show status				
+			}	
+		else if (v[3] == "TALK") {																	// TALK
+			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0]);							// Update variance
+			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
+			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
+			else 						app.voice.Talk(v[6],v[4]);									// Talk		
+			if ((o=app.students[app.students.findIndex((s)=>{ return v[4] == s.id })])) {			// Point at student data
+				o.lastIntent=this.lastIntent;														// Set intent													
+				o.lastRemark=this.lastRemark;														// Set remark													
+				o.lastResponse=v[6]																	// Set response
+				o.bakt=v[7] ? v[7].split(",") : [0,0,0,0,0,this.lastIntent];						// Set variance + intent
+				}
+			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
+				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
+					let intent=res.intent.name.substring(1);										// Get intent
+					intent=isNaN(intent) ? 0 : intent;												// Validate
+					this.rp.curIntent=intent;														// Set current intent
+					if (v[5]) app.curStudent=v[5];													// Set new active student 
+					this.rp.Draw(v[6],app.curStudent);												// Redraw response panel
+					});
+				}
+			}
+		else if (v[3] == "ACT")	{																	// ACT										
+			if ((v[4] == "Teacher") || (v[4] == "Coach")) return;									// Only for students
+			if (v[5] == "fidget") {																	// Fidget
+				let seat=v[4] ? app.students.find(x => x.id == v[4]).seat : 0;						// Get seat number
+				app.students[seat].fidget=1-app.students[seat].fidget;								// Toggle fidget								
+				}
+			else	app.sc.StartAnimation(v[4],app.seqs[v[5]]); 									// Start animation									
+			}
+		else if (v[3] == "VIDEO")  	{ if (!$("#lz-videoChat").length) this.VideoChat();	}			// VIDEO
+		else if (v[3] == "PROMPT") 	{ PopUp(v[4],8); Sound("ding"); }								// PROMPT
+		else if (v[3] == "PICTURE") { app.bb.SetPic(v[5],true,"",v[4]); }							// PICTURE
+		else if (v[3] == "RESTART") {																// RESTART
+			$("#startBut").html("START");															// Set label					
+			$("#startBut").css("background-color", "#27ae60");										// Set color
+			this.StartSession();																	// Start session										
+			}
+		else if (v[3] == "START")  {				                                               	// START
+			let now=new Date().getTime();															// Get now
+			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
+			else			this.startTime=now;														// Reset start
+			this.inSim=v[4] == "true";																// Set flag
+			if (this.role != "Teacher")	{															// If a non-teacher
+				if (this.inSim)	 this.voice.Listen();												// Turn on speech recognition
+				else			 this.voice.StopListening();											// Turn off
+				}
+			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
+			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
+			}  
+		else if ((v[3] == "CHAT") && (this.role == v[4])) {	Sound("ding"); Bubble(v[5],5,bx); }		// CHAT
+	}
+
+	LogEvent(e)																					// ADD EVENT TO LOG
+	{
+		let o={ to:"", data:"", text:"", intent:""};												// Event stub
+		if (e[2] == "ADMIN")			return;														// Ignore admin
+		o.time=e[1];	o.from=e[2];	o.what=e[3];												// Add basics
+		if (e[3] == "START") 			o.data=e[4];												// START
+		else if (e[3] == "ACT") 		o.from=e[4],o.data=e[5];									// ACT 																			
+		else if (e[3] == "PIC") 		o.data=`${e[4]}:${e[5]}`;									// PIC 																			
+		else if (e[3] == "TALK") {																	// TALK 
+			o.to=e[5];	o.text=e[6];	o.from=e[4];												// Talking to, what they said, from																		
+			if (o.from == "Teacher")	{ o.what="REMARK";   o.intent=e[7]; }						// Set intent for teacher
+			else{ 																					// Set bakt and intent for response
+				o.what="RESPONSE";  																// Set what
+				o.intent=this.lastIntent;															// Intent 
+				o.data=e[7] ? e[7] : [0,0,0,0,0,1]; 												// Data
+				}
+			}
+		this.sessionLog.push(o);																	// Add to session log
+	}
+
 
 } // App class closure

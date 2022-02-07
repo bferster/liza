@@ -21,7 +21,7 @@ class Feedback {
 		$("#talkInput").blur();																		// Set focus away from inputs				
 		if (e.target.localName != "canvas")	return;													// React only to canvas hits
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point
-		if (o.object.name == "body") {																// If a student
+		if (o && o.object && (o.object.name == "body")) {											// If a student
 			app.curStudent=o.object.parent.parent.name;												// Set name (body is 2 deep)
 			let stuIndex=app.students.findIndex((s)=>{ return app.curStudent == s.id });			// Get index
 			if (!(o=app.students[stuIndex]))  return;										        // Point at student

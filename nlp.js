@@ -139,13 +139,12 @@ class NLP {
 			if (!x || (x == "0"))		return 0;														// No change
 			else						return x-0;														// Return change
 		}
-
-
 	}
 
 	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
 	{
-		let i,o,d=[],res={ intent:0, text:"" };
+		let i,o,d=[];
+		let res={ intent:0, text:"", bakt:[0,0,0,0,0,1] };												// Default response
 		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
 		if (intent == "ANDYOU") {																		// Ask another student same question as before
 			student=app.curStudent;																		// Redirect to new student
