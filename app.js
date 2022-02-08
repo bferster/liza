@@ -22,7 +22,6 @@ class App  {
 		this.curTime=0;																				// Time in session in seconds
 		this.totTime=0;																				// Session time in seconds
 		this.eventTriggers=[];																		// Holds event triggers
-		this.variance=[];																			// Holds variance data
 		this.nextTrigger={id:0, time:100000, type:""};												// Next trigger to look for
 		this.curStudent="";																			// Currently active student
 		this.lastIntent="";																			// Last intent
@@ -117,6 +116,8 @@ class App  {
 					}
 				Prompt("Remember to speak clearly","on");											// Prompt
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
+				if (this.role != "Teacher")															// If a student
+					app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|ACT|"+app.role+"|nod");	// Send nod 
 				this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
 				this.inRemark=true;																	// Teacher is talking
 				this.talkTime=new Date().getTime();													// Time when talking started 
@@ -191,6 +192,8 @@ class App  {
 		let i;
 		this.trt=0;																					// At start
 		this.sessionLog=[];																			// Clear session log
+		this.trend=[0,0,0,0,0];																		// Reset variance trend
+		this.numResponses=0;																		// No responses yet
 		this.inSim=false;																			// Not in simulation
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
@@ -262,14 +265,15 @@ class App  {
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		try {
-			let o={ fidget:0, s:15, var:[], src:"assets/body2.dae" };								// Basic info
+			let o={ fidget:0, s:15, trend:[], src:"assets/body2.dae" };								// Basic info
 			o.id=d.id;																				// Name
 			o.sex=d.data.match(/sex=(.+?)\W/)[1];													// Get sex
-			o.var[0]=d.data.match(/b=(.+?)\D/)[1]-0;												// Get variant B
-			o.var[1]=d.data.match(/a=(.+?)\D/)[1]-0;														// A
-			o.var[2]=d.data.match(/k=(.+?)\D/)[1]-0;														// K
-			o.var[3]=d.data.match(/t=(.+?)\D/)[1]-0;														// T
-			o.var[4]=d.data.match(/u=(.+?)\D/)[1]-0;														// U
+			o.trend[0]=d.data.match(/b=(.+?)\D/)[1]-0;												// Get variant B
+			o.trend[1]=d.data.match(/a=(.+?)\D/)[1]-0;												// A
+			o.trend[2]=d.data.match(/k=(.+?)\D/)[1]-0;												// K
+			o.trend[3]=d.data.match(/t=(.+?)\D/)[1]-0;												// T
+			o.trend[4]=d.data.match(/u=(.+?)\D/)[1]-0;												// U
+			o.numResponses=0;																		// No responses yet
 			o.seat=d.data.match(/seat=(.+?)\D/)[1]-0;												// Get seat
 			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
 			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set skin
@@ -332,10 +336,8 @@ class App  {
 		let i;
 		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
 		let o=app.students[stuIndex];																// Point at student
+		app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-178,bakt);						// Show variance
 		if (!o)	return;																				// Quit if not a student
-		o.var=[];																					// Reset variance
-		app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt);						// Show variance
-		for (i=0;i<5;++i) o.var[i]=Math.max(Math.min(o.var[i]+bakt[i],9),0);						// Set variant *trend* B 0-9
 	}
 
 	DoAction(act, remark)																		// PERFORM STUDENT ACTION
@@ -446,6 +448,7 @@ class App  {
 		this.seqs["interrupt"]="handUp,.6,handRight,.5,handUp,.6,handRight,.5,startUp,.5,1";
 		this.seqs["write"]="write1,.6,write2,.7,write1,.8,write2,.5,write1,.7,write2,.4,write1,.8,write2,.7,startUp,1,1";
 		this.seqs["read"]="readS,1,readL,1,readR,1,readL,1,readR,1,readL,1,readR,1,readL,1,readR,1,headCenter,1,startUp,.5,1";
+		this.seqs["nod"]="headBack,.3,headUp,.2,1";
 		this.seqs["nodYes"]="headBack,.4,headDown,.3,headUp,.3,2";
 		this.seqs["nodNo"]="headLeft,.3,headRight,.3,headCenter,.3,2";
 		this.seqs["headUp"]="headUp,1";			this.seqs["headDown"]="headDown,1";			
@@ -629,11 +632,16 @@ class App  {
 			else{ 																					// Set bakt and intent for response
 				o.what="RESPONSE";  																// Set what
 				o.intent=this.lastIntent;															// Intent 
-				o.data=e[7] ? e[7] : [0,0,0,0,0,1]; 												// Data
+				o.data=e[7] ? e[7] : "0,0,0,0,0,1"; 												// Data
+				let i,s=app.students[app.students.findIndex((s)=>{ return e[4] == s.id })]; 		// Point at student
+				if (s) {																			// Valid student
+					let v=o.data.split(",");														// As an array
+					for (i=0;i<5;++i)  s.trend[i]+=v[i]-0;											// Add to counts
+					s.numResponses++;																// Add to number of responses
+					}
 				}
 			}
 		this.sessionLog.push(o);																	// Add to session log
-	}
-
+		}
 
 } // App class closure

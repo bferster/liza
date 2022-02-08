@@ -26,35 +26,48 @@ class Feedback {
 			let stuIndex=app.students.findIndex((s)=>{ return app.curStudent == s.id });			// Get index
 			if (!(o=app.students[stuIndex]))  return;										        // Point at student
 			app.voice.ShowSpeakerText(app.curStudent,o.lastResponse ? o.lastResponse : "");			// Show response text
-			app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt ? o.bakt : [0,0,0,0,0]); // Show variance
+			app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-178,o.bakt ? o.bakt : [0,0,0,0,0]); // Show variance
 			}
 	}
 
-	DrawVariance(x, y, v, wid=15)																// SHOW STUDENT VARIANCE
+	DrawVariance(x, y, v)																		// SHOW STUDENT VARIANCE
 	{
 		let i,j,c=[];
 		for (i=0;i<4;++i) {
 			if (v[i] == -1)		c[i]=1;
-			else if (v[i] == 1)	c[i]=6;
-			else if (v[i] == 2)	c[i]=14;
+			else if (v[i] == 1)	c[i]=2;
+			else if (v[i] == 2)	c[i]=6;
+			else if (v[i] == 3)	c[i]=14;
 			else 				c[i]=16;
 			}		
 		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
 		let labs=["Value","Language","Knowledge","Thinking"];
 		$("#lz-variance").remove();																	// Remove old one
-		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px"><table>`;	// Header	
+		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px">`;
+		str+="<table style='margin-bottom:8px'>";	
 		for (i=0;i<4;++i) {																			// For each row
-		str+="<tr>";																				// Start row
+			str+="<tr>";																			// Start row
 			for (j=0;j<4;++j) {																		// For each column
 				str+="<td";																			// Start column
 				if (!j)	str+=" style='border-right:1px solid #999'";								// Add border
 				str+=`><div id="vdot${i}${j}" class="lz-vardot": style="border:1px solid ${cols[i]}60`;// Add dot frame
 				if ((1<<j)&c[i] ) str+=`;background-color:${cols[i]}`;								// Color it?
-				str+=`;width:${wid}px;height:${wid}px">${(c[i] == 1) ? "-" : ""}</div></td>`;		// Finish dot
+				str+=`;width:15px;height:15px">${(c[i] == 1) ? "-" : ""}</div></td>`;		// Finish dot
 				}
 			str+=`<td style='padding-left:8px;color:${cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
 			}
-		str+=`</tr></table></div>`;
+		str+=`</tr></table>`;
+		
+		
+		v=[10,30,160,90];
+	
+		
+//		let o=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id }));			// Point at student
+		for (i=0;i<4;++i) {																			// For each factor
+			str+=`<div id="lztrend${i}" style="background-color:${cols[i]};width:${v[i]}px;height:7px"
+			title="${labs[i]} trend"></div>`;
+			}
+		str+="</div>";
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
 	}
 
@@ -68,15 +81,14 @@ class Feedback {
 		<div class='lz-feedback'>
 			<div style="width:225px;margin:16px 0 0 16px"> 
 				<select class="lz-is" id="lz-chooseStudent" style="width:160px"></select>
-				<div style="margin-top:106px"><i>View as a trend?</i> <input type="checkbox" id="lz-trendVar"></div>
-				<div class="lz-bs" style="background-color:#999;margin-top:11px; width:auto" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</div>
+				<div class="lz-bs" style="background-color:#999;margin-top:139px; width:auto" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</div>
 				</div>
 		<svg width="100%" height="100%">${this.DrawMovesGraph()}</svg>
 		</div>
 		<div id="sliderLine" class="lz-sliderline"></div>
 		<div id="sliderTime" class="lz-slidertime"></div>
 		<div id="timeSlider" class="lz-timeslider"></div>
-		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 62px);top:184px;width:18px;cursor:pointer">`;
+		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 52px);top:184px;width:18px;cursor:pointer">`;
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 
 		for (i=0;i<app.students.length;++i) 														// For each student
@@ -145,7 +157,9 @@ class Feedback {
 		let wid=$(window).width()-290;																// Size of graph
 		clearInterval(this.interval);																// Clear timer
 		const getPixFromTime=(time)=>{ return time*1000/this.maxTime*(wid-67)+62; };				// CONVERT TIME TO PIXELS
-
+		let n=Math.floor(this.maxTime/1000);														// Unber of minues
+		for (i=1;i<n;++i) 																			// For each grid line
+			str+=`<text y="200" x="${getPixFromTime(i*60)}" font-size="12" fill="#999">${i} min</text>`; // Draw minutes					
 		for (i=0;i<5;++i) {																			// For each grid line
 			str+=`<text x="0" y="${y+4}" fill="#999">${this.intentLabels[5-i]}</text>						
 			<line x1="59" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:1"/>
@@ -298,7 +312,7 @@ class ResponsePanel  {
 		$("[id^=lztab-]").on("click", (e)=> { 														// ON TAB CLICK
 			this.curTab=e.target.id.substr(6);														// Get id
 			$("[id^=lztab-]").css({"font-weight":"200","color":"#666","border-bottom":"1px solid #999"});	// Revert
-			$("#lztab-"+id).css({"font-weight":"700","color":"#333","border-bottom":"none"});		// Highlight
+			$("#lztab-"+this.curTab).css({"font-weight":"700","color":"#333","border-bottom":"none"});		// Highlight
 			fillList(this.curTab);																	// Fill list
 			});
 		
