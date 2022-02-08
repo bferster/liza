@@ -106,8 +106,11 @@ class App  {
 			});	
 		$(window).on("keydown", (e) => {															// HANDLE KEY DOWN
 			if (e.which == 32) {																	// Spacebar
-				if (e.target.type == "text")	return true;										// If in a text input, quit
-				if (e.originalEvent.repeat)		return false;										// Only 1st one
+				if (e.target.type == "text") {														// If in a text input
+					if (e.originalEvent.repeat)	{ $("#talkInput").blur(); return false; }			// Only 1st one and blur talkinput
+					return true;													
+					}
+				if (e.originalEvent.repeat)	  return false; 										// Only 1st one
 				if (!this.inSim && (this.role == "Teacher")) {										// If a teacher not in a session
 					PopUp("Please START the session to talk to the class"); 						// Prompt
 					return;																			// Quit

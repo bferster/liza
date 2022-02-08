@@ -227,14 +227,15 @@ class NLP {
 
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
-		if (app.df.id) 
+		if (msg && msg.length < 2)	return;																// Too small
+		if (app.df.id) 																					// If using Dialogflow
 			app.ws.send(app.sessionId+"|DIALOGFLOW|ADMIN|INFER|"+app.df.id+"|"+app.df.email+"|"+app.df.key+"|"+msg);  	// Ask for inference
-		else{
-			fetch(this.AIhost+":5005/model/parse", {														// Fetch data
-				method:"POST",																				// POST
-				body: JSON.stringify({text:msg})															// Payload	
+		else{																							// Use Rasa
+			fetch(this.AIhost+":5005/model/parse", {													// Fetch data
+				method:"POST",																			// POST
+				body: JSON.stringify({text:msg})														// Payload	
 				})
-			.then(res => res.json()).then(res =>{ callback(res); })											// Return respons in callback
+			.then(res => res.json()).then(res =>{ callback(res); })										// Return respons in callback
 			}
 	}
 
