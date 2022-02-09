@@ -26,25 +26,28 @@ class Feedback {
 			let stuIndex=app.students.findIndex((s)=>{ return app.curStudent == s.id });			// Get index
 			if (!(o=app.students[stuIndex]))  return;										        // Point at student
 			app.voice.ShowSpeakerText(app.curStudent,o.lastResponse ? o.lastResponse : "");			// Show response text
-			app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-178,o.bakt ? o.bakt : [0,0,0,0,0]); // Show variance
+			if (!$("#lz-feedbar").length)															// Not if timeline up
+				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt ? o.bakt : [0,0,0,0,0]); // Show variance
+			else app.fb.Draw();																		// Change student otherwise
+
 			}
 	}
 
-	DrawVariance(x, y, v)																		// SHOW STUDENT VARIANCE
+	DrawVariance(x, y, v, time=1000000)															// SHOW STUDENT VARIANCE
 	{
 		let i,j,c=[];
-		for (i=0;i<4;++i) {
-			if (v[i] == -1)		c[i]=1;
-			else if (v[i] == 1)	c[i]=2;
-			else if (v[i] == 2)	c[i]=6;
-			else if (v[i] == 3)	c[i]=14;
-			else 				c[i]=16;
+		for (i=0;i<4;++i) {																			// For each factor
+			if (v[i] == -1)		c[i]=1;																// Set bit,ap to 1st
+			else if (v[i] == 1)	c[i]=2;																// 2nd
+			else if (v[i] == 2)	c[i]=6;																// 2nd & 3rd
+			else if (v[i] == 3)	c[i]=14;															// 2nd, 3rd & 4th
+			else 				c[i]=16;															// None
 			}		
 		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
 		let labs=["Value","Language","Knowledge","Thinking"];
 		$("#lz-variance").remove();																	// Remove old one
 		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px">`;
-		str+="<table style='margin-bottom:8px'>";	
+		str+="<table style='margin-bottom:10px'>";	
 		for (i=0;i<4;++i) {																			// For each row
 			str+="<tr>";																			// Start row
 			for (j=0;j<4;++j) {																		// For each column
@@ -52,20 +55,27 @@ class Feedback {
 				if (!j)	str+=" style='border-right:1px solid #999'";								// Add border
 				str+=`><div id="vdot${i}${j}" class="lz-vardot": style="border:1px solid ${cols[i]}60`;// Add dot frame
 				if ((1<<j)&c[i] ) str+=`;background-color:${cols[i]}`;								// Color it?
-				str+=`;width:15px;height:15px">${(c[i] == 1) ? "-" : ""}</div></td>`;		// Finish dot
+				str+=`;width:15px;height:15px">${(c[i] == 1) ? "-" : ""}</div></td>`;				// Finish dot
 				}
 			str+=`<td style='padding-left:8px;color:${cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
 			}
 		str+=`</tr></table>`;
-		
-		
-		v=[10,30,160,90];
+
+		trace(time)
+		v=[10,30,150,90]; //0-150
 	
 		
 //		let o=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id }));			// Point at student
-		for (i=0;i<4;++i) {																			// For each factor
-			str+=`<div id="lztrend${i}" style="background-color:${cols[i]};width:${v[i]}px;height:7px"
-			title="${labs[i]} trend"></div>`;
+	
+		if (x < 200) {																				// In timeline	
+			for (i=0;i<4;++i) {																		// For each factor
+				str+=`<div style="height:13px;color:#fff;font-size:9px;margin:0 0 1px 2px">
+				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${cols[i]};
+				width:13px;height:12px;margin-right:5px;vertical-align:2px;padding:1px;">${labs[i].charAt(0)}</div>
+				<div id="lztrend${i}" style="display:inline-block;background-color:${cols[i]};width:${v[i]}px;height:11px;
+				border-radius:0 16px 16px 0"
+				title="${labs[i]} trend"></div></div>`;
+				}
 			}
 		str+="</div>";
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
@@ -81,9 +91,8 @@ class Feedback {
 		<div class='lz-feedback'>
 			<div style="width:225px;margin:16px 0 0 16px"> 
 				<select class="lz-is" id="lz-chooseStudent" style="width:160px"></select>
-				<div class="lz-bs" style="background-color:#999;margin-top:139px; width:auto" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</div>
 				</div>
-		<svg width="100%" height="100%">${this.DrawMovesGraph()}</svg>
+		<svg id="lz-fbsvg" width="100%" height="100%">${this.DrawMovesGraph()}</svg>
 		</div>
 		<div id="sliderLine" class="lz-sliderline"></div>
 		<div id="sliderTime" class="lz-slidertime"></div>
@@ -91,11 +100,12 @@ class Feedback {
 		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 52px);top:184px;width:18px;cursor:pointer">`;
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 
+//		<div class="lz-bs" style="background-color:#999;margin-top:139px; width:auto" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</div>
 		for (i=0;i<app.students.length;++i) 														// For each student
 			$("#lz-chooseStudent").append(`<option>${app.students[i].id}</option`);					// Add to choser
 		$("#lz-chooseStudent").val(app.curStudent);													// Point at current student	
 		o=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 			// Point at student data
-		app.fb.DrawVariance(27,window.innerHeight-190,o.bakt ? o.bakt :[0,0,0,0,0]);				// Show variance
+		app.fb.DrawVariance(27,window.innerHeight-193,o.bakt ? o.bakt :[0,0,0,0,0],this.curTime);	// Show variance at curtime
 		if (isMobile) $("#lz-feedbar").css("top",window.innerHeight-256+"px");						// IOS issue
 		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
 	
@@ -115,11 +125,12 @@ class Feedback {
 			});
 		$("[id^=lzDot-]").on("mouseout",(e)=>{ 	$("#lz-dlg").remove(); });							// Clear chat if out
 	
-		$("[id^=lzDot-]").on("click",(e)=>{ 														// CLICK ON DOT TO SPEAK
+		$("[id^=lzDot-]").on("click",(e)=>{ 														// CLICK ON DOT 
 			let id=e.target.id.substr(6);															// Get id
 			let o=app.sessionLog[id];																// Point at dot
-			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-190,o.data ? o.data.split(",") : [0,0,0,0,0]); // Show variance
-			});
+			this.ShowNow(o.time*1000);																// Go there	in msec
+			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data.split(",") : [0,0,0,0,0],this.curTime); // Show variance
+		});
 
 		$("#lz-chooseStudent").change(()=> {														// ON CHANGE STUDENT
 			 app.curStudent=$("#lz-chooseStudent").val(); 											// Set new student
@@ -138,7 +149,7 @@ class Feedback {
 		   	});
 	}
 	
-	ShowNow(time) 																				// SHOW CURRENT TIME
+	ShowNow(time) 																				// SHOW CURRENT TIME (USES MSECS)
 	{	
 		this.curTime=time;																			// Set current position in session
 		let min=Math.floor(time/60000);																// Mins
@@ -229,7 +240,7 @@ class Feedback {
 							let o=app.sessionLog[move];													// Point at event
 							app.voice.Talk(o.text,(o.from == "Teacher") ? "Teacher" : o.from);			// Speak
 							if (o.what == "RESPONSE")													// If a response
-								app.fb.DrawVariance(27,window.innerHeight-190,o.data ? o.data.split(",") : [0,0,0,0,0]);// Show variance
+								app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data.split(",") : [0,0,0,0,0],this.curTime);// Show variance
 							this.curMove=move;															// Set current move
 							}
 						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there

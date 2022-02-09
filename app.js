@@ -336,7 +336,8 @@ class App  {
 		let i;
 		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
 		let o=app.students[stuIndex];																// Point at student
-		app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-178,bakt);						// Show variance
+		if ($("#lz-feedbar").length) app.fb.Draw();													// If timeline up, show new dot
+		else	app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt);				// Show variance
 		if (!o)	return;																				// Quit if not a student
 	}
 
