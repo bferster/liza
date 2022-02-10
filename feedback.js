@@ -61,18 +61,25 @@ class Feedback {
 			}
 		str+=`</tr></table>`;
 
-		trace(time)
-		v=[10,30,150,90]; //0-150
-	
-		
-//		let o=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id }));			// Point at student
-	
-		if (x < 200) {																				// In timeline	
+		let s=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 		// Point at student data
+		if ((x < 200) && s) {																		// In timeline	
+			v=s.base.slice();																		// Get baseline student variance
+			let o,k=1;																				// Reset count
+			for (j=0;j<app.sessionLog.length;++j) {													// For each event
+				o=app.sessionLog[j];																// Point at it
+				if (o.time*1000 > this.curTime) break;												// Only up to time
+				if ((o.what == "RESPONSE") && (app.curStudent == o.from)) {							// If a response from this student
+					v[0]+=o.data[0]-0; 	v[1]+=o.data[1]-0;											// Sum B and As
+					v[2]+=o.data[2]-0; 	v[3]+=o.data[3]-0;											// K and Ts
+					k++;																			// Add to count																
+					}
+				}
+			v[0]/=k;	v[1]/=k;	v[2]/=k;	v[3]/=k;											// Calc bar means
 			for (i=0;i<4;++i) {																		// For each factor
 				str+=`<div style="height:13px;color:#fff;font-size:9px;margin:0 0 1px 2px">
 				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${cols[i]};
 				width:13px;height:12px;margin-right:5px;vertical-align:2px;padding:1px;">${labs[i].charAt(0)}</div>
-				<div id="lztrend${i}" style="display:inline-block;background-color:${cols[i]};width:${v[i]}px;height:11px;
+				<div id="lztrend${i}" style="display:inline-block;background-color:${cols[i]};width:${Math.min(150,v[i]*50)}px;height:11px;
 				border-radius:0 16px 16px 0"
 				title="${labs[i]} trend"></div></div>`;
 				}
@@ -129,7 +136,7 @@ class Feedback {
 			let id=e.target.id.substr(6);															// Get id
 			let o=app.sessionLog[id];																// Point at dot
 			this.ShowNow(o.time*1000);																// Go there	in msec
-			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data.split(",") : [0,0,0,0,0],this.curTime); // Show variance
+			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0],this.curTime); // Show variance
 		});
 
 		$("#lz-chooseStudent").change(()=> {														// ON CHANGE STUDENT
@@ -145,12 +152,14 @@ class Feedback {
 		   	slide:(event,ui)=>{																		// On slide
 				if ($("#playerButton").prop("src").match(/pausebut/)) this.Play();					// Stop playing, if playing
 			   	this.ShowNow(ui.value);																// Show time																	
-				}
+
+			}
 		   	});
 	}
 	
 	ShowNow(time) 																				// SHOW CURRENT TIME (USES MSECS)
 	{	
+		let i,d=null;
 		this.curTime=time;																			// Set current position in session
 		let min=Math.floor(time/60000);																// Mins
 		let sec=Math.floor(time/1000)%60;															// Secs
@@ -160,7 +169,12 @@ class Feedback {
 		$("#sliderTime").html(min+":"+sec);															// Show value
 		$("#sliderLine").css("left",x+2+"px")														// Position line
 		$("#sliderTime").css("left",x-9+"px")														// Position text
-	}
+		for (i=0;i<app.sessionLog.length;i++) {														// For each event
+			if (app.sessionLog[i].what != "RESPONSE") 	continue;									// Only responses
+			if (app.sessionLog[i].time*1000 >= time)	{ d=app.sessionLog[i].data; break; }		// Past now
+			}
+		app.fb.DrawVariance(27,window.innerHeight-193,d ? d : [0,0,0,0,0],this.curTime);			// Show variance
+		}
 
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
 	{
@@ -240,7 +254,7 @@ class Feedback {
 							let o=app.sessionLog[move];													// Point at event
 							app.voice.Talk(o.text,(o.from == "Teacher") ? "Teacher" : o.from);			// Speak
 							if (o.what == "RESPONSE")													// If a response
-								app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data.split(",") : [0,0,0,0,0],this.curTime);// Show variance
+								app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0],this.curTime);// Show variance
 							this.curMove=move;															// Set current move
 							}
 						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there

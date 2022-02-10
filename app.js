@@ -33,7 +33,6 @@ class App  {
 		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
-		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.multi=window.location.search.match(/role=/i) ? true : false;							// Multi-player mode
 		
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
@@ -192,11 +191,8 @@ class App  {
 		let i;
 		this.trt=0;																					// At start
 		this.sessionLog=[];																			// Clear session log
-		this.trend=[0,0,0,0,0];																		// Reset variance trend
-		this.numResponses=0;																		// No responses yet
 		this.inSim=false;																			// Not in simulation
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
-		this.remarkLevels=[0,0,0,0,0];																// Remarks per level
 		this.curStudent=app.students[0].id;															// Pick first student
 		this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);								// Set right side
 		this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);								// Left 
@@ -249,7 +245,11 @@ class App  {
 				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|PROMPT|"+s); 	// Send prompt	
 				}
 			else if (v[i].match(/end:/i)) {															// END
-				s=this.remarkLevels.indexOf(Math.max(...this.remarkLevels));						// Get remark levels
+				let i,remarkLevels=[0,0,0,0,0];														// Remarks per level
+				for (i=0;i<this.sessionLog.length;++i)												// For each event
+					if (this.sessionLog[i].what == "REMARK")										// If a remark
+						remarkLevels[Math.floor(this.sessionLog[i].intent/100)-1]++;				// Add remark level	
+				s=remarkLevels.indexOf(Math.max(...remarkLevels));									// Get max remark level
 				s=app.nlp.GetResponse("",student,710+s*10);											// Get response from intent
 				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
 				}
@@ -265,15 +265,14 @@ class App  {
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		try {
-			let o={ fidget:0, s:15, trend:[], src:"assets/body2.dae" };								// Basic info
+			let o={ fidget:0, s:15, base:[], src:"assets/body2.dae" };								// Basic info
 			o.id=d.id;																				// Name
 			o.sex=d.data.match(/sex=(.+?)\W/)[1];													// Get sex
-			o.trend[0]=d.data.match(/b=(.+?)\D/)[1]-0;												// Get variant B
-			o.trend[1]=d.data.match(/a=(.+?)\D/)[1]-0;												// A
-			o.trend[2]=d.data.match(/k=(.+?)\D/)[1]-0;												// K
-			o.trend[3]=d.data.match(/t=(.+?)\D/)[1]-0;												// T
-			o.trend[4]=d.data.match(/u=(.+?)\D/)[1]-0;												// U
-			o.numResponses=0;																		// No responses yet
+			o.base[0]=d.data.match(/,b=(.+?)\D/)[1]-0;												// Get variant B
+			o.base[1]=d.data.match(/,a=(.+?)\D/)[1]-0;												// A
+			o.base[2]=d.data.match(/,k=(.+?)\D/)[1]-0;												// K
+			o.base[3]=d.data.match(/,t=(.+?)\D/)[1]-0;												// T
+			o.base[4]=d.data.match(/,u=(.+?)\D/)[1]-0;												// U
 			o.seat=d.data.match(/seat=(.+?)\D/)[1]-0;												// Get seat
 			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
 			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set skin
@@ -322,7 +321,6 @@ class App  {
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
-		this.remarkLevels[Math.floor(intent/100)-1]++;												// Add remark levels	
 		let res={ text:"", intent:0, bakt:[0,0,0,0,0]};												// Clear res
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
@@ -633,13 +631,7 @@ class App  {
 			else{ 																					// Set bakt and intent for response
 				o.what="RESPONSE";  																// Set what
 				o.intent=this.lastIntent;															// Intent 
-				o.data=e[7] ? e[7] : "0,0,0,0,0,1"; 												// Data
-				let i,s=app.students[app.students.findIndex((s)=>{ return e[4] == s.id })]; 		// Point at student
-				if (s) {																			// Valid student
-					let v=o.data.split(",");														// As an array
-					for (i=0;i<5;++i)  s.trend[i]+=v[i]-0;											// Add to counts
-					s.numResponses++;																// Add to number of responses
-					}
+				o.data=(e[7] ? e[7] : "0,0,0,0,0,1").split(",");									// Data as an array
 				}
 			}
 		this.sessionLog.push(o);																	// Add to session log
