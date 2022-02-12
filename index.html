@@ -34,7 +34,7 @@
 		.lz-controller {	position: fixed; top: calc(100% - 39px); left:0; background-color: #aaa; border: 1px solid #999;
 							padding:6px 12px; width: calc(100% - 24px); height:25px; display:none; user-select:none;
 							}
-		.lz-feedbackbar {	position: fixed; top: calc(100% - 64px); left:0; width:calc(100% - 16px); text-align:right;user-select:none;
+		.lz-feedbackprompt{	position: fixed; top: calc(100% - 64px); left:0; width:calc(100% - 16px); text-align:right;user-select:none;
 							}
 		.lz-dialog {		position: absolute; top:16px; left:16px; background-color: #eee; border: 1px solid #aaa;
 							padding:16px; border-radius: 16px; width: 600px;
@@ -86,10 +86,10 @@
 		.lz-playerslider{ 	background:#ccc; height:1px; width:80px; border:none; display:inline-block;
 							margin-left:6px;
 							}
-		.lz-feedbar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(var(--maxvh) - 256px); user-select:none;
+		.lz-timelinebar { 	position:absolute;color:#999; width:100%; left:0px; top:calc(var(--maxvh) - 256px); user-select:none;
 							background-color:#aaa; height:218px;  
 							}
-		.lz-feedback { 		display:flex; flex-direction: row; width:calc(100% - 16px); height:208px; margin: 8px; 
+		.lz-timelineback { 	display:flex; flex-direction: row; width:calc(100% - 16px); height:208px; margin: 8px; 
 							background-color:#fff; border-radius:5px; color:#333; 
 							}
 		.lz-chartbar { 		height:16px; background-color:#86d698; 
@@ -149,13 +149,13 @@
 		<input id="talkInput" type="text" class="lz-is" style="margin-left:6px;vertical-align:8px" placeholder="Type remark">
 		<span id="promptSpan" style="margin-left:16px;color:#333;vertical-align:8px">CLICK START TO BEGIN SESSION</span>
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
-		<img id="adviceBut" src="img/feedback.png" title="Feedback" style="cursor:pointer;margin-right:16px;float:right">
-		<img id="feedbackBut" src="img/graphbut.png" title="Timeline" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="feedbackBut" src="img/feedback.png" title="Feedback" style="cursor:pointer;margin-right:16px;float:right">
+		<img id="timelineBut" src="img/graphbut.png" title="Timeline" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="writeBut" src="img/drawbut.gif" title="Blackboard" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="resourceBut" src="img/scriptbut.gif" title="View teacher resources" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="videoBut" src="img/zoom.png" title="Video chat" style="cursor:pointer;margin-right:16px;float:right">
 	</div>
-	<div id="feedbackDiv" class="lz-feedbackbar"></div>
+	<div id="feedbackDiv" class="lz-feedbackprompt"></div>
 	<div id='blackboardDiv' class='lz-blackboard'>
 		<br><img id="BB-DrawBut" src="img/line-icon.png" style="cursor:pointer;margin-bottom:12px;margin-top:-12px" title="Draw"><br>
 		<img id="BB-EraseBut" src="img/eraser-icon.png" style="cursor:pointer;margin-bottom:12px" title="Erase"><br>

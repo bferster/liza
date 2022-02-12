@@ -52,7 +52,7 @@ class App  {
 		this.Draw();																				// Start 
 
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
-		$("#feedbackBut").on("click", ()=> { this.fb.Draw(); });									// ON FEEDBACK
+		$("#timelineBut").on("click", ()=> { this.fb.Draw(); });									// ON FEEDBACK
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			if (this.role != "Teacher") return;														// Only for teacher
@@ -61,20 +61,14 @@ class App  {
 			if (this.inSim) 			this.trt+=(now-this.startTime)/1000;						// If in sim already, add to trt
 			else						this.startTime=now;											// Not in sim, set start				
 			this.inSim=!this.inSim;																	// Toggle sim flag
-			if (this.inSim) 			this.voice.Listen()											// Turn on speech recognition
-			else 						this.voice.StopListening();									// Off						
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim);  		// Send sim status
-			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
-			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
-			Prompt(this.inSim ? "PRESS AND HOLD SPACEBAR TO TALK" : "CLICK START TO RESUME SESSION","on");	 // Directions
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim);  // Send sim status
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
 			if (this.role != "Teacher") return;														// Only for teacher
 			this.inSim=false;																		// Toggle sim flag
 			$("#startBut").html("START");															// Set label					
 			$("#startBut").css("background-color", "#27ae60");										// Set color						
-			this.voice.StopListening();																// STT off						
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
 					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|RESTART");  	// Send sim status
@@ -83,7 +77,7 @@ class App  {
 				});									
 			});	
 		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
-			$("#lz-feedbar").remove();																// Remove feedback panel
+			$("#lz-timelinebar").remove();																// Remove feedback panel
 			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
 			$("#blackboardDiv").css("top",h+"px");													// Set top
 			$("#blackboardDiv").css("display") == "none" ? 1 : 0;									// Hide or show
@@ -113,6 +107,7 @@ class App  {
 					PopUp("Please START the session to talk to the class"); 						// Prompt
 					return;																			// Quit
 					}
+				this.voice.Listen()																	// Turn on speech recognition
 				Prompt("Remember to speak clearly","on");											// Prompt
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
 				if (this.role != "Teacher")															// If a student
@@ -121,7 +116,7 @@ class App  {
 				this.inRemark=true;																	// Teacher is talking
 				this.talkTime=new Date().getTime();													// Time when talking started 
 				this.said="";																		// Clear spoken cache
-			}
+				}
 			});
 		$(window).on("keyup", (e)=> {																// HANDLE KEY UP
 			if (e.which == 32) {																	// Spacebar
@@ -131,6 +126,7 @@ class App  {
 					Prompt(this.said,3); 															// Show text 
 					app.OnPhrase(this.said);														// React to remark
 					app.said=""; 																	// Clear cache
+					this.voice.StopListening();														// STT off						
 					},1000); 																		// Wait a second
 				this.inRemark=false;																// Teacher is not talking
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
@@ -334,7 +330,7 @@ class App  {
 		let i;
 		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
 		let o=app.students[stuIndex];																// Point at student
-		if ($("#lz-feedbar").length) app.fb.Draw();													// If timeline up, show new dot
+		if ($("#lz-timelinebar").length) app.fb.Draw();												// If timeline up, show new dot
 		else	app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt);				// Show variance
 		if (!o)	return;																				// Quit if not a student
 	}
@@ -606,11 +602,7 @@ class App  {
 			let now=new Date().getTime();															// Get now
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else			this.startTime=now;														// Reset start
-			this.inSim=v[4] == "true";																// Set flag
-			if (this.role != "Teacher")	{															// If a non-teacher
-				if (this.inSim)	 this.voice.Listen();												// Turn on speech recognition
-				else			 this.voice.StopListening();											// Turn off
-				}
+			this.inSim=(v[4] == "true");																// Set flag
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
 			}  

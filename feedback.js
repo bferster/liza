@@ -26,7 +26,7 @@ class Feedback {
 			let stuIndex=app.students.findIndex((s)=>{ return app.curStudent == s.id });			// Get index
 			if (!(o=app.students[stuIndex]))  return;										        // Point at student
 			app.voice.ShowSpeakerText(app.curStudent,o.lastResponse ? o.lastResponse : "");			// Show response text
-			if (!$("#lz-feedbar").length)															// Not if timeline up
+			if (!$("#lz-timelinebar").length)															// Not if timeline up
 				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt ? o.bakt : [0,0,0,0,0]); // Show variance
 			else app.fb.Draw();																		// Change student otherwise
 
@@ -79,7 +79,7 @@ class Feedback {
 				str+=`<div style="height:13px;color:#fff;font-size:9px;margin:0 0 1px 2px">
 				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${cols[i]};
 				width:13px;height:12px;margin-right:5px;vertical-align:2px;padding:1px;">${labs[i].charAt(0)}</div>
-				<div id="lztrend${i}" style="display:inline-block;background-color:${cols[i]};width:${Math.min(150,v[i]*50)}px;height:11px;
+				<div id="lztrend${i}" style="display:inline-block;background-color:${cols[i]};width:${Math.max(0,Math.min(150,v[i]*50))}px;height:11px;
 				border-radius:0 16px 16px 0"
 				title="${labs[i]} trend"></div></div>`;
 				}
@@ -92,10 +92,10 @@ class Feedback {
 	{
 		let i,o;
 		this.maxTime=app.totTime*1000;																// Get TRT in msecs
-		$("#lz-feedbar").remove();																	// Remove old one
-		var str=`<div id="lz-feedbar" class="lz-feedbar"> 
-		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-feedbar").remove();clearInterval(app.fb.interval);$("#lz-variance").remove();'>
-		<div class='lz-feedback'>
+		$("#lz-timelinebar").remove();																	// Remove old one
+		var str=`<div id="lz-timelinebar" class="lz-timelinebar"> 
+		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-timelinebar").remove();clearInterval(app.fb.interval);$("#lz-variance").remove();'>
+		<div class='lz-timelineback'>
 			<div style="width:225px;margin:16px 0 0 16px"> 
 				<select class="lz-is" id="lz-chooseStudent" style="width:160px"></select>
 				</div>
@@ -112,9 +112,9 @@ class Feedback {
 			$("#lz-chooseStudent").append(`<option>${app.students[i].id}</option`);					// Add to choser
 		$("#lz-chooseStudent").val(app.curStudent);													// Point at current student	
 		o=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 			// Point at student data
-		app.fb.DrawVariance(27,window.innerHeight-193,o.bakt ? o.bakt :[0,0,0,0,0],this.curTime);	// Show variance at curtime
-		if (isMobile) $("#lz-feedbar").css("top",window.innerHeight-256+"px");						// IOS issue
-		$("#lz-feedbar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );		// Don't move orbiter
+		app.fb.DrawVariance(27,window.innerHeight-193,(o && o.bakt) ? o.bakt :[0,0,0,0,0],this.curTime);	// Show variance at curtime
+		if (isMobile) $("#lz-timelinebar").css("top",window.innerHeight-256+"px");					// IOS issue
+		$("#lz-timelinebar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 	
 		$("[id^=lzDot-]").on("mouseover",(e)=>{ 													// Show chat if over
 			let col;
