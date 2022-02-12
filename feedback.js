@@ -26,14 +26,13 @@ class Feedback {
 			let stuIndex=app.students.findIndex((s)=>{ return app.curStudent == s.id });			// Get index
 			if (!(o=app.students[stuIndex]))  return;										        // Point at student
 			app.voice.ShowSpeakerText(app.curStudent,o.lastResponse ? o.lastResponse : "");			// Show response text
-			if (!$("#lz-timelinebar").length)															// Not if timeline up
+			if (!$("#lz-timelinebar").length)														// Not if timeline up
 				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt ? o.bakt : [0,0,0,0,0]); // Show variance
 			else app.fb.Draw();																		// Change student otherwise
-
 			}
 	}
 
-	DrawVariance(x, y, v, time=1000000)															// SHOW STUDENT VARIANCE
+	DrawVariance(x, y, v, time)																	// SHOW STUDENT VARIANCE
 	{
 		let i,j,c=[];
 		for (i=0;i<4;++i) {																			// For each factor
@@ -64,17 +63,21 @@ class Feedback {
 		let s=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 		// Point at student data
 		if ((x < 200) && s) {																		// In timeline	
 			v=s.base.slice();																		// Get baseline student variance
-			let o,k=1;																				// Reset count
+			let o,counts=[1,1,1,1,1];																// Reset count
 			for (j=0;j<app.sessionLog.length;++j) {													// For each event
 				o=app.sessionLog[j];																// Point at it
-				if (o.time*1000 > this.curTime) break;												// Only up to time
-				if ((o.what == "RESPONSE") && (app.curStudent == o.from)) {							// If a response from this student
+				if (o.what != "RESPONSE")	continue;												// Only responses
+				if (o.time > time) 			break;													// Only up to time
+				if (app.curStudent == o.from) {														// If from this student
 					v[0]+=o.data[0]-0; 	v[1]+=o.data[1]-0;											// Sum B and As
 					v[2]+=o.data[2]-0; 	v[3]+=o.data[3]-0;											// K and Ts
-					k++;																			// Add to count																
+					if (o.data[0]) counts[0]++;														// Increase count for B																		
+					if (o.data[1]) counts[1]++;														// A																
+					if (o.data[2]) counts[2]++;														// K																		
+					if (o.data[3]) counts[3]++;														// T																		
 					}
 				}
-			v[0]/=k;	v[1]/=k;	v[2]/=k;	v[3]/=k;											// Calc bar means
+			v[0]/=counts[0];	v[1]/=counts[1];	v[2]/=counts[2];	v[3]/=counts[3];			// Calc bar means
 			for (i=0;i<4;++i) {																		// For each factor
 				str+=`<div style="height:13px;color:#fff;font-size:9px;margin:0 0 1px 2px">
 				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${cols[i]};
@@ -88,11 +91,12 @@ class Feedback {
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
 	}
 
-	Draw()																						// DRAW FEEDBACK PANEL
+	Draw(time)																						// DRAW FEEDBACK PANEL
 	{
-		let i,o;
+		let i;
 		this.maxTime=app.totTime*1000;																// Get TRT in msecs
-		$("#lz-timelinebar").remove();																	// Remove old one
+		this.curTime=(time != undefined) ? time*1000 : this.curTime;								// Set time
+		$("#lz-timelinebar").remove();																// Remove old one
 		var str=`<div id="lz-timelinebar" class="lz-timelinebar"> 
 		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-timelinebar").remove();clearInterval(app.fb.interval);$("#lz-variance").remove();'>
 		<div class='lz-timelineback'>
@@ -107,12 +111,9 @@ class Feedback {
 		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 52px);top:184px;width:18px;cursor:pointer">`;
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 
-//		<div class="lz-bs" style="background-color:#999;margin-top:139px; width:auto" id="lz-v${app.curStudent}" onclick="app.fb.ShowText()">View ${app.curStudent}'s text</div>
 		for (i=0;i<app.students.length;++i) 														// For each student
 			$("#lz-chooseStudent").append(`<option>${app.students[i].id}</option`);					// Add to choser
 		$("#lz-chooseStudent").val(app.curStudent);													// Point at current student	
-		o=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 			// Point at student data
-		app.fb.DrawVariance(27,window.innerHeight-193,(o && o.bakt) ? o.bakt :[0,0,0,0,0],this.curTime);	// Show variance at curtime
 		if (isMobile) $("#lz-timelinebar").css("top",window.innerHeight-256+"px");					// IOS issue
 		$("#lz-timelinebar").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 	
@@ -136,8 +137,7 @@ class Feedback {
 			let id=e.target.id.substr(6);															// Get id
 			let o=app.sessionLog[id];																// Point at dot
 			this.ShowNow(o.time*1000);																// Go there	in msec
-			if (o.what == "RESPONSE")app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0],this.curTime); // Show variance
-		});
+			});
 
 		$("#lz-chooseStudent").change(()=> {														// ON CHANGE STUDENT
 			 app.curStudent=$("#lz-chooseStudent").val(); 											// Set new student
@@ -161,19 +161,20 @@ class Feedback {
 	{	
 		let i,d=null;
 		this.curTime=time;																			// Set current position in session
+		time=Math.floor(time/1000);																	// In seconds
 		let min=Math.floor(time/60000);																// Mins
 		let sec=Math.floor(time/1000)%60;															// Secs
 		if (sec < 10) sec="0"+sec;																	// Add leading 0
-		$("#timeSlider").slider("option","value",time);												// Trigger slider
+		$("#timeSlider").slider("option","value",this.curTime);										// Trigger slider
 		let x=$($("#timeSlider").children('.ui-slider-handle')).offset().left;						// Get pos       		
 		$("#sliderTime").html(min+":"+sec);															// Show value
 		$("#sliderLine").css("left",x+2+"px")														// Position line
 		$("#sliderTime").css("left",x-9+"px")														// Position text
 		for (i=0;i<app.sessionLog.length;i++) {														// For each event
-			if (app.sessionLog[i].what != "RESPONSE") 	continue;									// Only responses
-			if (app.sessionLog[i].time*1000 >= time)	{ d=app.sessionLog[i].data; break; }		// Past now
+			if (app.sessionLog[i].what != "RESPONSE")	continue;									// Only responses
+			if (app.sessionLog[i].time >= time) 			{ d=app.sessionLog[i].data; break; }	// Past now
 			}
-		app.fb.DrawVariance(27,window.innerHeight-193,d ? d : [0,0,0,0,0],this.curTime);			// Show variance
+		app.fb.DrawVariance(27,window.innerHeight-193,d ? d : [0,0,0,0,0],time);					// Show variance
 		}
 
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
@@ -254,7 +255,7 @@ class Feedback {
 							let o=app.sessionLog[move];													// Point at event
 							app.voice.Talk(o.text,(o.from == "Teacher") ? "Teacher" : o.from);			// Speak
 							if (o.what == "RESPONSE")													// If a response
-								app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0],this.curTime);// Show variance
+								app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0],this.curTime/1000);// Show variance
 							this.curMove=move;															// Set current move
 							}
 						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there

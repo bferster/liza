@@ -327,11 +327,10 @@ class App  {
 
 	UpdateVariance(student, bakt)																// UPDATE STUDENT VARIANCE FROM RESPONSE
 	{
-		let i;
 		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
 		let o=app.students[stuIndex];																// Point at student
-		if ($("#lz-timelinebar").length) app.fb.Draw();												// If timeline up, show new dot
-		else	app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt);				// Show variance
+		if ($("#lz-timelinebar").length) app.fb.Draw(this.curTime);									// If timeline up, show new dot and variance
+		else app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt,this.curTime);	// Show variance
 		if (!o)	return;																				// Quit if not a student
 	}
 
