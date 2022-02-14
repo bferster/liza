@@ -361,16 +361,10 @@ var isMobile=false;																					// Flag for mobile devices
 
 	function Prompt(msg, secs)																		// TIMED PROMPT
 	{
-		var str="";
 		$("#promptSpan").html(msg);																		// Add message
-		if (secs == "on") 																				// If always on	
-			$("#promptSpan").fadeIn(200);																// Fade in
-		else{																							// Popping up	
-			$("#promptSpan").fadeIn(500).delay(secs ? secs*1000 : 5000)									// Animate in
-				.fadeOut(500,()=>{ $("#promptSpan").html("PRESS AND HOLD SPACEBAR TO TALK") })			// Fade out
-				.fadeIn(500); 																			// Fade in directions		
-			}
-	}
+		if (secs == "on") 	$("#promptSpan").fadeIn(200);												// If always on,fade in
+		else				$("#promptSpan").fadeIn(200).delay(secs ? secs*1000 : 5000).fadeOut(500);	// Animate in and out
+		}
 
 	function trace(msg, p1, p2, p3, p4)																// CONSOLE 
 	{

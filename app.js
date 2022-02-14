@@ -63,7 +63,8 @@ class App  {
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim);  // Send sim status
-			});									
+			Prompt("PRESS SPACEBAR TO TALK","on");	 												// Directions
+		});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
 			if (this.role != "Teacher") return;														// Only for teacher
 			this.inSim=false;																		// Toggle sim flag
@@ -77,7 +78,7 @@ class App  {
 				});									
 			});	
 		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
-			$("#lz-timelinebar").remove();																// Remove feedback panel
+			$("#lz-timelinebar").remove();															// Remove feedback panel
 			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
 			$("#blackboardDiv").css("top",h+"px");													// Set top
 			$("#blackboardDiv").css("display") == "none" ? 1 : 0;									// Hide or show
@@ -108,10 +109,10 @@ class App  {
 					return;																			// Quit
 					}
 				this.voice.Listen()																	// Turn on speech recognition
-				Prompt("Remember to speak clearly","on");											// Prompt
+				Prompt("Remember to speak clearly!"); 												// Prompt
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
 				if (this.role != "Teacher")															// If a student
-					app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|ACT|"+app.role+"|nod");	// Send nod 
+				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|ACT|"+app.role+"|nod");	// Send nod 
 				this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
 				this.inRemark=true;																	// Teacher is talking
 				this.talkTime=new Date().getTime();													// Time when talking started 
@@ -123,7 +124,7 @@ class App  {
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (this.inSim)	 setTimeout(()=>{ 													// React to remark if in sim
 					this.talkTime=(new Date().getTime()-this.talkTime)/1000;						// Compute talk time in seconds
-					Prompt(this.said,3); 															// Show text 
+					Prompt("You said:<i> "+this.said+"</i>",3); 									// Show text spoken
 					app.OnPhrase(this.said);														// React to remark
 					app.said=""; 																	// Clear cache
 					this.voice.StopListening();														// STT off						
@@ -557,8 +558,8 @@ class App  {
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 		this.LogEvent(v);																			// Log event
 		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
-		if (v[3] == "SPEAKING") {																	// SPEAKING
-			Prompt((v[6] == "1") ? v[4]+" speaking..." : "PRESS AND HOLD SPACEBAR TO TALK");		// Show status				
+		if ((v[3] == "SPEAKING") && (this.role != v[4])) {											// SPEAKING
+			Prompt((v[6] == "1") ? v[4]+" speaking..." : "", "on");									// Show status				
 			}	
 		else if (v[3] == "TALK") {																	// TALK
 			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0]);							// Update variance
