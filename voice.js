@@ -46,11 +46,11 @@ class Voice {
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.recognition=new SpeechRecognition();													// Init STT
 			this.recognition.continuous=false;															// Continual recognition on
-			this.recognition.interimResults=false;														// Return interim results
+			this.recognition.interimResults=false;														// Don't return interim results
 			this.recognition.lang="en-US";																// US English
 			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };							// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechrecognition capabilities														
-			this.recognition.onresult=(e)=>{ app.said+=" "+e.results[0][0].transcript; };				// On some speech recognized, add
+			this.recognition.onresult=(e)=> { app.said+=" "+e.results[0][0].transcript; }; 				// ON RECOGNITION						
 			} catch(e) { trace("Voice error",e) };														// On error
 		}
 

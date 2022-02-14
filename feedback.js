@@ -161,9 +161,9 @@ class Feedback {
 	{	
 		let i,d=null;
 		this.curTime=time;																			// Set current position in session
-		time=Math.floor(time/1000);																	// In seconds
 		let min=Math.floor(time/60000);																// Mins
 		let sec=Math.floor(time/1000)%60;															// Secs
+		time=Math.floor(time/1000);																	// In seconds
 		if (sec < 10) sec="0"+sec;																	// Add leading 0
 		$("#timeSlider").slider("option","value",this.curTime);										// Trigger slider
 		let x=$($("#timeSlider").children('.ui-slider-handle')).offset().left;						// Get pos       		

@@ -127,7 +127,7 @@ class App  {
 					app.OnPhrase(this.said);														// React to remark
 					app.said=""; 																	// Clear cache
 					this.voice.StopListening();														// STT off						
-					},1000); 																		// Wait a second
+					},2000); 																		// Wait a second
 				this.inRemark=false;																// Teacher is not talking
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
 				if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
