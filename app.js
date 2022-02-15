@@ -109,7 +109,7 @@ class App  {
 					return;																			// Quit
 					}
 				this.voice.Listen()																	// Turn on speech recognition
-				Prompt("Remember to speak clearly!"); 												// Prompt
+				Prompt("Remember to speak clearly!","on"); 											// Prompt
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
 				if (this.role != "Teacher")															// If a student
 				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|ACT|"+app.role+"|nod");	// Send nod 
@@ -124,7 +124,8 @@ class App  {
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (this.inSim)	 setTimeout(()=>{ 													// React to remark if in sim
 					this.talkTime=(new Date().getTime()-this.talkTime)/1000;						// Compute talk time in seconds
-					Prompt("You said:<i> "+this.said+"</i>",3); 									// Show text spoken
+					$("#promptSpan").html("You said:<i> "+this.said+"</i>");						// Add message
+					$("#promptSpan").fadeIn(200).delay(3000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS SPACEBAR TO TALK") }).fadeIn(200);		// Animate in and out
 					app.OnPhrase(this.said);														// React to remark
 					app.said=""; 																	// Clear cache
 					this.voice.StopListening();														// STT off						
