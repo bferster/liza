@@ -231,6 +231,7 @@ class NLP {
 		if (app.df.id) 																					// If using Dialogflow
 			app.ws.send(app.sessionId+"|DIALOGFLOW|ADMIN|INFER|"+app.df.id+"|"+app.df.email+"|"+app.df.key+"|"+msg);  	// Ask for inference
 		else{																							// Use Rasa
+			trace(123);
 			fetch(this.AIhost+":5005/model/parse", {													// Fetch data
 				method:"POST",																			// POST
 				body: JSON.stringify({text:msg})														// Payload	

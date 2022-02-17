@@ -22,7 +22,7 @@
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
 		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
-		<input type="file" id="lz-testFile" accept=".txt" style="display:none">
+		<input type="file" id="lz-testFile" accept=".yml" style="display:none">
 
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/logo.png" style="width:25%">
@@ -53,9 +53,11 @@
 
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
+	let ws=null;																					// Socket server																			
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
+		InitSocketServer();
 		$("#lz-makeTrain").on("click",()=>	  { MakeStories(1);    } );								// ON MAKE NLU ILE
 		$("#lz-makeSession").on("click", ()=> { MakeSession();     } );								// ON MAKE SESSION
 		$("#lz-testData").on("click", ()=> 	  { $("#lz-testFile").trigger("click"); 	});			// ON TEST DATA
@@ -75,10 +77,7 @@
 				GetTextBox("Type intent","","",(s)=>{ WitTrainIntent(s); });	
 				}
 			});
-
-GetDialogFlow("keyword")																// SEND REMARK TO DIALOGFLOW
-
-		});
+	});
 
 	function LoadConfig(dataset="Newdata")														// LOAD CONFIG FILE
 	{	
@@ -185,9 +184,9 @@ return;
 		uvocab["r100"]=vocab["r100"].filter(x => ![...vocab["r200"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
 		}
 	
-	function TestData(e)																		// TEST DATA
+	async function TestData(e)																	// TEST DATA
 	{	
-		let i,k,o,v,ins=0,tot=3,str="";
+		let i,k,o,v,id,str;
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
@@ -196,61 +195,91 @@ return;
 			LoadingIcon(true);																		// Show loading icon
 			let nums=[]; nums["*100"]=0; nums["*200"]=0; nums["*300"]=0;	nums["*400"]=0;	nums["*500"]=0;	
 			let oks=[];  oks["*100"]=0; oks["*200"]=0;	oks["*300"]=0;	oks["*400"]=0;	oks["*500"]=0	;
-			let tots=[];	report=[]
-			v=e.target.result.split("\n")
+			let tots=[],report=[],msgs=[];
+			v=e.target.result.split("\n");															// Divide by LF
 			for (i=0;i<v.length;++i) {																// For each line
-				if (!v[i]) continue;
+				if (!v[i]) 						continue;											// Skip is nothing there
 				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
-				if (v[i].match(/^   /)) {
-					ins++;																			// Sent one
-					GetResponse2(v[i].substr(5), k, (res, id)=>{
-						nums["*"+id]++;																// Advance total count
-						if (id == res.intent.name.substr(1))	oks["*"+id]++;
-						tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%";
-						tots["*200"]=oks["*200"]+"/"+nums["*200"]+"="+Math.floor(oks["*200"]/nums["*200"]*100)+"%";
-						tots["*300"]=oks["*300"]+"/"+nums["*300"]+"="+Math.floor(oks["*300"]/nums["*300"]*100)+"%";
-						tots["*400"]=oks["*400"]+"/"+nums["*400"]+"="+Math.floor(oks["*400"]/nums["*400"]*100)+"%";
-						tots["*500"]=oks["*500"]+"/"+nums["*500"]+"="+Math.floor(oks["*500"]/nums["*500"]*100)+"%";
-						$("#lz-loadingIconText").html("<b>"+(100-Math.floor(ins/tot*100))+"%</b>");	// Show progress
-						str=id;																		// Coded intent
-						str+=(id == res.intent.name.substr(1)) ? "   " : " X ";						// Right or wrong?
-						str+=res.intent_ranking[0].name.substr(1);									// Main intent
-						str+=" | "+res.intent_ranking[1].name.substr(1);							// 2nd choice
-//						str+=" | "+res.intent_ranking[2].name.substr(1);							// 3rd choice
-						str+=" | "+res.text;														// Text
-						report.push(str);															// Add to report
-						trace(tots);															// Show results
-						if (!--ins)	{																// If last
-							Sound("ding");															// Ding				
-							LoadingIcon(false);														// Show loading icon
-							report.sort(); 															// Sort
-							trace(report.join("\n"));												// Show results
-							trace(tots);															// Show results
-							}
-						})
-					}
+				if (v[i].match(/^   /)) 		msgs.push({ text:v[i].substr(5), intent:k });		// Add if an example
 				}
-			tot=ins;																				// Total sent
-		}
+			let tot=msgs.length;																	// Get total to detect
+			InferIntents(msgs,"dialog",(res)=>{ 														// On each inference
+				id=res.intent;																		// Get id	
+				nums["*"+id]++;																		// Advance total count
+				if (id == res.intent)	oks["*"+id]++;												// Add if a match
+				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(msgs.length/tot*100))+"%</b>");	// Show progress
+				str=id;																				// Coded intent
+				str+=(id == res.intent) ? "   " : " X ";											// Right or wrong?
+				str+=res.confidence;																// Confidence
+				str+=" | "+res.text;																// Text
+				report.push(str);																	// Add to report
+				if (!msgs.length) {																	// If last one
+					tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%"; // 100s tally
+					tots["*200"]=oks["*200"]+"/"+nums["*200"]+"="+Math.floor(oks["*200"]/nums["*200"]*100)+"%";	// 200s
+					tots["*300"]=oks["*300"]+"/"+nums["*300"]+"="+Math.floor(oks["*300"]/nums["*300"]*100)+"%";	// 300s
+					tots["*400"]=oks["*400"]+"/"+nums["*400"]+"="+Math.floor(oks["*400"]/nums["*400"]*100)+"%";	// 400s
+					tots["*500"]=oks["*500"]+"/"+nums["*500"]+"="+Math.floor(oks["*500"]/nums["*500"]*100)+"%";	// 500s
+					Sound("ding");																	// Ding				
+					LoadingIcon(false);																// Hide loading icon
+					report.sort(); 																	// Sort
+					trace(report.join("\n"));														// Show repoport
+					trace(tots);																	// Show results
+					}
+				});
+			};
 	}
 
-	function GetResponse2(msg, id, callback)														// GET RESPONSE FROM AI
+	let df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASC-X-BKYwggSiAgEAAoIBAQDIyWCZN4wQuQio\noIeCoXzIwwLvS5Q55HKo-X-w/xMqm5mXntySbZ/DnSFis5Nca/emZx9YAc1DpiMil/t\neyOhPseFWx77riq9YqnACKMxfeeADUEJTof+OOxJ/d+bJEDmyN/zAfGHOYCmzdea\nBB9LWgfegeSpN7pmHudtdy/4geNuwBcGV5VMJfrp1rvwGlPBi0jSisQ7y0oaBDbl\ntHB8zbqGfHi5usq87ghy8V1Ax3pilp+DcnSN+84h/tgQGeDh8p4nnXXTACCvQc30\nbmaMbDEuBEikoPjzRxTozPQblp910QvsAaIG7KQb+5hEb5jHjGrDbNUqIkfshKQj\nkW897VatAgMBAAECggEAQgz06RI70lh8P7SnP1LOUODN+1g6h5zeFyR5v+Kk9KoK\nI/uZvExOCowx94n5l9migB/x3wNRLZJrohzLCMU1L2pdU9/kkW5+dvygaqyHVjmF\n9oDN/dRN7r1ELK4NZ54XBcLS6HADIVw/m5vVi50vT4Qda4k4mVV7PihiMHbSEWEs\nOpnMpoIwNgMY3iTWN+fD113xrdkVwEZ9ZeWmvblizaEzjEUhLBGfkpX8huBmFon8\nCb/hTuNFP4IIxXv9O2w88x4NgF+8hB4cAP8rS7R3Hs6mpcQhlSJpYKZZFduNFKPE\nAFH3p1A7ooj+dKePawJhg/kti91jkFzC+JzzZAUKZQKBgQDou8xlf5WeDiXfiOHK\nIHNoFTxTFjJzMItxhrlKZr5WFeI8zryZ0Kcnd4JCw+vhYhPkS2UCieOPSm04oD8o\nTO/1xqRR1sYtpgBQmPzdAzoSU+70r3P3E4USAmSo8SYCNGrwjWGcB36bVQzldSoy\nNE/XGVZ6C1j2MPQ7dGO7JaaclwKBgQDc2/scmz1XHtY+MqUBgRqWmB5NeomP2fL2\nXDOs2BwjoRXnWtRscmmUfylvYR6/baKtr3BJgNohAR0t4D+S1yIe1WC5tFL4Um4l\n13gu9aW+WHEBNkYbC2uJMtulBFDHnvuWBOoYoBd4eGlWWRK+YScgHEl4EcvtMfW0\nlLkrDYZbWwKBgGVZwz1APmvCRYP/HDTlxNxCwy57sCSxs0gRH4fjDmh2xzsr3L4v\nO1vYk4V3xLU1/OuiWa6tVcgE5WOPhXGLb8RcaRqqqUsfy2tN9HBbA2MP4jP0ZE/o\n1D5vhF5+BctYAGoZZ7SHHv+OHjuetm1+knZdtmcXofo0f2eU3AmX7+KpAoGASleR\n0zM+FpE+tHj/qd33QTG7IYFZxJ4sdlja3BdygVu7r8CXOFnayC11mRQr8WvKEoS3\nW0aQJgPl+oc9XwQjbBWPFXNpakT05q/8uHHfdI74mtvWBUx2yhvga09kkY0mSn0k\n/10ECX0el/4rnQG+1cQvxsbWyeTDPCHDooZO73kCgYAMprTRXFc3IkT82cwfcWmY\n6TzfzmWmqxR41fjORQqr6bh/8B8GHvAXdl2DeKw6SoUl+CLylA2ucAuFmq70+m8i\nR6922rx3ThmaPBUlN//i2a-X-RYyHRbERwTJ0q2Gmw35qhfKGzhrML3pHjtjJmSpYp1\np0yznBeNUd/Dekkm-X-NNhrHQ==\n-----END PRIVATE KEY-----\n",
+			 email:"liza100s@liza-100s-mmhi.iam.gserviceaccount.com",
+			 id: "liza-100s-mmhi"
+			}
+	async function InferIntents(msgs, aiType, callback)											// GET RESPONSE FROM AI
 	{
-		let xhttp=new XMLHttpRequest();																// Alloc hxmlhttp
-		xhttp.onreadystatechange = function() {														// ON STATE CHANGE
-			if (this.readyState == 4 && this.status == 200) {										// Valid response
-				let o=JSON.parse(this.response);													// Objectify
-	//			trace(o);																			// Log
-				if (callback) callback(o,id);														// Run callback
-					return;																			// Quit
-				}
-			};
-		xhttp.open("POST", "https://lizasim.com:5005/model/parse");									// Set url
-		xhttp.setRequestHeader("Content-Type", "application/json");									// Set type
-		xhttp.send(JSON.stringify({text:msg}));														// Set paqyload
+		let inference={ text:"", intent:0, confidence:0 };											// Null inference
+		let m=msgs.shift();																			// Remove from list
+		if (aiType == "rasa") {																		// If Rasa
+			const response=await fetch("https://lizasim.com:5005/model/parse", {					// Fetch data
+				method:"POST",																		// POST
+				body: JSON.stringify({text:m.text})													// Payload	
+				});
+			let res=await response.json();															// Get response 
+			inference.text=res.text;																// Save text																	
+			inference.intent=res.intent.name.substr(1);												// Intent																		
+			inference.confidence=res.intent_ranking[0].name.substr(1);								// Confidence
+			}
+		if (aiType == "dialog") {																	// If DialogFlow
+			ws.send("1|DIALOGFLOW|ADMIN|INFER|"+df.id+"|"+df.email+"|"+df.key+"|"+m.text.substring(0,255));  // Ask for inference
+
 		}
 
 
+		callback(inference);																		// Return inference object
+//		if (msgs.length) InferIntents(msgs, aiType, callback)										// Recurse, if not last
+		} 
+
+	function InitSocketServer()																	// INIT SOCKET SERVER
+	{
+		if (window.location.host == "localhost") ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
+		else									 ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
+		ws.onmessage=(e)=>{ SocketIn(e); };															// ON INCOMING MESSAGE
+		ws.onclose=()=>   { console.log('disconnected'); ws=null; Sound("delete") };				// ON CLOSE
+		ws.onerror=(e)=>  { console.log('error',e);	};												// ON ERROR
+		ws.onopen=()=> 	  { console.log('connected'); };											// ON OPEN
+	}
+	
+	function SocketIn(event)																	// LOAD DATA FROM SOCKET SERVER
+	{
+		let o;
+		if (!event.data)			 return;														// Quit if no data
+		let v=event.data.split("|");																// Get params
+		trace(v)
+		if (v[1] == "DIALOGFLOW") {																	// A dialogflow inference
+			let inference={ text:v[4] };															// Save text																	
+			inference.intent=v[2].substr(1);														// Intent																		
+			inference.confidence=v[3];																// Confidence
+			trace(inference)
+			}
+	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT 

@@ -64,7 +64,7 @@ class App  {
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim);  // Send sim status
 			Prompt("PRESS SPACEBAR TO TALK","on");	 												// Directions
-		});									
+			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
 			if (this.role != "Teacher") return;														// Only for teacher
 			this.inSim=false;																		// Toggle sim flag
