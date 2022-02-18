@@ -53,7 +53,8 @@
 
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
-	let ws=null;																					// Socket server																			
+	let ws=null;																					// Socket server				
+	let aiType="dialog";																			// AI type																																			
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
@@ -69,7 +70,7 @@
 			$("#lz-tempFile").val("");																// Clear value		
 			});
 		$("#lz-testFile").on("change",(e)=>{														// ON TEST FILE LOAD
-			TestData(e);																			// Read file
+			TestData(e,aiType);																		// Read file
 			$("#lz-tempFile").val("");																// Clear value		
 			});
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
@@ -184,7 +185,7 @@ return;
 		uvocab["r100"]=vocab["r100"].filter(x => ![...vocab["r200"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
 		}
 	
-	async function TestData(e)																	// TEST DATA
+	async function TestData(e,aiType)																	// TEST DATA
 	{	
 		let i,k,o,v,id,str;
 		let file=e.target.files[0];																	// Point at file
@@ -203,14 +204,15 @@ return;
 				if (v[i].match(/^   /)) 		msgs.push({ text:v[i].substr(5), intent:k });		// Add if an example
 				}
 			let tot=msgs.length;																	// Get total to detect
-			InferIntents(msgs,"dialog",(res)=>{ 														// On each inference
+			InferIntents(msgs,aiType,(res)=>{ 												// On each inference
+				trace(res)
 				id=res.intent;																		// Get id	
 				nums["*"+id]++;																		// Advance total count
-				if (id == res.intent)	oks["*"+id]++;												// Add if a match
+				if (id == res.labeled)	oks["*"+id]++;												// Add if a match
 				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(msgs.length/tot*100))+"%</b>");	// Show progress
 				str=id;																				// Coded intent
-				str+=(id == res.intent) ? "   " : " X ";											// Right or wrong?
-				str+=res.confidence;																// Confidence
+				str+=(id == res.labeled) ? "   " : " X ";											// Right or wrong?
+				str+=res.labeled;																	// Labled intent
 				str+=" | "+res.text;																// Text
 				report.push(str);																	// Add to report
 				if (!msgs.length) {																	// If last one
@@ -235,52 +237,60 @@ return;
 			}
 	async function InferIntents(msgs, aiType, callback)											// GET RESPONSE FROM AI
 	{
-		let inference={ text:"", intent:0, confidence:0 };											// Null inference
+		try {
 		let m=msgs.shift();																			// Remove from list
-		if (aiType == "rasa") {																		// If Rasa
+		let inference={ text:m.text, labeled:m.intent, intent:0, confidence:0 };					// Null inference
+		if (aiType == "rasa") {																		// If RASA
 			const response=await fetch("https://lizasim.com:5005/model/parse", {					// Fetch data
 				method:"POST",																		// POST
 				body: JSON.stringify({text:m.text})													// Payload	
 				});
 			let res=await response.json();															// Get response 
-			inference.text=res.text;																// Save text																	
 			inference.intent=res.intent.name.substr(1);												// Intent																		
-			inference.confidence=res.intent_ranking[0].name.substr(1);								// Confidence
+			inference.confidence=res.intent.confidence;												// Confidence
+			inference.labeled=m.intent;																// Labeled intent
+			callback(inference);																	// Return inference object
+			if (msgs.length) InferIntents(msgs, aiType, callback)									// Recurse, if not last
 			}
-		if (aiType == "dialog") {																	// If DialogFlow
-			ws.send("1|DIALOGFLOW|ADMIN|INFER|"+df.id+"|"+df.email+"|"+df.key+"|"+m.text.substring(0,255));  // Ask for inference
-
-		}
-
-
-		callback(inference);																		// Return inference object
-//		if (msgs.length) InferIntents(msgs, aiType, callback)										// Recurse, if not last
-		} 
+		else if (aiType == "dialog") {																// If DIALOGFLOW
+			let p=new Promise((resolve, reject) => {
+				setTimeout(()=>{ws.send("1|DIALOGFLOW|ADMIN|INFER|"+df.id+"|"+df.email+"|"+df.key+"|"+m.text.substring(0,255))},500);
+				ws.onmessage=(e)=>{ 																// If a ws message
+					if (!e.data)			 return;												// Quit if no data
+					let v=event.data.split("|");													// Get params
+					if (v[1] != "DIALOGFLOW") return;												// Not a dialogflow inference
+					resolve(v) };																	// Resolve promise
+				}).then(res =>{ 																	// On resolution
+					inference.intent=res[2].substr(1);												// Intent																		
+					inference.confidence=res[3];													// Confidence
+					callback(inference); 															// Return inference
+					if (msgs.length) InferIntents(msgs, aiType, callback)							// Recurse, if not last
+					});
+			}
+		else if (aiType == "wit") {																	// If WIT
+			let url="https://api.wit.ai/message?v=20210922&q="+m.text.substring(0,255);				// URL
+			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");				// Get token
+			const response=await fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} });	// Send remark to wit
+			let res=await response.json();															// Get response
+			if (res.intents.length) {																// If an intent found
+				inference.intent=res.intents[0].name.substr(1);										// Get intent																		
+				inference.confidence=res.intents[0].confidence;										// Confidence
+				}	
+			callback(inference);																	// Return response
+			if (msgs.length) setTimeout(()=>{ InferIntents(msgs, aiType, callback);},1000);			// Recurse, if not last and add delay
+			}
+		} catch(e) {trace(e)}
+	} 
 
 	function InitSocketServer()																	// INIT SOCKET SERVER
 	{
 		if (window.location.host == "localhost") ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
 		else									 ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
-		ws.onmessage=(e)=>{ SocketIn(e); };															// ON INCOMING MESSAGE
 		ws.onclose=()=>   { console.log('disconnected'); ws=null; Sound("delete") };				// ON CLOSE
 		ws.onerror=(e)=>  { console.log('error',e);	};												// ON ERROR
 		ws.onopen=()=> 	  { console.log('connected'); };											// ON OPEN
 	}
 	
-	function SocketIn(event)																	// LOAD DATA FROM SOCKET SERVER
-	{
-		let o;
-		if (!event.data)			 return;														// Quit if no data
-		let v=event.data.split("|");																// Get params
-		trace(v)
-		if (v[1] == "DIALOGFLOW") {																	// A dialogflow inference
-			let inference={ text:v[4] };															// Save text																	
-			inference.intent=v[2].substr(1);														// Intent																		
-			inference.confidence=v[3];																// Confidence
-			trace(inference)
-			}
-	}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -357,12 +367,14 @@ return;
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
 		if (mask&1 && (test > 0)) SaveTextAsFile("test-nlu.txt",str2);								// Write testing file
 /*		DIALOGFLOW	
-
-	for (k in ints)	{																			// For each intent
+		
+		for (j=0;j<v.length;++j) {																// For each intent
 			str="[\n";
-			ints[k]=[... new Set(ints[k])];															// Make unique
-			for (i=0;i<Math.min(ints[k].length,num);++i) { 											// Add each remark in intent group
-				ss=ints[k][i].slice(6,-1);															// Remove yaml header
+			k=v[j];																					// intent name
+			tot=Math.floor(Math.min(num,ints[k].length)*(1-test));									// Get amount to train
+			inc=Math.max(ints[k].length/num,1);														// Sampling increment, at least 1
+			for (i=0;i<tot*inc;i+=inc) {															// For each one wanted
+				ss=ints[k][Math.floor(i)].slice(6,-1);												// Remove yaml header
 				ss=ss.replace(/"/g,"");																// No quotes
 				ss=ss.replace(/'/g,"\\u0027");														// Escape apos
 				str+=`{ "data": [{ "text": "${ss}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
@@ -372,20 +384,6 @@ return;
 		}
 */
 	}
-
-	function GetDialogFlow(remark)																// SEND REMARK TO DIALOGFLOW
-	{
-		const url="https://dialogflow.googleapis.com/v2/projects/liza-100s-mmhi/agent/sessions/123456789:detectIntent";		// URL
-		let token="ya29.A0ARrd-X-aM8XVgL5jZ-j7uhM6QUF6YvDK7lqU_vMGBN2WWkaQ5_UZeb_Fk8AZMSKt5MvCsCeC1EvG1xGj9BMik6Dwd-X-9pzw5norfHk6MYT6KdHFC7ntrbQnogfLBLAXDiRnV03lXRMny6avSd-X-UjfdjOHeLOjR8Cl84R6sRtEb8LI-_NgRxOEYTMc6CjpEe-X-W_6JW3TklMiAe7c-Pm7RtpEQl-X-QmaE7o3Fo80atsPKlC-EmdBLJWb_s".replace(/-X-/g,"");					// Get token
-		let body={"query_input":{"text":{"text":remark,"language_code":"en-US"}}};					// Make body
-		trace(body)
-		fetch(url,{ method:"POST",
-			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
-			  body: JSON.stringify(body)
-			  })	
-	  	.then(res => res.json()).then(res =>{ trace(res); })
-	}
-
 
 	async function MakeSession()																// CREATE SESSION FILE
 	{
@@ -414,39 +412,6 @@ return;
 		let str=Papa.unparse(data,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
 		SaveTextAsFile("session.csv",str);														// Write file
 		Sound("ding");																				// Sound
-/*
-		let i,o,s,newint,session=[],texts=[],intents=[],startTime=0;
-		let fields=["scene","actor","intent","calc","ok","time","text"];							// Field names
-		let sessId=$("#lz-session").val().split("-")[0];											// Session to add
-		LoadingIcon(true);																			// Show loading icon
-		for (i=0;i<rawData.length;++i) {															// For each line
-			o=rawData[i];																			// Point at it
-			if (o.rerid != sessId) 	continue;														// Skip if not right session
-			if (!startTime)			startTime=TimecodeToSeconds(o.timestamp);						// Set 1st time
-			s=nlp.CleanText(o.text);																// Clean
-			texts.push(s);																			// Add to array of texts
-			t=TimecodeToSeconds(o.timestamp)-startTime;												// Get event time
-			if (o.intent) newint=o.intent;															// Get new intent
-			session.push({ scene:o.topic, actor:o.speaker, intent:newint, time:t, text:s});			// Add line 
-			}
-			
-		const fetchAll=async(texts) => {															// GET ALL INTENTS AT ONCE
-  			let i,n;
-			const res   = await Promise.all(texts.map(t => GetResponse(t)));						// Ask for intents
-  			const jsons = await Promise.all(res.map(r => r.json()));								// Wait for them
-			for (i=0;i<jsons.length;++i) {															// For each line
-				n=(jsons[i].intent_ranking[0].name == "nlu_fallback") ? 1 : 0;						// Go to second choice
-				session[i].calc=jsons[i].intent_ranking[n].name.substr(1);							// Get intent
-				if (Math.floor(session[i].intent/100)*100 == session[i].calc) session[i].ok=1;		// A match
-				else														  session[i].ok=0;		// None
-				}
-			let str=Papa.unparse(session,{ header:true, skipEmptyLines:true, columns:fields });		// Make CSV using lib
-			SaveTextAsFile("session-"+sessId+".csv",str);											// Write file
-			LoadingIcon(false);																		// Hide loading icon
-			Sound("ding");																			// Sound
-			}
-		fetchAll(texts);																			// Get all intents
-*/
 	}
 
 	function GetResponse(msg)																	// GET RESPONSE FROM AI
@@ -480,35 +445,55 @@ return;
 			};
 	}
 
-/*///////////////////////////////////////////////////////////////////////////////////////////////
+/*
+///////////////////////////////////////////////////////////////////////////////////////////////
 // WIT
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	function WitTrainIntent(intent)
-	{
-		let i;
-		let n=Math.min(intents[intent].length,199);
-		for (i=0;i<n;++i)  WitTrain(intent, rawData[i].text)
+	async function TrainWit(e)																	// TRAIN WIT
+	{	
+		let i,v,msgs=[];
+		let file=e.target.files[0];																	// Point at file
+		if (!file) 	return;																			// Quit if bad
+		let reader=new FileReader();																// Init reader
+		reader.readAsText(file);																	// Read file
+		reader.onload=(e)=>{ 																		// When loaded
+			LoadingIcon(true);																		// Show loading icon
+			v=e.target.result.split("\n");															// Divide by LF
+			for (i=0;i<v.length;++i) {																// For each line
+				if (!v[i]) 						continue;											// Skip is nothing there
+				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
+				if (v[i].match(/^   /)) 		msgs.push({ text:v[i].substr(5), intent:k });		// Add if an example
+				}
+			let tot=msgs.length;																	// Get total to train
+			WitTrain(msgs, (r1,r2)=>{																// Start sending via recursion		
+				trace(r1,r2);																		// Log	
+				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(msgs.length/tot*100))+"%</b>");	// Show progress
+				if (!msgs.length) {																	// If last one
+					Sound("ding");																	// Ding				
+					LoadingIcon(false);																// Hide loading icon
+					}
+				});											
+			};
 	}
-
-	function WitTrain(intent, remark)															// SEND REMARK TO WIT
+	
+	async function WitTrain(msgs, callback)														// SEND REMARK TO WIT TO TRAIN
 	{
+		let inference={ text:"", intent:0, confidence:0 };											// Null inference
+		let m=msgs.shift();																			// Remove from list and save first
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL
-		let token="57CTW-X-CFRZYAIGCB-X-PHA6E5QT4-X-FG3IOR6O".replace(/-X-/g,"");					// Get token
-		intent=intent.replace(/\./,"_");															// Modify intent to suitb Wit
-		let body=[{ text:remark, intent:intent, entities:[], traits: [] }];							// Make body
-		trace(body)
-		fetch(url,{ method:"POST",
+		let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get token
+		let body=[{ text:m.text.substring(0,255), intent:"r"+m.intent, entities:[], traits: [] }];	// Make body
+		const response=await fetch(url, { 															// Send remark to wit
+			  method:"POST",
 			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
 			  body: JSON.stringify(body)
-			  })	
-	  	.then(res => res.json()).then(res =>{ trace(res); })
+			  });	
+		let res=await response.json();																// Get response
+		callback(m,res);																			// Return responss
+		if (msgs.length) setTimeout(()=>{ WitTrain(msgs, callback) },500);							// Recurse, if not last
 	}
-*/
-/*
-// 107292363236-rc8802iosnbgk2unvd5uf4b010rmlkn5.apps.googleusercontent.com
 
-POST https://dialogflow.googleapis.com/v2/projects/project-id/agent/sessions/123456789:detectIntent
 
 
 {
