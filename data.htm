@@ -54,7 +54,7 @@
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
 	let ws=null;																					// Socket server				
-	let aiType="dialog";																			// AI type																																			
+	let aiType="rasa";																			// AI type																																			
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
@@ -75,7 +75,6 @@
 			});
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				GetTextBox("Type intent","","",(s)=>{ WitTrainIntent(s); });	
 				}
 			});
 	});
@@ -187,6 +186,9 @@ return;
 	
 	async function TestData(e,aiType)																	// TEST DATA
 	{	
+
+//		TrainWit(e);	return;
+
 		let i,k,o,v,id,str;
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
@@ -204,16 +206,16 @@ return;
 				if (v[i].match(/^   /)) 		msgs.push({ text:v[i].substr(5), intent:k });		// Add if an example
 				}
 			let tot=msgs.length;																	// Get total to detect
-			InferIntents(msgs,aiType,(res)=>{ 												// On each inference
+			InferIntents(msgs,aiType,(res)=>{ 														// On each inference
 				trace(res)
 				id=res.intent;																		// Get id	
-				nums["*"+id]++;																		// Advance total count
-				if (id == res.labeled)	oks["*"+id]++;												// Add if a match
+				nums["*"+Math.floor(id/100)*100]++;													// Advance total count at 100 level
+				if (Math.floor(id/100)*100 == Math.floor(res.labeled/100)*100)	oks["*"+Math.floor(id/100)*100]++;	// Add if a match at 100 level
 				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(msgs.length/tot*100))+"%</b>");	// Show progress
-				str=id;																				// Coded intent
+				str=id+"\t";																		// Coded intent
 				str+=(id == res.labeled) ? "   " : " X ";											// Right or wrong?
-				str+=res.labeled;																	// Labled intent
-				str+=" | "+res.text;																// Text
+				str+="\t"+res.labeled;																// Labeled intent
+				str+="\t | \t"+res.text;															// Text
 				report.push(str);																	// Add to report
 				if (!msgs.length) {																	// If last one
 					tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%"; // 100s tally
@@ -226,6 +228,7 @@ return;
 					report.sort(); 																	// Sort
 					trace(report.join("\n"));														// Show repoport
 					trace(tots);																	// Show results
+					trace(nums,oks)
 					}
 				});
 			};
@@ -269,7 +272,10 @@ return;
 			}
 		else if (aiType == "wit") {																	// If WIT
 			let url="https://api.wit.ai/message?v=20210922&q="+m.text.substring(0,255);				// URL
-			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");				// Get token
+			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");				// Get sever token 100s
+//			let token="5BVRE-X-PNGZ6AKO-X-EA7P44KU3-X-PXU7LRKVVD".replace(/-X-/g,"");				// Get token 10s
+//			let token="SOYJDBYI5WSJB-X-VBCEQZ2CHSWNZ-X-2KYN4U".replace(/-X-/g,"");					// Get token 10 w/ 100 per intent
+			
 			const response=await fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
@@ -320,7 +326,8 @@ return;
 		
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
-			if ((o.intent < 180) || ((o.intent > 181) && (o.intent < 250))) continue;				// Cull 181-300
+			if ((o.intent < 180) || ((o.intent > 181) && (o.intent < 250))) continue;				// Cull 0-250
+//			if ((o.intent < 100) || ((o.intent > 179) && (o.intent < 210))) continue;				// Cull 181-210
 			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
 			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
@@ -365,7 +372,7 @@ return;
 				str2+=ints[k][Math.floor(i+tot)]+"\n";												// Get it
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
-		if (mask&1 && (test > 0)) SaveTextAsFile("test-nlu.txt",str2);								// Write testing file
+		if (mask&1 && (test > 0)) SaveTextAsFile("test.yml",str2);									// Write testing file
 /*		DIALOGFLOW	
 		
 		for (j=0;j<v.length;++j) {																// For each intent
@@ -445,7 +452,7 @@ return;
 			};
 	}
 
-/*
+//
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // WIT
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -481,8 +488,10 @@ return;
 	{
 		let inference={ text:"", intent:0, confidence:0 };											// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
-		const url="https://api.wit.ai/utterances?v=20210922";										// URL
-		let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get token
+		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
+		let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get sever token 100s
+//		let token="5BVRE-X-PNGZ6AKO-X-EA7P44KU3-X-PXU7LRKVVD".replace(/-X-/g,"");					// Get token 10s
+//		let token="SOYJDBYI5WSJB-X-VBCEQZ2CHSWNZ-X-2KYN4U".replace(/-X-/g,"");						// Get token 10 w/ 100 per intent
 		let body=[{ text:m.text.substring(0,255), intent:"r"+m.intent, entities:[], traits: [] }];	// Make body
 		const response=await fetch(url, { 															// Send remark to wit
 			  method:"POST",
@@ -494,7 +503,7 @@ return;
 		if (msgs.length) setTimeout(()=>{ WitTrain(msgs, callback) },500);							// Recurse, if not last
 	}
 
-
+/*
 
 {
   "queryParams": {
@@ -622,4 +631,6 @@ return;
 </script>
 </body>
 </html>
+
+
 
