@@ -627,6 +627,56 @@ return;
 		$("body").append(str);																		// Add icon to container
 	}
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// KEYS / VOCAB
+/////////////////////////////////////////////////////////////////////////////////////////////////
+	let keySyns=[];
+	MakeActionKeys()
+
+	function MakeActionKeys()
+	{
+		let i,v;
+		v=(`strategy,strategies,policy,policies,procedure,procedures,approach,approaches,approaching,blueprint,program,stratagem,stratagems,
+		plan,plans,planning,guideline,guidance,scheme,schema,organize,organization,tenet,path,pathway,avenue,agenda,agendas,agendum,channel,channels,modus,operandi,maneuver,
+		process,prototype,archetype,model,theory,theories,structure,structures,arrange,arrangement,arranging,classify,classification,clue,incorporate,integrate,
+		sort,proposal,propose,codify,codification,layout,design,designs,coordinate,create,creating,created,establish,standardize,figured,skill,skills,
+		rule,rules,construct,constructs,constructed,constructing,invent,technique,progression,unfolding,architecture,catalog,catalogue,alphabetize,pattern,
+		method,manner,mechanism,rubric,routine,scenario,outline,synopsis,summary,summarize,rundown,run-down,review,recap,recapitulation,
+		analysis,keyword,keywords,key_word,sequence.chronological,timeline,concept,concepts,conceptualize,context,
+		contextualize,revise,revision,sum,sum-up,take-away,takeaway`).replace(/\t|\n|\r/g,"").split(",");
+		for (i=0;i<v.length;++i) keySyns[v[i]]="key_strategy";
+		v=(`explain,explaining,explains,clarify,simplify,formulate,solve,determine,reason,reasoning,enlighten,decode,descrypt,unscramble,portray,comment,assert,disclose,depict,identify,find,pinpoint,
+		expound,exemplify,represent,annotate,annotating,delineate,define,designate,illustrate,reveal,tell,elucidate,paraphrase,unravel,untangle,describe,mean,
+		symbolize,exhibit,embody,epitomize,utter,communicate,declare,divulge,impart,notify,specify,expose,proclaim`).replace(/\t|\n|\r/g,"").split(",");
+		for (i=0;i<v.length;++i) keySyns[v[i]]="key_explain";
+		v=(`opine,believe,posit,presume,feel,imagine,envisage,envision,visualize,perceive,anticipate,foresee,realize,suppose,pretend,hypothesis,
+		hypothesize,speculate,estimate,presuppose,judge,guess,divine,stab,surmise,	rekon,decipher,deduce,infer,postulate,venture,conjecture,predict,
+		guesstimate,ascertain`).replace(/\t|\n|\r/g,"").split(",");
+		for (i=0;i<v.length;++i) keySyns[v[i]]="key_opine";
+		v=(`understand,glean,know,get,comprehend,comprehension,learn,fathom,deem,grasp,master,point,recognize,distinguish,information,inform`).replace(/\t|\n|\r/g,"").split(",");
+		for (i=0;i<v.length;++i) keySyns[v[i]]="key_understand";
+		v=(`prior,previous,previously,back`).replace(/\t|\n|\r/g,"").split(",");
+		for (i=0;i<v.length;++i) keySyns[v[i]]="key_prior";
+		v=(`compare,correlate,contrast,diverge,vary,equal,than,less,fewer,reduced,greater,increrase,increased,higher,added,larger,more,improve,improved,enhance,enhanced,
+		raise,raised,better,worse,changed,modify,modified,next,last,later,before,previous,previously,since,former,afterward,afterwards,subsequently,since,after,shift,
+		differ,differed,difference`).replace(/\t|\n|\r/g,"").split(",");
+		for (i=0;i<v.length;++i) keySyns[v[i]]="key_compare";
+		v=(`reflect,contemplate,think,consider,interpret,decide,decision,characterize,argue,claim,advocate,suggest,remember,remind,recollect,invoke,
+		theorize,suspect,scrutinize,conclude,conclusion,concede,ponder`).replace(/\t|\n|\r/g,"").split(",");
+		for (i=0;i<v.length;++i) keySyns[v[i]]="key_reflect";
+
+		trace(keySyns)
+	}
+/*
+
+reflect: contemplate
+
+*/
+
+
+
+
+
 
 </script>
 </body>
