@@ -186,7 +186,7 @@ class App  {
 
 	StartSession()																				// START/RESTART SESSION
 	{
-		let i;
+		let i,stuIndex;
 		this.trt=0;																					// At start
 		this.sessionLog=[];																			// Clear session log
 		this.inSim=false;																			// Not in simulation
@@ -196,6 +196,12 @@ class App  {
 		this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);								// Left 
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
 			this.eventTriggers[i].done=0;															// Reset done	
+			if (this.eventTriggers[i].type == "first") {											// A first response event
+				stuIndex=app.students.findIndex((s)=>{ return this.eventTriggers[i].who == s.id });	// Get index of student array
+				if (stuIndex >= 0) app.students[stuIndex].first=this.eventTriggers[i].do.substring(4);	// Get thing to say
+				}
+			}
+		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
 			if (this.eventTriggers[i].type == "time") {												// A time event
 				this.nextTrigger=this.eventTriggers[i];												// Point to next trigger 
 				break;																				// Quit looking
@@ -320,7 +326,12 @@ class App  {
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
 		let res={ text:"", intent:0, bakt:[0,0,0,0,0]};												// Clear res
-		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
+		let stuIndex=app.students.findIndex((s)=>{ return this.curStudent == s.id });				// Get index of current studeent
+		if (!this.multi && this.students[stuIndex].first) {											// An initial respons set
+			res.text=this.students[stuIndex].first;													// Set response
+			this.students[stuIndex].first="";														// Fulfilled
+			} 
+		else if (!this.multi && (intent > 49)) 														// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
 		if (res.text) 																				// If one
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")); // Send response

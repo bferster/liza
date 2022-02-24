@@ -22,6 +22,11 @@ string,initial,"<b>Ask students</b>:<br><br>I’ve called you together to improv
 trigger,time,"who=random,when=3,do=[say:600+act:interrupt],"
 trigger,time,"who=Luis,when=30,do=[say:150+act:interrupt],"
 trigger,time,"who=random,when=300,do=[end:],"
+trigger,first,"who=Chris,do=[say:Scientists found craters full of water on the moon],"
+trigger,first,"who=Farrah,do=[say:You’d need a scientific tool called a microscope to look really closely],"
+trigger,first,"who=Jazmin,do=[say:NASA sent a small machine],"
+trigger,first,"who=Luis,do=[say:Scientists use a lot of equipment, like oxygen tanks],"
+trigger,first,"who=Oliver,do=[say:So I guess my answer is right],"
 resource,Scene Overview,assets/overview.pdf
 resource,Student Task Materials,assets/student.pdf
 resource,Teaching Strategy Support,assets/supports.pdf
