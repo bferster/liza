@@ -13,7 +13,7 @@ class Feedback {
 		this.interval=null;																			// Timer
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
-		this.intentLabels=["Feedback","General","Ask","Value","Correct","Think"];					// Intent labels
+		this.intentLabels=["Students","General","Ask","Value","Correct","Think"];					// Intent labels
 	}
 
 	OnClick(e) 																					// ON SCREEN CLICK
@@ -136,7 +136,7 @@ class Feedback {
 		$("[id^=lzDot-]").on("click",(e)=>{ 														// CLICK ON DOT 
 			let id=e.target.id.substr(6);															// Get id
 			let o=app.sessionLog[id];																// Point at dot
-			this.ShowNow(o.time*1000);																// Go there	in msec
+			this.ShowNow(o.time*1000,o.from);														// Go there	in msec and show this student's data
 			});
 
 		$("#lz-chooseStudent").change(()=> {														// ON CHANGE STUDENT
@@ -152,12 +152,11 @@ class Feedback {
 		   	slide:(event,ui)=>{																		// On slide
 				if ($("#playerButton").prop("src").match(/pausebut/)) this.Play();					// Stop playing, if playing
 			   	this.ShowNow(ui.value);																// Show time																	
-
-			}
+				}
 		   	});
 	}
 	
-	ShowNow(time) 																				// SHOW CURRENT TIME (USES MSECS)
+	ShowNow(time, from) 																		// SHOW CURRENT TIME (USES MSECS)
 	{	
 		let i,d=null;
 		this.curTime=time;																			// Set current position in session
@@ -170,8 +169,10 @@ class Feedback {
 		$("#sliderTime").html(min+":"+sec);															// Show value
 		$("#sliderLine").css("left",x+2+"px")														// Position line
 		$("#sliderTime").css("left",x-9+"px")														// Position text
+		if (!from)	from=app.curStudent;															// Use current student, if from not explicit
 		for (i=0;i<app.sessionLog.length;i++) {														// For each event
-			if (app.sessionLog[i].what != "RESPONSE")	continue;									// Only responses
+			if (app.sessionLog[i].what != "RESPONSE")		continue;								// Only responses
+			if (app.sessionLog[i].from != from)				continue;								// Only from current student
 			if (app.sessionLog[i].time >= time) 			{ d=app.sessionLog[i].data; break; }	// Past now
 			}
 		app.fb.DrawVariance(27,window.innerHeight-193,d ? d : [0,0,0,0,0],time);					// Show variance
@@ -188,20 +189,19 @@ class Feedback {
 			str+=`<text y="200" x="${getPixFromTime(i*60)}" font-size="12" fill="#999">${i} min</text>`; // Draw minutes					
 		for (i=0;i<5;++i) {																			// For each grid line
 			str+=`<text x="0" y="${y+4}" fill="#999">${this.intentLabels[5-i]}</text>						
-			<line x1="59" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:1"/>
+			<line x1="59" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:${(i==5) ? 0 : 1}"/>
 			<text x="${wid+10}" y="${y+4}" fill="#999">${(5-i)*100}</text>`;						// Draw it
-			y+=31;																					// Next line down
+			y+=26;																					// Next line down
 			}
+		str+=`<text x="0" y="${y+4}" fill="#999">${this.intentLabels[0]}</text>`;					// Student label						
 		str+=`<path style="fill:none;stroke:#86d698;stroke-width:6;stroke-linecap:round;stroke-linejoin:round" d="`;
 		y=5*31+31;
 		for (i=0;i<app.sessionLog.length;i++) {														// For each event
 			o=app.sessionLog[i];																	// Point at it
-			if ((o.what != "RESPONSE") && (o.what != "REMARK")) 		continue;					// Skip unless talking
-			if ((o.what == "RESPONSE") && (o.from != app.curStudent))	continue;					// Not this student, but keep teachers
-			if ((o.what == "REMARK") && (o.to != app.curStudent))		continue;					// Only remarks to this student
-			if (o.intent > 599)											o.intent=100;				// Too high
+			if (o.what != "REMARK") 	continue;													// Show only teacher
+			if (o.intent > 599)			o.intent=100;												// Too high
 			x=getPixFromTime(o.time).toFixed(2);													// Get x pos
-			y=((5-Math.max(Math.floor(o.intent/100),1))*31+31).toFixed(2);							// Get y 5-1 from intent
+			y=((5-Math.max(Math.floor(o.intent/100),1))*26+31).toFixed(2);							// Get y 4-0 from intent
 			if (col == 0) 	str+="M "+x+" "+y,col++;												// Move there
 			else 			str+=" L "+x+" "+y;														// Add point
 			}
@@ -212,9 +212,9 @@ class Feedback {
 			if ((o.what != "RESPONSE") && (o.what != "REMARK")) 		continue;					// Skip unless talking
 			if (o.intent > 599)											o.intent=100;				// Too high
 			x=getPixFromTime(o.time);																// Get x pos
-			y=5-Math.max(Math.floor(o.intent/100),1).toFixed(2);									// Get y 5-1 from intent
-			col=(o.what == "RESPONSE") ? col=app.students.find(x => x.id == o.from).color : "#ccc"	// Set color
-			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*31+31}" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
+			if (o.what == "RESPONSE") y=5,col=app.students.find(x => x.id == o.from).color;			// Put students on bottom row
+			else					  y=5-Math.max(Math.floor(o.intent/100),1).toFixed(2),col="#ccc";	// Get y 4-0 from intent
+			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*26+30                        }" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
 			}
 		return str;																					// Return graph markup
 		}	

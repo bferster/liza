@@ -106,7 +106,7 @@ class Blackboard  {
 		$("#blackboardDiv").append(str+"</div");														// Add popup	
 
 		$("[id^=BBpic-]").on("click", function() {														// ON CLICK PIC
-			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|Teacher|PICTURE|"+app.bb.curSide+"|"+$(this).text());	// Send pic change
+			if ((app.role == "Teacher") || (app.role == "Coach")) app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|PICTURE|"+app.bb.curSide+"|"+$(this).text());	// Send pic change
 			});
 	}
 
