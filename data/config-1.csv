@@ -1,6 +1,6 @@
 type,id,text,data
 student,Jazmin,"jazmin,jazz,jasmine,jasmina","seat=0,sex=female,b=1,a=2,k=1,t=2,u=3,color=#076290,"
-student,Luis,"luis,louise,lewis,louis,louie,lou,lew","seat=1,sex=male,b=2,a=0,k=1,t=2,u=3,color=#e26d33,"
+student,Luis,"luis,louise,lewis,louis,louie,lou,luiz","seat=1,sex=male,b=2,a=0,k=1,t=2,u=3,color=#e26d33,"
 student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","seat=2,sex=female,b=2,a=1,k=1,t=2,u=3,color=#9b4286,"
 student,Oliver,"oliver,liver","seat=3,sex=male,b=3,a=2,k=1,t=1,u=3,color=#734325,"
 student,Chris,"chris,crisp,christ","seat=4,sex=male,b=1,a=1,k=3,t=2,u=3,color=#b1233c,"

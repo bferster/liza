@@ -45,12 +45,15 @@ class Voice {
 		try {																							// Try
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.recognition=new SpeechRecognition();													// Init STT
-			this.recognition.continuous=false;															// Continual recognition on
-			this.recognition.interimResults=false;														// Don't return interim results
+			this.recognition.continuous=false;															// Continual recognition off
+			this.recognition.interimResults=true;														// Return interim results?
 			this.recognition.lang="en-US";																// US English
 			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };							// ON STT END RE-LISTEN	IF IN SIM											
-			this.hasRecognition=true;																	// Has speechrecognition capabilities														
-			this.recognition.onresult=(e)=> { app.said+=" "+e.results[0][0].transcript; }; 				// ON RECOGNITION						
+			this.hasRecognition=true;																	// Has speechRecognition capabilities														
+			this.recognition.onresult=(e)=>{ 															// ON RECOGNITION
+				if (e.results[0].isFinal) app.said+=e.results[0][0].transcript+" ";						// Add what was said (check final if interim)
+				$("#promptSpan").html(app.said); 														// Show interim results
+				}					
 			} catch(e) { trace("Voice error",e) };														// On error
 		}
 
