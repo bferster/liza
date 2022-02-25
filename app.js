@@ -62,7 +62,7 @@ class App  {
 			else						this.startTime=now;											// Not in sim, set start				
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim);  // Send sim status
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim+"| ");  // Send sim status
 			Prompt("PRESS SPACEBAR TO TALK","on");	 												// Directions
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
@@ -98,6 +98,7 @@ class App  {
 			$("#talkInput").val("");																// Clear text
 			});	
 		$("#lz-rolePick").on("change", ()=> {														// ON CHANGE ROLE
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|ROLE|"+$("#lz-rolePick").val());  	// Send role change
 			this.role=$("#lz-rolePick").val();														// Set new role
 			app.rp.Draw();																			// Redraw reponse panel														
 			});
