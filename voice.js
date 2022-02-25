@@ -52,7 +52,7 @@ class Voice {
 			this.hasRecognition=true;																	// Has speechRecognition capabilities														
 			this.recognition.onresult=(e)=>{ 															// ON RECOGNITION
 				if (e.results[0].isFinal) app.said+=e.results[0][0].transcript+" ";						// Add what was said (check final if interim)
-				$("#promptSpan").html(app.said); 														// Show interim results
+				$("#promptSpan").html(app.said ? app.said+e.results[0][0].transcript+" " : e.results[0][0].transcript+" ");
 				}					
 			} catch(e) { trace("Voice error",e) };														// On error
 		}

@@ -328,7 +328,6 @@ return;
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if ((o.intent < 180) || ((o.intent > 181) && (o.intent < 250))) continue;				// Cull 0-250
-//			if ((o.intent < 100) || ((o.intent > 179) && (o.intent < 210))) continue;				// Cull 181-210
 			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
 			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
 			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
@@ -374,7 +373,7 @@ return;
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
 		if (mask&1 && (test > 0)) SaveTextAsFile("test.yml",str2);									// Write testing file
-/*		DIALOGFLOW	
+//		DIALOGFLOW	
 		
 		for (j=0;j<v.length;++j) {																// For each intent
 			str="[\n";
@@ -390,7 +389,7 @@ return;
 			str=str.slice(0,-2)+"\n]";
 			SaveTextAsFile(k.substr(1)+"_usersays_en.json",str);													// Write file
 		}
-*/
+//
 
 	Test500s(ints);
 	}

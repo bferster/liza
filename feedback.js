@@ -287,14 +287,22 @@ class ResponsePanel  {
 
 	Draw(remark="Nothing yet...",student="student")												// DRAW
 	{
+		$("#lz-rpback").remove();																	// Remove old one
+		if (app.role != "Teacher") {																// A student role
+			$("#mainDiv").css("margin-left","15%");													// Shift right													
+			app.sc.Resize();																		// Resize renderer
+			app.sc.SetCamera(0,200,600,0,0,0);														// Reset camera	
+			}
+		else{
+			$("#mainDiv").css("margin-left",0);														// No margin													
+			app.sc.Resize();																		// Resize renderer
+			app.sc.SetCamera(0,150,500,0,0,0);														// Reset camera	
+			return	
+			}
+		let v=app.strings.multi.split(",");															// Point at labels
 		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
 		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number
 		let intentDesc=this.intentDescs[this.curIntent/100];										// Get intent description
-		$("#mainDiv").css("margin-left","15%");														// Shift right													
-		app.sc.Resize();																			// Resize renderer
-		app.sc.SetCamera(0,200,600,0,0,0);															// Reset camera	
-		$("#lz-rpback").remove();																	// Remove old one
-		let v=app.strings.multi.split(",");															// Point at labels
 		if (!this.curTab) this.curTab=v[0];															// Init to 1st tab
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
@@ -319,8 +327,7 @@ class ResponsePanel  {
 				<span id="lztab-${v[4]}" class="lz-rptab">${v[4]}</span> 
 				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:-var(--maxvh)" : ""}"></div>
 				</div>
-				<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">
-				<select id="lzActs" class="lz-is" style="float:right;width:auto;display:none;margin:-6px 12px 0 0"></select>`;
+				<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">`;
 
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		addSeqs();																					// Add possible moves to select
@@ -343,7 +350,6 @@ class ResponsePanel  {
 			});
 		
 		$("#lztab-"+this.curTab).trigger("click");													// Fill list (must be after handler)
-			if (window.location.search.match(/role=coach/i)) addRoles();							// Add sudent roles if coach
 
 		$("#lzFidget").on("click", ()=> {															// ON FIDGET
 			$("#lzFidget").html($("#lzFidget").html() == "Fidget" ? "Stop it " : "Fidget");			// Toggle label
@@ -366,15 +372,10 @@ class ResponsePanel  {
 			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
 			$("#lzSeqs").prop("selectedIndex",0);													// Reset pulldowns
 			});
-
-		$("#lzActs").on("change", ()=> {															// ON CHANGE ROLE
-			if (!$("#lzActs").prop("selectedIndex"))	return;										// Skip 1st one
-			app.role=$("#lzActs").val();															// Set new role
-			this.Draw();																			// Redraw															
-			});
 	
 		function fillList(tab) {																	// FILL RESPONSE LIST
 			let i,v=[],str="",last="";
+			if (app.role == "Teacher") return;														// Not in coach role
 			if (app.role == "Coach") return;														// Not in coach role
 			let n=app.nlp.responses[app.role].length;												// Number of responses for student
 			let o=app.nlp.responses[app.role];														// Point at it
@@ -401,14 +402,6 @@ class ResponsePanel  {
 			for (var p in app.seqs) 			v.push(p);											// Add sequence to array
 			v.sort();																				// Sort bones
 			for (var i=0;i<v.length;++i) 	$("#lzSeqs").append("<option>"+v[i]+"</option>");		// Add option
-			}
-
-		function addRoles() {																		// FILL ROLES PULLDOWN
-			$("#lzActs").css("display","block");
-			$("#lzActs").empty();																	// Clear select
-			$("#lzActs").append("<option>Choose role to play</option>");							// Add choose
-			for (var i=0;i<app.students.length;++i) $("#lzActs").append("<option>"+app.students[i].id+"</option>");	// Add option
-			$("#lzActs").append("<option>Coach</option>");											// Add coach
 			}
 		}
 

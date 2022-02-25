@@ -4,7 +4,7 @@
 
 class App  {																					
 
-	constructor(id)   																			// CONSTRUCTOR
+	constructor()   																			// CONSTRUCTOR
 	{
 		app=this;
 		this.role="Teacher";																		// User's role in simulation
@@ -33,8 +33,8 @@ class App  {
 		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
-		this.multi=window.location.search.match(/role=/i) ? true : false;							// Multi-player mode
-		
+
+		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
@@ -50,7 +50,7 @@ class App  {
 		this.fb=new Feedback();																		// Alloc Feedback	
 		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
-
+		if (this.multi) $("#lz-rolePick").css("display","block");									// Show role picker
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
 		$("#timelineBut").on("click", ()=> { this.fb.Draw(); });									// ON FEEDBACK
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
@@ -97,6 +97,11 @@ class App  {
 			if (this.inSim)	this.OnPhrase($("#talkInput").val());									// Act on text, if in sim
 			$("#talkInput").val("");																// Clear text
 			});	
+		$("#lz-rolePick").on("change", ()=> {														// ON CHANGE ROLE
+			this.role=$("#lz-rolePick").val();														// Set new role
+			app.rp.Draw();																			// Redraw reponse panel														
+			});
+
 		$(window).on("keydown", (e) => {															// HANDLE KEY DOWN
 			if (e.which == 32) {																	// Spacebar
 				if (e.target.type == "text") {														// If in a text input
@@ -135,7 +140,7 @@ class App  {
 				if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
 				}
 			});
-	}
+		}
 
 	LoadFiles()																					// LOAD CONFIG FILE
 	{	
@@ -172,6 +177,8 @@ class App  {
 					}
 				this.eventTriggers.sort((a,b)=>{ return a.when-b.when });							// Sort events by time											
 				this.InitClassroom();																// Init classroom
+				$("#lz-rolePick").append("<option>Teacher</option>");								// Add teacher
+				for (i=0;i<app.students.length;++i) $("#lz-rolePick").append("<option>"+app.students[i].id+"</option>");	// Add option
 				this.StartSession();																// Start session
 			});	
 
@@ -180,7 +187,6 @@ class App  {
 			.then(res =>{ 																			// Process																			
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV
 				this.nlp.AddResponses(d);															// Add responses
-				if (this.role != "Teacher")	this.rp.Draw();											// Show response menu if not teacher
 			});
 	}
 
