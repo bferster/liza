@@ -31,7 +31,6 @@ class Voice {
 					});
 				};
 			this.tts.onend=()=> { 																		// ON TALKING END
-//				if (app.inSim) this.Listen();															// Resume listening
 				this.talking=0;  																		// Stop talking animation
 				if (app.curStudent) { 																	// If a student defined
 					let o=app.students.find(x => x.id == app.curStudent);								// Point at student
@@ -51,7 +50,11 @@ class Voice {
 			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };							// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechRecognition capabilities														
 			this.recognition.onresult=(e)=>{ 															// ON RECOGNITION
-				if (e.results[0].isFinal) app.said+=e.results[0][0].transcript+" ";						// Add what was said (check final if interim)
+				if (e.results[0].isFinal) {																// When a portion is final
+					app.said+=e.results[0][0].transcript+" ";											// Add what was said 
+					if ((app.role == "Teacher") && e.results[0][0].transcript && app.multi)				// If teacher talking in multiplayer mode
+						app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|ADMIN|INTERIM|Teacher|Class|"+e.results[0][0].transcript); // Send partial
+					}
 				$("#promptSpan").html(app.said ? app.said+e.results[0][0].transcript+" " : e.results[0][0].transcript+" ");
 				}					
 			} catch(e) { trace("Voice error",e) };														// On error
@@ -88,7 +91,6 @@ class Voice {
 				this.ShowSpeakerText(who,text);															// Show text underneath student										
 				}
 			speechSynthesis.cancel();																	// Clear current speech queue			
-//			if (app.inSim) 				this.StopListening();											// Stop listening
 			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice
 			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex
 			if (who == "male")			this.tts.voice=this.voices[this.maleVoice];						// Set male voice

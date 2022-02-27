@@ -29,6 +29,8 @@ class App  {
 		this.talkTime=0;																			// Calc talk time
 		this.inSim=false;																			// In simulation or not
 		this.inRemark=false;																		// Teacher talking flag
+		this.ignoreNextTalk=false;																	// Ignore TALK event flag
+
 		this.said="";																				// Current remark
 		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
@@ -580,11 +582,17 @@ class App  {
 		if ((v[3] == "SPEAKING") && (this.role != v[4])) {											// SPEAKING
 			Prompt((v[6] == "1") ? v[4]+" speaking..." : "", "on");									// Show status				
 			}	
+		if ((v[3] == "INTERIM") && (this.role != v[4])) {											// INTERIM TALK
+			app.voice.Talk(v[6],v[4]);																// Talk	interim fragments	
+			this.ignoreNextTalk=true;																// Don't repeat last talk, as we already heard it
+			}	
 		else if (v[3] == "TALK") {																	// TALK
 			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0]);							// Update variance
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
-			else 						app.voice.Talk(v[6],v[4]);									// Talk		
+			else if (!this.ignoreNextTalk)app.voice.Talk(v[6],v[4]);								// Talk		
+			this.ignoreNextTalk=false;																// Reset flag
+
 			if ((o=app.students[app.students.findIndex((s)=>{ return v[4] == s.id })])) {			// Point at student data
 				o.lastIntent=this.lastIntent;														// Set intent													
 				o.lastRemark=this.lastRemark;														// Set remark													
