@@ -49,7 +49,7 @@ class Scene {
 		light.position.set(0,0,1);																	// Set angle
 		this.scene.add(light);																		// Add directioal light
 		this.scene.add(new THREE.AmbientLight(0xffffff, 1));										// Add ambient light
-		this.outliner=new THREE.OutlineEffect(this.renderer, { defaultThickness:.002  });		// Add outliner
+		this.outliner=new THREE.OutlineEffect(this.renderer, { defaultThickness:.002  });			// Add outliner
 	}
 
 	Resize()																					// RESIZE 3D SPACE
