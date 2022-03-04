@@ -30,16 +30,20 @@ Question 5,Chris (Harrison),,,,,0,,,,,
 ,Ethan (Luis),,,,,0,,,,,
 ,Oliver (Dev),,,,,0,,,,,
 ,Sharleen (Ava),,,,,0,,,,,
-Question 6,Chris (Harrison),,,,,0,,,,
-,Farrah (Savannah),,,,,0,,,,
-,Jazmin,,,,,0,,,,
-,Ethan (Luis),,,,,0,,,,
-,Oliver (Dev),,,,,0,,,,
-,Sharleen (Ava),,,,,0,,,,
+Question 6,Chris (Harrison),,,,,0,,,,,
+,Farrah (Savannah),,,,,0,,,,,
+,Jazmin,,,,,0,,,,,
+,Ethan (Luis),,,,,0,,,,,
+,Oliver (Dev),,,,,0,,,,,
+,Sharleen (Ava),,,,,0,,,,,
 
 
-,Class,The answer is 4 of course,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101
-,Class,Would you believe 22?,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101
-,Class,The answer is 4 of course,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101
-,Class,I don't know how to add yet,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101
-,Class,Math is hard,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101
+,Class,The answer is 4 of course,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101,
+,Class,Would you believe 22?,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101,
+,Class,The answer is 4 of course,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101,
+,Class,I don't know how to add yet,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101,
+,Class,Math is hard,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101,
+,Class,hi how are you.,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Greeting,600,Start
+,Class,Why are we in this group?,0 (not present),0 (not present),0 (not present),0 (not present),Raise Hand,0,Greeting,600,Start
+,Class,"Hi, we're excited to work with you.",3 (belonging),0 (not present),0 (not present),0 (not present),Talk,0,Greeting,600,Start
+,Class,"We're doing well, how are you?",,0 (not present),0 (not present),0 (not present),Talk,0,Greeting,600,Start

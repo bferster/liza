@@ -336,12 +336,14 @@ class App  {
 	{
 		let res={ text:"", intent:0, bakt:[0,0,0,0,0]};												// Clear res
 		let stuIndex=app.students.findIndex((s)=>{ return this.curStudent == s.id });				// Get index of current studeent
-		if (!this.multi && this.students[stuIndex].first) {											// An initial respons set
-			res.text=this.students[stuIndex].first;													// Set response
-			this.students[stuIndex].first="";														// Fulfilled
-			} 
-		else if (!this.multi && (intent > 49)) 														// If a high-enough level and not in multiplayer																					
+		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
+		if (!this.multi && this.students[stuIndex].first) {											// An initial response set
+			if (res.intent != 600) {																// Not a greeting
+				res.text=this.students[stuIndex].first;												// Set response
+				this.students[stuIndex].first="";													// Fulfilled
+				}
+			} 
 		if (res.text) 																				// If one
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")); // Send response
 		return res;																					// Return it
