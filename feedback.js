@@ -304,6 +304,10 @@ class ResponsePanel  {
 		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number
 		let intentDesc=this.intentDescs[this.curIntent/100];										// Get intent description
 		if (!this.curTab) this.curTab=v[0];															// Init to 1st tab
+		if (app.role == "Gamer") {																	// Game mode
+			this.DrawGamer(remark,student);															// Draw game panel
+			return;																					// Quit
+			}
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px">
@@ -325,7 +329,7 @@ class ResponsePanel  {
 				<span id="lztab-${v[2]}" class="lz-rptab">${v[2]}</span> 
 				<span id="lztab-${v[3]}" class="lz-rptab">${v[3]}</span> 
 				<span id="lztab-${v[4]}" class="lz-rptab">${v[4]}</span> 
-				<div id="lz-rplist" class="lz-rplist" style="${(app.role != "Coach") ? "height:-var(--maxvh)" : ""}"></div>
+				<div id="lz-rplist" class="lz-rplist"></div>
 				</div>
 				<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">`;
 
@@ -368,15 +372,13 @@ class ResponsePanel  {
 			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|sit");		// Send action to server
 			});
 		$("#lzSeqs").on("change", ()=> {															// ON RUN SEQUENCE
-			if (app.role == "Coach") return;														// Not in coach role
 			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
 			$("#lzSeqs").prop("selectedIndex",0);													// Reset pulldowns
 			});
 	
 		function fillList(tab) {																	// FILL RESPONSE LIST
 			let i,v=[],str="",last="";
-			if (app.role == "Teacher") return;														// Not in coach role
-			if (app.role == "Coach") return;														// Not in coach role
+			if ((app.role == "Teacher")|| (app.role == "Gamer")) return;							// Not in teacher role
 			let n=app.nlp.responses[app.role].length;												// Number of responses for student
 			let o=app.nlp.responses[app.role];														// Point at it
 
@@ -403,6 +405,24 @@ class ResponsePanel  {
 			v.sort();																				// Sort bones
 			for (var i=0;i<v.length;++i) 	$("#lzSeqs").append("<option>"+v[i]+"</option>");		// Add option
 			}
+	}
+
+	DrawGamer(remark, student)																	// DRAW GAMER PANEL
+	{
+		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
+		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number
+		let intentDesc=this.intentDescs[this.curIntent/100];										// Get intent description
+		var str=`<div id="lz-rpback" class="lz-rpback"> 
+			<div class="lz-rpinner"> 
+				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px;margin-bottom:16px">
+					<div class="lz-rptitle">${intentLabel}</div><p>${intentDesc}</p>	
+				</div>
+				<div style="width:calc(50% - 10px);height:120px;padding:8px">
+					<div class="lz-rptitle">said to ${student}</div><p>${remark}</p>
+				</div>
+			<div id="lz-rplist" class="lz-rplist"></div>
+			</div>`;
+			$("body").append(str.replace(/\t|\n|\r/g,""));										// Add to body
 		}
 
 

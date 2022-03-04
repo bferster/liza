@@ -35,8 +35,9 @@ class App  {
 		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
-
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
+		if (window.location.search.match(/game/i)) this.role="Gamer";								// Game mode
+		
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 		for (let i=0;i<v.length;++i) {																// For each param
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
@@ -216,7 +217,8 @@ class App  {
 				break;																				// Quit looking
 				}
 			}
-	}
+		if (this.role == "Gamer") 	this.rp.Draw();													// Redraw response panel
+		}
 
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
 	{
@@ -335,6 +337,7 @@ class App  {
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
 		let res={ text:"", intent:0, bakt:[0,0,0,0,0]};												// Clear res
+		if (this.role == "Gamer") return res;														// No responses from gamers
 		let stuIndex=app.students.findIndex((s)=>{ return this.curStudent == s.id });				// Get index of current studeent
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
@@ -612,7 +615,7 @@ class App  {
 				}
 			}
 		else if (v[3] == "ACT")	{																	// ACT										
-			if ((v[4] == "Teacher") || (v[4] == "Coach")) return;									// Only for students
+			if (v[4] == "Teacher") return;															// Only for students
 			if (v[5] == "fidget") {																	// Fidget
 				let seat=v[4] ? app.students.find(x => x.id == v[4]).seat : 0;						// Get seat number
 				app.students[seat].fidget=1-app.students[seat].fidget;								// Toggle fidget								

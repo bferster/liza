@@ -103,7 +103,7 @@ class Voice {
 
 	ShowSpeakerText(student, msg)																	// SHOW SPEAKER'S TEXT
 	{
-		if ((student == "Teacher") || (student == "Coach")) return;										// Only for students
+		if (student == "Teacher") return;																// Only for students
 		$("#responseTextDiv").remove();					                                   				// Kill old one, if any
 		let p=app.sc.GetScreenPos(app.sc.models[student].model);										// Get pos of student
 		var str="<div id='responseTextDiv' style='position:absolute;font-size:14px;width:150px;text-align:center;";
