@@ -29,7 +29,7 @@ class Feedback {
 			if (!(o=app.students[stuIndex]))  return;										        // Point at student
 			app.voice.ShowSpeakerText(app.curStudent,o.lastResponse ? o.lastResponse : "");			// Show response text
 			if (!$("#lz-timelinebar").length)														// Not if timeline up
-				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt ? o.bakt : [0,0,0,0,0]); // Show variance
+				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt ? o.bakt :[0,0,0,0,0,0]); // Show variance
 			else app.fb.Draw();																		// Change student otherwise
 			}
 	}
@@ -184,7 +184,7 @@ class Feedback {
 			if (app.sessionLog[i].from != from)				continue;								// Only from current student
 			if (app.sessionLog[i].time >= time) 			{ d=app.sessionLog[i].data; break; }	// Past now
 			}
-		app.fb.DrawVariance(27,window.innerHeight-193,d ? d : [0,0,0,0,0],time);					// Show variance
+		app.fb.DrawVariance(27,window.innerHeight-193,d ? d : [0,0,0,0,0,0],time);					// Show variance
 		}
 
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
@@ -264,7 +264,7 @@ class Feedback {
 							let o=app.sessionLog[move];													// Point at event
 							app.voice.Talk(o.text,(o.from == "Teacher") ? "Teacher" : o.from);			// Speak
 							if (o.what == "RESPONSE")													// If a response
-								app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0],this.curTime/1000);// Show variance
+								app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0,0],this.curTime/1000);// Show variance
 							this.curMove=move;															// Set current move
 							}
 						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there
@@ -418,8 +418,9 @@ class ResponsePanel  {
 
 	DrawGamer(remark, student)																// DRAW GAMER PANEL
 	{
-		let v=[0,0,0,0,0,0,0];
+		let v=[0,0,0,0,0,0];
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
+			let bakt=app.map.
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:140px;padding:8px;margin-bottom:16px">
 					<div class="lz-rptitle">Teacher said:</div>	
@@ -427,7 +428,7 @@ class ResponsePanel  {
 				</div>
 				<div style="width:calc(50% - 10px);height:140px;padding:8px">
 					<div class="lz-rptitle">${student} said:</div>
-					<p>${app.lastResponse ? app.lastResponse : "Nothing yet..." }</p>
+					<p>${app.lastResponse.text ? app.lastResponse.text : "Nothing yet..." }</p>
 				</div>`;
 			if (remark == "Nothing yet...") {
 				str+=`<div id="lz-rplist" class="lz-dglist">
@@ -441,15 +442,15 @@ class ResponsePanel  {
 				<br><div id="lzgvar"></div>
 				<p><b>What intent do you think the teacher<br> had with that remark?</b></p>
 				<div style="text-align:left">
-					<input type="radio" id="lzg100" name="lzintent">
+					<input type="radio" id="lzg100" name="lzintent" value="100">
 					<label for="lgz100"> 100  Low level general remark</label><br>
-					<input type="radio" id="lzg100" name="lzintent">
+					<input type="radio" id="lzg200" name="lzintent" value="200">
 					<label for="lgz200"> 200 - Explains the text or question</label><br>
-					<input type="radio" id="lzg300" name="lzintent">
+					<input type="radio" id="lzg300" name="lzintent" value="300">
 					<label for="lgz300"> 300 - Values specific element of response</label><br>
-					<input type="radio" id="lzg400" name="lzintent">
+					<input type="radio" id="lzg400" name="lzintent" value="400">
 					<label for="lgz400"> 400 - Shares concern with portion of response</label><br>
-					<input type="radio" id="lzg500" name="lzintent">
+					<input type="radio" id="lzg500" name="lzintent" value="500">
 					<label for="lgz500"> 500 - Aware of thought processes</label><br>
 				<br></div>
 				</div><br>
@@ -475,11 +476,15 @@ class ResponsePanel  {
 			});
 
 		$("#lzgsend").on("click",()=>{ 																// ON SEND
-			let str="<p>This remark was rated as <i>400 - Shares concern with portion of response</i><br>";
-			str+=app.fb.GetVarianceMarkup([1,0,2,0],"x");											// Add dots
-			let points=Math.floor(Math.random()*8)+1;					
+			v[6]=Math.floor(app.lastResponse.intent/100)*100;										// Get intent in 100s
+			let str="<p>This remark was rated as <i>"+v[6]+" - "+this.intentDescs[Math.floor(v[6]/100)]+"</i><br>";
+			str+=app.fb.GetVarianceMarkup(app.lastResponse.variance,"x");							// Add dots
+			let points=Math.floor(Math.random()*4)+1;					
+			let intent=$("input[name='lzintent']:checked").val();
+	points=0;
+			if (Math.abs(v[6]-intent) < 200)	points+=2;											// Close
+			if (v[6] == intent)					points+=2;											// Exact
 			app.points+=points;																		// Add to total
-			v[6]=400;
 			str+="<b>You earned "+points+" points of student learning<br>Your total points are "+app.points+"!</b><br></p>"; // Points
 			$("#lz-results").html(str);																// Show results
 			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|RATE|"+points+"|"+v[6]+"|"+v.join(","));

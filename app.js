@@ -23,6 +23,7 @@ class App  {
 		this.totTime=0;																				// Session time in seconds
 		this.eventTriggers=[];																		// Holds event triggers
 		this.nextTrigger={id:0, time:100000, type:""};												// Next trigger to look for
+		this.lastResponse={ text:"", variance:[0,0,0,0,0,0], intent:0 };							// Last response 
 		this.curStudent="";																			// Currently active student
 		this.lastIntent="";																			// Last intent
 		this.lastRemark="";																			// Last remark
@@ -251,7 +252,7 @@ class App  {
 			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s);								// Get response from intent
-				else			s={ text:s, bakt:[0,0,0,0,0] };										// Explicit text
+				else			s={ text:s, bakt:[0,0,0,0,0,0] };										// Explicit text
 				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
 				}
 			else if (v[i].match(/act:/i)) {															// ACT
@@ -339,7 +340,7 @@ class App  {
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
-		let res={ text:"", intent:0, bakt:[0,0,0,0,0]};												// Clear res
+		let res={ text:"", intent:0, bakt:[0,0,0,0,0,0]};												// Clear res
 		if (this.role == "Gamer") return res;														// No responses from gamers
 		let stuIndex=app.students.findIndex((s)=>{ return this.curStudent == s.id });				// Get index of current studeent
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
@@ -595,7 +596,7 @@ class App  {
 			this.ignoreNextTalk=true;																// Don't repeat last talk, as we already heard it
 			}	
 		else if (v[3] == "TALK") {																	// TALK
-			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0]);							// Update variance
+			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0,0]);						// Update variance
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
 			else if (!this.ignoreNextTalk)app.voice.Talk(v[6],v[4]);								// Talk		
@@ -604,8 +605,9 @@ class App  {
 			if ((o=app.students[app.students.findIndex((s)=>{ return v[4] == s.id })])) {			// Point at student data
 				o.lastIntent=this.lastIntent;														// Set intent													
 				o.lastRemark=this.lastRemark;														// Set remark													
-				this.lastResponse=o.lastResponse=v[6]												// Set response
+				o.lastResponse=v[6]																	// Set response
 				o.bakt=v[7] ? v[7].split(",") : [0,0,0,0,0,this.lastIntent];						// Set variance + intent
+				app.lastResponse={ text:v[6], variance:v[7].split(","), intent:v[7].split(",")[5] }; // Set last response
 				}
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
 				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
