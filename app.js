@@ -30,20 +30,22 @@ class App  {
 		this.inSim=false;																			// In simulation or not
 		this.inRemark=false;																		// Teacher talking flag
 		this.ignoreNextTalk=false;																	// Ignore TALK event flag
-
+		this.userId="";																				// User ID
 		this.said="";																				// Current remark
 		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
-		if (window.location.search.match(/game/i)) this.role="Gamer";								// Game mode
-		
+		if (window.location.search.match(/game/i)) 	this.role="Gamer";								// Game mode
+		if (window.location.host == "localhost") 	this.userId="bferster";							// Set me if debug										
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
-		for (let i=0;i<v.length;++i) {																// For each param
+			for (let i=0;i<v.length;++i) {															// For each param
+			if (v[i] && v[i].match(/id=/)) 	 this.userId=v[i].substring(3).toLowerCase();  			// Get UserId
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session id
 			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get activity id	
 			}
+
 		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
 		this.LoadFiles();																			// Load config and other files
@@ -65,7 +67,7 @@ class App  {
 			else						this.startTime=now;											// Not in sim, set start				
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|START|"+this.inSim+"| ");  // Send sim status
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|START|"+this.inSim+"| ");  // Send sim status
 			Prompt("PRESS SPACEBAR TO TALK","on");	 												// Directions
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
@@ -75,7 +77,7 @@ class App  {
 			$("#startBut").css("background-color", "#27ae60");										// Set color						
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
-					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|RESTART");  	// Send sim status
+					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
 					Prompt("CLICK START TO BEGIN NEW SESSION","on");	 							// Directions
 					this.StartSession();															// Start session
 				});									
@@ -87,7 +89,7 @@ class App  {
 			$("#blackboardDiv").css("display") == "none" ? 1 : 0;									// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			});
-		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.role+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
+		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.userId+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("keydown", ()=> { 														// ON ENTER OF TEXT
 			if (($("#talkInput").val().length == 1) && this.inSim) {								// If first key struck while in sim
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
@@ -101,7 +103,7 @@ class App  {
 			$("#talkInput").val("");																// Clear text
 			});	
 		$("#lz-rolePick").on("change", ()=> {														// ON CHANGE ROLE
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.role+"|ROLE|"+$("#lz-rolePick").val());  	// Send role change
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|ROLE|"+$("#lz-rolePick").val());  	// Send role change
 			this.role=$("#lz-rolePick").val();														// Set new role
 			app.rp.Draw();																			// Redraw reponse panel														
 			});
@@ -121,7 +123,7 @@ class App  {
 				Prompt("Remember to speak clearly!","on"); 											// Prompt
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
 				if (this.role != "Teacher")															// If a student
-				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|ACT|"+app.role+"|nod");	// Send nod 
+				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|ACT|"+app.role+"|nod");	// Send nod 
 				this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
 				this.inRemark=true;																	// Teacher is talking
 				this.talkTime=new Date().getTime();													// Time when talking started 
@@ -228,7 +230,7 @@ class App  {
 		if (app.curTime >= app.totTime) {															// Add done
 			PopUp("Your Teaching with Grace session is over!");										// Popup
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
-			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|DONE");  // Send sim status
+			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|DONE");  // Send sim status
 			}
 		if (app.curTime >= app.nextTrigger.when) 	app.HandleEventTrigger(app.nextTrigger);		// Handle event trigger
 		return app.curTime;																			// Return elapsed time in seconds
@@ -249,15 +251,15 @@ class App  {
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s);								// Get response from intent
 				else			s={ text:s, bakt:[0,0,0,0,0] };										// Explicit text
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
 				}
 			else if (v[i].match(/act:/i)) {															// ACT
 				s=v[i].substring(4);																// Get text
-				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|ACT|"+student+"|"+s); 	
+				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+s); 	
 				}
 			else if (v[i].match(/prompt:/i)) {														// PROMPT
 				s=v[i].substring(7);																// Get text
-				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|PROMPT|"+s); 	// Send prompt	
+				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PROMPT|"+s); 	// Send prompt	
 				}
 			else if (v[i].match(/end:/i)) {															// END
 				let i,remarkLevels=[0,0,0,0,0];														// Remarks per level
@@ -266,7 +268,7 @@ class App  {
 						remarkLevels[Math.floor(this.sessionLog[i].intent/100)-1]++;				// Add remark level	
 				s=remarkLevels.indexOf(Math.max(...remarkLevels));									// Get max remark level
 				s=app.nlp.GetResponse("",student,710+s*10);											// Get response from intent
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.role+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
 				}
 			}
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
@@ -303,7 +305,7 @@ class App  {
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher") {																// Not the teacher talking
-			app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
+			app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
 			return;
 			}
 		let act=app.nlp.GetAction(text);															// Set action
@@ -321,7 +323,7 @@ class App  {
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
-				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.role+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
+				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				this.lastIntent=intent;																// Save last intent
 				if (intent >= 300) {																// If an intent detected
@@ -348,7 +350,7 @@ class App  {
 				}
 			} 
 		if (res.text) 																				// If one
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.curStudent+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")); // Send response
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")); // Send response
 		return res;																					// Return it
 	}
 
@@ -389,7 +391,7 @@ class App  {
 			let seat=student ? app.students.find(x => x.id == student).seat : 0;					// Get seat number
 			if (act == "fidget")			app.students[seat].fidget=1;							// Fidget								
 			else if (act == "fidgetStop")	app.students[seat].fidget=0;							// Off	
-			else 							app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.role+"|ACT|"+student+"|"+act); 	// Send response
+			else 							app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+act); 	// Send response
 			}					
 	}
 
@@ -430,7 +432,7 @@ class App  {
 		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
 		this.ws.onopen=()=> { 																		// ON OPEN
 			console.log('connected'); 																// Showconnected
-			this.ws.send(this.sessionId+"|"+this.activityId+"|"+this.role+"|INIT");					// Init																	
+			this.ws.send(this.sessionId+"|"+this.activityId+"|"+this.userId+"|INIT");				// Init																	
 			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
 			++this.secs;																			// Another second 
 			if (this.retryWS) {																		// If reconnecting to websocket

@@ -196,9 +196,12 @@ var isMobile=false;																					// Flag for mobile devices
 		if (window.location.host != "localhost") {													// Not in debug
 			$("#splashDiv").fadeIn();																// Fade in splash page
 			$("#splashBut").click( ()=> {															// On start button clicked
-				$("#splashDiv").fadeOut();															// Fade out splash
-				$("#mainDiv").fadeIn(2000);															// Fade in main
-				$("#controllerDiv").fadeIn(2000);													// Fade in controller
+				GetTextBox("Please sign in","Please type your email:","", (s)=>{					// Get id
+					app.userId=s;																	// Set user id
+					$("#splashDiv").fadeOut();														// Fade out splash
+					$("#mainDiv").fadeIn(2000);														// Fade in main
+					$("#controllerDiv").fadeIn(2000);												// Fade in controller
+					})
 				})
 			}
 		else{																						// Debug

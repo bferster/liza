@@ -34,33 +34,13 @@ class Feedback {
 
 	DrawVariance(x, y, v, time)																	// SHOW STUDENT VARIANCE
 	{
-		let i,j,c=[];
-		for (i=0;i<4;++i) {																			// For each factor
-			if (v[i] == -1)		c[i]=1;																// Set bit,ap to 1st
-			else if (v[i] == 1)	c[i]=2;																// 2nd
-			else if (v[i] == 2)	c[i]=6;																// 2nd & 3rd
-			else if (v[i] == 3)	c[i]=14;															// 2nd, 3rd & 4th
-			else 				c[i]=16;															// None
-			}		
+		$("#lz-variance").remove();																	// Remove old one
+		let i,j;
 		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
 		let labs=["Value","Language","Knowledge","Thinking"];
-		$("#lz-variance").remove();																	// Remove old one
 		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px">`;
-		str+="<table style='margin-bottom:10px'>";	
-		for (i=0;i<4;++i) {																			// For each row
-			str+="<tr>";																			// Start row
-			for (j=0;j<4;++j) {																		// For each column
-				str+="<td";																			// Start column
-				if (!j)	str+=" style='border-right:1px solid #999'";								// Add border
-				str+=`><div id="vdot${i}${j}" class="lz-vardot": style="border:1px solid ${cols[i]}60`;// Add dot frame
-				if ((1<<j)&c[i] ) str+=`;background-color:${cols[i]}`;								// Color it?
-				str+=`;width:15px;height:15px">${(c[i] == 1) ? "-" : ""}</div></td>`;				// Finish dot
-				}
-			str+=`<td style='padding-left:8px;color:${cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
-			}
-		str+=`</tr></table>`;
-
 		let s=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 		// Point at student data
+		str+=this.GetVarianceMarkup(v);																// Get dot display
 		if ((x < 200) && s) {																		// In timeline	
 			v=s.base.slice();																		// Get baseline student variance
 			let o,counts=[1,1,1,1,1];																// Reset count
@@ -87,8 +67,37 @@ class Feedback {
 				title="${labs[i]} trend"></div></div>`;
 				}
 			}
-		str+="</div>";
+			str+="</div>";
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
+	}
+
+	GetVarianceMarkup(v, prefix="")																// DRAW VARIANCE GRAPH
+	{
+		let i,j,c=[];
+		for (i=0;i<4;++i) {																			// For each factor
+			if (v[i] == -1)		c[i]=1;																// Set bit, cap to 1st
+			else if (v[i] == 1)	c[i]=2;																// 2nd
+			else if (v[i] == 2)	c[i]=6;																// 2nd & 3rd
+			else if (v[i] == 3)	c[i]=14;															// 2nd, 3rd & 4th
+			else 				c[i]=16;															// None
+			}		
+		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
+		let labs=["Value","Language","Knowledge","Thinking"];
+		let str="<table style='margin-bottom:10px'>";	
+		for (i=0;i<4;++i) {																			// For each row
+			str+="<tr>";																			// Start row
+			for (j=0;j<4;++j) {																		// For each column
+				str+="<td";																			// Start column
+				if (!j)	str+=" style='border-right:1px solid #999'";								// Add border
+				str+=`><div id="${prefix}vdot${i}${j}" class="lz-vardot": style="border:1px solid ${cols[i]}60`;// Add dot frame
+				if (prefix)	str+=";cursor:pointer";													// Pointer?
+				if ((1<<j)&c[i] ) str+=`;background-color:${cols[i]}`;								// Color it?
+				str+=`;width:15px;height:15px">${(c[i] == 1) ? "-" : ""}</div></td>`;				// Finish dot
+				}
+			str+=`<td style='padding-left:8px;color:${cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
+			}
+		str+=`</tr></table>`;
+		return str;
 	}
 
 	Draw(time)																						// DRAW FEEDBACK PANEL
@@ -340,7 +349,7 @@ class ResponsePanel  {
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 
 		$("#lz-chat").on("change", ()=> {															// ON MESSAGE TEACHER
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|CHAT|Teacher|<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val()); // Send message
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|CHAT|Teacher|<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val()); // Send message
 			let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;		// Bubble center
 			Bubble("<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val(),5,bx);					// Show
 			$("#lz-chat").val("");																	// Clear input
@@ -357,22 +366,22 @@ class ResponsePanel  {
 
 		$("#lzFidget").on("click", ()=> {															// ON FIDGET
 			$("#lzFidget").html($("#lzFidget").html() == "Fidget" ? "Stop it " : "Fidget");			// Toggle label
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|fidget");		// Send action to server
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|fidget");	// Send action to server
 			});
 		$("#lzYes").on("click", ()=> {																// ON YES
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|nodYes");		// Send action to server
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|nodYes");	// Send action to server
 			});
 		$("#lzNo").on("click", ()=> {																// ON NO
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|nodNo");		// Send action to server
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|nodNo");	// Send action to server
 			});
 		$("#lzWave").on("click", ()=> {																// ON WAVE
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|interrupt");	// Send action to server
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|interrupt"); // Send action to server
 			});
 		$("#lzSit").on("click", ()=> {																// ON SIT
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|sit");		// Send action to server
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|sit");		// Send action to server
 			});
 		$("#lzSeqs").on("change", ()=> {															// ON RUN SEQUENCE
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
 			$("#lzSeqs").prop("selectedIndex",0);													// Reset pulldowns
 			});
 	
@@ -393,7 +402,7 @@ class ResponsePanel  {
 
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.role+"|TALK|"+app.role+"|Teacher|"+app.nlp.responses[app.role][id].text+"|"+app.nlp.responses[app.role][id].bakt.join(","));
+				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+app.nlp.responses[app.role][id].text+"|"+app.nlp.responses[app.role][id].bakt.join(","));
 				});
 			}
 
@@ -412,6 +421,7 @@ class ResponsePanel  {
 		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
 		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number
 		let intentDesc=this.intentDescs[this.curIntent/100];										// Get intent description
+		let v=[1,2,3,0,0]
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px;margin-bottom:16px">
@@ -420,10 +430,23 @@ class ResponsePanel  {
 				<div style="width:calc(50% - 10px);height:120px;padding:8px">
 					<div class="lz-rptitle">said to ${student}</div><p>${remark}</p>
 				</div>
-			<div id="lz-rplist" class="lz-rplist"></div>
-			</div>`;
-			$("body").append(str.replace(/\t|\n|\r/g,""));										// Add to body
-		}
+			<div id="lz-rplist" class="lz-rplist" style="text-align:center">
+			<br><b>What do you think the student variance <br>will be to this remark?</b><br><br>
+			Click on the dots to set the variance for each factor.
+			<br><br><div id="lzgvar"></div>`;
+		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
+		$("#lzgvar").html(app.fb.GetVarianceMarkup(v,"g"));											// Set variance
+		
+		$("[id^=gvdot]").on("click",(e)=>{ 															// ON DOT CLICK
+			let row=e.target.id.substring(5,6);														// Get factor
+			let val=e.target.id.substr(6,7);														// Get val
+			v[row]=(v[row]++)%4
+trace(v)
+			$("#lzgvar").html(app.fb.GetVarianceMarkup(v,"g"));											// Set variance
+
+
+			});
+	}
 
 
 } // ResponsePanel class closure
