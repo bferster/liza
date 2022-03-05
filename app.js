@@ -35,6 +35,7 @@ class App  {
 		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
+		this.points=0;																				// Gamer points
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
 		if (window.location.search.match(/game/i)) 	this.role="Gamer";								// Game mode
 		if (window.location.host == "localhost") 	this.userId="bferster";							// Set me if debug										
@@ -359,7 +360,7 @@ class App  {
 		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
 		let o=app.students[stuIndex];																// Point at student
 		if ($("#lz-timelinebar").length) app.fb.Draw(this.curTime);									// If timeline up, show new dot and variance
-		else app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt,this.curTime);	// Show variance
+		else if (this.role != "Gamer")   app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt,this.curTime);	// Show variance
 		if (!o)	return;																				// Quit if not a student
 	}
 
@@ -603,7 +604,7 @@ class App  {
 			if ((o=app.students[app.students.findIndex((s)=>{ return v[4] == s.id })])) {			// Point at student data
 				o.lastIntent=this.lastIntent;														// Set intent													
 				o.lastRemark=this.lastRemark;														// Set remark													
-				o.lastResponse=v[6]																	// Set response
+				this.lastResponse=o.lastResponse=v[6]												// Set response
 				o.bakt=v[7] ? v[7].split(",") : [0,0,0,0,0,this.lastIntent];						// Set variance + intent
 				}
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark

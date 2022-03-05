@@ -61,7 +61,7 @@ class Feedback {
 			v[0]/=counts[0];	v[1]/=counts[1];	v[2]/=counts[2];	v[3]/=counts[3];			// Calc bar means
 			for (i=0;i<4;++i) {																		// For each factor
 				str+=`<div style="height:13px;color:#fff;font-size:9px;margin:0 0 1px 2px">
-				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${cols[i]};
+				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${app.fb.cols[i]};
 				width:13px;height:12px;margin-right:5px;vertical-align:2px;padding:1px;">${labs[i].charAt(0)}</div>
 				<div id="lztrend${i}" style="display:inline-block;background-color:${app.fb.cols[i]};width:${Math.max(0,Math.min(150,v[i]*50))}px;height:11px;
 				border-radius:0 16px 16px 0"
@@ -416,36 +416,48 @@ class ResponsePanel  {
 			}
 	}
 
-	DrawGamer(remark, student)																	// DRAW GAMER PANEL
+	DrawGamer(remark, student)																// DRAW GAMER PANEL
 	{
-		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
-		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number
-		let v=[0,0,0,0,0]
+		let v=[0,0,0,0,0,0,0];
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
-				<div class="lz-rptitle">said to ${student}</div><p>
-				${remark.charAt(0).toUpperCase()}${remark.substring(1)}</p>
-			<div id="lz-rplist" class="lz-dglist">
-			<br><b>Click on the dots to set the<br>variance for this remark</b><br>
-			<br><div id="lzgvar"></div><br>
-			<p><b>What intent do you think the teacher had with their remark?</b></p>
-			<div style="text-align:left">
-				<input type="radio" id="lzg100" name="lzintent">
-				<label for="lgz100"> 100  Low level general remark</label><br>
-				<input type="radio" id="lzg100" name="lzintent">
-				<label for="lgz200"> 200 - Explains the text or question</label><br>
-				<input type="radio" id="lzg300" name="lzintent">
-				<label for="lgz300"> 300 - Values specific element of response</label><br>
-				<input type="radio" id="lzg400" name="lzintent">
-				<label for="lgz400"> 400 - Shares concern with portion of response</label><br>
-				<input type="radio" id="lzg500" name="lzintent">
-				<label for="lgz500"> 500 - Aware of thought processes</label><br>
-			<br></div>
-			</div><br>
-			<div id="lz-results" class="lz-dglist">
-				<p id="lzgsend" class="lz-bs">Send</p>
-			</div>`;
-		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
+				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:140px;padding:8px;margin-bottom:16px">
+					<div class="lz-rptitle">Teacher said:</div>	
+					<p>${remark.charAt(0).toUpperCase()}${remark.substring(1)}</p>
+				</div>
+				<div style="width:calc(50% - 10px);height:140px;padding:8px">
+					<div class="lz-rptitle">${student} said:</div>
+					<p>${app.lastResponse ? app.lastResponse : "Nothing yet..." }</p>
+				</div>`;
+			if (remark == "Nothing yet...") {
+				str+=`<div id="lz-rplist" class="lz-dglist">
+				<br>When the teacher says something, a box will appear and ask you to rate the student response in terms of the <i>Value/Belonging, Use of Academic Language, Knowledge,</i> and the <i>Thinking </i>it elicited.
+				<br><br>You'll also rate the level of the remark itself, from 100 to 500.
+				<br><br>You will be awarded points on how close your ratings were to the system.<br><br>`;
+				}
+			else{
+				str+=`<div id="lz-rplist" class="lz-dglist">
+				<br><b>Click on the dots to set the<br>variance for this remark:</b><br>
+				<br><div id="lzgvar"></div>
+				<p><b>What intent do you think the teacher<br> had with that remark?</b></p>
+				<div style="text-align:left">
+					<input type="radio" id="lzg100" name="lzintent">
+					<label for="lgz100"> 100  Low level general remark</label><br>
+					<input type="radio" id="lzg100" name="lzintent">
+					<label for="lgz200"> 200 - Explains the text or question</label><br>
+					<input type="radio" id="lzg300" name="lzintent">
+					<label for="lgz300"> 300 - Values specific element of response</label><br>
+					<input type="radio" id="lzg400" name="lzintent">
+					<label for="lgz400"> 400 - Shares concern with portion of response</label><br>
+					<input type="radio" id="lzg500" name="lzintent">
+					<label for="lgz500"> 500 - Aware of thought processes</label><br>
+				<br></div>
+				</div><br>
+				<div id="lz-results" class="lz-dglist">
+					<p id="lzgsend" class="lz-bs">Send</p>
+				</div>`;
+			}
+		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div");										// Add to body
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$("#lzgvar").html(app.fb.GetVarianceMarkup(v,"g"));											// Set variance
 		
@@ -465,8 +477,12 @@ class ResponsePanel  {
 		$("#lzgsend").on("click",()=>{ 																// ON SEND
 			let str="<p>This remark was rated as <i>400 - Shares concern with portion of response</i><br>";
 			str+=app.fb.GetVarianceMarkup([1,0,2,0],"x");											// Add dots
-			str+="<b>You won 8 points for your good work!</b><br></p>";
+			let points=Math.floor(Math.random()*8)+1;					
+			app.points+=points;																		// Add to total
+			v[6]=400;
+			str+="<b>You earned "+points+" points of student learning<br>Your total points are "+app.points+"!</b><br></p>"; // Points
 			$("#lz-results").html(str);																// Show results
+			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|RATE|"+points+"|"+v[6]+"|"+v.join(","));
 			});
 	}
 
