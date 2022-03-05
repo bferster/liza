@@ -13,7 +13,9 @@ class Feedback {
 		this.interval=null;																			// Timer
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
-		this.intentLabels=["Students","General","Ask","Value","Correct","Think"];					// Intent labels
+		this.intentLabels=["Intent","General","Ask","Value","Correct","Think"];						// Intent labels
+		this.cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];										// BAKT colors
+
 	}
 
 	OnClick(e) 																					// ON SCREEN CLICK
@@ -36,7 +38,6 @@ class Feedback {
 	{
 		$("#lz-variance").remove();																	// Remove old one
 		let i,j;
-		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
 		let labs=["Value","Language","Knowledge","Thinking"];
 		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px">`;
 		let s=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 		// Point at student data
@@ -62,7 +63,7 @@ class Feedback {
 				str+=`<div style="height:13px;color:#fff;font-size:9px;margin:0 0 1px 2px">
 				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${cols[i]};
 				width:13px;height:12px;margin-right:5px;vertical-align:2px;padding:1px;">${labs[i].charAt(0)}</div>
-				<div id="lztrend${i}" style="display:inline-block;background-color:${cols[i]};width:${Math.max(0,Math.min(150,v[i]*50))}px;height:11px;
+				<div id="lztrend${i}" style="display:inline-block;background-color:${app.fb.cols[i]};width:${Math.max(0,Math.min(150,v[i]*50))}px;height:11px;
 				border-radius:0 16px 16px 0"
 				title="${labs[i]} trend"></div></div>`;
 				}
@@ -81,7 +82,6 @@ class Feedback {
 			else if (v[i] == 3)	c[i]=14;															// 2nd, 3rd & 4th
 			else 				c[i]=16;															// None
 			}		
-		let cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];
 		let labs=["Value","Language","Knowledge","Thinking"];
 		let str="<table style='margin-bottom:10px'>";	
 		for (i=0;i<4;++i) {																			// For each row
@@ -89,12 +89,12 @@ class Feedback {
 			for (j=0;j<4;++j) {																		// For each column
 				str+="<td";																			// Start column
 				if (!j)	str+=" style='border-right:1px solid #999'";								// Add border
-				str+=`><div id="${prefix}vdot${i}${j}" class="lz-vardot": style="border:1px solid ${cols[i]}60`;// Add dot frame
+				str+=`><div id="${prefix}vdot${i}${j}" class="lz-vardot": style="border:1px solid ${app.fb.cols[i]}60`;// Add dot frame
 				if (prefix)	str+=";cursor:pointer";													// Pointer?
-				if ((1<<j)&c[i] ) str+=`;background-color:${cols[i]}`;								// Color it?
+				if ((1<<j)&c[i] ) str+=`;background-color:${app.fb.cols[i]}`;						// Color it?
 				str+=`;width:15px;height:15px">${(c[i] == 1) ? "-" : ""}</div></td>`;				// Finish dot
 				}
-			str+=`<td style='padding-left:8px;color:${cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
+			str+=`<td style='padding-left:8px;color:${app.fb.cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
 			}
 		str+=`</tr></table>`;
 		return str;
@@ -420,31 +420,53 @@ class ResponsePanel  {
 	{
 		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
 		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number
-		let intentDesc=this.intentDescs[this.curIntent/100];										// Get intent description
-		let v=[1,2,3,0,0]
+		let v=[0,0,0,0,0]
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
-				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:120px;padding:8px;margin-bottom:16px">
-					<div class="lz-rptitle">${intentLabel}</div><p>${intentDesc}</p>	
-				</div>
-				<div style="width:calc(50% - 10px);height:120px;padding:8px">
-					<div class="lz-rptitle">said to ${student}</div><p>${remark}</p>
-				</div>
-			<div id="lz-rplist" class="lz-rplist" style="text-align:center">
-			<br><b>What do you think the student variance <br>will be to this remark?</b><br><br>
-			Click on the dots to set the variance for each factor.
-			<br><br><div id="lzgvar"></div>`;
-		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
+				<div class="lz-rptitle">said to ${student}</div><p>
+				${remark.charAt(0).toUpperCase()}${remark.substring(1)}</p>
+			<div id="lz-rplist" class="lz-dglist">
+			<br><b>Click on the dots to set the<br>variance for this remark</b><br>
+			<br><div id="lzgvar"></div><br>
+			<p><b>What intent do you think the teacher had with their remark?</b></p>
+			<div style="text-align:left">
+				<input type="radio" id="lzg100" name="lzintent">
+				<label for="lgz100"> 100  Low level general remark</label><br>
+				<input type="radio" id="lzg100" name="lzintent">
+				<label for="lgz200"> 200 - Explains the text or question</label><br>
+				<input type="radio" id="lzg300" name="lzintent">
+				<label for="lgz300"> 300 - Values specific element of response</label><br>
+				<input type="radio" id="lzg400" name="lzintent">
+				<label for="lgz400"> 400 - Shares concern with portion of response</label><br>
+				<input type="radio" id="lzg500" name="lzintent">
+				<label for="lgz500"> 500 - Aware of thought processes</label><br>
+			<br></div>
+			</div><br>
+			<div id="lz-results" class="lz-dglist">
+				<p id="lzgsend" class="lz-bs">Send</p>
+			</div>`;
+		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
+		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$("#lzgvar").html(app.fb.GetVarianceMarkup(v,"g"));											// Set variance
 		
 		$("[id^=gvdot]").on("click",(e)=>{ 															// ON DOT CLICK
+			let i;
 			let row=e.target.id.substring(5,6);														// Get factor
 			let val=e.target.id.substr(6,7);														// Get val
-			v[row]=(v[row]++)%4
-trace(v)
-			$("#lzgvar").html(app.fb.GetVarianceMarkup(v,"g"));											// Set variance
+			if (v[row] != 0)	v[row]=0;															// If set, row to 0
+			else 				v[row]=(val == 0) ? -1 : val-0;										// Set array
+			$("[id^=gvdot"+row+"]").css("background-color","#fff");									// Reset row
+			
+			if (v[row] == -1)	$("#gvdot"+row+"0").css("background-color",app.fb.cols[row]);		// Set value
+			else if (v[row]) 																		// If val is 1-3
+				for (i=1;i<=val;++i)	$("#gvdot"+row+i).css("background-color",app.fb.cols[row]);	// Set values
+			});
 
-
+		$("#lzgsend").on("click",()=>{ 																// ON SEND
+			let str="<p>This remark was rated as <i>400 - Shares concern with portion of response</i><br>";
+			str+=app.fb.GetVarianceMarkup([1,0,2,0],"x");											// Add dots
+			str+="<b>You won 8 points for your good work!</b><br></p>";
+			$("#lz-results").html(str);																// Show results
 			});
 	}
 

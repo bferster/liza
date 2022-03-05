@@ -64,6 +64,8 @@
 		.lz-rplist { 		text-align:left; overflow-y:auto; height:calc(var(--maxvh) - 303px); padding:0 16px; margin-right:2px; width:100%;
 							border:1px solid #aaa; border-radius:8px; background-color:#fff; border-top-left-radius:0; border-top-right-radius:0; border-top:none;
 							}
+		.lz-dglist { 		text-align:center; padding:0 16px; margin-right:2px; width:100%; border:1px solid #aaa; border-radius:8px; background-color:#fff;
+							}
 		.lz-rptab {			width:calc(20% - 4px); cursor:pointer; font-size:11px; background-color:#eee; padding:4px 0; border:1px solid #999;
 							border-radius:6px; margin-right: 2px; border-bottom-left-radius:0; border-bottom-right-radius:0; border-bottom:none; background-color:#fff; 
 							}
@@ -196,7 +198,7 @@ var isMobile=false;																					// Flag for mobile devices
 		if (window.location.host != "localhost") {													// Not in debug
 			$("#splashDiv").fadeIn();																// Fade in splash page
 			$("#splashBut").click( ()=> {															// On start button clicked
-				GetTextBox("Please sign in","Please type your email:","", (s)=>{					// Get id
+				GetTextBox("Please sign in","Please type your email (or <i>guest</i>):","", (s)=>{	// Get id
 					app.userId=s;																	// Set user id
 					$("#splashDiv").fadeOut();														// Fade out splash
 					$("#mainDiv").fadeIn(2000);														// Fade in main

@@ -40,7 +40,7 @@ class App  {
 		if (window.location.host == "localhost") 	this.userId="bferster";							// Set me if debug										
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 			for (let i=0;i<v.length;++i) {															// For each param
-			if (v[i] && v[i].match(/id=/)) 	 this.userId=v[i].substring(3).toLowerCase();  			// Get UserId
+			if (v[i] && v[i].match(/id=/)) 	 this.userId=v[i].substring(3).toLowerCase();  			// Get userId (for debugging only)
 			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session id
 			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get activity id	
@@ -227,12 +227,12 @@ class App  {
 		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
 		app.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
 		if (app.multi)	return app.curTime;															// No timed events in multiplayer mode
-		if (app.curTime >= app.totTime) {															// Add done
+/*		if (app.curTime >= app.totTime) {															// Add done
 			PopUp("Your Teaching with Grace session is over!");										// Popup
 			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
 			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|DONE");  // Send sim status
 			}
-		if (app.curTime >= app.nextTrigger.when) 	app.HandleEventTrigger(app.nextTrigger);		// Handle event trigger
+*/		if (app.curTime >= app.nextTrigger.when) 	app.HandleEventTrigger(app.nextTrigger);		// Handle event trigger
 		return app.curTime;																			// Return elapsed time in seconds
 	}
 
