@@ -608,7 +608,7 @@ class App  {
 				o.lastRemark=this.lastRemark;														// Set remark													
 				o.lastResponse=v[6]																	// Set response
 				o.bakt=v[7] ? v[7].split(",") : [0,0,0,0,0,this.lastIntent];						// Set variance + intent
-				app.lastResponse={ text:v[6], variance:v[7].split(","), intent:v[7].split(",")[5] }; // Set last response
+				app.lastResponse={ text:v[6], variance:o.bakt, intent:o.bakt[5] }; 					// Set last response
 				}
 			if (this.role != "Teacher" && v[4] == "Teacher") {										// If playing a non-teacher role, evaluate teacher's remark
 				this.nlp.InferIntent(v[6],(res)=>{ 													// Get intent from AI
@@ -616,9 +616,11 @@ class App  {
 					intent=isNaN(intent) ? 0 : intent;												// Validate
 					this.rp.curIntent=intent;														// Set current intent
 					if (v[5]) app.curStudent=v[5];													// Set new active student 
-					this.rp.Draw(v[6],app.curStudent);												// Redraw response panel
+					if (this.role != "Gamer") this.rp.Draw(v[6],app.curStudent);					// Redraw response panel
 					});
 				}
+			if (v[4] == "Teacher") this.lastRemark=v[6];											// Set last remark
+			if ((this.role == "Gamer") && (v[4] != "Teacher")) this.rp.Draw(this.lastRemark,app.curStudent);	// Redraw response panel
 			}
 		else if (v[3] == "ACT")	{																	// ACT										
 			if (v[4] == "Teacher") return;															// Only for students
