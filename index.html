@@ -59,9 +59,9 @@
 							border-right:1px solid #aaa; background-color:#eee; text-align:center; user-select:none;
 							}
 		.lz-rpinner { 		display:flex; flex-wrap:wrap; width:calc(100% - 24px); margin:2px 0 0 2px;
-							text-align:center; background-color:#eee; padding:12px;
+							text-align:center; background-color:#eee; padding:0 12px;
 							}
-		.lz-rplist { 		text-align:left; overflow-y:auto; height:calc(var(--maxvh) - 303px); padding:0 16px; margin-right:2px; width:100%;
+		.lz-rplist { 		text-align:left; overflow-y:auto; height:calc(var(--maxvh) - 282px); padding:0 16px; margin:0 2px 12px 0; width:100%;
 							border:1px solid #aaa; border-radius:8px; background-color:#fff; border-top-left-radius:0; border-top-right-radius:0; border-top:none;
 							}
 		.lz-dglist { 		text-align:center; padding:0 16px; margin-right:2px; width:100%; border:1px solid #aaa; border-radius:8px; background-color:#fff;
@@ -69,7 +69,7 @@
 		.lz-rptab {			width:calc(20% - 4px); cursor:pointer; font-size:11px; background-color:#eee; padding:4px 0; border:1px solid #999;
 							border-radius:6px; margin-right: 2px; border-bottom-left-radius:0; border-bottom-right-radius:0; border-bottom:none; background-color:#fff; 
 							}
-		.lz-rptitle {		width:100%; display:inline-block; font-size:24px; font-family:Chalk; text-align:center; font-weight:600;
+		.lz-rptitle {		width:100%; display:inline-block; font-size:20px; font-family:Chalk; text-align:center; font-weight:600;
 							}
 		.lz-timebar { 		position:absolute;color:#999; width:100%; left:0px; top:calc(var(--maxvh) - 128px);
 							background-color:#aaa; border-radius: 12px 12px 0 0; height:90px; user-select:none;
@@ -149,7 +149,7 @@
 		<div id="startBut" class="lz-startBut">START</div>
 		<img id="restartBut" src="img/restart.png" style="margin-left:6px;cursor:pointer" title="Restart class">
 		<input id="talkInput" type="text" class="lz-is" style="margin-left:6px;vertical-align:8px" placeholder="Type remark">
-		<span id="promptSpan" style="margin-left:16px;color:#333;vertical-align:8px">CLICK START TO BEGIN SESSION</span>
+		<span id="promptSpan" style="margin-left:16px;color:#333;vertical-align:8px"></span>
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<img id="feedbackBut" src="img/feedback.png" title="Feedback" style="cursor:pointer;margin-right:16px;float:right">
 		<img id="timelineBut" src="img/graphbut.png" title="Timeline" style="cursor:pointer;margin-right:16px;float:right">

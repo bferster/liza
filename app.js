@@ -57,6 +57,7 @@ class App  {
 		this.fb=new Feedback();																		// Alloc Feedback	
 		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
+		if (this.role != "Gamer")	Prompt("CLICK START TO BEGIN NEW SESSION","on");				// Directions
 		if (this.multi) $("#lz-rolePick").css("display","block");									// Show role picker
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
 		$("#timelineBut").on("click", ()=> { this.fb.Draw(); });									// ON FEEDBACK
@@ -80,7 +81,7 @@ class App  {
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
 					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
-					Prompt("CLICK START TO BEGIN NEW SESSION","on");	 							// Directions
+					if (this.role != "Gamer")	Prompt("CLICK START TO BEGIN NEW SESSION","on");	// Directions
 					this.StartSession();															// Start session
 				});									
 			});	
@@ -588,7 +589,7 @@ class App  {
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 		this.LogEvent(v);																			// Log event
 		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
-		if ((v[3] == "SPEAKING") && (this.role != v[4])) {											// SPEAKING
+		if ((v[3] == "SPEAKING") && (this.role != v[4]) && (this.role != "Gamer")) {				// SPEAKING
 			Prompt((v[6] == "1") ? v[4]+" speaking..." : "", "on");									// Show status				
 			}	
 		if ((v[3] == "INTERIM") && (this.role != v[4])) {											// INTERIM TALK
