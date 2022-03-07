@@ -300,6 +300,7 @@ class ResponsePanel  {
 			$("#mainDiv").css("margin-left","15%");													// Shift right													
 			app.sc.Resize();																		// Resize renderer
 			app.sc.SetCamera(0,200,600,0,0,0);														// Reset camera	
+			Prompt("","on");																		// No prompt
 			}
 		else{
 			$("#mainDiv").css("margin-left",0);														// No margin													

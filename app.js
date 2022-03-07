@@ -38,12 +38,11 @@ class App  {
 		this.teacherResources=[];																	// Teacher resource documents
 		this.points=0;																				// Gamer points
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
-		if (window.location.search.match(/game/i)) 	this.role="Gamer";								// Game mode
-		if (window.location.host == "localhost") 	this.userId="bferster";							// Set me if debug										
+		if (window.location.host == "localhost") this.userId="bferster";							// Set me if debug										
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 			for (let i=0;i<v.length;++i) {															// For each param
 			if (v[i] && v[i].match(/id=/)) 	 this.userId=v[i].substring(3).toLowerCase();  			// Get userId (for debugging only)
-			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
+//			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session id
 			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get activity id	
 			}
@@ -57,7 +56,6 @@ class App  {
 		this.fb=new Feedback();																		// Alloc Feedback	
 		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
-		if (this.role != "Gamer")	Prompt("CLICK START TO BEGIN NEW SESSION","on");				// Directions
 		if (this.multi) $("#lz-rolePick").css("display","block");									// Show role picker
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
 		$("#timelineBut").on("click", ()=> { this.fb.Draw(); });									// ON FEEDBACK
@@ -79,9 +77,11 @@ class App  {
 			$("#startBut").html("START");															// Set label					
 			$("#startBut").css("background-color", "#27ae60");										// Set color						
 			if (e.type == "click")																	// Only if actually clicked
-				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 		// Are you sure?
-					if (this.role == "Teacher") this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
-					if (this.role != "Gamer")	Prompt("CLICK START TO BEGIN NEW SESSION","on");	// Directions
+				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 	// Are you sure?
+					if (this.role == "Teacher") {
+						this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
+						Prompt("CLICK START TO BEGIN NEW SESSION","on");							// Directions
+						}
 					this.StartSession();															// Start session
 				});									
 			});	
@@ -108,6 +108,7 @@ class App  {
 		$("#lz-rolePick").on("change", ()=> {														// ON CHANGE ROLE
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|ROLE|"+$("#lz-rolePick").val());  	// Send role change
 			this.role=$("#lz-rolePick").val();														// Set new role
+			Prompt((this.role == "Teacher") ? "CLICK START TO BEGIN NEW SESSION" : "","on");		// No prompt
 			app.rp.Draw();																			// Redraw reponse panel														
 			});
 
@@ -186,7 +187,7 @@ class App  {
 					}
 				this.eventTriggers.sort((a,b)=>{ return a.when-b.when });							// Sort events by time											
 				this.InitClassroom();																// Init classroom
-				$("#lz-rolePick").append("<option>Teacher</option>");								// Add teacher
+				$("#lz-rolePick").append("<option>Teacher</option><option>Gamer</option>");			// Add teacher & gamer roles
 				for (i=0;i<app.students.length;++i) $("#lz-rolePick").append("<option>"+app.students[i].id+"</option>");	// Add option
 				this.StartSession();																// Start session
 			});	
@@ -206,6 +207,7 @@ class App  {
 		this.sessionLog=[];																			// Clear session log
 		this.inSim=false;																			// Not in simulation
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
+		this.points=0;																				// Clear points
 		this.curStudent=app.students[0].id;															// Pick first student
 		this.bb.SetSide(1);	this.bb.SetPic(this.bb.pics[1].lab,true);								// Set right side
 		this.bb.SetSide(0);	this.bb.SetPic(this.bb.pics[0].lab,true);								// Left 
@@ -222,8 +224,7 @@ class App  {
 				break;																				// Quit looking
 				}
 			}
-		if (this.role == "Gamer") 	this.rp.Draw();													// Redraw response panel
-		}
+	}
 
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
 	{
