@@ -293,7 +293,7 @@ class ResponsePanel  {
 						  "Aware of thought processes to plan, monitor, adjust, and reflect on learning actions" ];
 	}
 
-	Draw(remark="Nothing yet...",student="student")												// DRAW
+	Draw(remark="Nothing yet...",student="student", mode)										// DRAW
 	{
 		$("#lz-rpback").remove();																	// Remove old one
 		if (app.role != "Teacher") {																// A student role
@@ -314,7 +314,7 @@ class ResponsePanel  {
 		let intentDesc=this.intentDescs[this.curIntent/100];										// Get intent description
 		if (!this.curTab) this.curTab=v[0];															// Init to 1st tab
 		if (app.role == "Gamer") {																	// Game mode
-			this.DrawGamer(remark,student);															// Draw game panel
+			this.DrawGamer(remark,student,mode);													// Draw game panel
 			return;																					// Quit
 			}
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
@@ -416,7 +416,7 @@ class ResponsePanel  {
 			}
 	}
 
-	DrawGamer(remark, student)																// DRAW GAMER PANEL
+	DrawGamer(remark, student, mode="start")												// DRAW GAMER PANEL
 	{
 		let v=[0,0,0,0,0,0];
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
@@ -429,33 +429,36 @@ class ResponsePanel  {
 					<div class="lz-rptitle">${student} said:</div>
 					<p>${app.lastResponse.text ? app.lastResponse.text : "Nothing yet..." }</p>
 				</div>`;
-			if (remark == "Nothing yet...") {													// If start screen
+			if (mode == "start") {																// If start screen
 				str+=`<div id="lz-rplist" class="lz-dglist">
-				<br>When the teacher says something, a box will appear and ask you to rate the student response in terms of the <i>Value/Belonging, Use of Academic Language, Knowledge,</i> and the <i>Thinking </i>it elicited.
-				<br><br>You'll also rate the level of the remark itself, from 100 to 500.
+				<br>When the teacher says something, a box will appear and ask you to rate the feedback level of the remark itself, from 100 to 500.
+				<br><br>When the student replies, you will be asked to rate student response in terms of the <i>Value/Belonging, Use of Academic Language, Knowledge,</i> and the <i>Thinking </i>it elicited.
 				<br><br>You will be awarded points on how close your ratings were to the system.<br><br>`;
 				}
 			else{																				// Rating screen
 				Sound("ding");																	// Ding
 				str+=`<div id="lz-rplist" class="lz-dglist">
-				<br><b>Click on the dots to set the<br>variance for this remark:</b><br>
-				<br><div id="lzgvar"></div>
-				<p><b>What intent do you think the teacher<br> had with that remark?</b></p>
+				<p><b>What kind of feedback<br>was the teacher's remark?</b></p>
 				<div style="text-align:left">
 					<input type="radio" id="lzg100" name="lzintent" value="100">
-					<label for="lgz100"> 100  Low level general remark</label><br>
+					<label id="lzgl100" for="lgz100"> 100 - Low level or general remark</label><br>
 					<input type="radio" id="lzg200" name="lzintent" value="200">
-					<label for="lgz200"> 200 - Explains the text or question</label><br>
+					<label id="lzgl200" for="lgz200"> 200 - Explains the text or question</label><br>
 					<input type="radio" id="lzg300" name="lzintent" value="300">
-					<label for="lgz300"> 300 - Values specific element of response</label><br>
+					<label id="lzgl300" for="lgz300"> 300 - Values specific element of response</label><br>
 					<input type="radio" id="lzg400" name="lzintent" value="400">
-					<label for="lgz400"> 400 - Shares concern with portion of response</label><br>
+					<label id="lzgl400" for="lgz400"> 400 - Shares concern with portion of response</label><br>
 					<input type="radio" id="lzg500" name="lzintent" value="500">
-					<label for="lgz500"> 500 - Aware of thought processes</label><br>
-				<br></div>
+					<label id="lzgl500" for="lgz500"> 500 - Aware of thought processes</label><br><br>
+					</div>
+				<b>Click on the dots to set the variance<br>for the student's response:</b><br><br>
+					<div>
+						<div style="width:50%;display:inline-block" id="lzgvar"></div>
+						<div style="width:50%;display:inline-block"id="lzgvar2"></div>
+					</div>
 				</div>
 				<div id="lz-results" class="lz-dglist" style="margin-top:8px">
-					<p id="lzgsend" class="lz-bs">Send</p>
+					<p id="lzgsend" class="lz-bs">OK</p>
 				</div>`;
 			}
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div");										// Add to body
@@ -469,7 +472,6 @@ class ResponsePanel  {
 			if (v[row] != 0)	v[row]=0;															// If set, row to 0
 			else 				v[row]=(val == 0) ? -1 : val-0;										// Set array
 			$("[id^=gvdot"+row+"]").css("background-color","#fff");									// Reset row
-			
 			if (v[row] == -1)	$("#gvdot"+row+"0").css("background-color",app.fb.cols[row]);		// Set value
 			else if (v[row]) 																		// If val is 1-3
 				for (i=1;i<=val;++i)	$("#gvdot"+row+i).css("background-color",app.fb.cols[row]);	// Set values
@@ -478,8 +480,11 @@ class ResponsePanel  {
 		$("#lzgsend").on("click",()=>{ 																// ON SEND
 			v[6]=Math.floor(app.lastResponse.intent/100)*100;										// Get intent in 100s
 			let str="<p>This remark was rated as <i>"+v[6]+" - "+this.intentDescs[Math.floor(v[6]/100)]+"</i><br>";
-			str+=app.fb.GetVarianceMarkup(app.lastResponse.variance,"x");							// Add dots
-			let intent=$("input[name='lzintent']:checked").val();
+			$("#lzgvar2").html(app.fb.GetVarianceMarkup(app.lastResponse.variance,"x"));			// Set variance
+			let intent=$("input[name='lzintent']:checked").val();									// Get selected intent
+			$("#lzgl"+intent).css({color:"#990000","font-weight":"bold" });							// Hilite wrong
+			$("#lzgl"+v[6]).css({color:"#009900","font-weight":"bold" });							// Hilite right
+
 			let i,points=0;																			// Reset
 			for (i=0;i<4;++i) {																		// For each factor
 				if (v[i] == 0) 										 continue;						// Skip if not set								
@@ -489,7 +494,7 @@ class ResponsePanel  {
 			if (Math.abs(v[6]-intent) < 200)	points+=2;											// Close
 			if (v[6] == intent)					points+=2;											// Exact
 			app.points+=points;																		// Add to total
-			str+="<b>You earned "+points+" points of student learning<br>Your total points are "+app.points+"!</b><br></p>"; // Points
+			str+="<br><b>You earned "+points+" points of student learning<br>Your total points are "+app.points+"!</b><br></p>"; // Points
 			$("#lz-results").html(str);																// Show results
 			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|RATE|"+points+"|"+v[6]+"|"+v.join(","));
 			});

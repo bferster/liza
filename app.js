@@ -342,7 +342,7 @@ class App  {
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
-		let res={ text:"", intent:0, bakt:[0,0,0,0,0,0]};												// Clear res
+		let res={ text:"", intent:0, bakt:[0,0,0,0,0,0]};											// Clear res
 		if (this.role == "Gamer") return res;														// No responses from gamers
 		let stuIndex=app.students.findIndex((s)=>{ return this.curStudent == s.id });				// Get index of current studeent
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
@@ -617,11 +617,11 @@ class App  {
 					intent=isNaN(intent) ? 0 : intent;												// Validate
 					this.rp.curIntent=intent;														// Set current intent
 					if (v[5]) app.curStudent=v[5];													// Set new active student 
-					if (this.role != "Gamer") this.rp.Draw(v[6],app.curStudent);					// Redraw response panel
+					this.rp.Draw(v[6],app.curStudent,"remark");										// Redraw response panel
 					});
 				}
 			if (v[4] == "Teacher") this.lastRemark=v[6];											// Set last remark
-			if ((this.role == "Gamer") && (v[4] != "Teacher")) this.rp.Draw(this.lastRemark,app.curStudent);	// Redraw response panel
+			if ((this.role == "Gamer") && (v[4] != "Teacher")) this.rp.Draw(this.lastRemark,app.curStudent,"response");	// Redraw response panel
 			}
 		else if (v[3] == "ACT")	{																	// ACT										
 			if (v[4] == "Teacher") return;															// Only for students
