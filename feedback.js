@@ -285,7 +285,7 @@ class ResponsePanel  {
 	{
 		this.curIntent=0;
 		this.curTab="";																				// Currently open tab
-		this.intentDescs=["Nothing yet...",
+		this.intentDescs=["",
 						  "Low information remark or compliment that has a low impact",
 					   	  "Explains the text or question with or without reference to the text",
 						  "Values specific element of response related to a reading or thinking skill",
@@ -293,7 +293,7 @@ class ResponsePanel  {
 						  "Aware of thought processes to plan, monitor, adjust, and reflect on learning actions" ];
 	}
 
-	Draw(remark="Nothing yet...",student="student", mode)										// DRAW
+	Draw(remark="",student="Student", mode)														// DRAW
 	{
 		$("#lz-rpback").remove();																	// Remove old one
 		if (app.role != "Teacher") {																// A student role
@@ -421,24 +421,25 @@ class ResponsePanel  {
 		let v=[0,0,0,0,0,0];
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
-				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:110px;padding:8px;margin-bottom:8px">
+				<div style="width:calc(50% - 20px);border-right:1px solid #999;height:130px;padding:8px;margin:12px 0">
+					<div class="lz-rptitle">${student} said:</div>
+					<p>${app.lastResponse.text ? app.lastResponse.text : "" }</p>
+				</div>
+				<div style="width:calc(50% - 20px);height:130px;padding:8px;margin:12px 0">
 					<div class="lz-rptitle">Teacher said:</div>	
 					<p>${remark.charAt(0).toUpperCase()}${remark.substring(1)}</p>
-				</div>
-				<div style="width:calc(50% - 10px);height:110px;padding:8px">
-					<div class="lz-rptitle">${student} said:</div>
-					<p>${app.lastResponse.text ? app.lastResponse.text : "Nothing yet..." }</p>
 				</div>`;
+			str+=`<div id="lz-rplist" class="lz-dglist">`;
 			if (mode == "start") {																// If start screen
-				str+=`<div id="lz-rplist" class="lz-dglist">
-				<br>When the teacher says something, a box will appear and ask you to rate the feedback level of the remark itself, from 100 to 500.
-				<br><br>When the student replies, you will be asked to rate student response in terms of the <i>Value/Belonging, Use of Academic Language, Knowledge,</i> and the <i>Thinking </i>it elicited.
+				str+=`<br>When the teacher says something, you will be asked to rate the feedback level of that remark, from 100 to 500.
 				<br><br>You will be awarded points on how close your ratings were to the system.<br><br>`;
 				}
-			else{																				// Rating screen
+			else if (mode == "response") {														// A response
+				str+=`<br>Waiting for teacher's remark...<br><br>`;
+				}
+			else if (mode == "remark") {														// A remark
 				Sound("ding");																	// Ding
-				str+=`<div id="lz-rplist" class="lz-dglist">
-				<p><b>What kind of feedback<br>was the teacher's remark?</b></p>
+				str+=`<p><b>How would you rate<br>the teacher's remark?</b></p>
 				<div style="text-align:left">
 					<input type="radio" id="lzg100" name="lzintent" value="100">
 					<label id="lzgl100" for="lgz100"> 100 - Low level or general remark</label><br>
@@ -451,11 +452,6 @@ class ResponsePanel  {
 					<input type="radio" id="lzg500" name="lzintent" value="500">
 					<label id="lzgl500" for="lgz500"> 500 - Aware of thought processes</label><br><br>
 					</div>
-				<b>Click on the dots to set the variance<br>for the student's response:</b><br><br>
-					<div>
-						<div style="width:50%;display:inline-block" id="lzgvar"></div>
-						<div style="width:50%;display:inline-block"id="lzgvar2"></div>
-					</div>
 				</div>
 				<div id="lz-results" class="lz-dglist" style="margin-top:8px">
 					<p id="lzgsend" class="lz-bs">OK</p>
@@ -463,7 +459,6 @@ class ResponsePanel  {
 			}
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div");										// Add to body
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
-		$("#lzgvar").html(app.fb.GetVarianceMarkup(v,"g"));											// Set variance
 		
 		$("[id^=gvdot]").on("click",(e)=>{ 															// ON DOT CLICK
 			let i;
@@ -478,19 +473,14 @@ class ResponsePanel  {
 			});
 
 		$("#lzgsend").on("click",()=>{ 																// ON SEND
+			let points=0;																			// Reset
 			v[6]=Math.floor(app.lastResponse.intent/100)*100;										// Get intent in 100s
-			let str="<p>This remark was rated as <i>"+v[6]+" - "+this.intentDescs[Math.floor(v[6]/100)]+"</i><br>";
-			$("#lzgvar2").html(app.fb.GetVarianceMarkup(app.lastResponse.variance,"x"));			// Set variance
+			let str=`<br>This remark was rated as <i>${v[6]} - ${this.intentDescs[Math.floor(v[6]/100)]}</i><br><br>
+			<div style="margin-left:25%">
+			${app.fb.GetVarianceMarkup(app.lastResponse.variance,"x")}</div>`;							
 			let intent=$("input[name='lzintent']:checked").val();									// Get selected intent
 			$("#lzgl"+intent).css({color:"#990000","font-weight":"bold" });							// Hilite wrong
 			$("#lzgl"+v[6]).css({color:"#009900","font-weight":"bold" });							// Hilite right
-
-			let i,points=0;																			// Reset
-			for (i=0;i<4;++i) {																		// For each factor
-				if (v[i] == 0) 										 continue;						// Skip if not set								
-				if (Math.abs(v[i]-app.lastResponse.variance[i] < 2)) points++;						// Add a point if close
-				if (v[i] == app.lastResponse.variance[i])			 points++;						// Add a point if exact match
-				}
 			if (Math.abs(v[6]-intent) < 200)	points+=2;											// Close
 			if (v[6] == intent)					points+=2;											// Exact
 			app.points+=points;																		// Add to total

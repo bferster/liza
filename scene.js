@@ -134,6 +134,7 @@ class Scene {
 
 	SetClock(pct)																				// SET CLOCK 
 	{
+		if (isNaN(pct)) pct=-.002;																	// Force noon
 		app.clockHand.rotation.z=((pct*360-90)%360)*Math.PI/-180;									// Rotate hand
 	}
 

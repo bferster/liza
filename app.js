@@ -63,7 +63,7 @@ class App  {
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			if (this.role != "Teacher") return;														// Only for teacher
 			let now=new Date().getTime();															// Get now
-			if (this.strings.initial && (this.trt == 0)) PopUp(this.strings.initial,10);			// Prompt teacher
+			if (this.strings.initial && (this.trt == 0)) PopUp(this.strings.initial,6);				// Prompt teacher
 			if (this.inSim) 			this.trt+=(now-this.startTime)/1000;						// If in sim already, add to trt
 			else						this.startTime=now;											// Not in sim, set start				
 			this.inSim=!this.inSim;																	// Toggle sim flag
