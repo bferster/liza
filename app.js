@@ -114,6 +114,7 @@ class App  {
 
 		$(window).on("keydown", (e) => {															// HANDLE KEY DOWN
 			if (e.which == 32) {																	// Spacebar
+				if (this.role == "Gamer") return;													// Gamers don't talk
 				if (e.target.type == "text") {														// If in a text input
 					if (e.originalEvent.repeat)	{ $("#talkInput").blur(); return false; }			// Only 1st one and blur talkinput
 					return true;													
@@ -136,6 +137,7 @@ class App  {
 			});
 		$(window).on("keyup", (e)=> {																// HANDLE KEY UP
 			if (e.which == 32) {																	// Spacebar
+				if (this.role == "Gamer") return;													// Gamers don't talk
 				if (e.target.type == "text")	return true;										// If in a text input, quit
 				if (this.inSim)	 setTimeout(()=>{ 													// React to remark if in sim
 					this.talkTime=(new Date().getTime()-this.talkTime)/1000;						// Compute talk time in seconds
@@ -590,7 +592,7 @@ class App  {
 		let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;			// Bubble center
 		this.LogEvent(v);																			// Log event
 		if (this.role != "Teacher")	this.curTime=v[1];												// Set student's time
-		if ((v[3] == "SPEAKING") && (this.role != v[4]) && (this.role != "Gamer")) {				// SPEAKING
+		if ((v[3] == "SPEAKING") && (this.role != v[4])) {											// SPEAKING
 			Prompt((v[6] == "1") ? v[4]+" speaking..." : "", "on");									// Show status				
 			}	
 		if ((v[3] == "INTERIM") && (this.role != v[4])) {											// INTERIM TALK

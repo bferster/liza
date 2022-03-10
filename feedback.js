@@ -422,11 +422,11 @@ class ResponsePanel  {
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 20px);border-right:1px solid #999;height:130px;padding:8px;margin:12px 0">
-					<div class="lz-rptitle">${student} said:</div>
+					<div class="lz-rptitle">${student} response:</div>
 					<p>${app.lastResponse.text ? app.lastResponse.text : "" }</p>
 				</div>
 				<div style="width:calc(50% - 20px);height:130px;padding:8px;margin:12px 0">
-					<div class="lz-rptitle">Teacher said:</div>	
+					<div class="lz-rptitle">Teacher remark:</div>	
 					<p>${remark.charAt(0).toUpperCase()}${remark.substring(1)}</p>
 				</div>`;
 			str+=`<div id="lz-rplist" class="lz-dglist">`;
@@ -439,7 +439,7 @@ class ResponsePanel  {
 				}
 			else if (mode == "remark") {														// A remark
 				Sound("ding");																	// Ding
-				str+=`<p><b>How would you rate<br>the teacher's remark?</b></p>
+				str+=`<p><b>Please identify the teacher's remark type</b></p>
 				<div style="text-align:left">
 					<input type="radio" id="lzg100" name="lzintent" value="100">
 					<label id="lzgl100" for="lgz100"> 100 - Low level or general remark</label><br>
@@ -475,7 +475,8 @@ class ResponsePanel  {
 		$("#lzgsend").on("click",()=>{ 																// ON SEND
 			let points=0;																			// Reset
 			v[6]=Math.floor(app.lastResponse.intent/100)*100;										// Get intent in 100s
-			let str=`<br>This remark was rated as <i>${v[6]} - ${this.intentDescs[Math.floor(v[6]/100)]}</i><br><br>
+			let str=`<br>This remark was rated as <i>${v[6]} - ${this.intentDescs[Math.floor(v[6]/100)]}</i><br>
+			<p><b>Student response qualities</b></p>
 			<div style="margin-left:25%">
 			${app.fb.GetVarianceMarkup(app.lastResponse.variance,"x")}</div>`;							
 			let intent=$("input[name='lzintent']:checked").val();									// Get selected intent
