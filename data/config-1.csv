@@ -31,6 +31,7 @@ trigger,first,"who=Oliver,do=[say:So I guess my answer is right],"
 resource,Scene Overview,assets/overview.pdf
 resource,Student Task Materials,assets/student.pdf
 resource,Teaching Strategy Support,assets/supports.pdf
+resource,About student variances,assets/variances.pdf
 picture,Question,assets/Discussion.png
 picture,Important vocabulary,assets/ImportantWords.png
 picture,Lunar orbiter,assets/rover.png

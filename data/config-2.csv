@@ -22,14 +22,12 @@ seat,6,"x=-200,y=-100,z=0,r=0,"
 seat,7,"x=-100,y=-100,z=0,r=0,"
 seat,8,"x=0,y=-100,z=0,r=0,"
 seat,9,"x=250,y=-100,z=0,r=30,"
-resource,Teacher prep,assets/prep.pdf
-resource,Student facing,assets/student.pdf
+resource,Scene Overview,assets/meet.pdf
 resource,Strategy supports,assets/supports.pdf
-picture,Question,assets/Discussion2.png
-picture,Math lesson,assets/ImportantWords.png
+picture,Note catcher,assets/wereading.png
+picture,Questions,assets/whowhat.png
 picture,Lunar orbiter,assets/rover.png
-picture,Important words,assets/ImportantWords.png
-picture,Misleading words,assets/MisleadingWords.png
+picture,Blank board,assets/blankBB.png
 action,firstSlide,"begin slide,start slide",
 action,nextSlide,"advance side,next side,nextSlide slide",
 action,lastSlide,"back side,back slide,last slide,last side,previous slide,previous side",

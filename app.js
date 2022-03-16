@@ -108,6 +108,7 @@ class App  {
 		$("#lz-rolePick").on("change", ()=> {														// ON CHANGE ROLE
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|ROLE|"+$("#lz-rolePick").val());  	// Send role change
 			this.role=$("#lz-rolePick").val();														// Set new role
+			$("#lz-rolePick").blur();																// Clear focus
 			Prompt((this.role == "Teacher") ? "CLICK START TO BEGIN NEW SESSION" : "","on");		// No prompt
 			app.rp.Draw();																			// Redraw reponse panel														
 			});

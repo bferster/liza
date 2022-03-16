@@ -422,11 +422,11 @@ class ResponsePanel  {
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 20px);border-right:1px solid #999;height:130px;padding:8px;margin:12px 0">
-					<div class="lz-rptitle">${student} response:</div>
+					<div class="lz-rptitle">${student} said:</div>
 					<p>${app.lastResponse.text ? app.lastResponse.text : "" }</p>
 				</div>
 				<div style="width:calc(50% - 20px);height:130px;padding:8px;margin:12px 0">
-					<div class="lz-rptitle">Teacher remark:</div>	
+					<div class="lz-rptitle">Teacher said:</div>	
 					<p>${remark.charAt(0).toUpperCase()}${remark.substring(1)}</p>
 				</div>`;
 			str+=`<div id="lz-rplist" class="lz-dglist">`;
@@ -439,7 +439,7 @@ class ResponsePanel  {
 				}
 			else if (mode == "remark") {														// A remark
 				Sound("ding");																	// Ding
-				str+=`<p><b>Please identify the teacher's remark type</b></p>
+				str+=`<p><b>Please identify the teacher's feedback type</b></p>
 				<div style="text-align:left">
 					<input type="radio" id="lzg100" name="lzintent" value="100">
 					<label id="lzgl100" for="lgz100"> 100 - Low level or general remark</label><br>
