@@ -85,6 +85,7 @@ class App  {
 					this.StartSession();															// Start session
 				});									
 			});	
+
 		$("#writeBut").on("click", ()=> { 															// ON BULLETIN BOAD
 			$("#lz-timelinebar").remove();															// Remove feedback panel
 			var h=window.innerHeight-$("#blackboardDiv").height()-78;								// Calc top
@@ -227,7 +228,8 @@ class App  {
 				break;																				// Quit looking
 				}
 			}
-	}
+		if (app.multi) 	app.rp.Draw();																// Draw response panel														
+		}
 
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
 	{

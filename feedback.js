@@ -296,7 +296,7 @@ class ResponsePanel  {
 	Draw(remark="",student="Student", mode)														// DRAW
 	{
 		$("#lz-rpback").remove();																	// Remove old one
-		if (app.role != "Teacher") {																// A student role
+		if (app.role != "Tdeacher") {																// A student role
 			$("#mainDiv").css("margin-left","15%");													// Shift right													
 			app.sc.Resize();																		// Resize renderer
 			app.sc.SetCamera(0,200,600,0,0,0);														// Reset camera	
@@ -306,7 +306,7 @@ class ResponsePanel  {
 			$("#mainDiv").css("margin-left",0);														// No margin													
 			app.sc.Resize();																		// Resize renderer
 			app.sc.SetCamera(0,150,500,0,0,0);														// Reset camera	
-			return	
+			return;
 			}
 		let v=app.strings.multi.split(",");															// Point at labels
 		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
@@ -317,6 +317,31 @@ class ResponsePanel  {
 			this.DrawGamer(remark,student,mode);													// Draw game panel
 			return;																					// Quit
 			}
+		else if (app.role == "Teacher") {
+			var str=`<div id="lz-rpback" class="lz-rpback"> 
+			<br><div class="lz-rptitle">Some tips for teachers</div>
+			<div id="lz-rplist" style="margin:12px;padding:12px;width:calc(100% -32px);text-align:left;border:1px solid #aaa;border-radius:8px;background-color:#fff">
+			<div class="lz-rptitle"><b>Using Grace</b></div>
+				<ul style="line-height:20px">
+					<li>Click START button to begin class</li>
+					<li>Press spacebar to begin talking</li>
+					<li>When Grace has transcribed your voice, the text in the grey bar will turn green.</li>
+					<li>Release spacebar to send to class</li>
+				</ul>
+				<div class="lz-rptitle"><b>Some questions to ask</b></div>
+				<ul style="line-height:20px">
+					<li>How are you doing?</li>
+					<li>What equipment did scientists use to discover water on the moon?</li>
+					<li>Where in the text did you find that?</li>
+					<li>What do you need to change in your answer?</li>
+					<li>How has your thinking changed?</li>
+					<li>What was the keyword in the question?</li>
+				</ul>
+			</div>`;
+			$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
+			return;																					// Quit
+		}
+		
 		var str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:110px;padding:8px">
