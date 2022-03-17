@@ -140,14 +140,14 @@ class App  {
 			if (e.which == 32) {																	// Spacebar
 				if (this.role == "Gamer") return;													// Gamers don't talk
 				if (e.target.type == "text")	return true;										// If in a text input, quit
-				if (this.inSim)	 setTimeout(()=>{ 													// React to remark if in sim
+				if (this.inSim)	{ 																	// React to remark if in sim
 					this.talkTime=(new Date().getTime()-this.talkTime)/1000;						// Compute talk time in seconds
 					$("#promptSpan").html("You said:<i> "+this.said+"</i>");						// Add message
-					$("#promptSpan").fadeIn(200).delay(3000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS SPACEBAR TO TALK") }).fadeIn(200);		// Animate in and out
+					$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS SPACEBAR TO TALK") }).fadeIn(200);		// Animate in and out
 					app.OnPhrase(this.said);														// React to remark
 					app.said=""; 																	// Clear cache
 					this.voice.StopListening();														// STT off						
-					},2000); 																		// Wait a second
+					}
 				this.inRemark=false;																// Teacher is not talking
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
 				if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
@@ -596,7 +596,7 @@ class App  {
 		if ((v[3] == "SPEAKING") && (this.role != v[4])) {											// SPEAKING
 			Prompt((v[6] == "1") ? v[4]+" speaking..." : "", "on");									// Show status				
 			}	
-		if ((v[3] == "INTERIM") && (this.role != v[4])) {											// INTERIM TALK
+		else if ((v[3] == "INTERIM") && (this.role != v[4])) {										// INTERIM TALK
 			app.voice.Talk(v[6],v[4]);																// Talk	interim fragments	
 			this.ignoreNextTalk=true;																// Don't repeat last talk, as we already heard it
 			}	

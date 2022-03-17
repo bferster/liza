@@ -52,10 +52,11 @@ class Voice {
 			this.recognition.onresult=(e)=>{ 															// ON RECOGNITION
 				if (e.results[0].isFinal) {																// When a portion is final
 					app.said+=e.results[0][0].transcript+" ";											// Add what was said 
-//					if ((app.role == "Teacher") && e.results[0][0].transcript && app.multi)				// If teacher talking in multiplayer mode
-//						app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|ADMIN|INTERIM|Teacher|Class|"+e.results[0][0].transcript); // Send partial
+					if ((app.role == "Teacher") && e.results[0][0].transcript && app.multi)				// If teacher talking in multiplayer mode
+						app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|ADMIN|INTERIM|Teacher|Class|"+e.results[0][0].transcript); // Send partial
+					$("#promptSpan").html(app.said ? "<span style='color:#006600'>"+app.said+"</span>" : ""); // Show portion to teacher as green
 					}
-				$("#promptSpan").html(app.said ? app.said+e.results[0][0].transcript+" " : e.results[0][0].transcript+" ");
+				else $("#promptSpan").html(e.results[0][0].transcript ? app.said+e.results[0][0].transcript+" " : e.results[0][0].transcript+" "); // Show portion to teacher
 				}					
 			} catch(e) { trace("Voice error",e) };														// On error
 		}
