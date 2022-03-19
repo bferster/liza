@@ -7,7 +7,8 @@ class Voice {
 	constructor()																					// CONSTRUCTOR
 	{
 		var _this=this;
-		this.listening=false;																			// Recognizing?
+		this.listening=false;																			// Recognizing flag
+		this.getLastClause=false;																		// Get last clause																
 		this.hasRecognition=false;																		// Assume no STT
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		try {																							// Try
@@ -47,14 +48,20 @@ class Voice {
 			this.recognition.continuous=false;															// Continual recognition off
 			this.recognition.interimResults=true;														// Return interim results?
 			this.recognition.lang="en-US";																// US English
-			this.recognition.onend=(e)=>{ if (this.listening) this.Listen() };							// ON STT END RE-LISTEN	IF IN SIM											
+			this.recognition.onstart=()=>{ this.started=true; };										// ON STT START SET STATUS FLAG
+			this.recognition.onend=()=>  { this.started=false; if (this.listening) this.Listen() };		// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechRecognition capabilities														
-			this.recognition.onresult=(e)=>{ 															// ON RECOGNITION
+				this.recognition.onresult=(e)=>{ 														// ON RECOGNITION
 				if (e.results[0].isFinal) {																// When a portion is final
 					app.said+=e.results[0][0].transcript+" ";											// Add what was said 
 					if ((app.role == "Teacher") && e.results[0][0].transcript && app.multi)				// If teacher talking in multiplayer mode
 						app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|ADMIN|INTERIM|Teacher|Class|"+e.results[0][0].transcript); // Send partial
 					$("#promptSpan").html(app.said ? "<span style='color:#006600'>"+app.said+"</span>" : ""); // Show portion to teacher as green
+					if (this.getLastClause) {															// Get final utterance
+						app.OnPhrase(app.said);															// React to remark
+						app.said=""; 																	// Clear cache
+						this.recognition.abort(); 														// Stop recognition
+						}
 					}
 				else $("#promptSpan").html(e.results[0][0].transcript ? app.said+e.results[0][0].transcript+" " : e.results[0][0].transcript+" "); // Show portion to teacher
 				}					
@@ -64,17 +71,16 @@ class Voice {
 	Listen()																						// TURN ON SPEECH RECOGNITION
 	{
 		try { 
-			this.recognition.start(); 																	// Start recognition
+			if (!this.started)	this.recognition.start(); 												// Start recognition, unless already started
 			this.listening=true;																		// We're listening
+			this.getLastClause=false;																	// Not the last phrase yet
 		} catch(e) { trace("Voice error",e) };															// On error
 	}
 
 	StopListening()																					// TURN OFF SPEECH RECOGNITION
 	{
-		try { 
-			this.recognition.abort(); 																	// Stop recognition
-			this.listening=false;																		// Not listening
-		} catch(e) { trace("Voice error",e) };															// On error
+		this.listening=false;																			// Not listening anymore
+		this.getLastClause=true;																		// Get last phrase when transcribed
 	}
 
 	Talk(text, who)																					// SAY SOMETHING

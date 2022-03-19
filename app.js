@@ -68,8 +68,11 @@ class App  {
 			else						this.startTime=now;											// Not in sim, set start				
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|START|"+this.inSim+"| ");  // Send sim status
-			Prompt("PRESS SPACEBAR TO TALK","on");	 												// Directions
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|START|"+this.inSim+"| ");  	// Send sim status
+			Prompt(this.inSim ? "PRESS AND HOLD MIC ICON TO TALK" : "CLICK START TO RESUME SESSION","on");	// Directions
+			$("#restartBut").css("display","inline-block");											// Show restart
+			$("#talkInput").css("display",this.inSim ? "inline-block": "none");						// Show input field if in sim
+			$("#talkBut").css("display",this.inSim ? "inline-block": "none");						// Talk but
 			});									
 		$("#restartBut").on("click change",  (e)=> { 												// ON RESTART 
 			if (this.role != "Teacher") return;														// Only for teacher
@@ -80,9 +83,9 @@ class App  {
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 	// Are you sure?
 					if (this.role == "Teacher") {
 						this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
-						Prompt("CLICK START TO BEGIN NEW SESSION","on");							// Directions
 						}
-					this.StartSession();															// Start session
+					this.StartSession();															// Init session
+					$("#startBut").trigger("click");												// Trigger start								
 				});									
 			});	
 
@@ -110,49 +113,29 @@ class App  {
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|ROLE|"+$("#lz-rolePick").val());  	// Send role change
 			this.role=$("#lz-rolePick").val();														// Set new role
 			$("#lz-rolePick").blur();																// Clear focus
-			Prompt((this.role == "Teacher") ? "CLICK START TO BEGIN NEW SESSION" : "","on");		// No prompt
+			Prompt((this.role == "Teacher") ? "CLICK <span style='color:#006600'><b>START</b></span> TO START SESSION" : "","on");		// No prompt
+			$("#startBut").css("display",this.role == "Teacher" ? "inline-block": "none");			// Show start only for teacher
 			app.rp.Draw();																			// Redraw reponse panel														
 			});
-
-		$(window).on("keydown", (e) => {															// HANDLE KEY DOWN
-			if (e.which == 32) {																	// Spacebar
-				if (this.role == "Gamer") return;													// Gamers don't talk
-				if (e.target.type == "text") {														// If in a text input
-					if (e.originalEvent.repeat)	{ $("#talkInput").blur(); return false; }			// Only 1st one and blur talkinput
-					return true;													
-					}
-				if (e.originalEvent.repeat)	  return false; 										// Only 1st one
-				if (!this.inSim && (this.role == "Teacher")) {										// If a teacher not in a session
-					PopUp("Please START the session to talk to the class"); 						// Prompt
-					return;																			// Quit
-					}
-				this.voice.Listen()																	// Turn on speech recognition
-				Prompt("Remember to speak clearly!","on"); 											// Prompt
-				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
-				if (this.role != "Teacher")															// If a student
-				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|ACT|"+app.role+"|nod");	// Send nod 
-				this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
-				this.inRemark=true;																	// Teacher is talking
-				this.talkTime=new Date().getTime();													// Time when talking started 
-				this.said="";																		// Clear spoken cache
-				}
+		$("#talkBut").on("mousedown", () => {														// ON TALK BUTTON
+			if (this.role == "Gamer") return;														// Gamers don't talk
+			this.voice.Listen()																		// Turn on speech recognition
+			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";						// Student always talk to teacher and vice versa
+			if (this.role != "Teacher")																// If a student
+			app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|ACT|"+app.role+"|nod");	// Send nod 
+			this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
+			this.inRemark=true;																		// Teacher is talking
+			this.talkTime=new Date().getTime();														// Time when talking started 
+			this.said="";																			// Clear spoken cache
 			});
-		$(window).on("keyup", (e)=> {																// HANDLE KEY UP
-			if (e.which == 32) {																	// Spacebar
-				if (this.role == "Gamer") return;													// Gamers don't talk
-				if (e.target.type == "text")	return true;										// If in a text input, quit
-				if (this.inSim)	{ 																	// React to remark if in sim
-					this.talkTime=(new Date().getTime()-this.talkTime)/1000;						// Compute talk time in seconds
-					$("#promptSpan").html("You said:<i> "+this.said+"</i>");						// Add message
-					$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS SPACEBAR TO TALK") }).fadeIn(200);		// Animate in and out
-					app.OnPhrase(this.said);														// React to remark
-					app.said=""; 																	// Clear cache
-					this.voice.StopListening();														// STT off						
-					}
-				this.inRemark=false;																// Teacher is not talking
-				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
-				if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
-				}
+		$("#talkBut").on("mouseup", (e) => {														// ON TALK BUTTON UP
+			if (this.role == "Gamer") return;														// Gamers don't talk
+			this.talkTime=(new Date().getTime()-this.talkTime)/1000;								// Compute talk time in seconds
+			$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS AND HOLD MIC ICON TO TALK") }).fadeIn(200);		// Animate in and out
+			this.voice.StopListening();															// STT off						
+			this.inRemark=false;																// Teacher is not talking
+			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
+			if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
 			});
 		}
 
@@ -236,12 +219,7 @@ class App  {
 		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
 		app.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
 		if (app.multi)	return app.curTime;															// No timed events in multiplayer mode
-/*		if (app.curTime >= app.totTime) {															// Add done
-			PopUp("Your Teaching with Grace session is over!");										// Popup
-			$("#restartBut").trigger("change");														// Stop sim, but don't ask if sure.
-			if (app.role == "Teacher") app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|DONE");  // Send sim status
-			}
-*/		if (app.curTime >= app.nextTrigger.when) 	app.HandleEventTrigger(app.nextTrigger);		// Handle event trigger
+		if (app.curTime >= app.nextTrigger.when) 	app.HandleEventTrigger(app.nextTrigger);		// Handle event trigger
 		return app.curTime;																			// Return elapsed time in seconds
 	}
 
@@ -349,7 +327,7 @@ class App  {
 	{
 		let res={ text:"", intent:0, bakt:[0,0,0,0,0,0]};											// Clear res
 		if (this.role == "Gamer") return res;														// No responses from gamers
-		let stuIndex=app.students.findIndex((s)=>{ return this.curStudent == s.id });				// Get index of current studeent
+		let stuIndex=Math.max(0,app.students.findIndex((s)=>{ return this.curStudent == s.id }));	// Get index of current studeent
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
 		if (!this.multi && this.students[stuIndex].first) {											// An initial response set
@@ -648,9 +626,11 @@ class App  {
 			let now=new Date().getTime();															// Get now
 			if (this.inSim) this.trt+=(now-this.startTime)/1000;									// If in sim already, add to trt
 			else			this.startTime=now;														// Reset start
-			this.inSim=(v[4] == "true");																// Set flag
+			this.inSim=(v[4] == "true");															// Set flag
 			$("#startBut").html(this.inSim ? "PAUSE" : "START");									// Set label					
 			$("#startBut").css("background-color",this.inSim ? "#938253" : "#27ae60");				// Set color						
+			$("#talkInput").css("display",this.inSim ? "inline-block": "none");						// Show input field if in sim
+			$("#talkBut").css("display",this.inSim ? "inline-block": "none");						// Talk but
 			}  
 		else if ((v[3] == "CHAT") && (this.role == v[4])) {	Sound("ding"); Bubble(v[5],5,bx); }		// CHAT
 	}
