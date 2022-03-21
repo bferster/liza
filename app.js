@@ -119,6 +119,7 @@ class App  {
 			});
 		$("#talkBut").on("mousedown", () => {														// ON TALK BUTTON
 			if (this.role == "Gamer") return;														// Gamers don't talk
+			$("#talkBut").prop("src","img/intalkbut.png");											// Green button
 			this.voice.Listen()																		// Turn on speech recognition
 			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";						// Student always talk to teacher and vice versa
 			if (this.role != "Teacher")																// If a student
@@ -130,11 +131,12 @@ class App  {
 			});
 		$("#talkBut").on("mouseup", (e) => {														// ON TALK BUTTON UP
 			if (this.role == "Gamer") return;														// Gamers don't talk
+			this.voice.StopListening();																// STT off						
+			$("#talkBut").prop("src","img/talkbut.png");											// Green button
 			this.talkTime=(new Date().getTime()-this.talkTime)/1000;								// Compute talk time in seconds
 			$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS AND HOLD MIC ICON TO TALK") }).fadeIn(200);		// Animate in and out
-			this.voice.StopListening();															// STT off						
-			this.inRemark=false;																// Teacher is not talking
-			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
+			this.inRemark=false;																	// Teacher is not talking
+			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";						// Student always talk to teacher and vice versa
 			if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
 			});
 		}
@@ -332,7 +334,9 @@ class App  {
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
 		if (!this.multi && this.students[stuIndex].first) {											// An initial response set
 			if (res.intent != 600) {																// Not a greeting
-				res.text=this.students[stuIndex].first;												// Set response
+				let s=this.students[stuIndex].first;												// Get first response
+				if (!isNaN(s))	res=app.nlp.GetResponse("",app.curStudent,s);						// Get response from intent
+				else			res.text=s;															// Use it directly
 				this.students[stuIndex].first="";													// Fulfilled
 				}
 			} 

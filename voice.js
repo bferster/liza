@@ -60,8 +60,10 @@ class Voice {
 					if (this.getLastClause) {															// Get final utterance
 						app.OnPhrase(app.said);															// React to remark
 						app.said=""; 																	// Clear cache
+						this.listening=false;															// Not listening anymore
+						this.getLastClause=false;														// No last phrase anymore
 						this.recognition.abort(); 														// Stop recognition
-						}
+					}
 					}
 				else $("#promptSpan").html(e.results[0][0].transcript ? app.said+e.results[0][0].transcript+" " : e.results[0][0].transcript+" "); // Show portion to teacher
 				}					
@@ -73,13 +75,11 @@ class Voice {
 		try { 
 			if (!this.started)	this.recognition.start(); 												// Start recognition, unless already started
 			this.listening=true;																		// We're listening
-			this.getLastClause=false;																	// Not the last phrase yet
 		} catch(e) { trace("Voice error",e) };															// On error
 	}
 
 	StopListening()																					// TURN OFF SPEECH RECOGNITION
 	{
-		this.listening=false;																			// Not listening anymore
 		this.getLastClause=true;																		// Get last phrase when transcribed
 	}
 
