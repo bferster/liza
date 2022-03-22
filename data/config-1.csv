@@ -80,6 +80,8 @@ vocab,r400,"involve,letter,equipment's,opposed,wider,factually,invoke,invokes,ma
 vocab,r500,"leading,annotating,holiday,absorb,farming,correcting,sequence,chronological,timeline,broke,boiling,summarizing,format,promote,realm,imagination,alice,notebook,solidify,takeaway,segue,frame,compares,proceed,encounter,participating,authors,rounded,forgotten,shifting,stumbling,specifying,techniques,scanned,annotate"
 trigger,time,"who=random,when=5,do=[say:100+act:interrupt],"
 trigger,time,"who=Luis,when=15,do=[say:150+act:interrupt],"
+trigger,time,"who=Farrah,when=120,do=[say:150+act:interrupt],"
+trigger,time,"who=Chris,when=210,do=[say:150+act:interrupt],"
 trigger,time,"who=random,when=300,do=[end:],"
 trigger,first,"who=Chris,do=[say:120],"
 trigger,first,"who=Farrah,do=[say:120],"
