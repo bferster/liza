@@ -5,7 +5,6 @@ student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh","seat=
 student,Oliver,"oliver,liver","seat=3,sex=male,b=3,a=2,k=1,t=1,u=3,color=#734325,"
 student,Chris,"chris,crisp,christ","seat=4,sex=male,b=1,a=1,k=3,t=2,u=3,color=#b1233c,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
-session,data,"trt=330,"
 seat,0,"x=200,y=110,z=0,r=-25,"
 seat,1,"x=100,y=70,z=0,r=-15,"																							
 seat,2,"x=0,y=50,z=0,r=0,"
@@ -78,16 +77,19 @@ vocab,r200,"wacky,content,lands,sheet,because,proven,looper,bottle,indices,unint
 vocab,r300,"cited,poorly,fault,heart,enjoyment,active,learner,drunk,usefulness,offered,elaborated,justified,engage,packet,proved,ballpark,redirected,rethought,evident,seeking,separating,logical,series,splitting,strength,shorter,county,password,scanning,interpreted,immediately,fitted,capacities,grasp,disagreement,cinnamon,concisely,party,credit,rooted,banner,interests,matched,accessed,miscroscope,understatement,prediction,disappear,displays,outstanding,utilizing,revisiting,appears,capture,scoping,predictions,oliverin,analogy,pools,gracious,sharper,progression,painted,mismatch,emphasize,writer,theme,success,relationship,paraphrasing,regulation,advocated,inclusion,composed,chemistry,perks,summarized,refered,re-read,strengthened"
 vocab,r400,"involve,letter,equipment's,opposed,wider,factually,invoke,invokes,maker,counts,vague,rearrange,convey,posts,toward,scale,prompted,train,slowly,watched,troubles,grows,misconceptions,surviving,intention,incomplete,lacking,handed,svannah,valueable,nancy,extended,grading,disover,amaze,encompass,struggling,fewer,master,aright,official,supporting,importantly,justify,descriptively,summed,piggybacking,glimpse,outfits,substitute,differ,rewrote,validate,spits,specialized,questoin,trick,throwing,clever,successful,tests,addressing,phone,toaster,identifies,proposed,linked,addresses,music,applicable,slower,spray,venus,cracks,blanks,meteor,running,normal,typical,helmet,sophomore,worse,personalize,pinpoints,women,quotation,farther,interpret,positives,outweigh,phrasing,individualized,million,samantha,rebuild,machine's,recommendation,assets,spins,activities,infers,author's,writer's,activated,incorporating,quoting,bounce,bubble,generalizing,splits,leaning,assumed,incorporated,contrasting,articulate,creates,acquit,matters,tense,goodness,nodding,overload,annotations,cluse,brainstorm,hints,explicit,accent,manage,brees,titles,subtitles,jumps,checks,links,recommend,environmentalist,gathering,calculate,ruler,visual,lacks,brilliant,pinpointing,relative,reasonable,addiction,citing,catching,shane,corresponding,photos,photo,assess,assisted,impairs,touches,boxes,paints,fuller,miniscule,analyzed,treasure,unpacking,extend,extracted,aligned,appeared,hunting,align,thread,jamines,qould,explanations,critters,recognizing,concept,primarily,packages,ranking,sorting"
 vocab,r500,"leading,annotating,holiday,absorb,farming,correcting,sequence,chronological,timeline,broke,boiling,summarizing,format,promote,realm,imagination,alice,notebook,solidify,takeaway,segue,frame,compares,proceed,encounter,participating,authors,rounded,forgotten,shifting,stumbling,specifying,techniques,scanned,annotate"
-trigger,time,"who=random,when=5,do=[say:100+act:interrupt],"
-trigger,time,"who=Luis,when=15,do=[say:150+act:interrupt],"
-trigger,time,"who=Farrah,when=120,do=[say:150+act:interrupt],"
-trigger,time,"who=Chris,when=210,do=[say:150+act:interrupt],"
-trigger,time,"who=random,when=300,do=[end:],"
-trigger,first,"who=Chris,do=[say:120],"
-trigger,first,"who=Farrah,do=[say:120],"
-trigger,first,"who=Jazmin,do=[say:120],"
-trigger,first,"who=Luis,do=[say:120],"
-trigger,first,"who=Oliver,do=[say:120],"
+
+session,data,"trt=420,"
+trigger,time,"who=random,when=7,do=[say:100+act:interrupt]"
+trigger,time,"who=Luis,when=20,do=[say:150+act:interrupt]"
+trigger,time,"who=Farrah,when=120,do=[say:150+act:interrupt]"
+trigger,time,"who=Chris,when=210,do=[say:150+act:interrupt]"
+trigger,first,"who=Chris,do=[say:120]"
+trigger,first,"who=Farrah,do=[say:120]"
+trigger,first,"who=Jazmin,do=[say:120]"
+trigger,first,"who=Luis,do=[say:120]"
+trigger,first,"who=Oliver,do=[say:120]"
+trigger,time,"who=random,when=420,do=[end:]"
+
 keyrule,ANDYOU,"how|what,about,you",
 keyrule,ANDYOU,"what,you,think|say",
 keyrule,ANDYOU,"lets|let's,hear,from",

@@ -63,13 +63,13 @@ class App  {
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			if (this.role != "Teacher") return;														// Only for teacher
 			let now=new Date().getTime();															// Get now
-			if (this.strings.initial && (this.trt == 0)) PopUp(this.strings.initial,6);				// Prompt teacher
+			if (this.strings.initial && !this.multi && (this.trt == 0)) PopUp(this.strings.initial,5);	// Prompt teacher
 			if (this.inSim) 			this.trt+=(now-this.startTime)/1000;						// If in sim already, add to trt
 			else						this.startTime=now;											// Not in sim, set start				
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
 			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|START|"+this.inSim+"| ");  	// Send sim status
-			Prompt(this.inSim ? "PRESS AND HOLD MIC ICON TO TALK" : "CLICK START TO RESUME SESSION","on");	// Directions
+			Prompt(this.inSim ? "PRESS AND HOLD SPACEBAR TO TALK" : "CLICK START TO RESUME SESSION","on");	// Directions
 			$("#restartBut").css("display","inline-block");											// Show restart
 			$("#talkInput").css("display",this.inSim ? "inline-block": "none");						// Show input field if in sim
 			$("#talkBut").css("display",this.inSim ? "inline-block": "none");						// Talk but
@@ -117,6 +117,23 @@ class App  {
 			$("#startBut").css("display",this.role == "Teacher" ? "inline-block": "none");			// Show start only for teacher
 			app.rp.Draw();																			// Redraw reponse panel														
 			});
+		$(window).on("keydown", (e) => {															// HANDLE KEY DOWN
+			if (e.which == 32) {																	// Spacebar
+				if (e.target.type == "text") {														// If in a text input
+					if (e.originalEvent.repeat)	{ $("#talkInput").blur(); return false; }			// Only 1st one and blur talkinput
+					return true;													
+					}
+				if (e.originalEvent.repeat)	  return false; 										// Only 1st one
+				$("#talkBut").trigger("mousedown");													// Trigger mousedown
+				}
+			});
+		
+		$(window).on("keyup", (e)=> {																// HANDLE KEY UP
+				if (e.which == 32) {																// Spacebar
+					if (e.target.type == "text")	return true;									// If in a text input, quit
+					$("#talkBut").trigger("mouseup");												// Trigger mouseup
+					}
+			});
 		$("#talkBut").on("mousedown", () => {														// ON TALK BUTTON
 			if (this.role == "Gamer") return;														// Gamers don't talk
 			$("#talkBut").prop("src","img/intalkbut.png");											// Green button
@@ -134,7 +151,7 @@ class App  {
 			this.voice.StopListening();																// STT off						
 			$("#talkBut").prop("src","img/talkbut.png");											// Green button
 			this.talkTime=(new Date().getTime()-this.talkTime)/1000;								// Compute talk time in seconds
-			$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS AND HOLD MIC ICON TO TALK") }).fadeIn(200);		// Animate in and out
+			$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS AND HOLD SPACEBAR TO TALK") }).fadeIn(200);		// Animate in and out
 			this.inRemark=false;																	// Teacher is not talking
 			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";						// Student always talk to teacher and vice versa
 			if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
@@ -174,7 +191,6 @@ class App  {
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
 					}
-				this.eventTriggers.sort((a,b)=>{ return a.when-b.when });							// Sort events by time											
 				this.InitClassroom();																// Init classroom
 				$("#lz-rolePick").append("<option>Teacher</option><option>Gamer</option>");			// Add teacher & gamer roles
 				for (i=0;i<app.students.length;++i) $("#lz-rolePick").append("<option>"+app.students[i].id+"</option>");	// Add option
@@ -220,7 +236,6 @@ class App  {
 	{
 		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
 		app.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
-		if (app.multi)	return app.curTime;															// No timed events in multiplayer mode
 		if (app.curTime >= app.nextTrigger.when) 	app.HandleEventTrigger(app.nextTrigger);		// Handle event trigger
 		return app.curTime;																			// Return elapsed time in seconds
 	}
@@ -236,13 +251,13 @@ class App  {
 		if (student == "random")  student=this.students[Math.floor(Math.random()*this.students.length)].id;	// Get random student
 		let v=e.do.split("+");																		// Split do items
 		for (i=0;i<v.length;++i) {																	// For each do item
-			if (v[i].match(/say:/i)) {																// SAY
+			if (v[i].match(/say:/i) && !this.multi) {												// SAY
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s);								// Get response from intent
-				else			s={ text:s, bakt:[0,0,0,0,0,0] };										// Explicit text
+				else			s={ text:s, bakt:[0,0,0,0,0,0] };									// Explicit text
 				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
 				}
-			else if (v[i].match(/act:/i)) {															// ACT
+			else if (v[i].match(/act:/i) && !this.multi) {											// ACT
 				s=v[i].substring(4);																// Get text
 				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+s); 	
 				}
@@ -255,8 +270,8 @@ class App  {
 				for (i=0;i<this.sessionLog.length;++i)												// For each event
 					if (this.sessionLog[i].what == "REMARK")										// If a remark
 						remarkLevels[Math.floor(this.sessionLog[i].intent/100)-1]++;				// Add remark level	
-				s=remarkLevels.indexOf(Math.max(...remarkLevels));									// Get max remark level
-				s=app.nlp.GetResponse("",student,710+s*10);											// Get response from intent
+				s=Math.max(1,remarkLevels.indexOf(Math.max(...remarkLevels)));						// Get max remark level
+				s=app.nlp.GetResponse("",student,720+s*10);											// Get response from intent
 				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
 				}
 			}

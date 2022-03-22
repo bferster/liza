@@ -102,7 +102,7 @@ class Feedback {
 	Draw(time)																						// DRAW FEEDBACK PANEL
 	{
 		let i;
-		this.maxTime=app.totTime*1000;																// Get TRT in msecs
+		this.maxTime=app.curTime*1000;																// Swet max time
 		this.curTime=(time != undefined) ? time*1000 : this.curTime;								// Set time
 		$("#lz-timelinebar").remove();																// Remove old one
 		var str=`<div id="lz-timelinebar" class="lz-timelinebar"> 
@@ -192,7 +192,7 @@ class Feedback {
 		let wid=$(window).width()-290;																// Size of graph
 		clearInterval(this.interval);																// Clear timer
 		const getPixFromTime=(time)=>{ return time*1000/this.maxTime*(wid-67)+62; };				// CONVERT TIME TO PIXELS
-		let n=Math.floor(this.maxTime/1000);														// Unber of minues
+		let n=Math.floor(this.maxTime/1000);														// Nunber of minutes
 		for (i=1;i<n;++i) 																			// For each grid line
 			str+=`<text y="200" x="${getPixFromTime(i*60)}" font-size="12" fill="#999">${i} min</text>`; // Draw minutes					
 		for (i=0;i<5;++i) {																			// For each grid line
@@ -227,51 +227,51 @@ class Feedback {
 		return str;																					// Return graph markup
 		}	
 
-		ShowText()
-		{
-			SlideUp(24,34,app.curStudent+"'s text",`This space will show ${app.curStudent}'s written answer to the prompt for reference.`)
-		}
+	ShowText()
+	{
+		SlideUp(24,34,app.curStudent+"'s text",`This space will show ${app.curStudent}'s written answer to the prompt for reference.`)
+	}
 
-		Play() 																						// PLAY/STOP TIMELINE ANIMATION
-		{
-			clearInterval(this.interval);																// Clear timer
-			if ($("#playerButton").prop("src").match(/pausebut/)) 										// If playing, stop
-				$("#playerButton").prop("src","img/playbut.png");										// Show play button
-			else{																						// If not playing, start
-				Sound("click");																			// Click sound							
-				$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
-				this.startPlay=new Date().getTime();													// Set start in msecs
-				let off=((this.curTime-this.curStart)/this.maxTime);			 						// Get offset from start
-				this.interval=setInterval(()=> {														// Start timer
-					let i,move=0,who="";																// Active move
-					let now=new Date().getTime()-this.startPlay;										// Get time 0-maxtime
-					let pct=now/this.maxTime; 															// Get percentage
-					pct+=off;																			// Add starting offset
-					if (this.curTime > this.maxTime) pct=99;											// Past end point, force quit
-					if (pct >= 1) {																		// If done
-						this.Play();																	// Stop playing
-						this.curStart=this.curTime=0;													// Reset
-						}													
-					else{																				// If playing
-						now=pct*this.maxTime+this.curStart;												// Start point
-						for (i=0;i<app.sessionLog.length;i++) {											// For each event
-							if ((app.sessionLog[i].what != "REMARK") && (app.sessionLog[i].what != "RESPONSE")) continue;	// Only talking
-							if (app.sessionLog[i].time*1000 <= now)										// Past now (now in msecs, time in secs)
-								move=i;																	// Set current move 
-							}
-						if (move != this.curMove) {														// A new move
-							let o=app.sessionLog[move];													// Point at event
-							app.voice.Talk(o.text,(o.from == "Teacher") ? "Teacher" : o.from);			// Speak
-							if (o.what == "RESPONSE")													// If a response
-								app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0,0],this.curTime/1000);// Show variance
-							this.curMove=move;															// Set current move
-							}
-						this.ShowNow(pct*this.maxTime+this.curStart);									// Go there
-						}	
-					}
-				,10);																					// ~5fps
-			}
+	Play() 																						// PLAY/STOP TIMELINE ANIMATION
+	{
+		clearInterval(this.interval);																// Clear timer
+		if ($("#playerButton").prop("src").match(/pausebut/)) 										// If playing, stop
+			$("#playerButton").prop("src","img/playbut.png");										// Show play button
+		else{																						// If not playing, start
+			Sound("click");																			// Click sound							
+			$("#playerButton").prop("src","img/pausebut.png");										// Show pause button
+			this.startPlay=new Date().getTime();													// Set start in msecs
+			let off=((this.curTime-this.curStart)/this.maxTime);			 						// Get offset from start
+			this.interval=setInterval(()=> {														// Start timer
+				let i,move=0,who="";																// Active move
+				let now=new Date().getTime()-this.startPlay;										// Get time 0-maxtime
+				let pct=now/this.maxTime; 															// Get percentage
+				pct+=off;																			// Add starting offset
+				if (this.curTime > this.maxTime) pct=99;											// Past end point, force quit
+				if (pct >= 1) {																		// If done
+					this.Play();																	// Stop playing
+					this.curStart=this.curTime=0;													// Reset
+					}													
+				else{																				// If playing
+					now=pct*this.maxTime+this.curStart;												// Start point
+					for (i=0;i<app.sessionLog.length;i++) {											// For each event
+						if ((app.sessionLog[i].what != "REMARK") && (app.sessionLog[i].what != "RESPONSE")) continue;	// Only talking
+						if (app.sessionLog[i].time*1000 <= now)										// Past now (now in msecs, time in secs)
+							move=i;																	// Set current move 
+						}
+					if (move != this.curMove) {														// A new move
+						let o=app.sessionLog[move];													// Point at event
+						app.voice.Talk(o.text,(o.from == "Teacher") ? "Teacher" : o.from);			// Speak
+						if (o.what == "RESPONSE")													// If a response
+							app.fb.DrawVariance(27,window.innerHeight-193,o.data ? o.data : [0,0,0,0,0,0],this.curTime/1000);// Show variance
+						this.curMove=move;															// Set current move
+						}
+					this.ShowNow(pct*this.maxTime+this.curStart);									// Go there
+					}	
+				}
+			,10);																					// ~5fps
 		}
+	}
 	
 }	// Class closure
 
@@ -324,9 +324,9 @@ class ResponsePanel  {
 			<div class="lz-rptitle"><b>Using Grace</b></div>
 				<ul style="line-height:20px">
 					<li>Click START button to begin class</li>
-					<li>Press spacebar to begin talking</li>
-					<li>When Grace has transcribed your voice, the text in the grey bar will turn green.</li>
-					<li>Release spacebar to send to class</li>
+					<li>Press microphone icon to begin talking</li>
+					<li>Release icon to send to class</li>
+					<li>If you pause while talking, the intermediate phrases will be sent to other the players</li>
 				</ul>
 				<div class="lz-rptitle"><b>Some questions to ask</b></div>
 				<ul style="line-height:20px">
