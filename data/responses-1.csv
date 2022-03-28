@@ -112,22 +112,37 @@ Remark (Teacher Feedback),ID,Student,Response,Valued/Belonging (200/300),Academi
 ,,Oliver (Dev),"Ok, next time I'll try to read the story really carefully because I might be missing part of the answer.",1 (acknowledged),0 (not present),0 (not present),2 (Careful),Talk,8,Apply Next Time (I will remember to ...),520,Reflect
 ,,Oliver (Dev),"Before our conversation, I thought a microscope was the right answer and after our conversation I see that it's the Lunar orbiter.",1 (acknowledged),2 (V + Complex sentence),2 (evidence from text),2 (Careful),Talk,10,Then & Now - I used to think and now I think,530,Reflect
 ,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
+,,Teacher,Click START button to begin class,,,,,,,Using Grace,,Tips
+,,Teacher,Press spacebar to begin talking,,,,,,,Talking to the class,,Tips
+,,Teacher,Release spacebar to send remark to class,,,,,,,Talking to the class,,Tips
+,,Teacher,"If you pause while talking, partial phrases will be send to other players to keep them engaged",,,,,,,Talking to the class,,Tips
+,,Teacher,You can also text them by typing,,,,,,,Talking to the class,,Tips
+,,Teacher,"So, we are looking for the one that was used to discover, or to find. So, can you see another equipment that was mentioned in the passage, apart from the microscope?",,,,,,,Ask a question to see the student perspective,200,Ask
+,,Teacher,"So, you say a small machine. What specific small machine do you think you were talking about there?",,,,,,,Ask a question to see the student perspective,200,Ask
+,,Teacher,And how did you gather that information?,,,,,,,Ask a question to see the student perspective,200,Ask
+,,Teacher,Can you find any other kinds of equipment in the text?,,,,,,,Ask a question to see the student perspective,200,Ask
+,,Teacher,That's very good. I like how you were able to tell me exactly where you found your answer that's more of what I would be looking for when you try to respond.,,,,,,,Identify value you see in the student's perspective,300,Value
+,,Teacher,Thank you for sharing your background knowledge with us.,,,,,,,Identify value you see in the student's perspective,300,Value
+,,Teacher,That’s a good question.,,,,,,,Identify value you see in the student's perspective,300,Value
+,,Teacher,"Look at paragraph two, to see if there was a special machine that they brought to investigate the water on the moon.",,,,,,,Identify an aspect that needs improvement and offer a suggestion for revision,400,Correct
+,,Teacher,"Scientists can use a microscope to look closely at water, but they had to use a more specific tool to look for the water first. To find what that tool was, let’s go back to the text. I want you to highlight words that are equipment. Then read what it says about how scientists used that equipment.",,,,,,,Identify an aspect that needs improvement and offer a suggestion for revision,400,Correct
+,,Teacher,"NASA sent out a small machine, but we need to be specific. I would love it if you could tell me a little bit more about what that machine is. I'm looking for the specific name and it starts with the letter L, if that's helpful. You can look back in your reading for that.",,,,,,,Identify an aspect that needs improvement and offer a suggestion for revision,400,Correct
+,,Teacher,"As far as what type of equipment scientists used to discover the water on the moon, it has a specific name. So, it's always very important to read everything in the question and text before answering the question.",,,,,,,Identify an aspect that needs improvement and offer a suggestion for revision,400,Correct
+,,Teacher,"So, next time you have to answer a question that requires information from the text, please remember to make sure you understand the question first before you start trying to find an answer.",,,,,,,"Push student thinking (e.g. metacognitiion, learning, transfer, generalization)",500,Reflect
+,,Teacher,"Next time you have a similar question, what would you do first?",,,,,,,"Push student thinking (e.g. metacognitiion, learning, transfer, generalization)",500,Reflect
+,,Teacher,"What's something new that you've learned today about how to answer a text-based question like this one?
+",,,,,,,"Push student thinking (e.g. metacognitiion, learning, transfer, generalization)",500,Reflect
+,,Teacher,What equipment did scientists use to discover water on the moon.,,,,,,,,,
+,,Teacher,"Water on the Moon
+Adapted from the New York Times, by Kenneth Chang
+The Moon is a Desert
+(1) Scientists have found evidence that water can be found deep within the moon’s
+polar craters. These craters are dark places where the sun never shines.
+(2) NASA sent a small machine called a lunar orbiter to investigate. This lunar orbiter
+looks for ice deposits in a large polar crater. These ice deposits are very small.
+(3) That means the moon is still drier than the driest desert on earth. The water they
+found is microscopic, meaning you wouldn’t be able to see it if you were looking straight
+at it! You’d need a scientific tool called a microscope to look really closely.",,,,,,,,,
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,

@@ -202,6 +202,7 @@ class App  {
 			.then(res =>{ 																			// Process																			
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV
 				this.nlp.AddResponses(d);															// Add responses
+				if (app.multi) 	app.rp.Draw();														// Draw response panel														
 			});
 	}
 
@@ -229,7 +230,6 @@ class App  {
 				break;																				// Quit looking
 				}
 			}
-		if (app.multi) 	app.rp.Draw();																// Draw response panel														
 		}
 
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS

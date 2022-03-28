@@ -284,7 +284,7 @@ class ResponsePanel  {
 	constructor()   																			// CONSTRUCTOR
 	{
 		this.curIntent=0;
-		this.curTab="";																				// Currently open tab
+		this.curTab=0;																				// Currently open tab
 		this.intentDescs=["",
 						  "Low information remark or compliment that has a low impact",
 					   	  "Explains the text or question with or without reference to the text",
@@ -295,54 +295,24 @@ class ResponsePanel  {
 
 	Draw(remark="",student="Student", mode)														// DRAW
 	{
+		let i,tabs=[]
 		$("#lz-rpback").remove();																	// Remove old one
-		if (app.role != "Tdeacher") {																// A student role
-			$("#mainDiv").css("margin-left","15%");													// Shift right													
-			app.sc.Resize();																		// Resize renderer
-			app.sc.SetCamera(0,200,600,0,0,0);														// Reset camera	
-			Prompt("","on");																		// No prompt
-			}
-		else{
-			$("#mainDiv").css("margin-left",0);														// No margin													
-			app.sc.Resize();																		// Resize renderer
-			app.sc.SetCamera(0,150,500,0,0,0);														// Reset camera	
-			return;
-			}
-		let v=app.strings.multi.split(",");															// Point at labels
+		$("#mainDiv").css("margin-left","15%");														// Shift right													
+		app.sc.Resize();																			// Resize renderer
+		app.sc.SetCamera(0,200,600,0,0,0);															// Reset camera	
+		Prompt("","on");																			// No prompt
 		let intentLabel=app.fb.intentLabels[this.curIntent/100];									// Get intent label
 		intentLabel+=this.curIntent ? " - "+this.curIntent : "";									// Add number
 		let intentDesc=this.intentDescs[this.curIntent/100];										// Get intent description
-		if (!this.curTab) this.curTab=v[0];															// Init to 1st tab
 		if (app.role == "Gamer") {																	// Game mode
 			this.DrawGamer(remark,student,mode);													// Draw game panel
 			return;																					// Quit
 			}
-		else if (app.role == "Teacher") {
-			var str=`<div id="lz-rpback" class="lz-rpback"> 
-			<br><div class="lz-rptitle">Some tips for teachers</div>
-			<div id="lz-rplist" style="margin:12px;padding:12px;width:calc(100% -32px);text-align:left;border:1px solid #aaa;border-radius:8px;background-color:#fff">
-			<div class="lz-rptitle"><b>Using Grace</b></div>
-				<ul style="line-height:20px">
-					<li>Click START button to begin class</li>
-					<li>Press microphone icon to begin talking</li>
-					<li>Release icon to send to class</li>
-					<li>If you pause while talking, the intermediate phrases will be sent to other the players</li>
-				</ul>
-				<div class="lz-rptitle"><b>Some questions to ask</b></div>
-				<ul style="line-height:20px">
-					<li>How are you doing?</li>
-					<li>What equipment did scientists use to discover water on the moon?</li>
-					<li>Where in the text did you find that?</li>
-					<li>What do you need to change in your answer?</li>
-					<li>How has your thinking changed?</li>
-					<li>What was the keyword in the question?</li>
-				</ul>
-			</div>`;
-			$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
-			return;																					// Quit
-		}
-		
-		var str=`<div id="lz-rpback" class="lz-rpback"> 
+		let o=app.nlp.responses[app.role];															// Point at responses
+		for (i=0;i<o.length;++i) tabs.push(o[i].label)												// Add all tabs
+		tabs=[... new Set(tabs)];																	// Make unique
+
+		let str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:110px;padding:8px">
 					<div class="lz-rptitle">${intentLabel}</div><p>${intentDesc}</p>	
@@ -358,17 +328,18 @@ class ResponsePanel  {
 					<div id="lzYes"		class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Yes</div>
 					<div id="lzFidget"	class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Fidget</div>
 				</div>
-				<span id="lztab-${v[0]}" class="lz-rptab">${v[0]}</span>
-				<span id="lztab-${v[1]}" class="lz-rptab">${v[1]}</span> 
-				<span id="lztab-${v[2]}" class="lz-rptab">${v[2]}</span> 
-				<span id="lztab-${v[3]}" class="lz-rptab">${v[3]}</span> 
-				<span id="lztab-${v[4]}" class="lz-rptab">${v[4]}</span> 
+				<span id="lztab-0" class="lz-rptab">${tabs[0]}</span>
+				<span id="lztab-1" class="lz-rptab">${tabs[1]}</span> 
+				<span id="lztab-2" class="lz-rptab">${tabs[2]}</span> 
+				<span id="lztab-3" class="lz-rptab">${tabs[3]}</span> 
+				<span id="lztab-4" class="lz-rptab">${tabs[4]}</span> 
 				<div id="lz-rplist" class="lz-rplist"></div>
 				</div>
 				<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">`;
 
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		addSeqs();																					// Add possible moves to select
+
 		if (isMobile) $("#lz-rpback").height(window.innerHeight-70);								// IOS issue
 		if (isMobile) $("#lz-rplist").height(window.innerHeight-312);								// IOS issue
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
@@ -411,25 +382,28 @@ class ResponsePanel  {
 			});
 	
 		function fillList(tab) {																	// FILL RESPONSE LIST
-			let i,v=[],str="",last="";
-			if ((app.role == "Teacher")|| (app.role == "Gamer")) return;							// Not in teacher role
-			let n=app.nlp.responses[app.role].length;												// Number of responses for student
-			let o=app.nlp.responses[app.role];														// Point at it
-
-			for (i=0;i<n;++i) if (tab == o[i].label) v.push(o.slice(i,i+1)[0]);						// Add to array if a label match
-			v.sort((a,b)=> a.type < b.type ? 1 : -1);	 											// Sort by type
-			for (i=0;i<v.length;++i) {																// For each match
-				if (v[i].type != last)	str+=`<p><b>${v[i].type}</b></p>`; 							// Add new section head	
-				last=v[i].type;																		// Then is now	
-				str+=`<p><img id="resp-${v[i].index}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px"> ${v[i].text}</p>`; // add response
-				}		
+			let i,j,heads=[],v=[],str="";
+			for (i=0;i<o.length;++i) {																// For each response
+				if (o[i].label == tabs[tab]) {														// In this tab
+					v.push(o[i]);																	// Add to list to draw	
+					heads.push(o[i].type);															// Add all heads in tab
+					}
+				}
+			heads=[... new Set(heads)];																// Make unique
+			for (i=0;i<heads.length;++i) {															// For each heading
+				str+=`<p><b>${heads[i]}</b></p>`; 													// Add new section head	
+				for (j=0;j<v.length;++j) {															// For each item
+					if (v[j].type == heads[i]) 
+					if (app.role == "Teacher")	str+=`<p>&bull; ${v[j].text}</p>`; // Add response only
+					else					str+=`<p><img id="resp-${v[i].index}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px" title="Click to play"> ${v[j].text}</p>`; // add response
+					}
+				}
 			$("#lz-rplist").html(str);																// Add responses
-
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+app.nlp.responses[app.role][id].text+"|"+app.nlp.responses[app.role][id].bakt.join(","));
+				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+o[id].text+"|"+o[id].bakt.join(","));
 				});
-			}
+			}		
 
 		function addSeqs() {																		// FILL SEQS PULLDOWN
 			var v=[];
