@@ -13,7 +13,7 @@ class Feedback {
 		this.interval=null;																			// Timer
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
-		this.intentLabels=["Intent","General","Ask","Value","Correct","Think"];						// Intent labels
+		this.intentLabels=["Goal","General","Ask","Value","Correct","Think"];						// Intent labels
 		this.cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];										// BAKT colors
 	}
 
@@ -81,7 +81,7 @@ class Feedback {
 			else if (v[i] == 3)	c[i]=14;															// 2nd, 3rd & 4th
 			else 				c[i]=16;															// None
 			}		
-		let labs=["Value","Language","Knowledge","Thinking"];
+		let labs=["Valued","Language","Knowledge","Thinking"];
 		let str="<table style='margin-bottom:10px'>";	
 		for (i=0;i<4;++i) {																			// For each row
 			str+="<tr>";																			// Start row

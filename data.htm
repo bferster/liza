@@ -320,11 +320,6 @@ return;
 		let level=$("#lz-series").val();															// Level of intents
 		let num=$("#lz-num").val();																	// Max per intent
 		
-//		ints["bot_challenge"]=[]; 	 ints["addition"]=[]; 											// Built-ins
-//		ints["bot_challenge"].push("    - are you a bot?"); ints["bot_challenge"].push("    - are you human?");
-//		ints["bot_challenge"].push("    - am I talking to a bot?"); ints["bot_challenge"].push("    - am I talking to a human?");
-//		ints["addition"].push("    - what is 2+2?"); ints["addition"].push("    - what does 2+2 equal?"); ints["addition"].push("    - what does 2+2 make?"); 
-		
 		for (i=0;i<rawData.length;++i) {															// For each line
 			o=rawData[i];																			// Point at it
 			if ((o.intent < 180) || ((o.intent > 181) && (o.intent < 250))) continue;				// Cull 0-250
@@ -373,7 +368,25 @@ return;
 			}
 		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
 		if (mask&1 && (test > 0)) SaveTextAsFile("test.yml",str2);									// Write testing file
-//		DIALOGFLOW	
+
+/* 		ORIGINAL DATA 200-500
+		v=[];
+		for (i=0;i<rawData.length;++i) {															// For each line
+			o=rawData[i];																			// Point at it
+			if  (o.intent < 200) 				 continue;											// Cull 0-200
+			if  (o.intent ==  250.1) 			 continue;											// Cull made up 200s)
+			if  (o.intent ==  550.1) 			 continue;											// Cull made up 500s)
+			if (nlp.Tokenize(o.text).length < 4) continue;											// Skip if short
+			o.tags=nlp.GetIntentTags(o.text) 														// Get intent tags
+			if (o.speaker == "Teacher") v.push(o);													// If remark, add
+			}
+		v.sort((a,b)=>{ return a.intent-b.intent }); 												// Sort
+		let fields=["id","intent","text","tags"];													// Field names
+		str=Papa.unparse(v,{ header:true, skipEmptyLines:true, columns:fields });					// Make CSV using lib
+		SaveTextAsFile("data.csv",str);																// Write file
+*/
+
+/*		DIALOGFLOW	
 		
 		for (j=0;j<v.length;++j) {																// For each intent
 			str="[\n";
@@ -389,9 +402,8 @@ return;
 			str=str.slice(0,-2)+"\n]";
 			SaveTextAsFile(k.substr(1)+"_usersays_en.json",str);													// Write file
 		}
-//
+*/
 
-	Test500s(ints);
 	}
 
 	async function MakeSession()																// CREATE SESSION FILE
