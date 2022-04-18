@@ -12,6 +12,7 @@ class NLP {
 		this.keyTags=[];																				// Keywords keyed to intents 
 		this.keyRules=[];																				// Keeyword matching rules
 		this.vocab=[];																					// Unique vocab by intent 
+		this.intentCaps=[];																				// Intent caps
 		this.AIhost="https://lizasim.com";																// AI host 
 		this.responses=[];																				// Response file
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list (unused)
@@ -144,6 +145,10 @@ class NLP {
 	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
 	{
 		let i,o,d=[];
+//		let si=Math.max(0,app.students.findIndex((s)=>{ return app.curStudent == s.id }));				// Get index of current student
+//		if (this.intentCaps.cap400 && (app.students[si].highest == 400)) intent=Math.max(intent,400); // At least 400	if last intent was 400+			
+//		if (this.intentCaps.cap500 && (app.students[si].highest == 500)) intent=Math.max(intent,500); // 500+				
+//		app.students[si].highest=Math.max(app.students[si].highest,intent;								// Student's highest intent	
 		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0] };												// Default response
 		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
 		if (intent == "ANDYOU") {																		// Ask another student same question as before

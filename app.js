@@ -190,6 +190,9 @@ class App  {
 						if ((v=d[i].text.match(/do=\[(.+?)\]/i)))	o.do=v[1];						// Do
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
+					else if (d[i].type == "rule") {													// Rules
+						if (d[i].id == "cap")	app.nlp.intentCaps["cap"+d[i].text]=1;				// Add cap rule
+						}
 					}
 				this.InitClassroom();																// Init classroom
 				$("#lz-rolePick").append("<option>Teacher</option><option>Gamer</option>");			// Add teacher & gamer roles
@@ -286,7 +289,7 @@ class App  {
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		try {
-			let o={ fidget:0, s:15, base:[], src:"assets/body2.dae" };								// Basic info
+			let o={ fidget:0, s:15, highest:0, base:[], src:"assets/body2.dae" };				// Basic info
 			o.id=d.id;																				// Name
 			o.sex=d.data.match(/sex=(.+?)\W/)[1];													// Get sex
 			o.base[0]=d.data.match(/,b=(.+?)\D/)[1]-0;												// Get variant B
@@ -327,9 +330,9 @@ class App  {
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=isNaN(intent) ? 0 : intent;													// Validate
+				this.lastIntent=intent;																// Save last intent
 				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
-				this.lastIntent=intent;																// Save last intent
 				if (intent >= 300) {																// If an intent detected
 					let s=app.curStudent+"'s response to remark: ";									// Student name
 					s+=app.fb.intentLabels[intent/100];												// Get intent label
@@ -337,7 +340,7 @@ class App  {
 					$("#feedbackDiv").html(s);														// Show in feedback area
 					}	
 			trace(res,r.text)
-			});
+			});                         
 		}
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
