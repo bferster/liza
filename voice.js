@@ -6,14 +6,14 @@ class Voice {
 
 	constructor()																					// CONSTRUCTOR
 	{
-		var _this=this;
+		let _this=this;
 		this.listening=false;																			// Recognizing flag
 		this.getLastClause=false;																		// Get last clause																
 		this.hasRecognition=false;																		// Assume no STT
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		try {																							// Try
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			var mac=0;																					// Assume non-mac
+			let i,mac=0;																				// Assume non-mac
 			if (window.navigator.userAgentData)															// Exists?
 				mac=window.navigator.userAgentData.platform != "Windows";								// A mac?
 			this.femaleVoice=mac ? 0 : 1;																// Female voice
@@ -33,14 +33,11 @@ class Voice {
 				};
 			this.tts.onend=()=> { 																		// ON TALKING END
 				this.talking=0;  																		// Stop talking animation
-				if (app.curStudent) { 																	// If a student defined
-					let o=app.students.find(x => x.id == app.curStudent);								// Point at student
-					if (o)	app.sc.SetBone(app.students[o.seat],"mouth",0,0,0); 						// Neutral mouth 
-					}
+				if ((i=app.studex[app.curStudent])) 													// Valid student
+					app.sc.SetBone(app.students[i-1],"mouth",0,0,0); 									// Neutral mouth 
 				$("#responseTextDiv").delay(3000).fadeOut(300);											// Fade out response bubble
-				};	
-
-			} catch(e) { trace("TTS error",e) };														// On error
+			};	
+		} catch(e) { trace("TTS error",e) };															// On error
 		
 		try {																							// Try
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility

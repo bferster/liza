@@ -92,5 +92,5 @@ keyrule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi",
 keyrule,600,"how|how's|house,are|is|have|goes|going",
 keyrule,600,"nice|good|great,to,see|meet",
 keyrule,600,"good|morning|afternoon|evening|day",
-rule,cap,400,""
-rule,cap,500,""
+rule,cap,400,">="
+rule,cap,500,">="

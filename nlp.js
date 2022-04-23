@@ -145,11 +145,13 @@ class NLP {
 	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
 	{
 		let i,o,d=[];
-//		let si=Math.max(0,app.students.findIndex((s)=>{ return app.curStudent == s.id }));				// Get index of current student
-//		if (this.intentCaps.cap400 && (app.students[si].highest == 400)) intent=Math.max(intent,400); // At least 400	if last intent was 400+			
-//		if (this.intentCaps.cap500 && (app.students[si].highest == 500)) intent=Math.max(intent,500); // 500+				
-//		app.students[si].highest=Math.max(app.students[si].highest,intent;								// Student's highest intent	
 		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0] };												// Default response
+		if (!(i=app.studex[student])) 	return res;														// Quit if not a valid student
+		--i;																							// Zero base
+		if (this.intentCaps.cap400 && (app.students[i].highestIntent == 400)) intent=Math.max(intent,400); 	// At least 400	if last intent was 400+			
+		if (this.intentCaps.cap500 && (app.students[i].highestIntent == 500)) intent=Math.max(intent,500); 	// 500+				
+		if (intent < 600)																				// If an AI generated intent
+			app.students[i].highestIntent=Math.max(app.students[i].highestIntent,intent);				// Set student's highest intent	
 		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
 		if (intent == "ANDYOU") {																		// Ask another student same question as before
 			student=app.curStudent;																		// Redirect to new student

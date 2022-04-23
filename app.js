@@ -17,6 +17,7 @@ class App  {
 		this.desks=[];																				// Holds desks	
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
+		this.studex=[];																				// Student name to index array
 		this.startTime;																				// Start of session in ms
 		this.trt=0;																					// Total running time in seconds
 		this.curTime=0;																				// Time in session in seconds
@@ -191,7 +192,7 @@ class App  {
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
 					else if (d[i].type == "rule") {													// Rules
-						if (d[i].id == "cap")	app.nlp.intentCaps["cap"+d[i].text]=1;				// Add cap rule
+						if (d[i].id == "cap")	app.nlp.intentCaps["cap"+d[i].text]=1;				// Add intent cap rule
 						}
 					}
 				this.InitClassroom();																// Init classroom
@@ -211,7 +212,7 @@ class App  {
 
 	StartSession()																				// START/RESTART SESSION
 	{
-		let i,stuIndex;
+		let i,s;
 		this.trt=0;																					// At start
 		this.sessionLog=[];																			// Clear session log
 		this.inSim=false;																			// Not in simulation
@@ -223,8 +224,8 @@ class App  {
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
 			this.eventTriggers[i].done=0;															// Reset done	
 			if (this.eventTriggers[i].type == "first") {											// A first response event
-				stuIndex=app.students.findIndex((s)=>{ return this.eventTriggers[i].who == s.id });	// Get index of student array
-				if (stuIndex >= 0) app.students[stuIndex].first=this.eventTriggers[i].do.substring(4);	// Get thing to say
+				if ((s=this.studex[this.eventTriggers[i].who]))										// Get who
+					app.students[s-1].first=this.eventTriggers[i].do.substring(4);					// Get thing to say
 				}
 			}
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
@@ -233,6 +234,7 @@ class App  {
 				break;																				// Quit looking
 				}
 			}
+		for (i=0;i<this.students.length;++i)	this.students[i].highestIntent=0;					// Reset student's highest intent
 		}
 
 	SetSessionTiming(now)																		// SET SESSION TIMING IN SECONDS
@@ -289,7 +291,7 @@ class App  {
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		try {
-			let o={ fidget:0, s:15, highest:0, base:[], src:"assets/body2.dae" };				// Basic info
+			let o={ fidget:0, s:15, highestIntent:0, base:[], src:"assets/body2.dae" };				// Basic info
 			o.id=d.id;																				// Name
 			o.sex=d.data.match(/sex=(.+?)\W/)[1];													// Get sex
 			o.base[0]=d.data.match(/,b=(.+?)\D/)[1]-0;												// Get variant B
@@ -300,9 +302,13 @@ class App  {
 			o.seat=d.data.match(/seat=(.+?)\D/)[1]-0;												// Get seat
 			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
 			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set skin
-			if (o.id != "Class") this.students.push(o);												// Add only students to students array
+			if (o.id != "Class") {																	// Only students
+				this.students.push(o); 																// Add to students array
+				this.studex[o.id]=this.students.length;												// Add index finder 
+				}
 			this.nlp.AddSyns("student",d.id,d.text.split(","));										// Add student synonyms
 		} catch(e) { trace(e) }																		// Catch error
+
 	}
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED
@@ -345,17 +351,18 @@ class App  {
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
-		let res={ text:"", intent:0, bakt:[0,0,0,0,0,0]};											// Clear res
-		if (this.role == "Gamer") return res;														// No responses from gamers
-		let stuIndex=Math.max(0,app.students.findIndex((s)=>{ return this.curStudent == s.id }));	// Get index of current studeent
+		let i,res={ text:"", intent:0, bakt:[0,0,0,0,0,0]};											// Clear res
+		if (this.role == "Gamer") 				return res;											// No responses from gamers
+		if (!(i=this.studex[this.curStudent]))	return res;											// Quit if bad name
+		--i;																						// Zero-base index
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
-		if (!this.multi && this.students[stuIndex].first) {											// An initial response set
+		if (!this.multi && this.students[i].first) {												// An initial response set
 			if (res.intent != 600) {																// Not a greeting
-				let s=this.students[stuIndex].first;												// Get first response
+				let s=this.students[i].first;														// Get first response
 				if (!isNaN(s))	res=app.nlp.GetResponse("",app.curStudent,s);						// Get response from intent
 				else			res.text=s;															// Use it directly
-				this.students[stuIndex].first="";													// Fulfilled
+				this.students[i].first="";															// Fulfilled
 				}
 			} 
 		if (res.text) 																				// If one
@@ -365,11 +372,8 @@ class App  {
 
 	UpdateVariance(student, bakt)																// UPDATE STUDENT VARIANCE FROM RESPONSE
 	{
-		let stuIndex=app.students.findIndex((s)=>{ return student == s.id });						// Get index
-		let o=app.students[stuIndex];																// Point at student
 		if ($("#lz-timelinebar").length) app.fb.Draw(this.curTime);									// If timeline up, show new dot and variance
 		else if (this.role != "Gamer")   app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt,this.curTime);	// Show variance
-		if (!o)	return;																				// Quit if not a student
 	}
 
 	DoAction(act, remark)																		// PERFORM STUDENT ACTION

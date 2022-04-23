@@ -19,13 +19,14 @@ class Feedback {
 
 	OnClick(e) 																					// ON SCREEN CLICK
 	{
+		let i;
 		$("#talkInput").blur();																		// Set focus away from inputs				
 		if (e.target.localName != "canvas")	return;													// React only to canvas hits
 		let o=app.sc.GetModelPos(e.clientX,e.clientY);												// Get id of model at point
 		if (o && o.object && (o.object.name == "body")) {											// If a student
 			app.curStudent=o.object.parent.parent.name;												// Set name (body is 2 deep)
-			let stuIndex=app.students.findIndex((s)=>{ return app.curStudent == s.id });			// Get index
-			if (!(o=app.students[stuIndex]))  return;										        // Point at student
+			if (!(i=app.studex[app.curStudent]))	return;											// Quit if bad name
+			o=app.students[i-1];;										       						// Point at student
 			app.voice.ShowSpeakerText(app.curStudent,o.lastResponse ? o.lastResponse : "");			// Show response text
 			if (!$("#lz-timelinebar").length)														// Not if timeline up
 				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,o.bakt ? o.bakt :[0,0,0,0,0,0]); // Show variance
@@ -36,10 +37,11 @@ class Feedback {
 	DrawVariance(x, y, v, time)																	// SHOW STUDENT VARIANCE
 	{
 		$("#lz-variance").remove();																	// Remove old one
-		let i,j;
+		let i,j,s;
 		let labs=["Value","Language","Knowledge","Thinking"];
 		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px">`;
-		let s=app.students[app.students.findIndex((s)=>{ return app.curStudent == s.id })]; 		// Point at student data
+		if (!(i=app.studex[app.curStudent]))	return;												// Quit if bad name
+		s=app.students[i-1]; 																		// Point at student data
 		str+=this.GetVarianceMarkup(v);																// Get dot display
 		if ((x < 200) && s) {																		// In timeline	
 			v=s.base.slice();																		// Get baseline student variance
