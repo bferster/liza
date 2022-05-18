@@ -436,8 +436,13 @@ class App  {
 
 	InitSocketServer()																			// INIT SOCKET SERVER
 	{
-		this.retryWS=false;																			// Reconnecting to web socket
+		if (noNode) {																				// If no nodeJs backend
+			this.ws={};																				// Fake socket
+			this.ws.send=(msg)=> { this.SocketIn({data:msg});	}									// Send calls socketIn
+			return;																					// Quit
+			}
 		this.secs=0;																				// Time
+		this.retryWS=false;																			// Reconnecting to web socket
 		if (window.location.host == "localhost") this.ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
 		else									 this.ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
 		this.ws.onmessage=(e)=>{ this.SocketIn(e); };												// ON INCOMING MESSAGE

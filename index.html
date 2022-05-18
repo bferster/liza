@@ -177,10 +177,11 @@
 // MAIN 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-if ((location.protocol != 'https:') && (window.location.host != "localhost")) location.href = 'https:' + window.location.href.substring(window.location.protocol.length); // FORCE HTTPS!
-
 var app=null;																						// Holds app
-var isMobile=false;																					// Flag for mobile devices
+var isMobile=false;																					// Mobile?
+var noNode=false;																					// No node js?
+
+if ((location.protocol != 'https:') && (window.location.host != "localhost") && !noNode) location.href = 'https:' + window.location.href.substring(window.location.protocol.length); // FORCE HTTPS!
 
 	$(window).on("resize orientationchange", ()=>{                                       		 // ON WINDOW RESIZE
 		document.documentElement.style.setProperty("--maxvh", window.innerHeight+"px");				// Set CSS var for IOS 100vh isssue

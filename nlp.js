@@ -235,14 +235,25 @@ class NLP {
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
 		if (msg && msg.length < 2)	return;																// Too small
-		if (app.df.id) 																					// If using Dialogflow
-			app.ws.send(app.sessionId+"|DIALOGFLOW|ADMIN|INFER|"+app.df.id+"|"+app.df.email+"|"+app.df.key+"|"+msg);  	// Ask for inference
+		if (noNode) {																					// If using wit
+			let inference={ text:msg, intent:{name:"r0"}, type:"wit" };									// Null inference
+			let url="https://api.wit.ai/message?v=20210922&q="+msg.substring(0,255);					// URL
+			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get sever token 100s
+			fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })	// Send remark to wit
+			.then(res => res.json()).then(res =>{ 
+				if (res.intents.length) {																// If an intent found
+					inference.intent.name=res.intents[0].name;											// Get intent (mimic Rasa format )																	
+					inference.intent.confidence=res.intents[0].confidence;								// Confidence
+					}	
+				callback(inference);																	// Return response
+				});
+			}
 		else{																							// Use Rasa
 			fetch(this.AIhost+":5005/model/parse", {													// Fetch data
 				method:"POST",																			// POST
 				body: JSON.stringify({text:msg})														// Payload	
 				})
-			.then(res => res.json()).then(res =>{ callback(res); })										// Return respons in callback
+			.then(res => res.json()).then(res =>{ callback(res); })										// Return response in callback
 			}
 	}
 
