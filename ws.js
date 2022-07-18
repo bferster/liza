@@ -18,8 +18,9 @@
 	npm install fs
 	npm install os
 	npm install ws
-	node socketserver.js
 	npm install @google-cloud/dialogflow
+	
+	node ws.js
 
 	npm install forever
 	cd ~/htdocs/go | forever stopall | forever start ws.js | forever logs | sudo cat /home/bitnami/.forever/<id>.log
@@ -40,8 +41,8 @@
 	
 	if (!local) {																				// If on web
 		const server = https.createServer({														// Create an https server
-			cert: fs.readFileSync("/opt/bitnami/apache/conf/www.lizasim.com.crt"),				// Point at cert
-			key: fs.readFileSync("/opt/bitnami/apache/conf/www.lizasim.com.key")				// And key
+			cert: fs.readFileSync("/opt/bitnami/apache/conf/agileteacher.org.crt"),				// Point at cert
+			key: fs.readFileSync("/opt/bitnami/apache/conf/agileteacher.org.key")				// And key
 			});
 		webSocketServer= new WebSocket.Server({ server });										// Open it
 		server.listen(8080);																	// Listen on port 8080

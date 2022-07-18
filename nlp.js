@@ -235,7 +235,7 @@ class NLP {
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
 		if (msg && msg.length < 2)	return;																// Too small
-		if (noNode) {																					// If using wit
+		if (useDF) {																					// If using wit.ai
 			let inference={ text:msg, intent:{name:"r0"}, type:"wit" };									// Null inference
 			let url="https://api.wit.ai/message?v=20210922&q="+msg.substring(0,255);					// URL
 			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get sever token 100s
