@@ -259,8 +259,8 @@ class App  {
 			if (v[i].match(/say:/i) && !this.multi) {												// SAY
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s);								// Get response from intent
-				else			s={ text:s, bakt:[0,0,0,0,0,0] };									// Explicit text
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
+				else			s={ text:s, bakt:[0,0,0,0,0,0], MP3:"" };							// Explicit text
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")+(s.MP3 ? "|"+s.MP3 : "")); 
 				}
 			else if (v[i].match(/act:/i) && !this.multi) {											// ACT
 				s=v[i].substring(4);																// Get text
@@ -277,7 +277,7 @@ class App  {
 						remarkLevels[Math.floor(this.sessionLog[i].intent/100)-1]++;				// Add remark level	
 				s=Math.max(1,remarkLevels.indexOf(Math.max(...remarkLevels)));						// Get max remark level
 				s=app.nlp.GetResponse("",student,720+s*10);											// Get response from intent
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")); 
+				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")+(s.MP3 ? "|"+s.MP3 : "")); 
 				}
 			}
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
@@ -345,7 +345,6 @@ class App  {
 					s+=intent ? " "+intent : "";													// Add number
 					$("#feedbackDiv").html(s);														// Show in feedback area
 					}	
-			trace(res,r.text)
 			});                         
 		}
 
@@ -366,8 +365,8 @@ class App  {
 				}
 			} 
 		if (res.text) 																				// If one
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")); // Send response
-		return res;																					// Return it
+			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")+(res.MP3 ? "|"+res.MP3 : "")); // Send response
+		return res;										S											// Return it
 	}
 
 	UpdateVariance(student, bakt)																// UPDATE STUDENT VARIANCE FROM RESPONSE
@@ -615,9 +614,9 @@ class App  {
 			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0,0]);						// Update variance
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
-			else if (!this.ignoreNextTalk)app.voice.Talk(v[6],v[4]);								// Talk		
+			else if (!this.ignoreNextTalk)	app.voice.Talk(v[6], v[4], v[8] ?  v[8] : "");			// Talk		
 			this.ignoreNextTalk=false;																// Reset flag
-
+trace(v)
 			if ((o=app.students[app.students.findIndex((s)=>{ return v[4] == s.id })])) {			// Point at student data
 				o.lastIntent=this.lastIntent;														// Set intent													
 				o.lastRemark=this.lastRemark;														// Set remark													

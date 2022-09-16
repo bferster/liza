@@ -52,7 +52,7 @@ Remark (Teacher Question),Voice,Student,Response,Valued/Belonging (200/300),Acad
 ,Class,Class,Math is hard,0 (not present),0 (not present),0 (not present),0 (not present),Talk,8,Add,1101,
 ,Farrah,Farrah,Thanks for coming to our class today!,,0 (not present),0 (not present),0 (not present),Talk,0,Greeting,100,Start
 ,Farrah,Farrah,"Um, what equipment did scientists use to discover water on the moon?",1 (acknowledged),1 (vocabulary),0 (not present),0 (not present),Raise Hand,0,Repeat Question,110,Start
-,Farrah,Farrah,You’d need a microscope to look really closely.,1 (acknowledged),2 (V + Complex sentence),2 (evidence from text),1 (Incomplete),Talk,3,Repeat Initial Response,120,Start
+,Farrah,Farrah,You'd need a microscope to look really closely.,1 (acknowledged),2 (V + Complex sentence),2 (evidence from text),1 (Incomplete),Talk,3,Repeat Initial Response,120,Start
 ,Farrah,Farrah,I still don't understand why my answer is wrong.,0 (not present),0 (not present),0 (not present),1 (Incomplete),Raise Hand,2,Challenge,150,Question
 ,Farrah,Farrah,I'm still kind of confused,0 (not present),0 (not present),0 (not present),1 (Incomplete),Raise Hand,2,Challenge,150,Question
 ,Farrah,Farrah," The reading says that the water was small, so, I thought of equipment like the microscopes we use to look at small things.",1 (acknowledged),1 (vocabulary),1 (prior knowledge),1 (Incomplete),Raise Hand,3,Elaborates with Background Knowledge,200,Explain

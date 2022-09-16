@@ -80,7 +80,7 @@ class Voice {
 		this.getLastClause=true;																		// Get last phrase when transcribed
 	}
 
-	Talk(text, who)																					// SAY SOMETHING
+	Talk(text, who, mp3File)																			// SAY SOMETHING
 	{
 		if (!text)	return;																				// Nothing to say
 		text=text.replace(/\{.*?\}/g,"");																// Remove any braced text
@@ -93,6 +93,12 @@ class Voice {
 			if (who != "Teacher") {																		// Student talking
 				this.talking=who;																		// Trigger mouth animation if a student
 				this.ShowSpeakerText(who,text);															// Show text underneath student										
+				}
+			if (mp3File) {																				// If an MP3 file to be played
+				let snd=new Audio("assets/audio-"+app.activityId+"/"+mp3File+".mp3");					// Use mp3 file
+				snd.play();																				// Play it
+				snd.onended=()=>{ this.talking=0; } 													// Stop talking animation
+				return;
 				}
 			speechSynthesis.cancel();																	// Clear current speech queue			
 			if (who == "Teacher") 		this.tts.voice=this.voices[this.instructorVoice];				// Instructor's  voice

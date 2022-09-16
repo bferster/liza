@@ -129,6 +129,7 @@ class NLP {
 			o.label=d[i]["Response category"];															// Get response category
 			if (d[i]["Type of Student Response"]) o.type=d[i]["Type of Student Response"];				// Get type
 			o.intent=d[i]["Intent"];																	// Get intent
+			o.MP3=d[i]["MP3"];																			// Get mps file, if any
 			o.action=d[i]["Student Physical Action"];													// Get action
 			o.index=this.responses[k].length;															// Add index
 			this.responses[k].push(o);																	// Add to list
@@ -145,7 +146,7 @@ class NLP {
 	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
 	{
 		let i,o,d=[];
-		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0] };												// Default response
+		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0], MP3:"" };										// Default response
 		if (!(i=app.studex[student])) 	return res;														// Quit if not a valid student
 		--i;																							// Zero base
 		if (this.intentCaps.cap400 && (app.students[i].highestIntent == 400)) intent=Math.max(intent,400); 	// At least 400	if last intent was 400+			
