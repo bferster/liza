@@ -24,7 +24,7 @@
 
 	npm install forever
 	cd ~/htdocs/go | forever stopall | forever start ws.js | forever logs | sudo cat /home/bitnami/.forever/<id>.log
-	open port:8080
+	open port:8082
 
 	ID|TIME|SENDER|OP|DATA-0 ... DATA-N
 	
@@ -45,7 +45,7 @@
 			key: fs.readFileSync("/opt/bitnami/apache/conf/agileteacher.org.key")				// And key
 			});
 		webSocketServer= new WebSocket.Server({ server });										// Open it
-		server.listen(8080);																	// Listen on port 8080
+		server.listen(8082);																	// Listen on port 8082
 		}
 	else webSocketServer = new WebSocket.Server({ port:8080 });									// Open in debug
 	setInterval(()=>{ SaveSessionData(); },1000*60*60);											// 60 minute timer

@@ -292,7 +292,7 @@ return;
 	function InitSocketServer()																	// INIT SOCKET SERVER
 	{
 		if (window.location.host == "localhost") ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
-		else									 ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
+		else									 ws=new WebSocket('wss://'+window.location.host+':8082');	// Secure											
 		ws.onclose=()=>   { console.log('disconnected'); ws=null; Sound("delete") };				// ON CLOSE
 		ws.onerror=(e)=>  { console.log('error',e);	};												// ON ERROR
 		ws.onopen=()=> 	  { console.log('connected'); };											// ON OPEN

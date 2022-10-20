@@ -443,7 +443,7 @@ class App  {
 		this.secs=0;																				// Time
 		this.retryWS=false;																			// Reconnecting to web socket
 		if (window.location.host == "localhost") this.ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
-		else									 this.ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
+		else									 this.ws=new WebSocket('wss://'+window.location.host+':8082');	// Secure											
 		this.ws.onmessage=(e)=>{ this.SocketIn(e); };												// ON INCOMING MESSAGE
 		this.ws.onclose=()=>   { console.log('disconnected'); this.ws=null; this.retryWS=true; Sound("delete") };		// ON CLOSE
 		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
@@ -454,7 +454,7 @@ class App  {
 			++this.secs;																			// Another second 
 			if (this.retryWS) {																		// If reconnecting to websocket
 				if (window.location.host == "localhost") this.ws=new WebSocket('ws://'+window.location.host+':8080');	// Open insecure websocket											
-				else									 this.ws=new WebSocket('wss://'+window.location.host+':8080');	// Secure											
+				else									 this.ws=new WebSocket('wss://'+window.location.host+':8082');	// Secure											
 				this.ws.onmessage=(e)=>{ this.SocketIn(e); };										// ON INCOMING MESSAGE
 				this.ws.onclose=()=>   { this.retryWS=true; console.log('disconnected'); };			// ON CLOSE
 				this.ws.onopen=()=>    { console.log('re-connected'); };							// ON OPEN  
