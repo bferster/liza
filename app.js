@@ -616,7 +616,6 @@ class App  {
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
 			else if (!this.ignoreNextTalk)	app.voice.Talk(v[6], v[4], v[8] ?  v[8] : "");			// Talk		
 			this.ignoreNextTalk=false;																// Reset flag
-trace(v)
 			if ((o=app.students[app.students.findIndex((s)=>{ return v[4] == s.id })])) {			// Point at student data
 				o.lastIntent=this.lastIntent;														// Set intent													
 				o.lastRemark=this.lastRemark;														// Set remark													

@@ -95,7 +95,7 @@ class Voice {
 				this.ShowSpeakerText(who,text);															// Show text underneath student										
 				}
 			if (mp3File) {																				// If an MP3 file to be played
-				let snd=new Audio("assets/audio-"+app.activityId+"/"+mp3File+".mp3");					// Use mp3 file
+				let snd=new Audio(mp3File);																// Use mp3 file
 				snd.play();																				// Play it
 				snd.onended=()=>{ this.talking=0; } 													// Stop talking animation
 				return;

@@ -395,15 +395,17 @@ class ResponsePanel  {
 			for (i=0;i<heads.length;++i) {															// For each heading
 				str+=`<p><b>${heads[i]}</b></p>`; 													// Add new section head	
 				for (j=0;j<v.length;++j) {															// For each item
-					if (v[j].type == heads[i]) 
-					if (app.role == "Teacher")	str+=`<p>&bull; ${v[j].text}</p>`; // Add response only
-					else					str+=`<p><img id="resp-${v[i].index}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px" title="Click to play"> ${v[j].text}</p>`; // add response
-					}
+					if (v[j].type == heads[i])  {															
+						if (app.role == "Teacher")	str+=`<p>&bull; ${v[j].text}</p>`; 				// Add response only
+						else						str+=`<p><img id="resp-${v[j].index}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px" title="Click to play"> ${v[j].text}</p>`; // add response
+						}
+					}	
 				}
 			$("#lz-rplist").html(str);																// Add responses
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
-				app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+o[id].text+"|"+o[id].bakt.join(","));
+				let s=app.sessionId+"|"+app.curTime+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+o[id].text+"|"+o[id].bakt.join(",")+"|"+(o[id].MP3 ? o[id].MP3 : "");
+				app.ws.send(s);
 				});
 			}		
 
