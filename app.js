@@ -8,8 +8,8 @@ class App  {
 	{
 		app=this;
 		this.role="Teacher";																		// User's role in simulation
-		this.sessionId="1";																			// Session id
-		this.activityId="1";																		// Activity id
+		this.sessionId="2";																			// Session id
+		this.activityId="2";																		// Activity id
 		this.strings=[];																			// Config strings
 		this.sessionLog=[];																			// Session log
 		this.poses=[];																				// Holds poses

@@ -36,6 +36,7 @@
 	ps -ef (kill PID) to remove
 	nohup rasa run -m models --enable-api --cors "*" --ssl-certificate /opt/bitnami/letsencrypt/certificates/www.lizasim.com.crt --ssl-keyfile /opt/bitnami/letsencrypt/certificates/www.lizasim.com.key --port 5006?
 
+	ssh -i c:/Bill/CC/js/agile.pem bitnami@54.88.128.161
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 	

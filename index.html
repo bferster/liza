@@ -216,8 +216,10 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",(e)=> {																// HANDLE KEYPRESS
-			if ((e.which == 84) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+T)
-				}
+			if ((e.which == 81) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+Q)
+				trace(123)	
+				WitTalk()
+			}
 			});
 	});	
  
@@ -459,6 +461,21 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 			}
  	 	return m;																						// Return multiplied matrix
 	}
+
+	function WitTalk(msg)
+	{
+
+	let body={  "q": "sample full text to speech request",
+  		"voice": "Rebecca", "style": "soft", "speed": 150, "pitch": 110,  "gain": 95
+		}
+	let url="https://api.wit.ai/synthesize?v=20210922";					// URL
+			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get sever token 100s
+			fetch(url, { method:"POST",	 body: JSON.stringify(body),		
+				headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })		// Send remark to wit
+			.then(res => res.json()).then(res =>{ trace(res); });
+	}
+	
+
 
 </script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
