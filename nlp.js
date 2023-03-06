@@ -175,13 +175,13 @@ class NLP {
 
 	MatchKeyRule(remark, originalIntent) 															// CHECK FOR MATCH AGAINST RULES
 	{
-		let i,j,n,re;
+		let i,j,n,r,re;
 		if (!remark) return originalIntent;																// Return original intent given
 		for (i=0;i<this.keyRules.length;++i) {															// For each rule
 			n=0;																						// Reset num matched
 			for (j=0;j<this.keyRules[i].ands.length;++j) {												// For each clause
-				re=new RegExp(this.keyRules[i].ands[j],"i");											// Make regex
-				if (remark.match(re))	++n;															// Add to count if a match
+				re=new RegExp(this.keyRules[i].ands[j],"ig");											// Make regex
+				if ((r=remark.match(re)))	n+=r.length;												// Add to count if matches
 				}
 			if (n >= this.keyRules[i].ands.length)	return this.keyRules[i].intent;						// Return intent if a complete match 
 			}
@@ -235,9 +235,15 @@ class NLP {
 
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
+		let inference={ text:msg, intent:{name:"r0"}, type:"wit" };										// Null inference
 		if (msg && msg.length < 2)	return;																// Too small
-		if (useDF) {																					// If using wit.ai
-			let inference={ text:msg, intent:{name:"r0"}, type:"wit" };									// Null inference
+		if (app.activityId != 1) { 																		// Not the trained set
+			inference.intent.name="r100";																// Force it 100	
+			inference.intent.confidence=0;																// No confidence
+			trace(msg,inference)
+			callback(inference);																		// Run callback
+			}
+		else if (useDF) {																				// If using wit.ai
 			let url="https://api.wit.ai/message?v=20210922&q="+msg.substring(0,255);					// URL
 			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get sever token 100s
 			fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })	// Send remark to wit
