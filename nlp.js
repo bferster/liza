@@ -241,11 +241,15 @@ class NLP {
 			let url="https://api.wit.ai/message?v=20210922&q="+msg.substring(0,255);					// URL
 			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get sever token 100s
 			fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })	// Send remark to wit
-			.then(res => res.json()).then(res =>{ 
+			.then(res => res.json()).then(res =>{ 														// Process result
 				if (res.intents.length) {																// If an intent found
 					inference.intent.name=res.intents[0].name;											// Get intent (mimic Rasa format )																	
 					inference.intent.confidence=res.intents[0].confidence;								// Confidence
 					}	
+				else{																					// No intent foubd
+					inference.intent.name="r100";														// Force it 100	
+					inference.intent.confidence=0;														// No confidence
+					}								
 				callback(inference);																	// Return response
 				});
 			}
