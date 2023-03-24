@@ -40,8 +40,7 @@
 	sudo /opt/bitnami/ctlscript.sh stop
 	sudo /opt/bitnami/letsencrypt/lego --tls --email="bferster@stagetools.com" --domains="agileteacher.org" --path="/opt/bitnami/letsencrypt" renew --days 90
 	sudo /opt/bitnami/letsencrypt/lego --path /opt/bitnami/letsencrypt list
-
-
+	sudo /opt/bitnami/ctlscript.sh start
 
 	ssh -i c:/Bill/CC/js/agile.pem bitnami@54.88.128.161
 

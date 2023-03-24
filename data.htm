@@ -22,7 +22,7 @@
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
 		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
-		<input type="file" id="lz-testFile" accept=".yml" style="display:none">
+		<input type="file" id="lz-testFile" accept=".csv,.CSV,.yml" style="display:none">
 
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/logo.png" style="width:25%">
@@ -37,7 +37,7 @@
 			&nbsp &nbsp; Test % <input type="input" class="co-is" style="width:40px" value="0" id="lz-holdOut"/>
 			<hr><p>
 				<div class="co-bs" id="lz-makeTrain">Make nlu.yml</div>
-				&nbsp; &nbsp; &nbsp;<div class="co-bs" id="lz-testData">Test data</div>
+				&nbsp; &nbsp; &nbsp;<div class="co-bs" id="lz-testData">Train data</div>
 				&nbsp; &nbsp; &nbsp;<div class="co-bs" id="lz-makeSession">Make session</div>
 				&nbsp;<input type="input" class="co-is" style="width:40px" value="78" id="lz-session"/>
 			</p>
@@ -54,7 +54,7 @@
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
 	let ws=null;																					// Socket server				
-	let aiType="rasa";																			// AI type																																			
+	let aiType="wit";																				// AI type																																			
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
@@ -69,7 +69,7 @@
 			ImportCSV(e);																			// Read file
 			$("#lz-tempFile").val("");																// Clear value		
 			});
-		$("#lz-testFile").on("change",(e)=>{														// ON TEST FILE LOAD
+		$("#lz-testFile").on("change",(e)=>{														// ON TRAIN
 			TestData(e,aiType);																		// Read file
 			$("#lz-tempFile").val("");																// Clear value		
 			});
@@ -185,11 +185,12 @@ return;
 		uvocab["r100"]=vocab["r100"].filter(x => ![...vocab["r200"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
 		}
 	
-	async function TestData(e,aiType)																	// TEST DATA
+	async function TestData(e, aiType)															// TEST DATA
 	{	
-
-//		TrainWit(e);	return;
-
+		if (aiType == "wit") {
+			TrainWit(e);	
+			return;
+			}
 		let i,k,o,v,id,str;
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
@@ -239,6 +240,7 @@ return;
 			 email:"liza100s@liza-100s-mmhi.iam.gserviceaccount.com",
 			 id: "liza-100s-mmhi"
 			}
+
 	async function InferIntents(msgs, aiType, callback)											// GET RESPONSE FROM AI
 	{
 		try {
@@ -473,24 +475,18 @@ return;
 
 	async function TrainWit(e)																	// TRAIN WIT
 	{	
-		let i,v,msgs=[];
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			LoadingIcon(true);																		// Show loading icon
-			v=e.target.result.split("\n");															// Divide by LF
-			for (i=0;i<v.length;++i) {																// For each line
-				if (!v[i]) 						continue;											// Skip is nothing there
-				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
-				if (v[i].match(/^   /)) 		msgs.push({ text:v[i].substr(5), intent:k });		// Add if an example
-				}
-			let tot=msgs.length;																	// Get total to train
-			WitTrain(msgs, (r1,r2)=>{																// Start sending via recursion		
+			let d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
+			let tot=d.length;																		// Total
+			WitTrain(d, (r1,r2)=>{																	// Start sending via recursion		
 				trace(r1,r2);																		// Log	
-				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(msgs.length/tot*100))+"%</b>");	// Show progress
-				if (!msgs.length) {																	// If last one
+				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(tot/d.length*100))+"%</b>");	// Show progress
+				if (!d.length) {																	// If last one
 					Sound("ding");																	// Ding				
 					LoadingIcon(false);																// Hide loading icon
 					}
@@ -503,10 +499,9 @@ return;
 		let inference={ text:"", intent:0, confidence:0 };											// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
-		let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get sever token 100s
-//		let token="5BVRE-X-PNGZ6AKO-X-EA7P44KU3-X-PXU7LRKVVD".replace(/-X-/g,"");					// Get token 10s
-//		let token="SOYJDBYI5WSJB-X-VBCEQZ2CHSWNZ-X-2KYN4U".replace(/-X-/g,"");						// Get token 10 w/ 100 per intent
-		let body=[{ text:m.text.substring(0,255), intent:"r"+m.intent, entities:[], traits: [] }];	// Make body
+//		let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// RER service access token
+		let token="ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");					// Level2 service access token
+		let body=[{ text:m.text.substring(0,255), intent:m.intent, entities:[], traits: [] }];		// Make body
 		const response=await fetch(url, { 															// Send remark to wit
 			  method:"POST",
 			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
