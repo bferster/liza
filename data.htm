@@ -11,35 +11,36 @@
 	</head>
 	<style>
 		body { 	font-family:Segoe UI,Verdana,Geneva,sans-serif;font-size:16px; margin:20px; }
-		.co-is 		{	border-radius:16px; padding:0 8px; height: 24px; border:1px solid #999; font-size: 13px; text-align:center; }
-		.co-bs 		{	display:inline-block; border-radius:16px; padding:0 16px; border:1px solid #999; font-size: 13px; 
+		.lz-is 		{	border-radius:16px; padding:0 8px; height: 24px; border:1px solid #999; font-size: 13px; text-align:center; }
+		.lz-bs 		{	display:inline-block; border-radius:16px; padding:0 16px; border:1px solid #999; font-size: 13px; 
 						cursor:pointer; z-index:2; padding-bottom:1px; color:#000; background-color: #eee; font-weight:600; }
-		.co-bsg		{	cursor: pointer; color:#fff; text-align: center; border-radius: 16px; display: inline-block; user-select: none;
+		.lz-bsg		{	cursor: pointer; color:#fff; text-align: center; border-radius: 16px; display: inline-block; user-select: none;
 						font-size: 13px; background-color: #999; padding: 2px 8px 2px 8px; }
 		.lz-confirm {	position: absolute;  width: 300px; padding: 16px; left: calc(50% - 150px); top: calc(50% - 50px); user-select: none;	
 						border-radius: 8px; background-color: #fff; border: 1px solid #999; box-shadow: 4px 2px 12px 2px #aaa; }
 	</style>
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
-		<div class="co-bs" id="lz-importData" style="margin:12px">Load session</div>
+		<div class="lz-bs" id="lz-importData" style="margin:12px">Load session</div>
+		<input type="file" id="lz-trainFile" accept=".csv,.CSV,.yml" style="display:none">
 		<input type="file" id="lz-testFile" accept=".csv,.CSV,.yml" style="display:none">
 
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/logo.png" style="width:25%">
 			<hr>
-			Dataset: <select class="co-is" id="lz-dataset">
+			Dataset: <select class="lz-is" id="lz-dataset">
 				<option>Newdata</option><option>Cleaned</option><option>Original</option>><option>Testdata</option>
 				</select>
-			&nbsp &nbsp; Series: <select class="co-is" id="lz-series">
+			&nbsp &nbsp; Series: <select class="lz-is" id="lz-series">
 				<option>Hundreds</option><option>Tens</option><option>Decimals</option><option>
 			</select>
-			&nbsp &nbsp; Max per intent: <input type="input" class="co-is" style="width:40px" value="500" id="lz-num"/>
-			&nbsp &nbsp; Test % <input type="input" class="co-is" style="width:40px" value="0" id="lz-holdOut"/>
+			&nbsp &nbsp; Max per intent: <input type="input" class="lz-is" style="width:40px" value="500" id="lz-num"/>
+			&nbsp &nbsp; Test % <input type="input" class="lz-is" style="width:40px" value="0" id="lz-holdOut"/>
 			<hr><p>
-				<div class="co-bs" id="lz-makeTrain">Make nlu.yml</div>
-				&nbsp; &nbsp; &nbsp;<div class="co-bs" id="lz-testData">Train data</div>
-				&nbsp; &nbsp; &nbsp;<div class="co-bs" id="lz-makeSession">Make session</div>
-				&nbsp;<input type="input" class="co-is" style="width:40px" value="78" id="lz-session"/>
+				<div class="lz-bs" id="lz-testData">Test data</div>
+				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-trainData">Train data</div>
+				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-deleteData">Delete data</div>
+				&nbsp;<input type="input" class="lz-is" style="width:40px" value="78" id="lz-session"/>
 			</p>
 			<hr>
 			<p id="outp" style="text-align:left"></p>
@@ -59,20 +60,25 @@
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
 		InitSocketServer();
-		$("#lz-makeTrain").on("click",()=>	  { MakeStories(1);    } );								// ON MAKE NLU ILE
-		$("#lz-makeSession").on("click", ()=> { MakeSession();     } );								// ON MAKE SESSION
-		$("#lz-testData").on("click", ()=> 	  { $("#lz-testFile").trigger("click"); 	});			// ON TEST DATA
+		$("#lz-testData").on("click",()=>  	  { $("#lz-testFile").trigger("click");    } );			// ON TEST TRAINING DATA
+		$("#lz-deleteData").on("click", ()=>  { DeleteTrainingData();     } );						// ON DELETE TRAINING DATA
+		$("#lz-trainData").on("click", ()=>   { $("#lz-trainFile").trigger("click"); 	});			// ON TRAIN DATA
 		$("#lz-importData").on("click",()=>   { $("#lz-tempFile").trigger("click"); 	});			// ON IMPORT
-		$("#lz-dataset").on("change", ()=>    { LoadConfig($("#lz-dataset").val()) 		});			// ON DATASET
+		$("#lz-dataset").on("change", ()=>    { LoadConfig($("#lz-dataset").val()) 		});			// ON DATASET CHANGE
 				
-		$("#lz-tempFile").on("change",(e)=>{														// ON FILE LOAD
+		$("#lz-tempFile").on("change",(e)=>{														// ON TEMP FILE LOAD
 			ImportCSV(e);																			// Read file
 			$("#lz-tempFile").val("");																// Clear value		
 			});
-		$("#lz-testFile").on("change",(e)=>{														// ON TRAIN
-			TestData(e,aiType);																		// Read file
-			$("#lz-tempFile").val("");																// Clear value		
+		$("#lz-trainFile").on("change",(e)=>{														// ON TRAIN FILE LOAD
+			TrainData(e);																			// Read file
+			$("#lz-trainFile").val("");																// Clear value		
 			});
+		$("#lz-testFile").on("change",(e)=>{														// ON TEST FILE LOAD
+			TestData(e);																			// Read file
+			$("#lz-testFile").val("");																// Clear value		
+			});
+
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 81) && e.ctrlKey)	{										// Test key (CTL-Q)
 				Test500s();
@@ -93,6 +99,25 @@
 				LoadRawData("data/"+dataset+".csv");												// Load raw data file
 			});
 		}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+////////////////////////////////////////////////////////////////////////////////////////////////////////// RASA	
+	
 	
 	function LoadRawData(file)																	// LOAD RAW DATA CSV
 	{
@@ -185,19 +210,63 @@ return;
 		uvocab["r100"]=vocab["r100"].filter(x => ![...vocab["r200"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
 		}
 	
-	async function TestData(e, aiType)															// TEST DATA
+	async function TrainData(e)																	// TRAIN DATA
 	{	
 		if (aiType == "wit") {
 			TrainWit(e);	
 			return;
 			}
+	}
+
+
+	async function TestData(e)																	// TEST DATA
+	{	
 		let i,k,o,v,id,str;
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
+	
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			LoadingIcon(true);																		// Show loading icon
+			if (aiType == "wit") {																	// If wit
+				let count=0;
+				let d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
+				let tot=d.length;																	// Total
+				let orig=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+				InferIntents(d, (res)=>{ 															// On each inference
+					i=(tot-d.length-1);																// Current index
+					orig[i].confidence=res.confidence;												// Save confidence
+					orig[i].labeled=res.labeled;													// Save intent
+					orig[i].match=(orig[i].labeled == orig[i].intent) ? 1 : 0;						// Do they match?
+					count+=orig[i].match;															// Add to count
+					trace(res)	
+					if (!d.length) {																// If last one
+						Sound("ding");																// Ding				
+						LoadingIcon(false);															// Hide loading icon
+						let fields=["intent","text","note","confidence","labeled","match"];			// Field names
+						str=Papa.unparse(orig,{ header:true, skipEmptyLines:true, columns:fields });// Make CSV using lib
+						SaveTextAsFile("test.csv",str);												// Write file
+						let results=[];
+						for (i=0;i<orig.length;++i) {												// For each utterance
+							if (!results[orig[i].intent]) {											// First one
+								results[orig[i].intent]={};											// Add obj
+								results[orig[i].intent].tot=0;										// Init
+								results[orig[i].intent].match=0;	
+								}
+							results[orig[i].intent].tot++;											// Add to count
+							results[orig[i].intent].match+=orig[i].match;							// Add match
+							}
+						for (o in results) {
+							o.accuracy=o.match/o.tot;
+							trace(o.toUpperCase(),results[o].match+"/"+results[o].tot+" has "+(results[o].match/results[o].tot*100)+"% accuracy");	// Intent accuracy
+							}
+						trace(count/tot*100+"% total accuracy");									// Total accuracy
+						}
+					});
+				return;
+				}
+
 			let nums=[]; nums["*100"]=0; nums["*200"]=0; nums["*300"]=0;	nums["*400"]=0;	nums["*500"]=0;	
 			let oks=[];  oks["*100"]=0; oks["*200"]=0;	oks["*300"]=0;	oks["*400"]=0;	oks["*500"]=0	;
 			let tots=[],report=[],msgs=[];
@@ -208,7 +277,7 @@ return;
 				if (v[i].match(/^   /)) 		msgs.push({ text:v[i].substr(5), intent:k });		// Add if an example
 				}
 			let tot=msgs.length;																	// Get total to detect
-			InferIntents(msgs,aiType,(res)=>{ 														// On each inference
+			InferIntents(msgs, (res)=>{ 															// On each inference
 				trace(res)
 				id=res.intent;																		// Get id	
 				nums["*"+Math.floor(id/100)*100]++;													// Advance total count at 100 level
@@ -241,7 +310,7 @@ return;
 			 id: "liza-100s-mmhi"
 			}
 
-	async function InferIntents(msgs, aiType, callback)											// GET RESPONSE FROM AI
+	async function InferIntents(msgs, callback)													// GET RESPONSE FROM AI
 	{
 		try {
 		let m=msgs.shift();																			// Remove from list
@@ -256,7 +325,7 @@ return;
 			inference.confidence=res.intent.confidence;												// Confidence
 			inference.labeled=m.intent;																// Labeled intent
 			callback(inference);																	// Return inference object
-			if (msgs.length) InferIntents(msgs, aiType, callback)									// Recurse, if not last
+			if (msgs.length) InferIntents(msgs, callback)											// Recurse, if not last
 			}
 		else if (aiType == "dialog") {																// If DIALOGFLOW
 			let p=new Promise((resolve, reject) => {
@@ -270,7 +339,7 @@ return;
 					inference.intent=res[2].substr(1);												// Intent																		
 					inference.confidence=res[3];													// Confidence
 					callback(inference); 															// Return inference
-					if (msgs.length) InferIntents(msgs, aiType, callback)							// Recurse, if not last
+					if (msgs.length) InferIntents(msgs, callback)									// Recurse, if not last
 					});
 			}
 		else if (aiType == "wit") {																	// If WIT
@@ -286,7 +355,7 @@ return;
 				inference.confidence=res.intents[0].confidence;										// Confidence
 				}	
 			callback(inference);																	// Return response
-			if (msgs.length) setTimeout(()=>{ InferIntents(msgs, aiType, callback);},1000);			// Recurse, if not last and add delay
+			if (msgs.length) setTimeout(()=>{ InferIntents(msgs, callback);},200);				// Recurse, if not last and add delay
 			}
 		} catch(e) {trace(e)}
 	} 
@@ -408,6 +477,17 @@ return;
 
 	}
 
+
+	function DeleteTrainingData()															// DELETE TRAINING DATA
+	{
+		if (aiType != "wit")	return;																// Not wit
+		ConfirmBox("Are your sure?","",()=>{
+			WitGetUtterances((d)=>{
+				WitDeleteUtternances(d,(r)=>{ trace(r);	});
+				});
+			})
+	}
+
 	async function MakeSession()																// CREATE SESSION FILE
 	{
 		let i=0,o,n=rawData.length,data=[];
@@ -494,6 +574,28 @@ return;
 			};
 	}
 	
+	function WitGetUtterances(callback)															// GET ARRAY OF UTTERANCES
+	{
+		const url="https://api.wit.ai/utterances?v=20210922&limit=10000";							// URL 
+		let token="ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");					// Level2 service access token
+		const response=fetch(url, { 																// Send command to wit
+			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'} 
+			  })	
+			.then(res => res.json()).then(res =>{callback(res); });									// Send data back
+	}
+
+	function WitDeleteUtternances(utterances, callback)											// DELETE UTTERANCES FROM< SERVER
+	{
+		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
+		let token="ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");					// Level2 service access token
+		const response=fetch(url, { 																// Send command to wit
+			  method:"DELETE",
+			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
+			  body: JSON.stringify(utterances)
+			  })	
+		  .then(res => res.json()).then(res =>{callback(res); });									// Send data back
+	}
+
 	async function WitTrain(msgs, callback)														// SEND REMARK TO WIT TO TRAIN
 	{
 		let inference={ text:"", intent:0, confidence:0 };											// Null inference
@@ -611,6 +713,32 @@ return;
 		$("#dialogOK").on("click", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ON OK 
 		$("#dialogCancel").on("click", function() {	$("#confirmBoxDiv").remove(); });								// ON CANCEL
 		}
+
+	function ConfirmBox(title, content, callback, callback2)										// CONFIRMATION BOX
+	{
+		Sound("ding");																					// Ding sound
+		$("#confirmBoxDiv").remove();																	// Remove 
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add dialog												
+		var str="<img src='img/smlogo.png' width='64'>";												// Logo							
+		str+="<span style='font-size:16px;float:right;color:#b9220a;margin-top:6px'><b>"+title+"</b></span><br>"; // Title
+		str+="<p>"+content+"<p>";
+		str+="<div style='float:right'><div id='confirmOK' class='lz-bs'>OK</div>";
+		str+="<div id='confirmCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
+		$("#confirmBoxDiv").html(str);	
+	
+		$("#confirmOK").on("click", function() {														// ON OK BUT
+				$("#confirmBoxDiv").remove();															// Remove 
+				if (callback)	callback();																// If callback defined, run it
+				});
+
+		$("#confirmCancel").on("click", function() {													// ON CANCEL BUT
+				$("#confirmBoxDiv").remove();															// Remove 
+				if (callback2)	callback2();															// If callback defined, run it
+				Sound("delete");																		// Delete sound
+				});
+	}
+
+
 
 	function TimecodeToSeconds(timecode) 														// CONVERT TIMECODE TO MILLISECONDS
 	{
