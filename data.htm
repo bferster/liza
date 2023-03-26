@@ -21,13 +21,14 @@
 	</style>
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
-		<div class="lz-bs" id="lz-importData" style="margin:12px">Load session</div>
+		<!--div class="lz-bs" id="lz-importData" style="margin:12px">Load session</div-->
 		<input type="file" id="lz-trainFile" accept=".csv,.CSV,.yml" style="display:none">
 		<input type="file" id="lz-testFile" accept=".csv,.CSV,.yml" style="display:none">
 
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/logo.png" style="width:25%">
 			<hr>
+			<!---
 			Dataset: <select class="lz-is" id="lz-dataset">
 				<option>Newdata</option><option>Cleaned</option><option>Original</option>><option>Testdata</option>
 				</select>
@@ -36,13 +37,14 @@
 			</select>
 			&nbsp &nbsp; Max per intent: <input type="input" class="lz-is" style="width:40px" value="500" id="lz-num"/>
 			&nbsp &nbsp; Test % <input type="input" class="lz-is" style="width:40px" value="0" id="lz-holdOut"/>
-			<hr><p>
+			<hr><p-->
 				<div class="lz-bs" id="lz-testData">Test data</div>
 				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-trainData">Train data</div>
 				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-deleteData">Delete data</div>
-				&nbsp;<input type="input" class="lz-is" style="width:40px" value="78" id="lz-session"/>
 			</p>
-			<hr>
+			<hr><br>
+			Type test remark here: <input type="input" class="lz-is" style="width:50%" id="lz-utter"/> &nbsp; <span id="lz-result"></span>
+			<br><br><hr><br>
 			<p id="outp" style="text-align:left"></p>
 		</div>
 	
@@ -55,14 +57,15 @@
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
 	let ws=null;																					// Socket server				
-	let aiType="wit";																				// AI type																																			
+	let aiType="wit";																				// AI type
+	let witToken="ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");					// Level2 service access token
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
 		InitSocketServer();
 		$("#lz-testData").on("click",()=>  	  { $("#lz-testFile").trigger("click");    } );			// ON TEST TRAINING DATA
-		$("#lz-deleteData").on("click", ()=>  { DeleteTrainingData();     } );						// ON DELETE TRAINING DATA
-		$("#lz-trainData").on("click", ()=>   { $("#lz-trainFile").trigger("click"); 	});			// ON TRAIN DATA
+//		$("#lz-deleteData").on("click", ()=>  { DeleteTrainingData();     } );						// ON DELETE TRAINING DATA
+//		$("#lz-trainData").on("click", ()=>   { $("#lz-trainFile").trigger("click"); 	});			// ON TRAIN DATA
 		$("#lz-importData").on("click",()=>   { $("#lz-tempFile").trigger("click"); 	});			// ON IMPORT
 		$("#lz-dataset").on("change", ()=>    { LoadConfig($("#lz-dataset").val()) 		});			// ON DATASET CHANGE
 				
@@ -77,6 +80,13 @@
 		$("#lz-testFile").on("change",(e)=>{														// ON TEST FILE LOAD
 			TestData(e);																			// Read file
 			$("#lz-testFile").val("");																// Clear value		
+			});
+
+		$("#lz-utter").on("change",(e)=>{															// ON TEST REMARK
+			InferIntents([{text:$("#lz-utter").val()}],(r)=>{
+				trace(r)
+				$("#lz-result").html(`<b>${r.intent}</b> at ${Math.round(r.confidence*100)}%`);
+				});
 			});
 
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
@@ -159,7 +169,7 @@
 		<tr><td><b>Number of remarks</b>:</td><td>${nRemarks}</td></tr>
 		<tr><td><b>Number of responses</b>: &nbsp; </td><td>${nResponses}</td></tr>`
 		str+=getIntents()+"</table>";																// Get number of intents
-		$("#outp").html(str.replace(/\t|\n|\r/g,""));												// Show stats
+	//	$("#outp").html(str.replace(/\t|\n|\r/g,""));												// Show stats
 
 		function getIntents() {																		// GET INTENTS
 			let i,j,s="";
@@ -218,10 +228,9 @@ return;
 			}
 	}
 
-
 	async function TestData(e)																	// TEST DATA
 	{	
-		let i,k,o,v,id,str;
+		let i,k,o,v,id,str,s="";
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
 	
@@ -231,20 +240,22 @@ return;
 			LoadingIcon(true);																		// Show loading icon
 			if (aiType == "wit") {																	// If wit
 				let count=0;
-				let d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
+				let d=[],orig=[];
+				let v=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
+				for (i=0;i<v.length;++i)if (v[i].note == "hold")	d.push(v[i]),orig.push(v[i]);	// Only holds
 				let tot=d.length;																	// Total
-				let orig=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
 				InferIntents(d, (res)=>{ 															// On each inference
 					i=(tot-d.length-1);																// Current index
 					orig[i].confidence=res.confidence;												// Save confidence
-					orig[i].labeled=res.labeled;													// Save intent
-					orig[i].match=(orig[i].labeled == orig[i].intent) ? 1 : 0;						// Do they match?
+					orig[i].infer=res.intent;														// Save inferred intent
+					orig[i].match=(res.intent == orig[i].intent) ? 1 : 0;							// Do they match?
 					count+=orig[i].match;															// Add to count
-					trace(res)	
+					trace(res);
+					$("#lz-loadingIconText").html("<b>"+Math.floor(i/tot*100)+"%</b>");				// Show progress
 					if (!d.length) {																// If last one
 						Sound("ding");																// Ding				
 						LoadingIcon(false);															// Hide loading icon
-						let fields=["intent","text","note","confidence","labeled","match"];			// Field names
+						let fields=["intent","text","note","confidence","infer","match"];			// Field names
 						str=Papa.unparse(orig,{ header:true, skipEmptyLines:true, columns:fields });// Make CSV using lib
 						SaveTextAsFile("test.csv",str);												// Write file
 						let results=[];
@@ -257,12 +268,12 @@ return;
 							results[orig[i].intent].tot++;											// Add to count
 							results[orig[i].intent].match+=orig[i].match;							// Add match
 							}
-						for (o in results) {
-							o.accuracy=o.match/o.tot;
-							trace(o.toUpperCase(),results[o].match+"/"+results[o].tot+" has "+(results[o].match/results[o].tot*100)+"% accuracy");	// Intent accuracy
-							}
-						trace(count/tot*100+"% total accuracy");									// Total accuracy
-						}
+						for (o in results) 
+							s+=o.toUpperCase()+" "+results[o].match+"/"+results[o].tot+" has "+Math.round(results[o].match/results[o].tot*100)+"% accuracy<br>";	// Intent accuracy
+						s+="<br>"+Math.round(count/tot*100)+"% total accuracy";						// Total accuracy
+						$("#outp").html(s.replace(/\t|\n|\r/g,""));									// Show stats
+						return;
+					}
 					});
 				return;
 				}
@@ -343,15 +354,11 @@ return;
 					});
 			}
 		else if (aiType == "wit") {																	// If WIT
-			let url="https://api.wit.ai/message?v=20210922&q="+m.text.substring(0,255);				// URL
-			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");				// Get sever token 100s
-//			let token="5BVRE-X-PNGZ6AKO-X-EA7P44KU3-X-PXU7LRKVVD".replace(/-X-/g,"");				// Get token 10s
-//			let token="SOYJDBYI5WSJB-X-VBCEQZ2CHSWNZ-X-2KYN4U".replace(/-X-/g,"");					// Get token 10 w/ 100 per intent
-			
-			const response=await fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} });	// Send remark to wit
+			let url="https://api.wit.ai/message?v=20210922&q="+m.text.substring(0,255);				// URL			
+			const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken, 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
-				inference.intent=res.intents[0].name.substr(1);										// Get intent																		
+				inference.intent=res.intents[0].name;												// Get intent																		
 				inference.confidence=res.intents[0].confidence;										// Confidence
 				}	
 			callback(inference);																	// Return response
@@ -561,7 +568,8 @@ return;
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			LoadingIcon(true);																		// Show loading icon
-			let d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;			// Parse CSV using papa lib
+			let i,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			for (i=0;i<d.length;++i) if (d[i].note == "hold")	d.splice(i,1);						// Remove holds
 			let tot=d.length;																		// Total
 			WitTrain(d, (r1,r2)=>{																	// Start sending via recursion		
 				trace(r1,r2);																		// Log	
@@ -577,9 +585,8 @@ return;
 	function WitGetUtterances(callback)															// GET ARRAY OF UTTERANCES
 	{
 		const url="https://api.wit.ai/utterances?v=20210922&limit=10000";							// URL 
-		let token="ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");					// Level2 service access token
 		const response=fetch(url, { 																// Send command to wit
-			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'} 
+			  headers: { Authorization:'Bearer '+witToken, 'Content-Type':'application/json'} 
 			  })	
 			.then(res => res.json()).then(res =>{callback(res); });									// Send data back
 	}
@@ -587,10 +594,9 @@ return;
 	function WitDeleteUtternances(utterances, callback)											// DELETE UTTERANCES FROM< SERVER
 	{
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
-		let token="ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");					// Level2 service access token
 		const response=fetch(url, { 																// Send command to wit
 			  method:"DELETE",
-			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
+			  headers: { Authorization:'Bearer '+witToken, 'Content-Type':'application/json'}, 
 			  body: JSON.stringify(utterances)
 			  })	
 		  .then(res => res.json()).then(res =>{callback(res); });									// Send data back
@@ -601,12 +607,10 @@ return;
 		let inference={ text:"", intent:0, confidence:0 };											// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
-//		let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// RER service access token
-		let token="ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");					// Level2 service access token
 		let body=[{ text:m.text.substring(0,255), intent:m.intent, entities:[], traits: [] }];		// Make body
 		const response=await fetch(url, { 															// Send remark to wit
 			  method:"POST",
-			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
+			  headers: { Authorization:'Bearer '+witToken, 'Content-Type':'application/json'}, 
 			  body: JSON.stringify(body)
 			  });	
 		let res=await response.json();																// Get response
