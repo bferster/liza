@@ -55,10 +55,10 @@ action,wave2,"interrupt",
 action,pair,"pair,pare,pier,pear",
 action,read,"read,reed,red,re-read,reread",
 
-keyrule,1010,"book|books|read|reading|reader|read,summer|vacation"
-keyrule,1020,"fiction,nonfiction|non-fiction",
-keyrule,1030,"favorite|best,read,school|class",
-keyrule,1040,"write|draw|list,names|character|characters",
+!keyrule,1010,"book|books|read|reading|reader|read,summer|vacation"
+!keyrule,1020,"fiction,nonfiction|non-fiction",
+!keyrule,1030,"favorite|best,read,school|class",
+!keyrule,1040,"write|draw|list,names|character|characters",
 
 keyrule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi",
 keyrule,600,"how|how's|house,are|is|have|goes|going",

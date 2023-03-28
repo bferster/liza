@@ -28,11 +28,11 @@
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/logo.png" style="width:25%">
 			<hr>
-			<!---
-			Dataset: <select class="lz-is" id="lz-dataset">
-				<option>Newdata</option><option>Cleaned</option><option>Original</option>><option>Testdata</option>
-				</select>
-			&nbsp &nbsp; Series: <select class="lz-is" id="lz-series">
+			Activity: &nbsp;<select class="lz-is" id="lz-dataset">
+				<option>Fiction</option><option>Space</option>
+				</select>&nbsp &nbsp; 
+			<!--
+				&nbsp &nbsp; Series: <select class="lz-is" id="lz-series">
 				<option>Hundreds</option><option>Tens</option><option>Decimals</option><option>
 			</select>
 			&nbsp &nbsp; Max per intent: <input type="input" class="lz-is" style="width:40px" value="500" id="lz-num"/>
@@ -58,16 +58,20 @@
 	let nlp=new NLP();																				// Alloc NLP class
 	let ws=null;																					// Socket server				
 	let aiType="wit";																				// AI type
-	let witToken="ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");					// Level2 service access token
+
+	let modelName="Fiction";																		// AI Model to use
+	let witToken={};
+	witToken.Space=  "ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");				// Space service access token
+	witToken.Fiction="VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z".replace(/-X-/g,"");				// Diction service access token
 
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
 		InitSocketServer();
 		$("#lz-testData").on("click",()=>  	  { $("#lz-testFile").trigger("click");    } );			// ON TEST TRAINING DATA
-//		$("#lz-deleteData").on("click", ()=>  { DeleteTrainingData();     } );						// ON DELETE TRAINING DATA
-//		$("#lz-trainData").on("click", ()=>   { $("#lz-trainFile").trigger("click"); 	});			// ON TRAIN DATA
+		$("#lz-deleteData").on("click", ()=>  { DeleteTrainingData();     } );						// ON DELETE TRAINING DATA
+		$("#lz-trainData").on("click", ()=>   { if (window.location.host == "localhost") $("#lz-trainFile").trigger("click")}); 	// ON TRAIN DATA		
 		$("#lz-importData").on("click",()=>   { $("#lz-tempFile").trigger("click"); 	});			// ON IMPORT
-		$("#lz-dataset").on("change", ()=>    { LoadConfig($("#lz-dataset").val()) 		});			// ON DATASET CHANGE
+		$("#lz-dataset").on("change", ()=>    { modelName=$("#lz-dataset").val()		});			// ON DATASET CHANGE
 				
 		$("#lz-tempFile").on("change",(e)=>{														// ON TEMP FILE LOAD
 			ImportCSV(e);																			// Read file
@@ -223,7 +227,7 @@ return;
 	async function TrainData(e)																	// TRAIN DATA
 	{	
 		if (aiType == "wit") {
-			TrainWit(e);	
+			TrainWit(e);																			// Load and train data	
 			return;
 			}
 	}
@@ -239,16 +243,18 @@ return;
 		reader.onload=(e)=>{ 																		// When loaded
 			LoadingIcon(true);																		// Show loading icon
 			if (aiType == "wit") {																	// If wit
-				let count=0;
+				let count=0,notFound=0;																// Counts
 				let d=[],orig=[];
 				let v=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
 				for (i=0;i<v.length;++i)if (v[i].note == "hold")	d.push(v[i]),orig.push(v[i]);	// Only holds
 				let tot=d.length;																	// Total
 				InferIntents(d, (res)=>{ 															// On each inference
 					i=(tot-d.length-1);																// Current index
+					orig[i].intent=orig[i].intent.toLowerCase();									// Force LC
 					orig[i].confidence=res.confidence;												// Save confidence
 					orig[i].infer=res.intent;														// Save inferred intent
 					orig[i].match=(res.intent == orig[i].intent) ? 1 : 0;							// Do they match?
+					if (res.confidence < .4)	 orig[i].match=-1;									// Not properly inferred
 					count+=orig[i].match;															// Add to count
 					trace(res);
 					$("#lz-loadingIconText").html("<b>"+Math.floor(i/tot*100)+"%</b>");				// Show progress
@@ -265,12 +271,16 @@ return;
 								results[orig[i].intent].tot=0;										// Init
 								results[orig[i].intent].match=0;	
 								}
-							results[orig[i].intent].tot++;											// Add to count
-							results[orig[i].intent].match+=orig[i].match;							// Add match
+							if (orig[i].match != -1) {												// If confidence is high enough
+								results[orig[i].intent].match+=orig[i].match;						// Add match
+								results[orig[i].intent].tot++;										// Add to count
+								}
+							else notFound++;														// Add to bad count
 							}
 						for (o in results) 
 							s+=o.toUpperCase()+" "+results[o].match+"/"+results[o].tot+" has "+Math.round(results[o].match/results[o].tot*100)+"% accuracy<br>";	// Intent accuracy
 						s+="<br>"+Math.round(count/tot*100)+"% total accuracy";						// Total accuracy
+						s+="<br>"+notFound+" Not categorized";										// Uncategorized
 						$("#outp").html(s.replace(/\t|\n|\r/g,""));									// Show stats
 						return;
 					}
@@ -355,7 +365,7 @@ return;
 			}
 		else if (aiType == "wit") {																	// If WIT
 			let url="https://api.wit.ai/message?v=20210922&q="+m.text.substring(0,255);				// URL			
-			const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken, 'Content-Type':'application/json'} });	// Send remark to wit
+			const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
 				inference.intent=res.intents[0].name;												// Get intent																		
@@ -487,7 +497,7 @@ return;
 
 	function DeleteTrainingData()															// DELETE TRAINING DATA
 	{
-		if (aiType != "wit")	return;																// Not wit
+		if (window.location.host != "localhost") 	return;										// Only local can delete
 		ConfirmBox("Are your sure?","",()=>{
 			WitGetUtterances((d)=>{
 				WitDeleteUtternances(d,(r)=>{ trace(r);	});
@@ -573,7 +583,7 @@ return;
 			let tot=d.length;																		// Total
 			WitTrain(d, (r1,r2)=>{																	// Start sending via recursion		
 				trace(r1,r2);																		// Log	
-				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(tot/d.length*100))+"%</b>");	// Show progress
+				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>");	// Show progress
 				if (!d.length) {																	// If last one
 					Sound("ding");																	// Ding				
 					LoadingIcon(false);																// Hide loading icon
@@ -586,7 +596,7 @@ return;
 	{
 		const url="https://api.wit.ai/utterances?v=20210922&limit=10000";							// URL 
 		const response=fetch(url, { 																// Send command to wit
-			  headers: { Authorization:'Bearer '+witToken, 'Content-Type':'application/json'} 
+			  headers: { Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} 
 			  })	
 			.then(res => res.json()).then(res =>{callback(res); });									// Send data back
 	}
@@ -596,7 +606,7 @@ return;
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
 		const response=fetch(url, { 																// Send command to wit
 			  method:"DELETE",
-			  headers: { Authorization:'Bearer '+witToken, 'Content-Type':'application/json'}, 
+			  headers: { Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'}, 
 			  body: JSON.stringify(utterances)
 			  })	
 		  .then(res => res.json()).then(res =>{callback(res); });									// Send data back
@@ -607,10 +617,10 @@ return;
 		let inference={ text:"", intent:0, confidence:0 };											// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
-		let body=[{ text:m.text.substring(0,255), intent:m.intent, entities:[], traits: [] }];		// Make body
+		let body=[{ text:m.text.substring(0,255), intent:m.intent.toLowerCase(), entities:[], traits: [] }];	// Make body
 		const response=await fetch(url, { 															// Send remark to wit
 			  method:"POST",
-			  headers: { Authorization:'Bearer '+witToken, 'Content-Type':'application/json'}, 
+			  headers: { Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'}, 
 			  body: JSON.stringify(body)
 			  });	
 		let res=await response.json();																// Get response
