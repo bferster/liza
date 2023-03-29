@@ -194,6 +194,10 @@ class App  {
 					else if (d[i].type == "rule") {													// Rules
 						if (d[i].id == "cap")	app.nlp.intentCaps["cap"+d[i].text]=1;				// Add intent cap rule
 						}
+					else if (d[i].type == "aimodel") {												// AI model 
+						app.nlp.aiType=d[i].id;														// Set type of AI model used to train
+						app.nlp.aiToken=d[i].text;													// Set token
+						}
 					}
 				this.InitClassroom();																// Init classroom
 				$("#lz-rolePick").append("<option>Teacher</option><option>Gamer</option>");			// Add teacher & gamer roles

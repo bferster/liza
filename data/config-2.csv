@@ -54,14 +54,9 @@ action,wave,"wave",
 action,wave2,"interrupt",
 action,pair,"pair,pare,pier,pear",
 action,read,"read,reed,red,re-read,reread",
-
-!keyrule,1010,"book|books|read|reading|reader|read,summer|vacation"
-!keyrule,1020,"fiction,nonfiction|non-fiction",
-!keyrule,1030,"favorite|best,read,school|class",
-!keyrule,1040,"write|draw|list,names|character|characters",
-
-keyrule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi",
-keyrule,600,"how|how's|house,are|is|have|goes|going",
+aimodel,wit,"VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z"
+keyTule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi",
+keyTule,600,"how|how's|house,are|is|have|goes|going",
 keyrule,600,"nice|good|great,to,see|meet",
 keyrule,600,"good|morning|afternoon|evening|day",
 
@@ -69,6 +64,6 @@ keyrule,ANDYOU,"how|what,about,you",
 keyrule,ANDYOU,"what,you,think|say",
 keyrule,ANDYOU,"lets|let's,hear,from",
 keyrule,1101,"2,\+|plus|and,2",
-                                            
 
                                                                                    
+ 

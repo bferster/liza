@@ -79,6 +79,7 @@ vocab,r400,"involve,letter,equipment's,opposed,wider,factually,invoke,invokes,ma
 vocab,r500,"leading,annotating,holiday,absorb,farming,correcting,sequence,chronological,timeline,broke,boiling,summarizing,format,promote,realm,imagination,alice,notebook,solidify,takeaway,segue,frame,compares,proceed,encounter,participating,authors,rounded,forgotten,shifting,stumbling,specifying,techniques,scanned,annotate"
 
 session,data,"trt=420,"
+aimodel,wit,"JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3"
 trigger,time,"who=random,when=7,do=[say:600+act:interrupt]"
 trigger,time,"who=random,when=20,do=[say:100+act:interrupt]"
 trigger,time,"who=Chris,when=210,do=[say:150+act:interrupt]"

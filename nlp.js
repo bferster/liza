@@ -13,7 +13,7 @@ class NLP {
 		this.keyRules=[];																				// Keeyword matching rules
 		this.vocab=[];																					// Unique vocab by intent 
 		this.intentCaps=[];																				// Intent caps
-		this.AIhost="https://lizasim.com";																// AI host 
+		this.aiToken="";	this.aiType="";																// AI model to use
 		this.responses=[];																				// Response file
 		this.stopWords=[ "i","me","my","myself","we","our","ours","ourselves","let's","lets","let",		// Stop word list (unused)
 			"yourself","yourselves","he","him","his","himself","she","her","hers","herself",
@@ -72,6 +72,7 @@ class NLP {
 			if (text.match(/know|tell|say|no/i))														// Asking for response
 				return "pickme:"+text;																	// Ask to pick back with question
 			}
+		if (text.match(/raise|show of/i) && text.match(/hand/i))return "pickme:"+text;					// Rause your hands if
 		if (!text.match(/please/i))	return "";															// Got to say please and address whole class
 		for (k in this.actSyns)	{																		// For each action possible
 			re=new RegExp(k,"i");																		// Make regex
@@ -235,39 +236,39 @@ class NLP {
 
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
-		let inference={ text:msg, intent:{name:"r0"}, type:"wit" };										// Null inference
 		if (msg && msg.length < 2)	return;																// Too small
-		if (app.activityId != 1) { 																		// Not the trained set
-			inference.intent.name="r100";																// Force it 100	
-			inference.intent.confidence=0;																// No confidence
-			trace(msg,inference)
-			callback(inference);																		// Run callback
-			}
-		else if (useDF) {																				// If using wit.ai
+		if ("wit" == "wit") {																			// WIT
 			let url="https://api.wit.ai/message?v=20210922&q="+msg.substring(0,255);					// URL
-			let token="JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3".replace(/-X-/g,"");					// Get sever token 100s
-			fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })	// Send remark to wit
+			let token=this.aiToken.replace(/-X-/g,"");													// Get sever token 100s
+				fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })	// Send remark to wit
 			.then(res => res.json()).then(res =>{ 														// Process result
+				let inference={ text:msg, intent:{name:"r0"}, type:"wit" };								// Null inference
 				if (res.intents.length) {																// If an intent found
 					inference.intent.name=res.intents[0].name;											// Get intent (mimic Rasa format )																	
 					inference.intent.confidence=res.intents[0].confidence;								// Confidence
+					if (inference.intent.name == "clarify")			inference.intent.name="r200";		// Convert clarify to r100
+					else if (inference.intent.name == "reflect")	inference.intent.name="r300";		// Reflect	
+					else if (inference.intent.name == "redirect")	inference.intent.name="r400";		// Redirect			
+					else if (inference.intent.name == "thinking")	inference.intent.name="r500";		// Thinking			
+					else 											inference.intent.name="r100";		// Low			
 					}	
 				else{																					// No intent foubd
 					inference.intent.name="r100";														// Force it 100	
 					inference.intent.confidence=0;														// No confidence
 					}								
+				trace(inference.intent.name,inference.intent.confidence)
 				callback(inference);																	// Return response
 				});
 			}
 		else{																							// Use Rasa
-			fetch(this.AIhost+":5005/model/parse", {													// Fetch data
+			fetch("url"+":5005/model/parse", {															// Fetch data
 				method:"POST",																			// POST
 				body: JSON.stringify({text:msg})														// Payload	
 				})
 			.then(res => res.json()).then(res =>{ callback(res); })										// Return response in callback
 			}
 	}
-
+	
 /*	
 	Compare(textA, textB)																			// HOW SIMILAR TWO STRINGS ARE
 	{
