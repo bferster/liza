@@ -24,8 +24,8 @@ seat,8,"x=0,y=-100,z=0,r=0,"
 seat,9,"x=250,y=-100,z=0,r=30,"
 resource,Scene Overview,assets/meet.pdf
 resource,Strategy supports,assets/supports.pdf
-picture,Note catcher,assets/wereading.png
 picture,Questions,assets/whowhat.png
+picture,Question,assets/fiction.png
 picture,Lunar orbiter,assets/rover.png
 picture,Blank board,assets/blankBB.png
 action,firstSlide,"begin slide,start slide",
@@ -54,11 +54,22 @@ action,wave,"wave",
 action,wave2,"interrupt",
 action,pair,"pair,pare,pier,pear",
 action,read,"read,reed,red,re-read,reread",
-aimodel,wit,"VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z"
+aimodel,wit,"VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z",
+session,data,"trt=300,",
+
 keyTule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi",
 keyTule,600,"how|how's|house,are|is|have|goes|going",
 keyrule,600,"nice|good|great,to,see|meet",
 keyrule,600,"good|morning|afternoon|evening|day",
+
+trigger,time,"who=Chris,when=2,do=[say:This is a good time to take a few deep breaths. I'll tell you when 10 seconds are up+act:interrupt]"
+trigger,time,"who=Chris,when=12,do=[say:Okay, let's start exploring the classroom. Drag your mouse to move the room around +act:interrupt]"
+trigger,time,"who=Farrah,when=24,do=[say:Okay, let's write on the black board+act:interrupt]"
+trigger,time,"who=Farrah,when=28,do=[say:Click on the pencil icon at the bottom right of your screen and cross out the bubble labeled how]"
+trigger,time,"who=Farrah,when=50,do=[say:Click on the pencil icon again to close it+act:interrupt]"
+trigger,time,"who=Luis,when=55,do=[say:Ask us some of the questions on the black board behind me. Press your spacebar to talk to us+act:interrupt]"
+trigger,time,"who=Chris,when=183,do=[say:Good. Let's see what we did. Click on the graph icon at the bottom left of your screen to veiw the time line+act:interrupt]"
+trigger,time,"who=Farrah,when=180,do=[say:Thanks for trying out Teaching with Grace!+act:sleep]"
 
 keyrule,ANDYOU,"how|what,about,you",
 keyrule,ANDYOU,"what,you,think|say",
