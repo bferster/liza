@@ -1,7 +1,7 @@
 type,id,text,data
 student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=1,"
 student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=2,"
-student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh",fair,"sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=3,"
+student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=3,"
 student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,"
 student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,"
 student,Sharleen,"sharleen,charlene,shar,charlie","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=0,"
@@ -48,13 +48,15 @@ action,wave,wave
 action,wave2,interrupt
 action,pair,"pair,pare,pier,pear"
 action,read,"read,reed,red,re-read,reread"
-
-aimodel,wit,VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z
-session,data,"trt=300,"
-
 keyTule,600,high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi
 keyrule,600,"nice|good|great,to,see|meet"
 keyrule,600,good|morning|afternoon|evening|day
+
+keyrule,ANDYOU,"how|what,about,you",,
+keyrule,ANDYOU,"what,you,think|say",,
+keyrule,ANDYOU,"lets|let's,hear,from",,
+keyrule,1101,"2,\+|plus|and,2",,
+
 
 
 picture,Welcome,assets/demoWelcome.png
@@ -66,10 +68,12 @@ picture,Question2,assets/demoQ3.png
 picture,Lunar orbiter,assets/rover.png
 picture,Blank board,assets/blankBB.png
 
+session,data,"trt=166,"
+aimodel,wit,VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z
 trigger,time,"who=Chris,when=.5,do=say:Welcome teacher, we're glad that you're here today. Before we get started let's take a couple deep breaths together to relax and focus on our learning.+act:interrupt"
 trigger,time,"who=Farrah,when=13,do=say:Okay, now, drag your mouse to walk around our classroom.+act:interrupt"
 trigger,time,"who=Luis,when=28,do=say:Do you like to read fiction or non-fiction? Click on the pencil icon on the toolbar to write on our blackboard. Circle the type that you most like to read.+act:interrupt+slide:0Draw"
-trigger,time,"who=Luis,when=40,do=say:When you're done, click on the pen in the toolbar to close the blackboard."
+trigger,time,"who=Luis,when=40,do=say:When you're done, click on the pencil in the toolbar to close the blackboard."
 trigger,time,"who=Jazmin,when=55,do=say:Ask us some of the questions on the black boards behind me. Press your spacebar to talk to us.+act:interrupt+slide:0Question1+slide:1Question2"
 trigger,time,"who=Luis,when=123,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see what we did today+act:interrupt"
 trigger,time,"who=Farrah,when=145,do=say:Now, you can use what you learned about our reading habits to plan future lessons for us."
@@ -81,7 +85,3 @@ trigger,time,"who=Chris,when=166,do=act:sit"
 trigger,time,"who=Jazmin,when=166,do=act:sit"
 
 
-keyrule,ANDYOU,"how|what,about,you",,
-keyrule,ANDYOU,"what,you,think|say",,
-keyrule,ANDYOU,"lets|let's,hear,from",,
-keyrule,1101,"2,\+|plus|and,2",,

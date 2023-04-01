@@ -20,6 +20,7 @@ class App  {
 		this.studex=[];																				// Student name to index array
 		this.startTime;																				// Start of session in ms
 		this.trt=0;																					// Total running time in seconds
+		this.unSaved=true;																			// Not databased yet
 		this.curTime=0;																				// Time in session in seconds
 		this.totTime=0;																				// Session time in seconds
 		this.eventTriggers=[];																		// Holds event triggers
@@ -214,6 +215,15 @@ class App  {
 			});
 	}
 
+	SaveSession()																				// SAVE SESSION TO DB
+	{
+		let i;
+		app.unSaved=false;																			// Set saved flag
+		for (i=0;i<app.sessionLog.length;++i) app.sessionLog[i].text=app.sessionLog[i].text.replace(/\'/g,"&apos");	// 
+		fetch(`//${window.location.host}:8081?q=save&type=TWG&email=${app.userId}&password=${app.activityId}`,	
+		{ method:"POST", "Content-Type":"application/json", body:JSON.stringify(app.sessionLog)}); 	// Save to DB
+	}
+	
 	StartSession()																				// START/RESTART SESSION
 	{
 		let i,s;
@@ -245,7 +255,8 @@ class App  {
 	{
 		if (!app.inSim)	 now=app.startTime;															// Don't set based on now if not in sim
 		app.curTime=app.trt+(now-app.startTime)/1000;												// Calc elapsed time in session
-		if (app.curTime >= app.nextTrigger.when) 	app.HandleEventTrigger(app.nextTrigger);		// Handle event trigger
+		if (app.curTime >= app.nextTrigger.when) 		app.HandleEventTrigger(app.nextTrigger);	// Handle event trigger
+		if (app.curTime > app.totTime && app.unSaved)  	app.SaveSession();							// If past time
 		return app.curTime;																			// Return elapsed time in seconds
 	}
 
