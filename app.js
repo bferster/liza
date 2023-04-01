@@ -188,7 +188,7 @@ class App  {
 						if ((v=d[i].text.match(/type=(.+?)\W/i)))	o.type=v[1];					// Get type
 						if ((v=d[i].text.match(/when=(.+?)\W/i)))	o.when=v[1]-0;					// When
 						if ((v=d[i].text.match(/who=(.+?)\W/i)))	o.who=v[1];						// Who
-						if ((v=d[i].text.match(/do=\[(.+?)\]/i)))	o.do=v[1];						// Do
+						if ((v=d[i].text.match(/do=(.+)/i)))		o.do=v[1];						// Do
 						this.eventTriggers.push(o);													// Add to trigger list
 						}
 					else if (d[i].type == "rule") {													// Rules
@@ -283,8 +283,12 @@ class App  {
 				s=app.nlp.GetResponse("",student,720+s*10);											// Get response from intent
 				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")+(s.MP3 ? "|"+s.MP3 : "")); 
 				}
+			else if (v[i].match(/slide:/i)) {														// SLIDE
+				this.bb.SetPic(v[i].substring(7),null, null, v[i].charAt(6));						// Show slide					
+				}
 			}
-		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
+			
+			for (i=0;i<this.eventTriggers.length;++i) {												// For each trigger
 			if (this.eventTriggers[i].type == "time" && !this.eventTriggers[i].done) {				// Am undone time event
 				this.nextTrigger=this.eventTriggers[i];												// Point to next trigger 
 				break;																				// Quit looking

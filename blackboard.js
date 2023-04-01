@@ -124,16 +124,16 @@ class Blackboard  {
 		this.pics.push( { lab:lab, src: url });															// Add to array
 	}
 
-	SetPic(label, record, slideNum, side)															// SHOW PIC	OR SLIDE																		
+	SetPic(label, record, slideNum, side=this.curSide)												// SHOW PIC	OR SLIDE																		
 	{
-		var _this=this;																					// Save context
+		let _this=this;																					// Save context
 		$("#BBImagePicker").remove();																	// Remove picker
 		$("[id^=BB-]").css("box-shadow","");															// Remove old highlights
 		var imageObj=new Image();																		// Create image
 		for (var i=0;i<this.pics.length;++i)															// For each pic
 			if (label == this.pics[i].lab)																// A match
 				imageObj.src=this.pics[i].src;															// Set source to start load
-		imageObj.side=this.curSide;																		// Tag side
+		imageObj.side=side;																				// Tag side
 		imageObj.label=label;																			// Set label
 		imageObj.side=(side == undefined) ? this.curSide : side;										// Set curSide if playing back slides
 		imageObj.snum=(slideNum == undefined) ? 0 :	slideNum;											// Set curSlide id playing back slides

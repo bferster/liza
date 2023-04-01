@@ -222,8 +222,6 @@ class Feedback {
 			if ((o.what != "RESPONSE") && (o.what != "REMARK")) 		continue;					// Skip unless talking
 			if (o.intent > 599)											o.intent=100;				// Too high
 			x=getPixFromTime(o.time);																// Get x pos
-			
-			trace(o,app.students.find(x => x.id == o.from))
 			if (o.what == "RESPONSE") y=5,col=app.students.find(x => x.id == o.from).color;			// Put students on bottom row
 			else					  y=5-Math.max(Math.floor(o.intent/100),1).toFixed(2),col="#ccc";	// Get y 4-0 from intent
 			str+=`<circle id="lzDot-${i}" cx="${x}" cy="${y*26+30                        }" r="6" fill="${col}" ; cursor="pointer"/>`;	// Add dot
