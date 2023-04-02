@@ -107,8 +107,8 @@ class App  {
 				}
 			});
 		$("#talkInput").on("change", ()=> { 														// ON ENTER OF TEXT
-			this.talkTime=(new Date().getTime()-this.talkTime)/1000;								// Compute talk time in seconds
-			if (this.inSim)	this.OnPhrase($("#talkInput").val());									// Act on text, if in sim
+			app.talkTime=(new Date().getTime()-app.talkTime)/1000;									// Compute talk time in seconds
+			if (app.inSim)	app.OnPhrase($("#talkInput").val());									// Act on text, if in sim
 			$("#talkInput").val("");																// Clear text
 			});	
 		$("#lz-rolePick").on("change", ()=> {														// ON CHANGE ROLE
@@ -139,14 +139,14 @@ class App  {
 		$("#talkBut").on("mousedown", () => {														// ON TALK BUTTON
 			if (this.role == "Gamer") return;														// Gamers don't talk
 			$("#talkBut").prop("src","img/intalkbut.png");											// Green button
+			this.said="";																			// Clear spoken cache
 			this.voice.Listen()																		// Turn on speech recognition
 			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";						// Student always talk to teacher and vice versa
 			if (this.role != "Teacher")																// If a student
-			app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|ACT|"+app.role+"|nod");	// Send nod 
+				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|ACT|"+app.role+"|nod");	// Send nod 
 			this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
 			this.inRemark=true;																		// Teacher is talking
 			this.talkTime=new Date().getTime();														// Time when talking started 
-			this.said="";																			// Clear spoken cache
 			});
 		$("#talkBut").on("mouseup", (e) => {														// ON TALK BUTTON UP
 			if (this.role == "Gamer") return;														// Gamers don't talk
@@ -296,10 +296,11 @@ class App  {
 				}
 			else if (v[i].match(/slide:/i)) {														// SLIDE
 				this.bb.SetPic(v[i].substring(7),null, null, v[i].charAt(6));						// Show slide					
+				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PICTURE|"+v[i].substring(7)+"|"+ v[i].charAt(6));	// Send pic change
 				}
 			}
 			
-			for (i=0;i<this.eventTriggers.length;++i) {												// For each trigger
+		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
 			if (this.eventTriggers[i].type == "time" && !this.eventTriggers[i].done) {				// Am undone time event
 				this.nextTrigger=this.eventTriggers[i];												// Point to next trigger 
 				break;																				// Quit looking
@@ -351,6 +352,7 @@ class App  {
 			}
 		app.DoAction(act,text);																		// If a please + action mentioned, do it
 		if (!act) 																					// If no action happening
+			trace("infer");
 			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
@@ -373,6 +375,8 @@ class App  {
 		if (this.role == "Gamer") 				return res;											// No responses from gamers
 		if (!(i=this.studex[this.curStudent]))	return res;											// Quit if bad name
 		--i;																						// Zero-base index
+		
+		trace("genrate response",intent)
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
 		if (!this.multi && this.students[i].first) {												// An initial response set

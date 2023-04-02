@@ -84,4 +84,3 @@ trigger,time,"who=Farrah,when=160,do=say: You can continue to play with Grace if
 trigger,time,"who=Chris,when=166,do=act:sit"
 trigger,time,"who=Jazmin,when=166,do=act:sit"
 
-

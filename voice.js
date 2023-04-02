@@ -6,14 +6,14 @@ class Voice {
 
 	constructor()																					// CONSTRUCTOR
 	{
-		let _this=this;
+		let i,_this=this;
 		this.listening=false;																			// Recognizing flag
 		this.getLastClause=false;																		// Get last clause																
 		this.hasRecognition=false;																		// Assume no STT
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		try {																							// Try
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			let i,mac=0;																				// Assume non-mac
+			let mac=0;																					// Assume non-mac
 			if (window.navigator.userAgentData)															// Exists?
 				mac=window.navigator.userAgentData.platform != "Windows";								// A mac?
 			this.femaleVoice=mac ? 0 : 1;																// Female voice
@@ -42,26 +42,28 @@ class Voice {
 		try {																							// Try
 			var SpeechRecognition=SpeechRecognition || webkitSpeechRecognition;							// Browser compatibility
 			this.recognition=new SpeechRecognition();													// Init STT
-			this.recognition.continuous=false;															// Continual recognition off
+			this.recognition.continuous=true;															// Continual recognition off
 			this.recognition.interimResults=true;														// Return interim results?
 			this.recognition.lang="en-US";																// US English
 			this.recognition.onstart=()=>{ this.started=true; };										// ON STT START SET STATUS FLAG
 			this.recognition.onend=()=>  { this.started=false; if (this.listening) this.Listen() };		// ON STT END RE-LISTEN	IF IN SIM											
 			this.hasRecognition=true;																	// Has speechRecognition capabilities														
-				this.recognition.onresult=(e)=>{ 														// ON RECOGNITION
-				if (e.results[0].isFinal) {																// When a portion is final
-					app.said+=e.results[0][0].transcript+" ";											// Add what was said 
-					if ((app.role == "Teacher") && e.results[0][0].transcript && app.multi)				// If teacher talking in multiplayer mode
+			
+			this.recognition.onresult=(e)=>{ 															// ON RECOGNITION
+				for (i=e.resultIndex; i<e.results.length;++i) 											// For each result
+					if (e.results[i].isFinal) {															// If final
+						app.said+=e.results[i][0].transcript;											// Add to cache
+						if ((app.role == "Teacher") && e.results[0][0].transcript && app.multi)			// If teacher talking in multiplayer mode
 						app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|ADMIN|INTERIM|Teacher|Class|"+e.results[0][0].transcript); // Send partial
-					$("#promptSpan").html(app.said ? "<span style='color:#006600'>"+app.said+"</span>" : ""); // Show portion to teacher as green
-					if (this.getLastClause) {															// Get final utterance
-						app.OnPhrase(app.said);															// React to remark
-						app.said=""; 																	// Clear cache
-						this.listening=false;															// Not listening anymore
-						this.getLastClause=false;														// No last phrase anymore
-						this.recognition.abort(); 														// Stop recognition
-					}
-					}
+						$("#promptSpan").html(app.said ? "<span style='color:#006600'>"+app.said+"</span>" : ""); // Show portion to teacher as green
+						if (this.getLastClause) {														// Get final utterance
+							app.OnPhrase(app.said);														// React to remark
+							app.said=""; 																// Clear cache
+							this.listening=false;														// Not listening anymore
+							this.getLastClause=false;													// No last phrase anymore
+							this.recognition.stop(); 													// Stop recognition
+							}
+						}
 				else $("#promptSpan").html(e.results[0][0].transcript ? app.said+e.results[0][0].transcript+" " : e.results[0][0].transcript+" "); // Show portion to teacher
 				}					
 			} catch(e) { trace("Voice error",e) };														// On error
@@ -70,6 +72,7 @@ class Voice {
 	Listen()																						// TURN ON SPEECH RECOGNITION
 	{
 		try { 
+			this.getLastClause=false;																	// Get last phrase when transcribed
 			if (!this.started)	this.recognition.start(); 												// Start recognition, unless already started
 			this.listening=true;																		// We're listening
 		} catch(e) { trace("Voice error",e) };															// On error
