@@ -1,29 +1,29 @@
-Remark (Teacher Question),Voice,Student,Response,Valued/Belonging (200/300),Academic Language (400),"Reading Level of Text (word length, sentence structure)",Relevancem- Closeness to Student Life Experience,Student Physical Action,Understanding Level,Type of Student Response,Intent,Response category
-Tell us two things: 1. What is a book that you like and 2. tell us why you like it?,Chris,Chris,"I recently read The Chronicles of Narnia with their younger sister. Despite being a classic children's book, the student found it to be a compelling and engaging read.",1 (acknowledged),0 (not present),4,2,Talk,,Tell,200,Start
-,Chris,Chris,My dad and I just got into the Harry Potter books.  We're kind of late to the party but I had no idea they'd be this good!,1 (acknowledged),0 (not present),4,2,Talk,,Tell,200,Start
-,Chris,Chris,I recently read Charlotte's Web and were delighted by the heartwarming tale of friendship between a spider and a pig,1 (acknowledged),0 (not present),5,0,Talk,,Tell,200,Start
-,Farrah,Farrah ,"I've been reading A Wrinkle in Time. I thought they did a pretty good job with the movie but on my book cover, the Mrs characters were older, so that's really different.",1 (acknowledged),0 (not present),5,0,Talk,,Tell,200,Start
-,Farrah,Farrah ,"I've been engrossed in the classic children's book The Lion, the Witch and the Wardrobe, by C.S. Lewis. I found the story to be magical and imaginative.",1 (acknowledged),0 (not present),5,0,Talk,,Tell,200,Start
-,Farrah,Farrah ,I love the adventures of Greg Heffley in the Diary of a Wimpy Kid series. I  found the humor and relatable experiences of the main character to be entertaining and fun.,1 (acknowledged),0 (not present),5,0,Talk,,Tell,200,Start
-,Jazmin,Jazmin,I like to read National Geographic Kids. They have some great articles about how we can take care of our planet and what animals are endangered because people are destroying their habitats. ,1 (acknowledged),2 (V + Complex sentence),7,2,Talk,,Tell,200,Start
-,Jazmin,Jazmin,"I lile the Magic Tree House series, which takes them on exciting adventures to different times and places. They appreciate how the books teach them about history and culture while still being entertaining",1 (acknowledged),2 (V + Complex sentence),7,2,Talk,,Tell,200,Start
-,Jazmin,Jazmin,"I love the Who Was book series, which tells the stories of historical figures and events in an engaging and accessible way.",1 (acknowledged),2 (V + Complex sentence),7,2,Talk,,Tell,200,Start
-,Luis,Luis,I read the cafeteria menu today. I'm always waiting for them to bring the chicken sandwich back.,1 (acknowledged),1 (vocabulary),,3,Talk,,Tell,200,Start
-,Luis,Luis,I read the phone book today. I'm alwayslook for people to connect with.,1 (acknowledged),1 (vocabulary),,3,Talk,,Tell,200,Start
-,Luis,Luis,"I like to read manuals and then match them up to the youtube video if I can,",1 (acknowledged),1 (vocabulary),,3,Talk,,Tell,200,Start
-,Oliver,Oliver,"I like the Percy Jackson books, but not the graphic novels.  You can't really use your imagination when they give you all the pictures, especially when it's not like how i imagined it when I was reading the books.",1 (acknowledged),2 (V + Complex sentence),6,1,Talk,,Tell,200,Start
-,Oliver,Oliver,"I've been enjoying the The Chronicles of Narnia series. I really like how the books transport them to a magical world full of talking animals, epic battles, and moral lessons.",1 (acknowledged),2 (V + Complex sentence),6,1,Talk,,Tell,200,Start
-,Oliver,Oliver,"I like the Series of Unfortunate Events books, which follow the misadventures of the Baudelaire orphans as they navigate a world of danger and mystery.",1 (acknowledged),2 (V + Complex sentence),6,1,Talk,,Tell,200,Start
-,Sharleen,Sharleen,Oh I can answer that easily. I love the Vampire Diaries because it's so romantic. ,2 (valued),1 (vocabulary),4,1,Talk,,Tell,200,Start
-,Sharleen,Sharleen,"I've been captivated by the Percy Jackson and the Olympians series, which goes on thrilling adventures through Greek mythology.",2 (valued),1 (vocabulary),4,1,Talk,,Tell,200,Start
-,Sharleen,Sharleen,"I love Harry Potter and find the magical world fun and exciting. I appreciate the intricate plot and well-developed characters, and I am are always eager to find out what happens next in the story.",2 (valued),1 (vocabulary),4,1,Talk,,Tell,200,Start
+Remark (Teacher Question),Voice,Student,Response,Belonging (200),Academic Language (400),Thinking (500),Understanding (300),Student Physical Action,Understanding Level,Type of Student Response,Intent,Response category
+Tell us two things: 1. What is a book that you like and 2. tell us why you like it?,Chris,Chris,"I recently read The Chronicles of Narnia with their younger sister. Despite being a classic children's book, the student found it to be a compelling and engaging read.",1,0,3,2,Talk,,Tell,200,Start
+,Chris,Chris,My dad and I just got into the Harry Potter books.  We're kind of late to the party but I had no idea they'd be this good!,1,0,3,2,Talk,,Tell,200,Start
+,Chris,Chris,I recently read Charlotte's Web and were delighted by the heartwarming tale of friendship between a spider and a pig,1,0,3,2,Talk,,Tell,200,Start
+,Farrah,Farrah ,"I've been reading A Wrinkle in Time. I thought they did a pretty good job with the movie but on my book cover, the Mrs characters were older, so that's really different.",1,0,2,0,Talk,,Tell,200,Start
+,Farrah,Farrah ,"I've been engrossed in the classic children's book The Lion, the Witch and the Wardrobe, by C.S. Lewis. I found the story to be magical and imaginative.",1,0,2,0,Talk,,Tell,200,Start
+,Farrah,Farrah ,I love the adventures of Greg Heffley in the Diary of a Wimpy Kid series. I  found the humor and relatable experiences of the main character to be entertaining and fun.,1,0,2,0,Talk,,Tell,200,Start
+,Jazmin,Jazmin,I like to read National Geographic Kids. They have some great articles about how we can take care of our planet and what animals are endangered because people are destroying their habitats. ,1,2,3,2,Talk,,Tell,200,Start
+,Jazmin,Jazmin,"I lile the Magic Tree House series, which takes them on exciting adventures to different times and places. They appreciate how the books teach them about history and culture while still being entertaining",1,2,3,2,Talk,,Tell,200,Start
+,Jazmin,Jazmin,"I love the Who Was book series, which tells the stories of historical figures and events in an engaging and accessible way.",1,2,3,2,Talk,,Tell,200,Start
+,Luis,Luis,I read the cafeteria menu today. I'm always waiting for them to bring the chicken sandwich back.,1,1,0,3,Talk,,Tell,200,Start
+,Luis,Luis,I like to read signs on the street. It lets me know what's happening.,1,1,0,3,Talk,,Tell,200,Start
+,Luis,Luis,"I like to read manuals and then match them up to the youtube video if I can,",1,1,0,3,Talk,,Tell,200,Start
+,Oliver,Oliver,"I like the Percy Jackson books, but not the graphic novels.  You can't really use your imagination when they give you all the pictures, especially when it's not like how i imagined it when I was reading the books.",1,2,2,1,Talk,,Tell,200,Start
+,Oliver,Oliver,"I've been enjoying the The Chronicles of Narnia series. I really like how the books transport them to a magical world full of talking animals, epic battles, and moral lessons.",1,2,2,1,Talk,,Tell,200,Start
+,Oliver,Oliver,"I like the Series of Unfortunate Events books, which follow the misadventures of the Baudelaire orphans as they navigate a world of danger and mystery.",1,2,2,1,Talk,,Tell,200,Start
+,Sharleen,Sharleen,Oh I can answer that easily. I love the Vampire Diaries because it's so romantic. ,2,1,1,1,Talk,,Tell,200,Start
+,Sharleen,Sharleen,"I've been captivated by the Percy Jackson and the Olympians series, which goes on thrilling adventures through Greek mythology.",2,1,1,1,Talk,,Tell,200,Start
+,Sharleen,Sharleen,"I love Harry Potter and find the magical world fun and exciting. I appreciate the intricate plot and well-developed characters, and I am are always eager to find out what happens next in the story.",2,1,1,1,Talk,,Tell,200,Start
 
-"Raise your hand if you like to read non-fiction books - reading about real people, places, and things that are happening.",Chris,Chris,I like non-fiction,1 (acknowledged),2 (V + Complex sentence),8,2,Talk,,Prefer,300,Start
-,Farrah,Farrah ,"I think nonfiction feels like schoolwork and I'd rather read for fun, not work.",1 (acknowledged),2 (V + Complex sentence),2,0,Talk,,Prefer,300,Start
-,Jazmin,Jazmin,Good question! I like both but only nonfiction when the topic is animals and our planet.,2 (valued),2 (V + Complex sentence),7,1,Talk,,Prefer,300,Start
-,Lus,Lus,"Give me action stuff anyday.  Wait, is nonfiction just books about people's lives and stuff? What would minecraft blogs be?",1 (acknowledged),1 (vocabulary),5,2,Think,,Prefer,300,Start
-,Oliver,Oliver,"Hmm, I guess I prefer fiction, but I'm into historical fiction too, which is kind of like non-fiction, except not everything is exactly true. ",1 (acknowledged),2 (V + Complex sentence),6,1,Think,,Prefer,300,Start
-,Sharleen,Sharleen,Nonfiction is boring.,-1 (lack of belonging),1 (vocabulary),0,0,Talk,,Prefer,300,Start
+"Raise your hand if you like to read non-fiction books - reading about real people, places, and things that are happening.",Chris,Chris,I like non-fiction,2,2,3,2,Talk,,Prefer,300,Start
+,Farrah,Farrah ,"I think nonfiction feels like schoolwork and I'd rather read for fun, not work.",2,2,2,0,Talk,,Prefer,300,Start
+,Jazmin,Jazmin,Good question! I like both but only nonfiction when the topic is animals and our planet.,2,2,3,1,Talk,,Prefer,300,Start
+,Luis,Luis,"Give me action stuff anyday.  Wait, is nonfiction just books about people's lives and stuff? What would minecraft blogs be?",2,1,1,2,Think,,Prefer,300,Start
+,Oliver,Oliver,"Hmm, I guess I prefer fiction, but I'm into historical fiction too, which is kind of like non-fiction, except not everything is exactly true. ",1,2,3,1,Think,,Prefer,300,Start
+,Sharleen,Sharleen,Nonfiction is boring.,0,0,0,0,Talk,,Prefer,300,Start
 
 "Write, List, or Draw the names of as many characters as you can think of ",Chris,Chris,,3 (belonging),1 (vocabulary),6,1,Talk,,Prefer,500,Start
 ,Farrah,Farrah ,,-1 (lack of belonging),0 (not present),"88- sidestep, avoid",-1,Talk,,Prefer,500,Start
@@ -32,11 +32,11 @@ Tell us two things: 1. What is a book that you like and 2. tell us why you like 
 ,Oliver,Oliver,,2 (valued),0 (not present),5,0,Talk,,Prefer,500,Start
 ,Sharleen,Sharleen,,-1 (lack of belonging),0 (not present),1,-1,Talk,,Prefer,500,Start
 
-,,,,,,,,,,,,
 
 
-,,,,,,,,,,,,
-,,,,,,,,,,,,
+
+
+
 
 
 

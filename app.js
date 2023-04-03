@@ -352,10 +352,10 @@ class App  {
 			}
 		app.DoAction(act,text);																		// If a please + action mentioned, do it
 		if (!act) 																					// If no action happening
-			trace("infer");
 			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
+				trace("infer",intent);
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				this.lastIntent=intent;																// Save last intent
 				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
@@ -375,7 +375,6 @@ class App  {
 		if (this.role == "Gamer") 				return res;											// No responses from gamers
 		if (!(i=this.studex[this.curStudent]))	return res;											// Quit if bad name
 		--i;																						// Zero-base index
-		
 		trace("genrate response",intent)
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response

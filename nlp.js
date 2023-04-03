@@ -120,11 +120,11 @@ class NLP {
 			o={ bakt:[]};																				// Init object
 			k=d[i]["Student"].split(" ")[0];															// Get first name
 			if (!this.responses[k]) this.responses[k]=[];												// Add base array
-			o.bakt[0]=getVariant(d[i]["Valued/Belonging (200/300"]);									// Get B factor
+			o.bakt[0]=getVariant(d[i]["Belonging (200)"]);												// Get B factor
 			o.bakt[1]=getVariant(d[i]["Academic Language (400)"]);										// A
 			o.bakt[2]=getVariant(d[i]["Knowledge (400)"]);												// K
 			o.bakt[3]=getVariant(d[i]["Thinking (500)"]);												// T
-			o.bakt[4]=getVariant(d[i]["Understanding Level"]);											// U
+			o.bakt[4]=getVariant(d[i]["Understanding (300)"]);											// U
 			o.bakt[5]=d[i]["Intent"];																	// Intent
 			o.text=d[i]["Response"];																	// Get response
 			o.label=d[i]["Response category"];															// Get response category
@@ -146,19 +146,21 @@ class NLP {
 
 	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
 	{
-		let i,o,d=[];
+		let i,o=intent,d=[];
 		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0], MP3:"" };										// Default response
 		if (!(i=app.studex[student])) 	return res;														// Quit if not a valid student
 		--i;																							// Zero base
 		if (this.intentCaps.cap400 && (app.students[i].highestIntent == 400)) intent=Math.max(intent,400); 	// At least 400	if last intent was 400+			
 		if (this.intentCaps.cap500 && (app.students[i].highestIntent == 500)) intent=Math.max(intent,500); 	// 500+				
 		if (intent < 600)																				// If an AI generated intent
-			app.students[i].highestIntent=Math.max(app.students[i].highestIntent,intent);				// Set student's highest intent	
+        app.students[i].highestIntent=Math.max(app.students[i].highestIntent,intent);				// Set student's highest intent	
 		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
+	trace("getresponse",o,intent)
 		if (intent == "ANDYOU") {																		// Ask another student same question as before
 			student=app.curStudent;																		// Redirect to new student
 			res.intent=intent=lastIntent;																// Use last intent
-			}
+		trace("andyou",lastIntent)	
+		}
 		o=app.nlp.responses[student];																	// Isolate student
 		if (!o || (student == "Class"))	return res;														// Null response
 		for (i=0;i<o.length;++i) {																		// For each response

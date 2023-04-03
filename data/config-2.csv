@@ -48,6 +48,7 @@ action,wave,wave
 action,wave2,interrupt
 action,pair,"pair,pare,pier,pear"
 action,read,"read,reed,red,re-read,reread"
+
 keyTule,600,high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi
 keyrule,600,"nice|good|great,to,see|meet"
 keyrule,600,good|morning|afternoon|evening|day
@@ -56,8 +57,6 @@ keyrule,ANDYOU,"how|what,about,you",,
 keyrule,ANDYOU,"what,you,think|say",,
 keyrule,ANDYOU,"lets|let's,hear,from",,
 keyrule,1101,"2,\+|plus|and,2",,
-
-
 
 picture,Welcome,assets/demoWelcome.png
 picture,whowhat,assets/whowhat.png
@@ -68,19 +67,19 @@ picture,Question2,assets/demoQ3.png
 picture,Lunar orbiter,assets/rover.png
 picture,Blank board,assets/blankBB.png
 
-session,data,"trt=166,"
+session,data,"trt=175,"
 aimodel,wit,VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z
-trigger,time,"who=Chris,when=.5,do=say:Welcome teacher, we're glad that you're here today. Before we get started let's take a couple deep breaths together to relax and focus on our learning.+act:interrupt"
-trigger,time,"who=Farrah,when=13,do=say:Okay, now, drag your mouse to walk around our classroom.+act:interrupt"
-trigger,time,"who=Luis,when=28,do=say:Do you like to read fiction or non-fiction? Click on the pencil icon on the toolbar to write on our blackboard. Circle the type that you most like to read.+act:interrupt+slide:0Draw"
-trigger,time,"who=Luis,when=40,do=say:When you're done, click on the pencil in the toolbar to close the blackboard."
-trigger,time,"who=Jazmin,when=55,do=say:Ask us some of the questions on the black boards behind me. Press your spacebar to talk to us.+act:interrupt+slide:0Question1+slide:1Question2"
-trigger,time,"who=Luis,when=123,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see what we did today+act:interrupt"
-trigger,time,"who=Farrah,when=145,do=say:Now, you can use what you learned about our reading habits to plan future lessons for us."
-trigger,time,"who=Luis,when=152,do=say:We look forward to your teaching us again!"
-trigger,time,"who=Chris,when=156,do=act:sleep"
-trigger,time,"who=Jazmin,when=156,do=act:sleep"
-trigger,time,"who=Farrah,when=160,do=say: You can continue to play with Grace if you'd like"
-trigger,time,"who=Chris,when=166,do=act:sit"
-trigger,time,"who=Jazmin,when=166,do=act:sit"
 
+trigger,time,"who=Chris,when=.5,do=say:Welcome teacher, we're glad that you're here today. Before we get started let's take a couple deep breaths together. Breathe in through your nose, hold your breath, now breathe out. Go ahead and take another breath. Breathing helps us relax and learn from our practice.+act:interrupt"
+trigger,time,"who=Farrah,when=20,do=say:Okay, now, drag your mouse to walk around our classroom.+act:interrupt"
+trigger,time,"who=Luis,when=35,do=say:Teacher, Do you like to read fiction or nonfiction? Click on the pencil icon on the toolbar to write on our blackboard. Circle the one you you most like to read.+act:interrupt+slide:0Draw"
+trigger,time,"who=Luis,when=50,do=say:When you're done, click on the pencil in the toolbar to close the blackboard."
+trigger,time,"who=Jazmin,when=60,do=say: Call on us by name and ask us the question on the board Tell us about what you like to read. Press your spacebar to talk to us.+act:interrupt+slide:0Question1+slide:1Question2"
+trigger,time,"who=Luis,when=135,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see what we did today+act:interrupt"
+trigger,time,"who=Farrah,when=165,do=say:Now, you can use what you learned about our reading habits to plan future lessons for us. Click on the notebook to download a scene overview more questions to ask your own students."
+trigger,time,"who=Luis,when=165,do=say:We look forward to your teaching us again!"
+trigger,time,"who=Chris,when=170,do=act:sleep"
+trigger,time,"who=Jazmin,when=170,do=act:sleep"
+trigger,time,"who=Farrah,when=171,do=say: You can continue to play with Grace if you'd like"
+trigger,time,"who=Chris,when=175,do=act:sit"
+trigger,time,"who=Jazmin,when=175,do=act:sit"
