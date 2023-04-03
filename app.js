@@ -222,6 +222,7 @@ class App  {
 		for (i=0;i<app.sessionLog.length;++i) app.sessionLog[i].text=app.sessionLog[i].text.replace(/\'/g,"&apos");	// 
 		fetch(`//${window.location.host}:8081?q=save&type=TWG&email=${app.userId}&password=${app.activityId}`,	
 		{ method:"POST", "Content-Type":"application/json", body:JSON.stringify(app.sessionLog)}); 	// Save to DB
+	
 	}
 	
 	StartSession()																				// START/RESTART SESSION
