@@ -528,6 +528,8 @@ class App  {
 		this.poses["write1"]="wristR,0,-40,0,thumbR,0,-45,0,wristL,0,75,0,neck,45,0,0";		this.poses["write2"]="wristR,0,-40,30,thumbR,0,-45,0";			
 		this.poses["sleep"]="neck,45,62,0,chest,49,0,0,armL,-12,53,0,wristL,0,0,0,forearmL,120,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,50,0,0";
+		this.poses["breathe1"]="neck,-16,0,0,mouth,12,0,0";			
+		this.poses["breathe2"]="neck,0,0,0,mouth,0,0,0";			
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
@@ -542,6 +544,7 @@ class App  {
 		this.seqs["headLeft"]="headLeft,1";		this.seqs["headRight"]="headRight,1";		this.seqs["headCenter"]="headCenter,1";
 		this.seqs["armUp"]="handUp,1";			this.seqs["armDown"]="leftArmDesk,1";
 		this.seqs["twistLeft"]="twistLeft,1";	this.seqs["twistRight"]="twistRight,1";
+		this.seqs["breathe"]="breathe1,2,breathe2,2,2";
 
 		for (i=0;i<10;++i)																			// For each desk
 			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/deskskin.png" : 0xdddddd} );	// Add desk

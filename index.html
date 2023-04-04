@@ -215,9 +215,9 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",(e)=> {																// HANDLE KEYPRESS
-			if ((e.which == 81) && e.altKey && e.ctrlKey)	{										// Test key (Ctrl+Alt+Q)
-				trace(123)	
-				WitTalk()
+			trace(e.which)
+			if ((e.which == 81) && e.altKey)	{										// Test key (Ctrl+Alt+Q)
+				app.Settings();
 			}
 			});
 	});	
