@@ -26,6 +26,7 @@ class App  {
 		this.eventTriggers=[];																		// Holds event triggers
 		this.nextTrigger={id:0, time:100000, type:""};												// Next trigger to look for
 		this.lastResponse={ text:"", variance:[0,0,0,0,0,0], intent:0 };							// Last response 
+		this.pauseTimer=null;																		// Time pause actions in script time
 		this.curStudent="";																			// Currently active student
 		this.lastIntent="";																			// Last intent
 		this.lastRemark="";																			// Last remark
@@ -299,6 +300,7 @@ class App  {
 				this.bb.SetPic(v[i].substring(7),null, null, v[i].charAt(6));						// Show slide					
 				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PICTURE|"+v[i].substring(7)+"|"+ v[i].charAt(6));	// Send pic change
 				}
+			else if (v[i].match(/pause:/i)) { this.Pause(v[i].substring(6),e.who);	}				// PAUSE/RESUME
 			}
 			
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
@@ -309,6 +311,28 @@ class App  {
 			}
 		}
 
+	Pause(cmd, time=60)																			// REACT TO PAUSE DO COMMAND IN TRIGGER SCRIPT
+	{
+		window.clearInterval(this.pauseTimer);														// Clear timer						
+		$("#startBut").trigger("click");															// Toggle start button	
+		if (time == 0)	return;																		// If resuming sim
+		app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|"+$("#startBut").html()+"|"+cmd);	
+		time=time*1000;																				// Convert to ms
+		let interval=500;																			// Look twice a second
+		if (cmd == "blackboard") $("#writeBut").on("click",function(e) { resume(e) });				// Blackboard 
+	
+		this.pauseTimer=window.setInterval((e)=>{													// INIT TIMER
+			time-=interval;																			// Subtract interval
+			trace(time)
+			if (time <= 0) 	this.Pause(0,0);														// We're done	
+			},interval);
+
+		function resume(e) {																		// RESUME SIMULATION
+			$("#"+e.target.id).off("click",function() { resume() });								// Remove handler
+			app.Pause(0,0);																			// Resume sim
+			}
+	}
+		
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		try {

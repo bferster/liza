@@ -70,6 +70,8 @@ picture,Blank board,assets/blankBB.png
 session,data,"trt=175,"
 aimodel,wit,VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z
 
+Nottrigger,time,"who=10,when=2,do=pause:blackboard"
+
 trigger,time,"who=Chris,when=.5,do=say:Welcome teacher, we're glad that you're here today. Before we get started let's take a couple deep breaths together. Breathe in through your nose, hold your breath, now breathe out. Go ahead and take another breath. Breathing helps us relax and learn from our practice.+act:interrupt"
 trigger,time,"who=Farrah,when=20,do=say:Okay, now, drag your mouse to walk around our classroom.+act:interrupt"
 trigger,time,"who=Luis,when=35,do=say:Teacher, Do you like to read fiction or nonfiction? Click on the pencil icon on the toolbar to write on our blackboard. Circle the one you you most like to read.+act:interrupt+slide:0Draw"
