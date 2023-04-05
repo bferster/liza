@@ -301,6 +301,17 @@ class App  {
 				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PICTURE|"+v[i].substring(7)+"|"+ v[i].charAt(6));	// Send pic change
 				}
 			else if (v[i].match(/pause:/i)) { this.Pause(v[i].substring(6),e.who);	}				// PAUSE/RESUME
+			else if (v[i].match(/close:/i)) {														// CLOSE WINDOW
+				i=v[i].substring(6);																// Get cmd
+				if (i == "graph") {																	// Graph
+					$("#lz-timelinebar").remove();
+					clearInterval(app.fb.interval);
+					$("#lz-variance").remove();	
+					}								
+				else if (i == "blackboard") $("#blackboardDiv").hide();								// Blackboard
+				else if (i == "resources") 	$("#lz-resources").remove();							// Resources
+				else if (i == "video") 		$("#lz-videoChat").remove();							// Video
+				}
 			}
 			
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
