@@ -269,9 +269,12 @@ class App  {
 		if (e.done)	return;																			// Already handled
 		e.done=1;																					// Flag it done
 		let student=e.who;																			// Get speaker
-		if (student == "current") student=this.curStudent;											// Use current student
-		if (student == "random")  student=this.students[Math.floor(Math.random()*this.students.length)].id;	// Get random student
+		if (student == "current") 		student=this.curStudent;									// Use current student
+		else if (student == "random")  	student=this.students[Math.floor(Math.random()*this.students.length)].id;	// Get random student
+		this.curStudent=student;																	// Set as current student
+
 		let v=e.do.split("+");																		// Split do items
+		
 		for (i=0;i<v.length;++i) {																	// For each do item
 			if (v[i].match(/say:/i) && !this.multi) {												// SAY
 				s=v[i].substring(4);																// Get text or intent
@@ -312,6 +315,7 @@ class App  {
 				else if (i == "resources") 	$("#lz-resources").remove();							// Resources
 				else if (i == "video") 		$("#lz-videoChat").remove();							// Video
 				}
+			else if (v[i].match(/assess:/i)) ShowAssess(v[i].substring(7));							// ASSESSMENT
 			}
 			
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
@@ -541,6 +545,8 @@ class App  {
 		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,50,0,0";
 		this.poses["breathe1"]="neck,-16,0,0,mouth,12,0,0";			
 		this.poses["breathe2"]="neck,0,0,0,mouth,0,0,0";			
+	
+	
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
@@ -556,6 +562,9 @@ class App  {
 		this.seqs["armUp"]="handUp,1";			this.seqs["armDown"]="leftArmDesk,1";
 		this.seqs["twistLeft"]="twistLeft,1";	this.seqs["twistRight"]="twistRight,1";
 		this.seqs["breathe"]="breathe1,2,breathe2,2,2";
+		//WTF
+		//LOOK DOWN
+
 
 		for (i=0;i<10;++i)																			// For each desk
 			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/deskskin.png" : 0xdddddd} );	// Add desk
@@ -672,6 +681,7 @@ class App  {
 			this.ignoreNextTalk=true;																// Don't repeat last talk, as we already heard it
 			}	
 		else if (v[3] == "TALK") {																	// TALK
+			
 			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0,0]);						// Update variance
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages

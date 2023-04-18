@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>Assessment</title>
+ 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>	
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script src="lib/jquery.ui.touch-punch.min.js"></script>
+	<script src="//unpkg.com/mathjs@7.0.2/dist/math.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=AM_CHTML"></script>
+
+	<style type="text/css">
+		body { 			font-family:Verdana,Geneva,sans-serif; font-size:xx-small}
+	
+		.ui-autocomplete { max-height: 300px; overflow-y: auto; }
+	
+ 		.unselectable { -moz-user-select: none;     -khtml-user-select: none;
+		   			 	-webkit-user-select: none;  -ms-user-select: none;   user-select: none;
+		   				}
+ 		.mainSty { 		font-family:Verdana,Geneva,sans-serif; font-size:12px; 
+						padding:0px; margin:0px;border-radius:1.5em;
+						-moz-user-select: none;     -khtml-user-select: none;
+		   			 	-webkit-user-select: none;  -ms-user-select: none;   user-select: none;
+						}
+		.titleSty { 	font-size:1.5em; font-weight:bold; text-align:center;padding-bottom:.6em;
+						color:#666
+						} 
+		.textSty { 		padding-left:1.3em; padding-right:1.3em;
+						} 
+ 		.promptSty { 	padding-left:3.3em;padding-right:3.3em;padding-top:.33em;padding-bottom:1.2em;
+						margin:.6em;
+						font-weight:bold;
+						border-bottom:1px solid #ccc;
+						} 
+		.optionsLSty { 	text-align:left;padding-top:.33em;display:inline-block;
+						} 
+		.optionsRSty { 	padding-top:.33em;padding-left:1.33em;display:inline-block;
+						vertical-align:top;
+						} 
+ 		.nextbutSty {	border-radius:100px;color:#009900;font-size:14px; padding:3px 12px; cursor:pointer;
+ 						}
+  		#sortable li {  margin-bottom:.6em; padding:1px; padding-left:.75em; padding-right:.75em;
+  						border:1px solid #999;border-radius:.8em; background-color:#ddd; cursor:pointer
+  						}
+ 		.is {			border-radius:.8em;padding-left:.6em;padding-right:.6em;padding-top:1px;
+						border:1px solid #999; font-size:1em; height: 1.66em; width:16.66em;
+						}
+	
+ 	</style>
+</head>
+<body>
+
+<div id="containerDiv" style="position:absolute;top:0px;left:0px;width:100%;text-align:center" class="mainSty">
+	<div id="titleDiv" class="titleSty"></div>
+	<div id="textDiv" class="textSty"></div>
+	<div id="promptDiv" class="promptSty"></div>
+	<br>
+	<div style="text-align:center" >
+		<div id="optionsLDiv" class="optionsLSty"></div>
+		<div id="optionsRDiv" class="optionsRSty"><br></div>
+	</div>
+</div>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	let aData=null;																// Holds assessment data
+	let answers=[];																// Holds answers
+	let promptVars=[];															// Holds prompt variables
+	let curPage=0;																// Current page of assessment
+	let curAssess="";															// Current assessment id
+	let numTries=0;																// Number of tries at page
+	let curTime;																// Current player time
+	let numAnswers=0, numCorrect=0;												// Correct answer count
+	let fontSize=12;
+	let gmath=math;
+	let poll=true;																// Poll mide vs. assess
+	let dbEmail="";																// Email holder
+	let dbAddress="";															// Database endpoint															
+	let dbType="AGQ";															// Database type
+
+	$(document).ready(function() {											// WHEN PAGE LOADED
+		let i;
+		let p=window.location.search.substring(1).split("&");					// Split into parts													
+		if (window.addEventListener) 											// If supported this way
+			window.addEventListener("message",AssessEventHandler,false);		// Add event handler
+		else																	// Use other method
+			window.attachEvent("message",AssessEventHandler);					// Add handler
+		$("body").on("keydown", function(e) {									// Handle key down
+				if (e.which == 27) 												// Esc key
+					Draw(aData.pages.length);									// Move on
+				});
+
+		for (i=0;i<p.length;++i) {												// For each param
+			if (p[i].match(/e=/i))	dbEmail=p[i].split("=")[1];					// Get email
+			if (p[i].match(/t=/i))	dbType=p[i].split("=")[1];					// Get db type
+			if (p[i].match(/j=/i))	{											// Get JSONP script
+				curAssess=p[i].split("=")[1];									// Get id
+				fetch("data/"+curAssess+".json#"+Math.floor(Math.random()*100000))	// Load file and twart caching
+				.then(res => res.json())										// Get as json
+				.then(res =>{													// Process		
+					AssessEventHandler({data:res});								// Show											
+					});													
+				}
+		if (p[i].match(/test/i))	{											// Get JSONP script
+				let e={};														
+				e.data='AssessAct=data|{"pages":[';
+				e.data+='{"title":"Radio choice images","skip":"true"';
+				e.data+=',"text":"Choose the one that will get PacMan home"';
+				e.data+=',"whyRight":" "';
+				e.data+=',"whyWrong":"No does not mean yes or maybe"';
+				e.data+=',"pic":"//viseyes.org/scale/res/pacman.JPG"';
+				e.data+=',"optionType":"radio","options":["A pic(//viseyes.org/scale/res/01_A.png)","*B pic(//viseyes.org/scale/res/01_B.png)","C pic(//viseyes.org/scale/res/01_C.png)"]},';
+
+				e.data+='{"title":"Multiple choice","skip":"true"';
+				e.data+=',"text":"Choose the one that says &quot;Yes&quot; You\'ll get 2 tries..."';
+				e.data+=',"numTries":"2"';
+				e.data+=',"whyRight":"Yes means yes"';
+				e.data+=',"whyWrong":"Yes does not mean no or maybe"';
+				e.data+=',"optionType":"checkbox","options":["*Yes","No","Maybe"]},';
+
+				e.data+='{"title":"Radio choice","skip":"true"';
+				e.data+=',"text":"Choose the one that says &quot;No&quot"';
+				e.data+=',"whyRight":" "';
+				e.data+=',"whyWrong":"No does not mean yes or maybe"';
+				e.data+=',"optionType":"radio","options":["Yes","*No","Maybe"]},';
+
+				e.data+='{"title":"Fill in the blank (Cloze)","skip":"true"';
+				e.data+=',"text":"Humpty Dumpty sat on a ______, Humpty Dumpty had a great ______.<br>There are  ______ hours in a day"';
+				e.data+=',"numTries":"2"';
+				e.data+=',"whyWrong":"Try 24 or twenty-four"';
+				e.data+=',"optionType":"cloze","options":["wall","fall","24;twenty-four;twenty four"]},'
+
+				e.data+='{"title":"Match","skip":"true"';
+				e.data+=',"text":"Match the number and text up"';
+				e.data+=',"numTries":"2"';
+				e.data+=',"whyWrong":" "';
+				e.data+=',"optionType":"match","options":["5:Fingers","50:States","7:Seas"]},'
+
+				e.data+='{"title":"Sort","skip":"true"';
+				e.data+=',"text":"Sort this list alphabetically"';
+				e.data+=',"numTries":"2"';
+				e.data+=',"whyWrong":" "';
+				e.data+=',"optionType":"sort","options":["Albatross","Bicycle","Climate"]},'
+
+				e.data+='{"title":"Slider","skip":"true"';
+				e.data+=',"text":"Choose a rating on the scale"';
+				e.data+=',"optionType":"slider","options":["Very Low:Very High"]}'
+
+				e.data+="]}"
+				AssessEventHandler(e);													
+				}
+		}
+	});
+
+	function AssessEventHandler(e)											// ON ASSESS EVENT
+	{
+		if (typeof(e.data) == "object") {										// Handle json file load
+			aData=e.data;														// Set data
+			Draw(0,false);														// Draw page
+			return;
+			}
+		
+		let v=e.data.split("|");												// Split into parts													
+		if (v[0] == "AssessAct=data") {											// If a data 
+			v[1]=v[1].replace(/""/g,"\"");										// Remove double quotes
+			aData=$.parseJSON(v[1]);											// Convert to obj
+			Draw(0,false);														// Draw page
+			}												
+	}	
+
+	function Draw(num, showRight, answer)									// DRAW NODE
+	{
+		let i,ifr,pic,lab,str="",col="#000",sliAns=-1;												
+		let studentRes="";														// Hold's student response
+		if (num >= aData.pages.length) {										// Past last page
+			let o,d=[];
+			for (i=0;i<aData.pages.length;++i) {								// For each question
+				o={};															// New obj
+				o.type=aData.pages[i].optionType;								// Save type
+				o.title=aData.pages[i].title.substring(0,128);					// Save answer
+				o.answer=aData.pages[i].answer;									// Save answer
+				d.push(o);														// Add to array
+				}
+			fetch(`//${window.location.host}:8081?q=save&type=AGQ&email=${dbEmail}&password=${curAssess}`,	
+			{ method:"POST", "Content-Type":"application/json", body:JSON.stringify(d)}) // Save to DB
+			.then(res => { SendMessage("done",curAssess+"|"+numCorrect/numAnswers); });	 // Send done message
+			return;																// Quit
+			}
+		if (curPage != num)														// If a new page
+			numTries=0;															// Reset tries counter
+		curPage=num;															// Set curpage
+		var d=aData.pages[num];													// Point at page
+			
+		promptVars=[];															// Clear prompt vars
+		let curPrompt=d.prompt ? SetPromptMacro(d.prompt) : "";
+		if (d.fontSize)	fontSize=d.fontSize-0;									// Set fontsize
+		d.title ? $("#titleDiv").html(SetPromptMacro(d.title)) : $("#titleDiv").html("");	// Add title
+		d.text ?  $("#textDiv").html(SetPromptMacro(d.text)) : $("#textDiv").html("");		// Text body
+		$("#promptDiv").html(curPrompt);										// Prompt
+
+		$("#containerDiv").css("font-size",fontSize+"px");						// Set fontsize
+		if ((d.options) &&  (d.optionType == "radio" || d.optionType == "checkbox")) {	// CHECK/RADIO OPTIONS
+//			d.options=Shuffle(d.options);										// Shuffle options
+			for (i=0;i<d.options.length;++i) {									// For each option
+				if (showRight) {												// If showing correct answers
+					if (d.options[i].match(/^\*/)) 	col="#00aa00";				// If a correct one
+					else							col="#aa0000";				// A wrong one
+					}
+				lab=d.options[i].replace(/^\*/,"");								// Remove "correct" dot
+				lab=SetPromptMacro(lab);										// Set macros
+				if (ifr=lab.match(/\$v(\d*)/ig)) {								// If a $v variable tag
+					for (j=0;j<ifr.length;++j) {								// For each one
+						r=ifr[j].substr(2);										// Extract index
+						r=promptVars[r];										// Get var at index
+						lab=lab.replace(/\$v(\d*)/i,r);							// Replace tag with calulated number
+						}
+					}				
+				str+="<span style='color:"+col+"'>";							// Add color span
+				if ((pic=lab.match(/pic\(.*?\)/i))) {							// If pic() macro set
+					lab=lab.replace(/pic\(.*?\)/i,"");							// Delete text
+					pic=pic[0].substr(4,pic[0].length-5);						// Get payload
+			 		str+="<br>&nbsp; &nbsp;<img style='vertical-align:top' src='"+pic+"'><br>";	 // Add pic
+					}	
+				str+="&nbsp;&nbsp; <input type='"+d.optionType+"' name='opt' id='opt"+i+"'value='"+d.options[i].replace(/^\*/,"")+"'>&nbsp;"+lab+"</span>";	// Add line
+				if (d.options[i].toLowerCase() == "*other")						// If an other option
+		 			str+="&nbsp <input class='is' style='width:6em;' type='text' id='otherOpt'><br></span>";	// Add line
+				else	str+="<br>";											// Add break
+				}
+			}
+		if ((d.options) && (d.optionType == "cloze")) {							// CLOZE OPTION
+			var s=d.text;
+			i=0;																// Reset counter
+			$("#textDiv").html("");												// No text
+			var imp="<input style='text-align:center;width:6.6em;border:none;border-bottom:1px solid;padding-left:.33em;color:#000099;font-size:1em' type='text' id='opt";
+			while (s.match(/__+/)) 												// While a blank
+				s=s.replace(/__+/,imp+(i++)+"'>");								// Replace with text box
+			str="<p style='margin-left:3.33em;margin-right:3.33em'>"+s+"</p>";	// Add cloze
+			}
+		if ((d.options) && ((d.optionType == "sort") || (d.optionType == "match"))) {	// Sort/match
+			v=[]
+			for (i=0;i<d.options.length;++i)  v.push(i);						// Normal array
+			v=Shuffle(v);														// Shuffle array
+			str="<ol id='sortable'>";											// Header
+			for (i=0;i<d.options.length;++i) 									// For each option
+				str+="<li id='"+i+"'>"+d.options[v[i]].split(":")[0]+"</li>";	// Add item
+			str+="</ol>";														// End tag
+			}
+		else if (d.optionType == "write") {										// WRITE OPTION
+			str+="&nbsp;&nbsp;<textarea id='opt' rows=3 ";
+			str+="placeholder='\n Write your answer here ...'";					// Placeholder
+			str+="style='border-radius:8px;font-size:1em;width:"+$("#optionsLDiv").parent().width()*.8+"px'></textarea><br></span>";	// area
+			str+="<br><div id='formulaBox' style='text-align:center;width:"+$("#optionsLDiv").parent().width()*.8+"px'></div>";
+			}	
+		else if (d.optionType == "slider") {									// SLIDER OPTION
+			var prevPos=0;
+			var w=Math.min($("#containerDiv").width()*.75,600);					// Get width
+			str+="<div id='slibase' style='border-bottom:2px solid #aaa;width:"+w+"px;height:30px'>";
+			for (i=0;i<20;++i) {
+				str+="<div id='slitic"+i+"' style='border-left:1px solid #aaa;width:1px;height:10px;"
+				str+="position:absolute'></div>";
+				}
+			str+="<div id='sliticp' style='border-left:4px solid #009900;width:0px;height:30px;position:absolute;display:none;'></div>"
+			str+="</div>";
+			if (d.options[0]) {
+				str+=d.options[0].split(":")[0];
+				str+="<div id='sliright' style='position:absolute'>"+d.options[0].split(":")[1]+"</div>"
+				}
+			str+="<br><br>";	
+			}
+		str+="<br><p style='text-align:center;margin-left:30px'><input id='nextBut' type='button' value='OK' class='nextbutSty'>"; 	// Add button
+		if (d.skip && d.skip != "false")										// If allowing skip button
+			str+="&nbsp;&nbsp;<input id='skipBut' type='button' value='Skip' class='nextbutSty'>"; 	// Add button
+		str+="</p>";															// End tag
+		$("#optionsLDiv").html(str);											// Set div
+		MathJax.Hub.Queue(["Typeset",MathJax.Hub]);								// Refresh
+		
+		if (d.optionType == "write") {											// ON WRITE
+			$("#opt").focus();													// Set focus on input
+			$("#opt").on("keydown",(e)=> {										// On keydown
+				let form=$("#opt").val();										// Get formula
+				if ((e.keyCode > 31) && (e.keyCode < 127))	form+=e.key;		// Add last key
+				$("#formulaBox").text("\`"+form+"\`");							// Add ticks								
+				MathJax.Hub.Queue(["Typeset",MathJax.Hub]);						// Refresh
+				});
+			}
+
+		if (d.optionType == "slider") {											// Slider option
+			var x=$("#slibase").position().left;								// Left
+			var y=$("#slibase").position().top+$("#slibase").height();			// Bottom
+			for (i=0;i<20;++i)													// For each tic
+				$("#slitic"+i).css({"left":((i*(w/19)+x))+"px","top":+(y-10)+"px"});// Position
+			$("#slitic0").css({"height":"15px","top":+(y-15)+"px","border-left":"2px solid #aaa"});
+			$("#slitic10").css({"height":"20px","top":+(y-20)+"px","border-left":"2px solid #aaa"});
+			$("#slitic19").css({"height":"15px","top":+(y-13)+"px","border-left":"2px solid #aaa"});
+			$("#sliright").css({"top":+(y+1)+"px","left":(w+x-$("#sliright").width()+"px")});	// Position max text
+			$("#slibase").on("click",function(e) {								// CLICK ON HANDLER
+				sliAns=Math.round(e.offsetX/w*100);								// Calc answer
+				if (!prevPos)	prevPos=e.clientX;								// Animation start 1st time
+				$("#sliticp").css({"left":prevPos+"px","display":"inline"});	// Show
+				$("#sliticp").animate({ left:e.clientX});						// Animate to place
+				prevPos=e.clientX;												// Then in now
+				});
+			}
+ 		$("#sortable" ).sortable({ axis:"y"} );									// Make sortable, if a sort
+		if ((d.optionType != "draw") && (d.optionType != "notes"))	{			// Not the draw or notes options
+			if (d.pic) $("#optionsRDiv").html("<img src='"+d.pic+"' width='300'>"); // Add pic
+			else	   $("#optionsRDiv").html("");								// Erase it
+			}
+		if ((d.options) && (d.optionType == "match")) {							// Match
+			str="<span style='text-align:left;font-weight:bold'>";				// Span
+			for (i=0;i<d.options.length;++i)									// For each option
+				str+="<p>"+d.options[i].split(":")[1]+"</p>";					// Add item
+			$("#optionsRDiv").html(str+"</span>");								// Set div
+			}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+		$("#nextBut").on("click",function() {									// NEXT BUTTON HANDLER
+			let ans,i,j;
+			++numTries;															// Increment tries
+			if (d.optionType == "write") {										// Draw style
+				ans=$("#opt").val();											// Get answer
+				studentResponse=ans;											// Save student response
+				ans=CheckWrittenAnswer(ans,d);									// Check answer
+				}	
+			else if (d.optionType == "slider") {								// Slider style
+				SendMessage("answer",curAssess+"|"+curPage+"|value|"+sliAns);	// Send answer message
+				Draw(curPage+1);												// Move on
+				return;															// Quit
+				}
+			let correct=0,wrong=0,requiredCorrect=0;
+			
+			if (d.optionType != "write") {										// Anything but write
+				studentResponse=$("input[name='opt']:checked").val();			// Get response
+				ans="*"+studentResponse;										// Chosen answer
+				}
+			if (d.options && (d.optionType != "write"))							// If options
+				for (i=0;i<d.options.length;++i) {								// For each option
+					if (d.options[i].match(/^\*/))	requiredCorrect++			// Add to required count
+					if (ans == d.options[i])									// If correct
+						correct++;												// Add to count
+						}
+			if (d.optionType == "radio")	ans=correct ? "right" : "wrong"		// Radio
+			else if (d.optionType == "cloze") {									// Cloze
+				for (i=0;i<d.options.length;++i) {								// For each option
+					v=d.options[i].split(";");									// Get parts
+					ans=$("#opt"+i).val();										// Get answer
+					for (j=0;j<v.length;++j) 									// For each possibility
+						if (ans.toLowerCase() == v[j].toLowerCase()) {			// If a match		
+							correct++;											// Add to corrects
+							break;												// Stop looking
+							}
+					if (j == v.length)											// Didn't find it
+						wrong++;												// Add to wrongs
+					}
+				ans="wrong";													// Assume wrong
+				if (correct == i)				ans="right";					// Correct				
+				if (correct && correct < i)		ans="partial"					// Partial
+				}
+			else if ((d.optionType == "sort") || (d.optionType == "match")) {	// Sort/Match
+				for (i=0;i<d.options.length;++i) 								// For each option
+				 	if ($("#sortable :eq("+i+")").text() == d.options[i].split(":")[0])	// A match
+						++correct;												// Inc right answer
+				ans="wrong";													// Assume wrong
+				if (correct == i)				ans="right";					// Correct				
+				if (correct && correct < i)		ans="partial"					// Partial
+				}
+			else if (d.optionType == "findtime") {								// Find time
+				var s,e;
+				ans="wrong";													// Assume wrong
+				for (i=0;i<d.options.length;++i) {								// For each option
+					s=d.options[i].split("-")[0];								// Start
+					e=d.options[i].split("-")[1];								// End
+					studentResponse=curTime;									// Srt answer
+					if (!e)	e=s;												// No end
+					if ((curTime >=s) && (curTime <=e))							// In span
+						ans="right";											// Right
+					}
+				}
+			else if (d.optionType != "write") {									// All else but write
+				correct=0;														// Restart
+				for (i=0;i<d.options.length;++i) {								// For each option
+					if ($("#opt"+i).prop("checked"))							// If checked
+						if (d.options[i].match(/^\*/)) 	correct++;				// Add to right count
+						else							wrong++;				// Add to wrong count
+					}
+				ans="wrong";													// Assume wrong
+				if (correct == requiredCorrect  && !wrong) 		ans="right";	// All correct
+				else if (correct < requiredCorrect && !wrong && correct) ans="partial"	// If partial
+				}
+			
+			if ($("#otherOpt").val()) studentResponse=ans=$("#otherOpt").val();	// If *other written in use its value
+			let ss;
+			str="<div style='margin-left:1.33em;margin-right:1.33em'><div style='font-size:1.5em;text-align:center;font-weight:bold;color:#";	// Title
+			if (!poll) {
+				if (ans == "right") {											// Right
+					ss=DoneMacro(d.whyRight);									// Run macros
+					if (!ss) ss="That's right";									// Default message
+					str+="009900'>"+ss+"</div><br><p>";							// Draw it
+					}				
+				else if (ans == "partial") { 									// Partial
+					str+="ff9900'>Sorry, you only got some right..</div><p>";	// Heading		
+					if (d.whyPartial)		str+=DoneMacro(d.whyPartial);		// Show partial explanation
+					else if (d.whyWrong)	str+=DoneMacro(d.whyWrong);			// Show wrong explanation
+				 	if (numTries < d.numTries)									// If more tries ahead
+				 		str+="<div style='text-align:center'><b>Please try again</b> ("+numTries+"/"+d.numTries+")</div>";	// Show progress
+					}
+				else if (ans == "wrong") { 										// Wrong
+					ss=DoneMacro(d.whyWrong);									// Run macros
+					if (!ss) ss="Sorry, that's not the right answer";			// Default message
+
+					str+="000099'>"+ss+"</div><p>";								// Draw it	
+				 	if (numTries < d.numTries)									// If more tries ahead
+				 		str+="<div style='text-align:center'><b>Please try again</b> ("+numTries+"/"+d.numTries+")</div>";	// Show progress
+					}
+				else{															// Anything else
+					str+="009900'>Answer</div><p>";								// Heading
+					if (d.whyRight)	str+=DoneMacro(d.whyRight);					// Show explanation
+					}				
+				str+="</p><div style='text-align:center'>";						// Center
+				str+="<input id='contBut' type='button' value='Continue' class='nextbutSty'></div></div>"; 	// Add button
+				}
+			$("#optionsLDiv").html(str);										// Set div
+			$("#optionsRDiv").html("");											// Set div
+
+	
+			$("#contBut").on("click",function() {								// CONTINUE BUTTON HANDLER
+				if (ans == "right")												// If right		
+					Draw(curPage+1);											// Show next
+				else{
+					if (numTries < d.numTries)	Draw(curPage);					// Reshow
+					else 						Draw(curPage+1);				// Move on
+					}
+				});
+			SendMessage("answer",curAssess+"|"+curPage+"|"+ans+"|"+ResolveVars(studentResponse)+"|"+curPrompt); // Send answer message
+			Draw(curPage+1);
+			});																	// End nextbut
+			
+		$("#skipBut").on("click",function() {									// SKIP BUTTON HANDLER
+			SendMessage("answer",curAssess+"|"+curPage+"|skip");				// Send answer message
+			Draw(curPage+1);													// Move on
+			});
+		
+	}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HELPERS
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function SendMessage(cmd, msg)											// SEND MESSAGE TO CONTAINER
+	{
+		if (cmd == "answer") {													// An answer
+			numAnswers++;														// Add to count
+			let v=msg.split("|");												// Get parts
+			if (v[2] == "right")	numCorrect++;								// Add to correct
+			aData.pages[v[1]].answer=v[3];										// Save in answers
+			}
+		var str="Assess|"+cmd;													// Add header				
+		if (msg) str+="|"+msg;													// If more to it, add
+		trace(str)
+		if (window.parent)														// If has a parent
+			window.parent.postMessage(str,"*");									// Send message to parent wind
+		else																	// Local	
+			window.postMessage(str,"*");										// Send message to wind
+	}
+
+	function Shuffle(array) 												// FISHER-YATES SHUFFLE
+	{
+	   	var i,j,t;
+		for (i=array.length-1;i>0;i--) {										// Work backwards thru array
+			j=Math.floor(Math.random()*(i+1));									// Get random num
+	      	t=array[i];															// Save current
+	        array[i]=array[j];													// Swap 
+	        array[j]=t;															// with random 
+	   		}
+    	return array;															// Return shuffled array
+	}	
+	
+	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
+	{
+		if (p4 != undefined)
+			console.log(msg,p1,p2,p3,p4);
+		else if (p3 != undefined)
+			console.log(msg,p1,p2,p3);
+		else if (p2 != undefined)
+			console.log(msg,p1,p2);
+		else if (p1 != undefined)
+			console.log(msg,p1);
+		else
+			console.log(msg);
+	}
+	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// NEW
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function CheckWrittenAnswer(ans, ques)										// CHECK WRITTEN ANSWER
+	{
+		if (!ques || !ans)	return "wrong";											// Quit if question or answer
+		let right=ResolveVars(ques.options[0]);										// Resolve any variables
+		right=(right+"").replace(/\$sa/ig,ans);										// Replace with student answer
+		ans=ans.replace(/\r|\n| /g,"");												// Remove white space from student answer
+		right=right.replace(/\r|\n| /g,"");											// Remove white space from correct answer
+		if (ans == right)				 	 return "right";						// Right if a direct textual match
+		try {																		// Inhibit errors
+			let ifr,ev;
+			if (ifr=(""+right).match(/simp\((.*)\)/i)) {							// If a SIMP() tag
+				return "wrong";														// Wrong
+				}
+			ev=math.evaluate(right);
+			if (ans == ev) 								return "right"; 			// Right if a calculated match
+			if (ev.entries && (ans == ev.entries[0]))	return "right";				// Right if matches entry
+			} catch(e) { console.log(e) };											// Show error
+		if ((ques.options[0]+"").match(/\$sa/i) && math.evaluate(right))  return "right"; // Right if a calculated t/f match
+		return "wrong";																// Return wrong
+	}
+
+	function ResolveVars(exp)													// RESOLVE VARIABLES
+	{
+		let i,r,v,ifr;
+		if (ifr=(""+exp).match(/\$v(\d*)/ig)) {										// If a $v variable tag
+			for (i=0;i<ifr.length;++i) {											// For each one
+				r=ifr[i].substr(2);													// Extract index
+				r=promptVars[r];													// Get var at index
+				exp=exp.replace(/\$v(\d*)/i,r);										// Replace tag with calulated number
+				}
+			}
+		if (ifr=(""+exp).match(/rand\((.*?)\)/ig)) {								// If a RAND() tag
+			for (i=0;i<ifr.length;++i) {											// For each one
+				v=ifr[i].substr(5,ifr[i].length-6).split(",");						// Isolate parameters
+				r=promptVars[v[0]];													// Get set var
+				exp=exp.replace(/rand\(.+?\)/i,r);									// Replace tag with calulated number
+				}
+			}
+		return ""+exp;																// Return expresion as a string
+	}
+
+	function SetPromptMacro(txt)												// SET MACROS IN PROMPTS
+	{
+		let ifr,i,v,l,r;
+		if (ifr=txt.match(/rand\((.*?)\)/ig)) {										// If a RAND() tag
+			for (i=0;i<ifr.length;++i) {											// For each one
+				v=ifr[i].substr(5,ifr[i].length-6).split(",");						// Isolate parameters
+				if ((""+v[1]).match(/\[/)) {										// An explicit list
+					l=v.join().match(/\[(.*?)\]/)[1].split(",");					// Get possibilites
+					r=Math.floor(Math.random()*l.length);							// Pick one at random
+					r=l[r];															// Set it									
+					}
+				else{
+					if (!v[1]) v[1]=0;												// Default min to 0
+					if (!v[2]) v[2]=100;											// Default max to 100
+					if (!v[3]) v[3]=0;												// Default places to 0
+					r=Math.random()*v[2]+(v[1]-0);									// Make number
+					r=r.toFixed(v[3]-0);											// Set places
+					}
+				promptVars[v[0]]=r;													// Set in variable array
+				txt=txt.replace(/rand\(.+?\)/i,r);									// Replace tag with calulated number
+				}
+			}
+		if (ifr=txt.match(/\$v(\d*)/ig)) {											// If a $v variable tag
+			for (i=0;i<ifr.length;++i) {											// For each one
+				r=ifr[i].substr(2);													// Extract index
+				r=promptVars[r];													// Get var at index
+				txt=txt.replace(/\$v(\d*)/i,r);										// Replace tag with variable number
+				}
+			}
+		if (ifr=txt.match(/\$\[.*?\]/g)) {											// If in need evaluation
+			for (i=0;i<ifr.length;++i) {											// For each one
+				r=math.evaluate(ifr[i].substr(2,ifr[i].length-3));					// Evaluate expression
+				txt=txt.replace(/\$\[.*?\]/,r);										// Replace tag with calulated number
+				}
+			}
+		return txt;																	// Return prompt
+	}
+
+	function DoneMacro(txt)														// HANDLE QUESTION WHEN DONE
+	{
+		let i,v,ifr;
+		if (!txt) return "";														// Quit if no text set
+		if (ifr=txt.match(/val\((.*?)\)/i)) {										// If a VAL() tag
+			v=ifr[1].split(",");													// Isolate parameters
+			txt=txt.replace(/val\((.*?)\)/i,"");									// Erase tag
+			SendMessage("rule","STATUS|"+v[0]+":"+v[1]);							// Send rule message
+			}
+		return(txt)
+	}
+
+	
+</script>
+</body></html>

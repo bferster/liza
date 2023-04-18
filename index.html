@@ -220,7 +220,28 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 				app.Settings();
 			}
 			});
-	});	
+
+		if (window.addEventListener) 																// If supported this way
+			window.addEventListener("message",AssessEventHandler,false);							// Add event handler
+		else																						// Use other method
+			window.attachEvent("message",AssessEventHandler);										// Add handler
+		
+		function AssessEventHandler(e)																// ON ASSESS EVENT
+		{
+			if (e.data && e.data.match(/Assess\|done/)) 	$("#lz-assess").remove();				// Remove old
+		}	
+
+	});
+		
+	function ShowAssess(id, pct=100)															// RUN ASSESSMENT MODULE
+	{
+		$("#lz-assess").remove();																	// Remove old
+			let url=`assess.htm?i=TGQ&j=${id}&e=${app.activityId}`;									// Assess module url
+		let str=`<div id="lz-assess" style="position:absolute;background-color:#eee;top:0;left:0;
+			border:1px solid #999;width:${pct}vw;height:${pct}vh">
+			<iframe style="width:100%;height:100%" src="${url}" frameborder="0" ></iframe></div>`;
+		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add it
+	}
  
 	function ShowHelp() 																		// SHOW HELP
 	{
