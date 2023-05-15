@@ -20,7 +20,6 @@ class Voice {
 			this.maleVoice=mac ? 1 : 0;																	// Male voice
  			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
-
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
 				this.voices=[];																			// Clear list
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
@@ -29,9 +28,10 @@ class Voice {
 					if (voice.name.match(/Microsoft Mark/i))		_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Male voice
 					if (voice.name == "Google US English")			_this.voices.push(voice),_this.femaleVoice=_this.voices.length-1;			// Female voice
 					if (voice.name.match(/Alex/i))					_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Mac male voice
-					});
+					trace(_this.voices.length-1,voice.name)					});
+trace(_this.maleVoice,_this.femaleVoice,_this.instructorVoice);		
 				};
-			this.tts.onend=()=> { 																		// ON TALKING END
+				this.tts.onend=()=> { 																		// ON TALKING END
 				this.talking=0;  																		// Stop talking animation
 				if ((i=app.studex[app.curStudent])) 													// Valid student
 					app.sc.SetBone(app.students[i-1],"mouth",0,0,0); 									// Neutral mouth 

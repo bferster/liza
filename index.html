@@ -215,7 +215,6 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 
 		$("#controllerDiv").on("mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 		$(window).on("keydown",(e)=> {																// HANDLE KEYPRESS
-			trace(e.which)
 			if ((e.which == 81) && e.altKey)	{										// Test key (Ctrl+Alt+Q)
 				app.Settings();
 			}

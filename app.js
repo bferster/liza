@@ -338,7 +338,6 @@ class App  {
 	
 		this.pauseTimer=window.setInterval((e)=>{													// INIT TIMER
 			time-=interval;																			// Subtract interval
-			trace(time)
 			if (time <= 0) 	this.Pause(0,0);														// We're done	
 			},interval);
 
@@ -411,11 +410,11 @@ class App  {
 
 	GenerateResponse(text, intent)																// RESPOND TO TEACHER REMARK
 	{
-		let i,res={ text:"", intent:0, bakt:[0,0,0,0,0,0]};											// Clear res
-		if (this.role == "Gamer") 				return res;											// No responses from gamers
-		if (!(i=this.studex[this.curStudent]))	return res;											// Quit if bad name
-		--i;																						// Zero-base index
-		trace("genrate response",intent)
+		let res={ text:"", intent:0, bakt:[0,0,0,0,0,0]};											// Clear res
+		if (this.role == "Gamer") 	return res;														// No responses from gamers
+		let i=this.studex[this.curStudent];															// Get student indez
+		i=i ? i-1 : 0;																				// Zero-base index, if valid
+		trace("generate response",intent,this.curStudent,i)
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
 		if (!this.multi && this.students[i].first) {												// An initial response set

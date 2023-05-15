@@ -45,9 +45,9 @@ action,wave2,interrupt
 action,pair,"pair,pare,pier,pear"
 action,read,"read,reed,red,re-read,reread"
 
-keyTule,600,high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi
-keyrule,600,"nice|good|great,to,see|meet"
-keyrule,600,good|morning|afternoon|evening|day
+keyrule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy",,
+keyrule,600,"nice|good|great,to,see|meet",,
+keyrule,600,"good,morning|afternoon|evening|day",,
 
 keyrule,ANDYOU,"how|what,about,you",,
 keyrule,ANDYOU,"what,you,think|say",,
@@ -63,7 +63,7 @@ picture,Question2,assets/demoQ3.png
 picture,Lunar orbiter,assets/rover.png
 picture,Blank board,assets/blankBB.png
 
-session,data,"trt=247,"
+session,data,"trt=297,"
 aimodel,wit,VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z
 trigger,time,"who=Chris,when=.5,do=say:Welcome teacher, we're glad that you're here today.+act:interrupt"
 trigger,time,"who=Luis,when=6,do=say:In the next 3 minutes, we are going to give you a tour of our classroom and invite you to learn from us what we like to read.+act:interrupt"
@@ -76,21 +76,30 @@ trigger,time,"who=Oliver,when=23,do=act:breathe"
 trigger,time,"who=Sharleen,when=23,do=act:breathe"
 trigger,time,"who=Jazmin,when=32,do=say:Okay, now, drag your mouse to walk around our classroom.+act:interrupt"
 trigger,time,"who=Luis,when=45,do=say:Teacher, Do you like to read fiction or nonfiction? Click on the pencil icon on the toolbar to write on our blackboard. Circle the one you you most like to read.+act:interrupt+slide:0Draw"
-trigger,time,"who=Jazmin,when=67,do=say:Call on us by name and ask us the question on the board Tell us about what you like to read. Press your spacebar to talk to us.+act:interrupt+slide:0Question1+slide:1Question2+close:blackboard"
-trigger,time,"who=Farrah,when=187,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see what we did today+act:interrupt"
-trigger,time,"who=Chris,when=197,do=say:On the left you will see ways that students responses differed to help you adjust your teaching to meet our needs.+act:interrupt"
-trigger,time,"who=Sharleen,when=207,do=say:The graph shows student responses along the bottom and your responses above each student by type of feedback we think you provided.+act:interrupt"
-trigger,time,"who=Chris,when=213,do=say:At the end of this session you can press the play button to replay the types of feedback you gave given to students.+act:interrupt"
-trigger,time,"who=Luis,when=232,do=say:Now, you can use what you learned about our reading habits to plan future lessons for us.+close:graph"
-trigger,time,"who=Chris,when=239,do=say:Click on the notebook in the toolbar to download more teaching resources"
-trigger,time,"who=Oliver,when=247,do=act:standUp"
-trigger,time,"who=Jazmin,when=247,do=act:twistRight"
-trigger,time,"who=Chris,when=247,do=act:write"
-trigger,time,"who=Luis,when=247,do=act:twistLeft"
-trigger,time,"who=Farrah,when=247,do=act:write"
-trigger,time,"who=Sharleen,when=247,do=act:sleep+act:sit+close:resources"
-trigger,time,"who=Farrah,when=252,do=say:You can continue to talk with us after this survey, if you'd like,+assess:demopoll"
-trigger,time,"who=Oliver,when=257,do=act:sit"
-trigger,time,"who=Chris,when=257,do=act:sit"
-trigger,time,"who=Luis,when=257,do=act:sit"
-trigger,time,"who=Jazmin,when=257,do=act:sit"
+
+trigger,time,"who=Farrah,when=66,do=say:We'd like to show you our Domino Discover routine - where we each share our name and our favorite subject at school.+act:interrupt"
+trigger,time,"who=Oliver,when=73,do=say:I'm Oliver - Independent work in social studies, I could have skipped a grade.+act:interrupt"
+trigger,time,"who=Chris,when=79,do=say:I'm Chris - I like every class when we talk with partners."
+trigger,time,"who=Farrah,when=85,do=say:I'm Farrah - I like P.E. and basketball after school."
+trigger,time,"who=Luis,when=90,do=say:I'm Luis - Lunch is the best."
+trigger,time,"who=Jazmin,when=93,do=say:I'm Jazmin - I like science because we do experiments"
+trigger,time,"who=Sharleen,when=99,do=say:I'm Sharleen - hmmm, I agree with Jazmin"
+
+trigger,time,"who=Chris,when=108,do=say:Get to know more about us by pressing the space bar and asking us to tell you about what we like to read. You can also ask us why we like fiction or nonfiction.+act:interrupt+slide:0Question1+slide:1Question2+close:blackboard"
+trigger,time,"who=Farrah,when=227,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see what we did today+act:interrupt"
+trigger,time,"who=Chris,when=237,do=say:On the left you will see ways that students responses differed to help you adjust your teaching to meet our needs.+act:interrupt"
+trigger,time,"who=Sharleen,when=247,do=say:The graph shows student responses along the bottom and your responses above each student by type of feedback we think you provided.+act:interrupt"
+trigger,time,"who=Chris,when=253,do=say:At the end of this session you can press the play button to replay the types of feedback you have given to students.+act:interrupt"
+trigger,time,"who=Luis,when=272,do=say:Now, you can use what you learned about our reading habits to plan future lessons for us.+close:graph"
+trigger,time,"who=Chris,when=279,do=say:Click on the notebook in the toolbar to download more teaching resources"
+trigger,time,"who=Oliver,when=287,do=act:standUp"
+trigger,time,"who=Jazmin,when=287,do=act:twistRight"
+trigger,time,"who=Chris,when=287,do=act:write"
+trigger,time,"who=Luis,when=287,do=act:twistLeft"
+trigger,time,"who=Farrah,when=287,do=act:write"
+trigger,time,"who=Sharleen,when=287,do=act:sleep+act:sit+close:resources"
+trigger,time,"who=Farrah,when=292,do=say:You can continue to talk with us after this survey, if you'd like,+assess:demopoll"
+trigger,time,"who=Oliver,when=297,do=act:sit"
+trigger,time,"who=Chris,when=297,do=act:sit"
+trigger,time,"who=Luis,when=297,do=act:sit"
+trigger,time,"who=Jazmin,when=297,do=act:sit"

@@ -1,22 +1,22 @@
 {"pages":[
 
 	{"title":"<br>Feelings of belonging",
-	"text":"What did you hear in the student responses>",
+	"text":"What did you hear in the student responses?",
 	"optionType":"radio",
 	"options":["Isolation","Acknowledged","Valued","Belonging"]},
 
 	{"title":"<br>Academic language",
-	"text":"What did you hear in the student responses>",
+	"text":"What did you hear in the student responses?",
 	"optionType":"radio",
 	"options":["Conversational Language","Vocabulary","Vocabulary + Details","Vocabulary + Compound Sentence"]},
 
 	{"title":"<br>Knowledge",
-	"text":"What did you hear in the student responses>",
+	"text":"What did you hear in the student responses?",
 	"optionType":"radio",
 	"options":["Tangential/off topic information","Prior Knowledge","Evidence","Evidence + Reasoning"]},
 
 	{"title":"<br>Thinking",
-	"text":"What did you hear in the student responses>",
+	"text":"What did you hear in the student responses?",
 	"optionType":"radio",
 	"options":["Careless","Incomplete","Careful","Elaborative"]},
 
