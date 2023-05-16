@@ -41,3 +41,9 @@ Tell us two things: 1. What is a book that you like and 2. tell us why you like 
 ,Class,Class,hi how are you.,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Greeting,600,Start
 ,Class,Class,"Hi, we're excited to work with you.",3 (belonging),0 (not present),0 (not present),0 (not present),Talk,0,Greeting,600,Start
 ,Class,Class,"We're doing well, how are you?",,0 (not present),0 (not present),0 (not present),Talk,0,Greeting,600,Start
+
+,Class,Class,"I wanted to thank you for when you called on us",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,720,End
+,Class,Class,"I wanted to thank you for how you asked us to say more about my answer.",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,730,End
+,Class,Class,"I wanted to thank you for how you asked us to say more about my answer.",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,740,End
+,Class,Class,"I wanted to thank you for how you explained what we needed to work on and gave us ideas on how to improve our answer",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,750,End
+,Class,Class,"I wanted to thank you for when you helped us think about our strategy - that was really useful for us",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,760,End

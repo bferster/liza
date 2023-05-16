@@ -300,7 +300,7 @@ class App  {
 				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")+(s.MP3 ? "|"+s.MP3 : "")); 
 				}
 			else if (v[i].match(/slide:/i)) {														// SLIDE
-				this.bb.SetPic(v[i].substring(7),null, null, v[i].charAt(6));						// Show slide					
+			                                                  	this.bb.SetPic(v[i].substring(7),null, null, v[i].charAt(6));						// Show slide					
 				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PICTURE|"+v[i].substring(7)+"|"+ v[i].charAt(6));	// Send pic change
 				}
 			else if (v[i].match(/pause:/i)) { this.Pause(v[i].substring(6),e.who);	}				// PAUSE/RESUME
@@ -316,8 +316,9 @@ class App  {
 				else if (i == "video") 		$("#lz-videoChat").remove();							// Video
 				}
 			else if (v[i].match(/assess:/i)) ShowAssess(v[i].substring(7));							// ASSESSMENT
+			else if (v[i].match(/camera:/i)) this.sc.SetCamera(...v[i].substring(7).split(","));	// CAMERA POSITION
 			}
-			
+
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
 			if (this.eventTriggers[i].type == "time" && !this.eventTriggers[i].done) {				// Am undone time event
 				this.nextTrigger=this.eventTriggers[i];												// Point to next trigger 
@@ -544,8 +545,7 @@ class App  {
 		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,50,0,0";
 		this.poses["breathe1"]="neck,-16,0,0,mouth,12,0,0";			
 		this.poses["breathe2"]="neck,0,0,0,mouth,0,0,0";			
-	
-	
+
 		this.seqs["sleep"]="sleep,1";
 		this.seqs["standUp"]="standUp,1";
 		this.seqs["sit"]="startUp,1";
@@ -680,7 +680,6 @@ class App  {
 			this.ignoreNextTalk=true;																// Don't repeat last talk, as we already heard it
 			}	
 		else if (v[3] == "TALK") {																	// TALK
-			
 			app.UpdateVariance(v[4],v[7] ? v[7].split(",") : [0,0,0,0,0,0]);						// Update variance
 			if ((this.role == v[5]) && (this.role != "Teacher")) Sound("ding");						// Alert student they are being talked to
 			if ((v[4] == "Teacher") && (this.role == "Teacher")) ;									// Don't play teacher originated messages
