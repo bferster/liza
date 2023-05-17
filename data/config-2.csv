@@ -100,3 +100,12 @@ trigger,time,"who=Sharleen,when=279,do=say:Click on the notebook in the toolbar 
 trigger,time,"who=Sharleen,when=287,do=act:close:resources"
 trigger,time,"who=random,when=290,do=end:"
 trigger,time,"who=Farrah,when=298,do=say:You can continue to talk with us after this survey, if you'd like,+assess:demopoll"
+trigger,time,"who=Oliver,when=299,do=act:interrupt"
+trigger,time,"who=Chris,when=299,do=act:interrupt"
+trigger,time,"who=Farrah,when=299,do=act:interrupt"
+trigger,time,"who=Luis,when=299,do=act:interrupt"
+trigger,time,"who=Jazmin,when=299,do=act:interrupt"
+trigger,time,"who=Sharleen,when=299,do=act:interrupt"
+
+
+

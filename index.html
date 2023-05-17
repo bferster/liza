@@ -227,13 +227,17 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 		
 		function AssessEventHandler(e)																// ON ASSESS EVENT
 		{
-			if (e.data && e.data.match(/Assess\|done/)) 	$("#lz-assess").remove();				// Remove old
+			if (e.data && e.data.match(/Assess\|done/)) {											// Assessment done	
+				$("#lz-assess").remove();															// Remove assessment
+				$("#startBut").trigger("click");													// Toggle start button to restart	
+				}
 		}	
 
 	});
 		
 	function ShowAssess(id, pct=100)															// RUN ASSESSMENT MODULE
 	{
+		$("#startBut").trigger("click");															// Toggle start button to pause
 		$("#lz-assess").remove();																	// Remove old
 			let url=`assess.htm?i=TGQ&j=${id}&e=${app.activityId}`;									// Assess module url
 		let str=`<div id="lz-assess" style="position:absolute;background-color:#eee;top:0;left:0;

@@ -71,7 +71,7 @@ class App  {
 			else						this.startTime=now;											// Not in sim, set start				
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|START|"+this.inSim+"| ");  	// Send sim status
+			app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|START|"+this.inSim+"| ");  	// Send sim status
 			Prompt(this.inSim ? "PRESS AND HOLD SPACEBAR TO TALK" : "CLICK START TO RESUME SESSION","on");	// Directions
 			$("#restartBut").css("display","inline-block");											// Show restart
 			$("#talkInput").css("display",this.inSim ? "inline-block": "none");						// Show input field if in sim
@@ -85,7 +85,7 @@ class App  {
 			if (e.type == "click")																	// Only if actually clicked
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 	// Are you sure?
 					if (this.role == "Teacher") {
-						this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
+						app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
 						}
 					this.StartSession();															// Init session
 					$("#startBut").trigger("click");												// Trigger start								
@@ -99,11 +99,11 @@ class App  {
 			$("#blackboardDiv").css("display") == "none" ? 1 : 0;									// Hide or show
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			});
-		$("#videoBut").on("click", ()=> { this.ws.send(this.sessionId+"|"+this.curTime+"|"+this.userId+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
+		$("#videoBut").on("click", ()=> { app.SendEvent(this.sessionId+"|"+this.curTime+"|"+this.userId+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
 		$("#talkInput").on("keydown", ()=> { 														// ON ENTER OF TEXT
 			if (($("#talkInput").val().length == 1) && this.inSim) {								// If first key struck while in sim
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
-				this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1|TEXT"); // Alert others to talking
+				app.SendEvent(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1|TEXT"); // Alert others to talking
 				this.talkTime=new Date().getTime();													// Get time 
 				}
 			});
@@ -113,7 +113,7 @@ class App  {
 			$("#talkInput").val("");																// Clear text
 			});	
 		$("#lz-rolePick").on("change", ()=> {														// ON CHANGE ROLE
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|ROLE|"+$("#lz-rolePick").val());  	// Send role change
+			app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|ROLE|"+$("#lz-rolePick").val());  	// Send role change
 			this.role=$("#lz-rolePick").val();														// Set new role
 			$("#lz-rolePick").blur();																// Clear focus
 			Prompt((this.role == "Teacher") ? "CLICK <span style='color:#006600'><b>START</b></span> TO START SESSION" : "","on");		// No prompt
@@ -144,8 +144,8 @@ class App  {
 			this.voice.Listen()																		// Turn on speech recognition
 			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";						// Student always talk to teacher and vice versa
 			if (this.role != "Teacher")																// If a student
-				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|ACT|"+app.role+"|nod");	// Send nod 
-			this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
+				app.SendEvent(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|ACT|"+app.role+"|nod");	// Send nod 
+			app.SendEvent(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1"); // Alert others to talking
 			this.inRemark=true;																		// Teacher is talking
 			this.talkTime=new Date().getTime();														// Time when talking started 
 			});
@@ -157,7 +157,7 @@ class App  {
 			$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS AND HOLD SPACEBAR TO TALK") }).fadeIn(200);		// Animate in and out
 			this.inRemark=false;																	// Teacher is not talking
 			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";						// Student always talk to teacher and vice versa
-			if (this.multi) this.ws.send(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
+			if (this.multi) app.SendEvent(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
 			});
 		}
 
@@ -276,19 +276,19 @@ class App  {
 		let v=e.do.split("+");																		// Split do items
 		
 		for (i=0;i<v.length;++i) {																	// For each do item
-			if (v[i].match(/say:/i) && !this.multi) {												// SAY
+			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
 				if (!isNaN(s))	s=app.nlp.GetResponse("",student,s);								// Get response from intent
 				else			s={ text:s, bakt:[0,0,0,0,0,0], MP3:"" };							// Explicit text
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")+(s.MP3 ? "|"+s.MP3 : "")); 
+				app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")+(s.MP3 ? "|"+s.MP3 : "")); 
 				}
-			else if (v[i].match(/act:/i) && !this.multi) {											// ACT
+			else if (v[i].match(/act:/i)) {															// ACT
 				s=v[i].substring(4);																// Get text
-				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+s); 	
+				app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+s); 	
 				}
 			else if (v[i].match(/prompt:/i)) {														// PROMPT
 				s=v[i].substring(7);																// Get text
-				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PROMPT|"+s); 	// Send prompt	
+				app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PROMPT|"+s); 	// Send prompt	
 				}
 			else if (v[i].match(/end:/i)) {															// END
 				let i,remarkLevels=[0,0,0,0,0];														// Remarks per level
@@ -297,11 +297,11 @@ class App  {
 						remarkLevels[Math.floor(this.sessionLog[i].intent/100)-1]++;				// Add remark level	
 				s=Math.max(1,remarkLevels.indexOf(Math.max(...remarkLevels)));						// Get max remark level
 				s=app.nlp.GetResponse("",student,720+s*10);											// Get response from intent
-				this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")+(s.MP3 ? "|"+s.MP3 : "")); 
+				app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+app.userId+"|TALK|"+student+"|Teacher|"+s.text+"|"+s.bakt.join(",")+(s.MP3 ? "|"+s.MP3 : "")); 
 				}
 			else if (v[i].match(/slide:/i)) {														// SLIDE
-			                                                  	this.bb.SetPic(v[i].substring(7),null, null, v[i].charAt(6));						// Show slide					
-				app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PICTURE|"+v[i].substring(7)+"|"+ v[i].charAt(6));	// Send pic change
+			   	this.bb.SetPic(v[i].substring(7),null, null, v[i].charAt(6));						// Show slide					
+				app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PICTURE|"+v[i].substring(7)+"|"+ v[i].charAt(6));	// Send pic change
 				}
 			else if (v[i].match(/pause:/i)) { this.Pause(v[i].substring(6),e.who);	}				// PAUSE/RESUME
 			else if (v[i].match(/close:/i)) {														// CLOSE WINDOW
@@ -332,7 +332,7 @@ class App  {
 		window.clearInterval(this.pauseTimer);														// Clear timer						
 		$("#startBut").trigger("click");															// Toggle start button	
 		if (time == 0)	return;																		// If resuming sim
-		app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|"+$("#startBut").html()+"|"+cmd);	
+		app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|"+$("#startBut").html()+"|"+cmd);	
 		time=time*1000;																				// Convert to ms
 		let interval=500;																			// Look twice a second
 		if (cmd == "blackboard") $("#writeBut").on("click",function(e) { resume(e) });				// Blackboard 
@@ -378,7 +378,7 @@ class App  {
 		if (talkingTo)  			app.curStudent=talkingTo;										// Set new active student 
 		else	 					talkingTo=app.curStudent;										// Get last one
 		if (app.role != "Teacher") {																// Not the teacher talking
-			app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
+			app.SendEvent(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+text);	// Send remark
 			return;
 			}
 		let act=app.nlp.GetAction(text);															// Set action
@@ -398,10 +398,10 @@ class App  {
 				trace("infer",intent);
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				this.lastIntent=intent;																// Save last intent
-				app.ws.send(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
+				app.SendEvent(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent >= 300) {																// If an intent detected
-					let s=app.curStudent+"'s response to remark: ";									// Student name
+					let s="Remark to "+app.curStudent+": ";											// Student name
 					s+=app.fb.intentLabels[intent/100];												// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
 					$("#feedbackDiv").html(s);														// Show in feedback area
@@ -427,7 +427,7 @@ class App  {
 				}
 			} 
 		if (res.text) 																				// If one
-			this.ws.send(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")+(res.MP3 ? "|"+res.MP3 : "")); // Send response
+			app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")+(res.MP3 ? "|"+res.MP3 : "")); // Send response
 		return res;										S											// Return it
 	}
 
@@ -465,7 +465,7 @@ class App  {
 			let seat=student ? app.students.find(x => x.id == student).seat : 0;					// Get seat number
 			if (act == "fidget")			app.students[seat].fidget=1;							// Fidget								
 			else if (act == "fidgetStop")	app.students[seat].fidget=0;							// Off	
-			else 							app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+act); 	// Send response
+			else 							app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+act); 	// Send response
 			}					
 	}
 
@@ -511,7 +511,7 @@ class App  {
 		this.ws.onerror=(e)=>  { console.log('error',e);	};										// ON ERROR
 		this.ws.onopen=()=> { 																		// ON OPEN
 			console.log('connected'); 																// Showconnected
-			this.ws.send(this.sessionId+"|"+this.activityId+"|"+this.userId+"|INIT");				// Init																	
+			app.SendEvent(this.sessionId+"|"+this.activityId+"|"+this.userId+"|INIT");				// Init																	
 			this.pollTimer= window.setInterval( ()=>{												// INIT POLLING SERVER
 			++this.secs;																			// Another second 
 			if (this.retryWS) {																		// If reconnecting to websocket
@@ -662,6 +662,12 @@ class App  {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SOCKET
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	SendEvent(event)																			// SEND EVENT TO SERVER AND ME
+	{
+		if (this.multi)	app.ws.send(event);															// Send to all players, if in multiplayer mode
+		else			app.SocketIn({ data:event});												// Just to me
+	}
 
 	SocketIn(event)																				// A WEBSOCKET MESSAGE FROM NODE WS SERVER
 	{

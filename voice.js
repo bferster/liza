@@ -13,25 +13,25 @@ class Voice {
 		this.thoughtBubbles=false;																		// Flag to show thought bubbles instead of TTS
 		try {																							// Try
 			this.tts=new SpeechSynthesisUtterance();													// Init TTS
-			let mac=0;																					// Assume non-mac
+			this.mac=0;																					// Assume non-mac
 			if (window.navigator.userAgentData)															// Exists?
-				mac=window.navigator.userAgentData.platform != "Windows";								// A mac?
-			this.femaleVoice=mac ? 0 : 1;																// Female voice
-			this.maleVoice=mac ? 1 : 0;																	// Male voice
+				this.mac=window.navigator.userAgentData.platform != "Windows";							// A mac?
+			this.femaleVoice=this.mac ? 0 : 1;															// Female voice
+			this.maleVoice=this.mac ? 1 : 0;															// Male voice
  			this.talking=0;																				// Talking flag to move mouth
 			this.voices=[];																				// New array
 			speechSynthesis.onvoiceschanged=()=> {														// React to voice init
 				this.voices=[];																			// Clear list
 				speechSynthesis.getVoices().forEach(function(voice) {									// For each voice
 					if (voice.lang == "en-US")						_this.voices.push(voice);			// Just look at English
-					if (voice.name == "Google UK English Female")	_this.voices.push(voice),_this.instructorVoice=_this.voices.length-1;		// Instructor's voice
-					if (voice.name.match(/Microsoft Mark/i))		_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Male voice
-					if (voice.name == "Google US English")			_this.voices.push(voice),_this.femaleVoice=_this.voices.length-1;			// Female voice
-					if (voice.name.match(/Alex/i))					_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Mac male voice
-					trace(_this.voices.length-1,voice.name)					});
-trace(_this.maleVoice,_this.femaleVoice,_this.instructorVoice);		
+					if (voice.name == "Google UK English Female")	_this.voices.push(voice),_this.instructorVoice=_this.voices.length-1;		// Instructor's voice for all
+					if (voice.name.match(/Microsoft Mark/i))		_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Male voice for PC
+					if (voice.name == "Google US English")			_this.voices.push(voice),_this.femaleVoice=_this.voices.length-1;			// Female voice for all
+					if (voice.name.match(/Alex/i))					_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Male voice ofr
+					if (voice.name.match(/Junior/i))	_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Mac male voice
+					});
 				};
-				this.tts.onend=()=> { 																		// ON TALKING END
+			this.tts.onend=()=> { 																		// ON TALKING END
 				this.talking=0;  																		// Stop talking animation
 				if ((i=app.studex[app.curStudent])) 													// Valid student
 					app.sc.SetBone(app.students[i-1],"mouth",0,0,0); 									// Neutral mouth 
@@ -54,7 +54,7 @@ trace(_this.maleVoice,_this.femaleVoice,_this.instructorVoice);
 					if (e.results[i].isFinal) {															// If final
 						app.said+=e.results[i][0].transcript;											// Add to cache
 						if ((app.role == "Teacher") && e.results[0][0].transcript && app.multi)			// If teacher talking in multiplayer mode
-						app.ws.send(app.sessionId+"|"+app.curTime.toFixed(2)+"|ADMIN|INTERIM|Teacher|Class|"+e.results[0][0].transcript); // Send partial
+						app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|ADMIN|INTERIM|Teacher|Class|"+e.results[0][0].transcript); // Send partial
 						$("#promptSpan").html(app.said ? "<span style='color:#006600'>"+app.said+"</span>" : ""); // Show portion to teacher as green
 						if (this.getLastClause) {														// Get final utterance
 							app.OnPhrase(app.said);														// React to remark
@@ -92,7 +92,7 @@ trace(_this.maleVoice,_this.femaleVoice,_this.instructorVoice);
 			return;
 			}
 		try{																							// Try
-			this.tts.rate=1.1;																			// Set voice speed rate
+			
 			if (who != "Teacher") {																		// Student talking
 				this.talking=who;																		// Trigger mouth animation if a student
 				this.ShowSpeakerText(who,text);															// Show text underneath student										
@@ -108,6 +108,8 @@ trace(_this.maleVoice,_this.femaleVoice,_this.instructorVoice);
 			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex
 			if (who == "male")			this.tts.voice=this.voices[this.maleVoice];						// Set male voice
 			else if (who == "female") 	this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
+			this.tts.rate=1.1;																			// Set voice speed rate for girls
+			if (this.mac && (who == "male"))	this.tts.rate=.9;										// Slow down mac for boys
 			this.tts.text=text;																			// Set text
 			speechSynthesis.speak(this.tts);															// Speak
 		}

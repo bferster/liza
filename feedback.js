@@ -13,7 +13,7 @@ class Feedback {
 		this.interval=null;																			// Timer
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
-		this.intentLabels=["Students","General","Clarify","Reflect","Rdirect","Think"];				// Intent labels
+		this.intentLabels=["Student","General","Clarify","Reflect","Rdirect","Think"];				// Intent labels
 		this.cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];										// BAKT colors
 	}
 
@@ -60,6 +60,7 @@ class Feedback {
 					}
 				}
 			v[0]/=counts[0];	v[1]/=counts[1];	v[2]/=counts[2];	v[3]/=counts[3];			// Calc bar means
+			str+=`<img src="img/totals.png" style="position:absolute;left:-12px;">`;							// Label
 			for (i=0;i<4;++i) {																		// For each factor
 				str+=`<div style="height:13px;color:#fff;font-size:9px;margin:0 0 1px 2px">
 				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${app.fb.cols[i]};
@@ -347,7 +348,7 @@ class ResponsePanel  {
 		$("#lz-rpback").on("wheel mousedown touchdown touchmove", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 
 		$("#lz-chat").on("change", ()=> {															// ON MESSAGE TEACHER
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|CHAT|Teacher|<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val()); // Send message
+			app.SendEvent(app.sessionId+"|"+app.curTime+"|"+app.userId+"|CHAT|Teacher|<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val()); // Send message
 			let bx=$("#lz-rpback").width()+(window.innerWidth-$("#lz-rpback").width())/2-150;		// Bubble center
 			Bubble("<b>From "+app.role+"<br><br></b>"+$("#lz-chat").val(),5,bx);					// Show
 			$("#lz-chat").val("");																	// Clear input
@@ -364,22 +365,22 @@ class ResponsePanel  {
 
 		$("#lzFidget").on("click", ()=> {															// ON FIDGET
 			$("#lzFidget").html($("#lzFidget").html() == "Fidget" ? "Stop it " : "Fidget");			// Toggle label
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|fidget");	// Send action to server
+			app.SendEvent(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|fidget");	// Send action to server
 			});
 		$("#lzYes").on("click", ()=> {																// ON YES
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|nodYes");	// Send action to server
+			app.SendEvent(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|nodYes");	// Send action to server
 			});
 		$("#lzNo").on("click", ()=> {																// ON NO
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|nodNo");	// Send action to server
+			app.SendEvent(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|nodNo");	// Send action to server
 			});
 		$("#lzWave").on("click", ()=> {																// ON WAVE
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|interrupt"); // Send action to server
+			app.SendEvent(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|interrupt"); // Send action to server
 			});
 		$("#lzSit").on("click", ()=> {																// ON SIT
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|sit");		// Send action to server
+			app.SendEvent(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|sit");		// Send action to server
 			});
 		$("#lzSeqs").on("change", ()=> {															// ON RUN SEQUENCE
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
+			app.SendEvent(app.sessionId+"|"+app.curTime+"|"+app.userId+"|ACT|"+app.role+"|"+$("#lzSeqs").val());		// Send action to server
 			$("#lzSeqs").prop("selectedIndex",0);													// Reset pulldowns
 			});
 	
@@ -405,7 +406,7 @@ class ResponsePanel  {
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id
 				let s=app.sessionId+"|"+app.curTime+"|"+app.userId+"|TALK|"+app.role+"|Teacher|"+o[id].text+"|"+o[id].bakt.join(",")+"|"+(o[id].MP3 ? o[id].MP3 : "");
-				app.ws.send(s);
+				app.SendEvent(s);
 				});
 			}		
 
@@ -466,7 +467,7 @@ class ResponsePanel  {
 		$("[id^=gvdot]").on("click",(e)=>{ 															// ON DOT CLICK
 			let i;
 			let row=e.target.id.substring(5,6);														// Get factor
-			let val=e.target.id.substr(6,7);														// Get val
+			let val=e.target.id.substr(6,7);												// Get val
 			if (v[row] != 0)	v[row]=0;															// If set, row to 0
 			else 				v[row]=(val == 0) ? -1 : val-0;										// Set array
 			$("[id^=gvdot"+row+"]").css("background-color","#fff");									// Reset row
@@ -490,7 +491,7 @@ class ResponsePanel  {
 			app.points+=points;																		// Add to total
 			str+="<br><b>You earned "+points+" points of student learning<br>Your total points are "+app.points+"!</b><br></p>"; // Points
 			$("#lz-results").html(str);																// Show results
-			app.ws.send(app.sessionId+"|"+app.curTime+"|"+app.userId+"|RATE|"+points+"|"+v[6]+"|"+v.join(","));
+			app.SendEvent(app.sessionId+"|"+app.curTime+"|"+app.userId+"|RATE|"+points+"|"+v[6]+"|"+v.join(","));
 			});
 	}
 
