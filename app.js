@@ -61,7 +61,7 @@ class App  {
 		this.Draw();																				// Start 
 		if (this.multi) $("#lz-rolePick").css("display","block");									// Show role picker
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
-		$("#timelineBut").on("click", ()=> { this.fb.Draw(); });									// ON FEEDBACK
+		$("#timelineBut").on("click", ()=> {  $("#blackboardDiv").hide(); this.fb.Draw(); });		// ON FEEDBACK
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
 		$("#startBut").on("click",    ()=> { 														// ON START 
 			if (this.role != "Teacher") return;														// Only for teacher
@@ -401,7 +401,7 @@ class App  {
 				app.SendEvent(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent >= 300) {																// If an intent detected
-					let s="Remark to "+app.curStudent+": ";											// Student name
+					let s="Feedback to "+app.curStudent+": ";											// Student name
 					s+=app.fb.intentLabels[intent/100];												// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
 					$("#feedbackDiv").html(s);														// Show in feedback area

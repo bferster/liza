@@ -467,7 +467,7 @@ class ResponsePanel  {
 		$("[id^=gvdot]").on("click",(e)=>{ 															// ON DOT CLICK
 			let i;
 			let row=e.target.id.substring(5,6);														// Get factor
-			let val=e.target.id.substr(6,7);												// Get val
+			let val=e.target.id.substr(6,7);														// Get val
 			if (v[row] != 0)	v[row]=0;															// If set, row to 0
 			else 				v[row]=(val == 0) ? -1 : val-0;										// Set array
 			$("[id^=gvdot"+row+"]").css("background-color","#fff");									// Reset row
@@ -479,7 +479,7 @@ class ResponsePanel  {
 		$("#lzgsend").on("click",()=>{ 																// ON SEND
 			let points=0;																			// Reset
 			v[6]=Math.floor(app.lastResponse.intent/100)*100;										// Get intent in 100s
-			let str=`<br>This remark was rated as <i>${v[6]} - ${this.intentDescs[Math.floor(v[6]/100)]}</i><br>
+			let str=`<br>This feedback was rated as <i>${v[6]} - ${this.intentDescs[Math.floor(v[6]/100)]}</i><br>
 			<p><b>Student response qualities</b></p>
 			<div style="margin-left:25%">
 			${app.fb.GetVarianceMarkup(app.lastResponse.variance,"x")}</div>`;							
