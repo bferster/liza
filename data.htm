@@ -371,6 +371,7 @@ return;
 				inference.intent=res.intents[0].name;												// Get intent																		
 				inference.confidence=res.intents[0].confidence;										// Confidence
 				}	
+			trace(res)
 			callback(inference);																	// Return response
 			if (msgs.length) setTimeout(()=>{ InferIntents(msgs, callback);},200);				// Recurse, if not last and add delay
 			}
