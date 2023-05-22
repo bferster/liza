@@ -85,7 +85,7 @@ trigger,time,"who=Luis,when=90,do=say:I'm Luis - Lunch is the best.+act:interrup
 trigger,time,"who=Jazmin,when=93,do=say:I'm Jazmin - I like science because we do experiments.+act:interrupt"
 trigger,time,"who=Sharleen,when=99,do=say:I'm Sharleen - um, I agree with Jazmin.+act:interrupt"
 
-trigger,time,"who=Chris,when=108,do=say:Get to know more about us by pressing the space bar and asking us to tell you about what we like to read. You can also ask us why we like fiction or nonfiction.+act:interrupt+slide:0Question1+slide:1Question2"
+trigger,time,"who=Chris,when=108,do=say:Get to know more about us by pressing the space bar and asking us to tell you about what we like to read. You can also ask us why we like fiction or nonfiction books.+act:interrupt+slide:0Question1+slide:1Question2"
 trigger,time,"who=Farrah,when=227,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see what we did today+act:interrupt"
 trigger,time,"who=Luis,when=237,do=say:Look for the green line to see the type of feedback you used to interact with us.+act:interrupt"
 trigger,time,"who=Jazmin,when=247,do=say:Click on a colored dot see the differences in our responses.+act:interrupt"

@@ -364,7 +364,7 @@ return;
 					});
 			}
 		else if (aiType == "wit") {																	// If WIT
-			let url="https://api.wit.ai/message?v=20210922&q="+m.text.substring(0,255);				// URL			
+			let url="https://api.wit.ai/message?v=20210922&n=3&q="+m.text.substring(0,255);				// URL			
 			const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
@@ -372,7 +372,12 @@ return;
 				inference.confidence=res.intents[0].confidence;										// Confidence
 				}	
 			trace(res)
-			callback(inference);																	// Return response
+			let str="<b>OTHER INTENTS:</b><br>";
+			for (let i=1;i<res.intents.length;++i) 
+				str+=Math.floor(res.intents[i].confidence*100)+"% "+res.intents[i].name+"<br>";
+			$("#outp").html(str);
+
+			callback(inference);																// Return response
 			if (msgs.length) setTimeout(()=>{ InferIntents(msgs, callback);},200);				// Recurse, if not last and add delay
 			}
 		} catch(e) {trace(e)}
