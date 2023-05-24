@@ -43,7 +43,7 @@ Why do you like to read ficton or non-fiction books.,Chris,Chris,I like non-fict
 ,Class,Class,"We're doing well, how are you?",,0 (not present),0 (not present),0 (not present),Talk,0,Greeting,600,Start
 
 ,Class,Class,"I wanted to thank you for when you called on us",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,720,End
-,Class,Class,"I wanted to thank you for how you asked us to say more about my answer.",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,730,End
-,Class,Class,"I wanted to thank you for how you asked us to say more about my answer.",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,740,End
+,Class,Class,"I wanted to thank you for how you asked us about our answer.",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,730,End
+,Class,Class,"I wanted to thank you for being interested in our answers.",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,740,End
 ,Class,Class,"I wanted to thank you for how you explained what we needed to work on and gave us ideas on how to improve our answer",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,750,End
-,Class,Class,"I wanted to thank you for when you helped us think about our strategy - that was really useful for us",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,760,End
+,Class,Class,"I wanted to thank you for when you helped us think about our ideas",,0 (not present),0 (not present),0 (not present),Talk,0,Ending,760,End
