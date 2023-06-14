@@ -21,17 +21,19 @@ What is a book that you like,Chris,Chris,"I recently read, The Chronicles of Nar
 Do you like to read non-fiction books.,Chris,Chris,I really like non-fiction.,2,2,3,2,Talk,,Prefer,300,Start
 ,Farrah,Farrah ,"I don't like non-fiction much",2,2,2,0,Talk,,Prefer,300,Start
 ,Jazmin,Jazmin,I like non-fiction just fine!.,2,2,3,1,Talk,,Prefer,300,Start
-,Luis,Luis,"I'm not sure, but probably not.",2,1,1,2,Think,,Prefer,300,Start
-,Chris,Chris,"I like mostly fiction but I'm into space travel so I guess if it's a book about going to space, I'm into that.",2,1,1,2,Think,,Prefer,300,Start
-,Oliver,Oliver,"I like some kinds of non-fiction.",1,2,3,1,Think,,Prefer,300,Start
-,Sharleen,Sharleen,Non-fiction is too boring.,0,0,0,0,Talk,,Prefer,300,Start
+,Luis,Luis,"I'm not sure, but probably not.",2,1,1,2,Talk,,Prefer,300,Start
+,Chris,Chris,"I like both fiction and non-fiction.",2,1,1,2,Talk,,Prefer,300,Start
+,Oliver,Oliver,"I like some kinds of non-fiction.",1,2,3,1,Talk,,Prefer,300,Start
+,Sharleen,Sharleen,I like fiction. Non-fiction is too boring.,0,0,0,0,Talk,,Prefer,300,Start
 
-Why do you like to read ficton or non-fiction books.,Chris,Chris,I like non-fiction alot,2,2,3,2,Talk,,Prefer,500,Start
-,Farrah,Farrah ,"I think nonfiction feels like schoolwork and I'd rather read for fun, not work.",2,2,2,0,Talk,,Prefer,500,Start
-,Jazmin,Jazmin,Good question! I like both but only nonfiction when the topic is animals and our planet.,2,2,3,1,Talk,,Prefer,500,Start
-,Chris,Chris,"I like both fiction and non-fiction.",2,1,1,2,Think,,Prefer,500,Start
-,Luis,Luis,"Give me action stuff anyday. Wait, nonfiction books are about real people. I read minecraft blogs.",2,1,1,2,Think,,Prefer,500,Start,Oliver,Oliver,"Hmm, I guess I prefer fiction, but I'm into historical fiction too, which is kind of like non-fiction, except not everything is exactly true. ",1,2,3,1,Think,,Prefer,500,Start
-,Sharleen,Sharleen,I like fiction. Non-fiction is boring.,0,0,0,0,Talk,,Prefer,500,Start
+Why do you like to read ficton or non-fiction books.
+,Farrah,Farrah ,"I think nonfiction feels like schoolwork and I'd rather read for fun, not work.",2,2,2,0,Talk,,Think,500,Start
+,Jazmin,Jazmin,Good question! I like both but only nonfiction when the topic is animals and our planet.,2,2,3,1,Talk,,Think,500,Start
+,Chris,Chris,"I like mostly fiction but I'm into space travel so I guess if it's a book about going to space, I'm into that.",2,1,1,2,thank,,Think,500,Start
+,Luis,Luis,"Give me action stuff anyday. Wait, nonfiction books are about real people. I read minecraft blogs.",2,1,1,2,Talk,,Think,500,Start
+,Chris,Chris,I like non-fiction alot,2,2,3,2,Talk,,Think,500,Start
+,Oliver,Oliver,"Hmm, I guess I prefer fiction, but I'm into historical fiction too, which is kind of like non-fiction, except not everything is exactly true.",1,2,3,1,Talk,,Think,500,Start
+,Sharleen,Sharleen,I like stories about people that are like me.,0,0,0,0,Talk,,Prefer,500,Start
 
 ,Class,Class,The answer is 4 of course,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101
 ,Class,Class,Would you believe 22?,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0,Add,1101

@@ -80,10 +80,10 @@ vocab,r500,"leading,annotating,holiday,absorb,farming,correcting,sequence,chrono
 
 session,data,"trt=420,"
 aimodel,wit,"JIZ-X-ALYOUZC-X-P3ALOLFY45EFM-X-3I5RUJQC3"
-trigger,time,"who=random,when=7,do=[say:600+act:interrupt]"
-trigger,time,"who=random,when=20,do=[say:100+act:interrupt]"
-trigger,time,"who=Chris,when=210,do=[say:150+act:interrupt]"
-trigger,time,"who=random,when=420,do=[end:]"
+trigger,time,"who=random,when=7,do=say:600+act:interrupt"
+trigger,time,"who=random,when=20,do=say:100+act:interrupt"
+trigger,time,"who=Chris,when=210,do=say:150+act:interrupt"
+trigger,time,"who=random,when=420,do=end:"
 keyrule,ANDYOU,"how|what,about,you",
 keyrule,ANDYOU,"what,you,think|say",
 keyrule,ANDYOU,"lets|let's,hear,from",
