@@ -13,7 +13,7 @@ class Feedback {
 		this.interval=null;																			// Timer
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
-		this.intentLabels=["Student","General","Clarify","Reflect","Rdirect","Think"];				// Intent labels
+		this.intentLabels=["Student","General","Clarify","Reflect","Redirect","Think"];				// Intent labels
 		this.cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];										// BAKT colors
 	}
 
@@ -119,7 +119,7 @@ class Feedback {
 		<div id="sliderLine" class="lz-sliderline"></div>
 		<div id="sliderTime" class="lz-slidertime"></div>
 		<div id="timeSlider" class="lz-timeslider"></div>
-		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 52px);top:184px;width:18px;cursor:pointer">`;
+		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 56px);top:174px;width:32px;cursor:pointer">`;
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 
 		for (i=0;i<app.students.length;++i) 														// For each student
@@ -192,7 +192,7 @@ class Feedback {
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
 	{
 		let i,o,x,col=0,y=31,str="";
-		let wid=$(window).width()-290;																// Size of graph
+		let wid=$(window).width()-300;																// Size of graph
 		clearInterval(this.interval);																// Clear timer
 		const getPixFromTime=(time)=>{ return time*1000/this.maxTime*(wid-67)+62; };				// CONVERT TIME TO PIXELS
 		let n=Math.floor(this.maxTime/1000);														// Nunber of minutes
@@ -201,7 +201,7 @@ class Feedback {
 		for (i=0;i<5;++i) {																			// For each grid line
 			str+=`<text x="0" y="${y+4}" fill="#999">${this.intentLabels[5-i]}</text>						
 			<line x1="59" y1="${y}" x2=${wid} y2="${y}" style="stroke:#ccc;stroke-width:${(i==5) ? 0 : 1}"/>
-			<text x="${wid+10}" y="${y+4}" fill="#999">${(5-i)*100}</text>`;						// Draw it
+			<text x="${wid+10}" y="${y+4}" fill="#999">${this.intentLabels[5-i]}</text>`;						// Draw it
 			y+=26;																					// Next line down
 			}
 		str+=`<text x="0" y="${y+4}" fill="#999">${this.intentLabels[0]}</text>`;					// Student label						
