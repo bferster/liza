@@ -7,6 +7,8 @@ class App  {
 	constructor()   																			// CONSTRUCTOR
 	{
 		app=this;
+		
+this.dan=0;		
 		this.role="Teacher";																		// User's role in simulation
 		this.sessionId="2";																			// Session id
 		this.activityId="2";																		// Activity id
@@ -351,7 +353,7 @@ class App  {
 	AddStudent(d)																				// ADD STUDENT TO DATA
 	{
 		try {
-			let o={ fidget:0, s:15, highestIntent:0, base:[], src:"assets/body2.dae" };				// Basic info
+			let o={ fidget:0, s:15, highestIntent:0, base:[], src:"assets/body2.dae" };				// Basic info 
 			o.id=d.id;																				// Name
 			o.sex=d.data.match(/sex=(.+?)\W/)[1];													// Get sex
 			o.base[0]=d.data.match(/,b=(.+?)\D/)[1]-0;												// Get variant B
@@ -362,6 +364,8 @@ class App  {
 			o.seat=d.data.match(/seat=(.+?)\D/)[1]-0;												// Get seat
 			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
 			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set skin
+
+if (this.dan) o.tex="#ffffff",o.src="assets/body3.dae";	// *DAN*
 			if (o.id != "Class") {																	// Only students
 				this.students.push(o); 																// Add to students array
 				this.studex[o.id]=this.students.length;												// Add index finder 
@@ -449,8 +453,8 @@ class App  {
 		if (act == "pair") {																		// If pairing
 			let who=this.nlp.GetWho(remark,false,true);												// Get student's mentioned											
 			if (who && app.curStudent == who[0]) 	return;											// Quit if only 1 student mentioned
-			let seat1=who[0] ? app.students.find(x => x.id == who[0]).seat : 0;						// Get mentioned seat number
-			let seat2=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get current student seat number
+			let seat1=who[0] ? app.students.find(x => x.id == who[0]).seat : 0;						// Get mentioned student index
+			let seat2=app.curStudent ? app.students.find(x => x.id == app.curStudent).seat : 0;		// Get current student student index
 			animateIt(who[0],"twist"+((seat1 < seat2) ? "Right" : "Left"));							// Animate mentioned	
 			animateIt(app.curStudent,"twist"+((seat1 < seat2) ? "Left" : "Right"));					// Animate current
 			return;																					// Quit	
@@ -462,9 +466,9 @@ class App  {
 			animateIt(app.curStudent,act);															// Animate that one	
 
 		function animateIt(student, act) {															// ANIMATE STUDENT
-			let seat=student ? app.students.find(x => x.id == student).seat : 0;					// Get seat number
-			if (act == "fidget")			app.students[seat].fidget=1;							// Fidget								
-			else if (act == "fidgetStop")	app.students[seat].fidget=0;							// Off	
+			let s=app.studex[student]-1;															// Get student index (it's 1-based)
+				if (act == "fidget")			app.students[s].fidget=1;								// Fidget								
+			else if (act == "fidgetStop")	app.students[s].fidget=0;								// Off	
 			else 							app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+act); 	// Send response
 			}					
 	}
@@ -565,8 +569,10 @@ class App  {
 		//LOOK DOWN
 
 
-		for (i=0;i<10;++i)																			// For each desk
+		for (i=0;i<10;++i) 																		// For each desk
+if (this.dan) 		this.desks.push({ id:"desk"+i, src:"assets/desk3.dae", seat:3, s:20, tex:"0xdddddd"} ); else	// Add desk *DAN*
 			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/deskskin.png" : 0xdddddd} );	// Add desk
+
 		this.LoadModels();										  									// Load 3D models
 	}
 

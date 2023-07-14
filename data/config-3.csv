@@ -1,24 +1,24 @@
 type,id,text,data
-student,Sharleen,"sharleen,charlene,shar,charlie","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=0,"
-student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=1,"
-student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=2,"
-student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=3,"
-student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,"
-student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,"
+student,Sharleen,"sharleen,charlene,shar,charlie","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=9,"
+student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=8,"
+student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=7,"
+student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=6,"
+student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=1,"
+student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=2,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children,friends","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
 session,data,"trt=300,",
 string,multi,"Start,Explain,Question,Discover,Reflect	",
 string,variance,"Belonging,Academic,Knowledge,Thinking										",
 seat,0,"x=250,y=125,z=0,r=-25,",
-seat,1,"x=150,y=100,z=0,r=-15,																							",
-seat,2,"x=50,y=75,z=0,r=-5,",
+seat,1,"x=250,y=-100,z=0,r=-15,																							",
+seat,2,"x=30,y=200,z=0,r=-25,",
 seat,3,"x=-50,y=75,z=0,r=5,",
 seat,4,"x=-150,y=100,z=0,r=15,",
 seat,5,"x=-250,y=125,z=0,r=25,"                                                  
 seat,6,"x=-200,y=-100,z=0,r=0,"
 seat,7,"x=-100,y=-100,z=0,r=0,"
-seat,8,"x=0,y=-100,z=0,r=0,"
-seat,9,"x=250,y=-100,z=0,r=30,"
+seat,8,"x=0,y=-100,z=0,r=70,"
+seat,9,"x=150,y=-100,z=0,r=-90,"
 
 resource,Identifying differences,assets/identifying.pdf
 resource,Questions for your teaching,assets/questions.pdf

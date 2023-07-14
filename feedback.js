@@ -60,7 +60,7 @@ class Feedback {
 					}
 				}
 			v[0]/=counts[0];	v[1]/=counts[1];	v[2]/=counts[2];	v[3]/=counts[3];			// Calc bar means
-			str+=`<img src="img/totals.png" style="position:absolute;left:-12px;">`;							// Label
+			str+=`<img src="img/totals.png" style="position:absolute;left:-12px;">`;				// Label
 			for (i=0;i<4;++i) {																		// For each factor
 				str+=`<div style="height:13px;color:#fff;font-size:9px;margin:0 0 1px 2px">
 				<div style="border-radius:9px;display:inline-block;text-align:center;background-color:${app.fb.cols[i]};
@@ -94,9 +94,9 @@ class Feedback {
 				str+=`><div id="${prefix}vdot${i}${j}" class="lz-vardot": style="border:1px solid ${app.fb.cols[i]}60`;// Add dot frame
 				if (prefix)	str+=";cursor:pointer";													// Pointer?
 				if ((1<<j)&c[i] ) str+=`;background-color:${app.fb.cols[i]}`;						// Color it?
-				str+=`;width:15px;height:15px">${(c[i] == 1) ? "-" : ""}</div></td>`;				// Finish dot
+				str+=`;color:#000;width:15px;height:15px">${!j ? "-" : ""}</div></td>`;				// Finish dot
 				}
-			str+=`<td style='padding-left:8px;color:${app.fb.cols[i]}'>${labs[i]}</td></tr>`;				// Add label and end row
+			str+=`<td style='padding-left:8px;color:${app.fb.cols[i]}'>${labs[i]}</td></tr>`;		// Add label and end row
 			}
 		str+=`</tr></table>`;
 		return str;

@@ -57,13 +57,14 @@
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
 	let ws=null;																					// Socket server				
-	let aiType="wit";																				// AI type
+	let aiType="dialog";																			// AI type
 
 	let modelName="Fiction";																		// AI Model to use
 	let witToken={};
 	witToken.Space=  "ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");				// Space service access token
-	witToken.Fiction="VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z".replace(/-X-/g,"");				// Diction service access token
-
+	witToken.Fiction="VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z".replace(/-X-/g,"");				// FB fiction service access token
+	witToken.Fiction="AH7-X-LA4QMUA-X-K6C4JCH7V7SH6-X-ULUGH6WTE".replace(/-X-/g,"");				// Fiction service access token
+	
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
 		InitSocketServer();
@@ -230,6 +231,10 @@ return;
 			TrainWit(e);																			// Load and train data	
 			return;
 			}
+		else if (aiType == "dialog") {
+			TrainDialog(e);																			// Load and make training data	
+			return;
+			}
 	}
 
 	async function TestData(e)																	// TEST DATA
@@ -326,10 +331,17 @@ return;
 			};
 	}
 
-	let df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASC-X-BKYwggSiAgEAAoIBAQDIyWCZN4wQuQio\noIeCoXzIwwLvS5Q55HKo-X-w/xMqm5mXntySbZ/DnSFis5Nca/emZx9YAc1DpiMil/t\neyOhPseFWx77riq9YqnACKMxfeeADUEJTof+OOxJ/d+bJEDmyN/zAfGHOYCmzdea\nBB9LWgfegeSpN7pmHudtdy/4geNuwBcGV5VMJfrp1rvwGlPBi0jSisQ7y0oaBDbl\ntHB8zbqGfHi5usq87ghy8V1Ax3pilp+DcnSN+84h/tgQGeDh8p4nnXXTACCvQc30\nbmaMbDEuBEikoPjzRxTozPQblp910QvsAaIG7KQb+5hEb5jHjGrDbNUqIkfshKQj\nkW897VatAgMBAAECggEAQgz06RI70lh8P7SnP1LOUODN+1g6h5zeFyR5v+Kk9KoK\nI/uZvExOCowx94n5l9migB/x3wNRLZJrohzLCMU1L2pdU9/kkW5+dvygaqyHVjmF\n9oDN/dRN7r1ELK4NZ54XBcLS6HADIVw/m5vVi50vT4Qda4k4mVV7PihiMHbSEWEs\nOpnMpoIwNgMY3iTWN+fD113xrdkVwEZ9ZeWmvblizaEzjEUhLBGfkpX8huBmFon8\nCb/hTuNFP4IIxXv9O2w88x4NgF+8hB4cAP8rS7R3Hs6mpcQhlSJpYKZZFduNFKPE\nAFH3p1A7ooj+dKePawJhg/kti91jkFzC+JzzZAUKZQKBgQDou8xlf5WeDiXfiOHK\nIHNoFTxTFjJzMItxhrlKZr5WFeI8zryZ0Kcnd4JCw+vhYhPkS2UCieOPSm04oD8o\nTO/1xqRR1sYtpgBQmPzdAzoSU+70r3P3E4USAmSo8SYCNGrwjWGcB36bVQzldSoy\nNE/XGVZ6C1j2MPQ7dGO7JaaclwKBgQDc2/scmz1XHtY+MqUBgRqWmB5NeomP2fL2\nXDOs2BwjoRXnWtRscmmUfylvYR6/baKtr3BJgNohAR0t4D+S1yIe1WC5tFL4Um4l\n13gu9aW+WHEBNkYbC2uJMtulBFDHnvuWBOoYoBd4eGlWWRK+YScgHEl4EcvtMfW0\nlLkrDYZbWwKBgGVZwz1APmvCRYP/HDTlxNxCwy57sCSxs0gRH4fjDmh2xzsr3L4v\nO1vYk4V3xLU1/OuiWa6tVcgE5WOPhXGLb8RcaRqqqUsfy2tN9HBbA2MP4jP0ZE/o\n1D5vhF5+BctYAGoZZ7SHHv+OHjuetm1+knZdtmcXofo0f2eU3AmX7+KpAoGASleR\n0zM+FpE+tHj/qd33QTG7IYFZxJ4sdlja3BdygVu7r8CXOFnayC11mRQr8WvKEoS3\nW0aQJgPl+oc9XwQjbBWPFXNpakT05q/8uHHfdI74mtvWBUx2yhvga09kkY0mSn0k\n/10ECX0el/4rnQG+1cQvxsbWyeTDPCHDooZO73kCgYAMprTRXFc3IkT82cwfcWmY\n6TzfzmWmqxR41fjORQqr6bh/8B8GHvAXdl2DeKw6SoUl+CLylA2ucAuFmq70+m8i\nR6922rx3ThmaPBUlN//i2a-X-RYyHRbERwTJ0q2Gmw35qhfKGzhrML3pHjtjJmSpYp1\np0yznBeNUd/Dekkm-X-NNhrHQ==\n-----END PRIVATE KEY-----\n",
-			 email:"liza100s@liza-100s-mmhi.iam.gserviceaccount.com",
-			 id: "liza-100s-mmhi"
+	let df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDNg4lVhiuu5Bgy\nimKeyXmb24phJg3yDHZI1YV/SlUq6ZzEX/tgQCPrzHzn6REr4rnbq3Jx54Hi3Wrw\nQY5EDAcSRQPK/6eDFAA1kibsYdlyaeQeUm/qs5cK2vf7c4fIsgGGsCQNzPQZ7Ojp\nwnI7t/+w2LsV1gLprLXDGMkXBRi53OyFExLE9E6ENZMuXdF6dfuD2zuz3Afw43Ej\nxnnqff3o722yWunSo5V22aDmVKVis2lZ1QnRZnqRIHZ/KzzrkTn+A8UnAFwWLAqR\nfff38P4i1bltJyJj0NAGdPqH6Wqv+HwtvV9PvKa01cJQZPzwiQcj9weTCyQOEnhS\nV4bNPzFlAgMBAAECggEAVlBpbK8WR7Tq6McwVmpeFfSl8Nlvv/o1768mC2knzgch\n3WRGio1FyPIwf6JmoNzvnHAsd+R4q9S85j1SSAgZLDYqOqcXLrlGwTkp+du63Q/W\nTFnpQVS+GkQPJN/H5qXEeFIgQl+TIhRbWlpdafGEhTzxjmE9BfGQwWj2hCGS2fRL\n+i8c0L3R4wPkIW/TuuoqzhnQXXyHRhHba1H3LY+jLWcg48LVFUg8m0k+73AIN/wF\nD6cA8B9OmG/mux5tDOTLxABv8TrjwrPrnnRDDqgLskPHuDGhnOP4WMpYQ3jut4So\n6P0on5oRIKflLLefogTVjxO0wIEZrCgXDMn5Ynd9HQKBgQDpjwxUMo2GhDCdUSdr\nz3kufO6HUUtdkgqHsvsvVB7HctQ3Gc3pFkZC9dMcWUlWZOUS7HTOHrNraimjdu5J\nnVcmMOShUJNm9TEe1Q81B9qo2B7o0+6MHqmLdDFiNT9HaJlWYmknGCiInoqTRvL7\n/aCRkPDA8pVNky/P4oMBSMBh4wKBgQDhQqdIXxfgzA8M3I1zFPNaotNPP0LIwmjO\niD8p0Px6yJAZ1uB/AmxaZ5lRI9XvduXnrabpnAWwTCJZiaxvgNekgJ88+JRAuAjl\njpTmDGqAKjaYru9MvmZ9yoRkXKk0u12eS+s/NqH/ILqR2bdiGOpXiLnrVG3Rq1Dl\nfyOHYgTiFwKBgQC1FQ++CCPqc3stvcoOsKGIBZz6lXEVbzFy3LYbj+D9Sm52+i7H\n1VlMeUPg6ukNbtScw3Acj3kUgw8digxeTvtOxQG+gLaIUPpwqUhNGXXTCx2L7yU4\nxl01njTbq+UP/G1GqK5WfUiQBDv0zEGAVrizo+jF8E8KAmBDkZ9402s1eQKBgQCQ\nMDgf7S69qCDiHLM2POzg0WTtTxMSqs6nlTLJM4rJlWQYBiFBa22sGLBc7dFdLQBQ\n4ij7U/GYPcOnCKcl4JUoKWTEhGFxY9veBPxunPf2/g5ggWmP+DhmwKEqFN4CcQSl\n9PaqSfA7/NkvzurBki0+xrgrWKnLEhwAKve1CxsRFQKBgQC6SQ9FjLHrPgODWWhI\nGQaQV5IUtCLCopbkLz4iIDtkVCHBJPjObM+LS6UCY863pEmVe+p+vjAI8FAK4qYB\nWrNFpx7KlpFR39B5n2DVvldLM8/3blEjg/DynxqMe5JcymDHnDEed4RnM7B2D9RX\n0JFxGQCsnmGUPtv/h6gQtls+TQ==\n-----END PRIVATE KEY-----\n",
+			 email:"bferster@newagent-xjie.iam.gserviceaccount.com",
+			 id: "newagent-xjie"
 			}
+
+		 df={  	key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCp7dXa4UdFsxO7\n6DouG+FnardYxALs0L4S/batUCKFuedXF29EJXn4hEF4E1Q/DnEB9vjuycT6CINd\nj5AdiStJRpytSqd+XlVVtpVEx18qLh+2Hg7tiUqc6oZSlqwdyhhICmanlSRQ+aIl\nAj2qJR7ZXCK5+iqlT9N9ddHj/52qImyn5AuZMGAH2WoWu74nF/A3kMAwV0B0ASO7\nBI9h3QlhsUdn+gy5H8HHOyORljOD5GCKKT86DFo8MsciYPPd+uFrorfxYQrt3ikN\nGso3Q2W3D23Voxt/eaPM1a20qTuA76nX4Gl1LsJEzQBqDPzdRKwgVIGhaKE8Lbxs\nWOG3I4mXAgMBAAECggEAG36sF5pT2ec7zi+pGkTQl9cgi3BLuN2do50BrdFFhLWr\nxN+51SDrN1bO8QrPmtRPXK4FYT2sbXhrKPxNqTnEkzqlpzRpHX1N+Wxtgo9vyndk\nEieS6sRIGlOoIDzY5IkKnL1yFrN/CMsbfTl7mMgg0bKiu8zKkaz031vs9iMp85kS\n0eXyTiCri4NP3agvVEErKEBox2hqf8iTVA98k/wl5Ip4oyJygZ5T//K8s/7PaedT\nJKjOTf+Ycax6NyZEK4hOfISTCtzBYgWW6OHclFIsFABMD1d9RhTNI1dsBYmCOrbx\n+66NYdE6m2RDQXxOCwmFAETBChyjtrkOsAnVxdRZAQKBgQDUd0eT8HVLC1YcsRdy\nnvlIQIt8ZtmgvIeGRtc2EcSWC2aN1Jl7f+pRwTFi3EEDpTId8AJ87hLXkmL2e/Bn\nr5L7hrew/4FKaSO9f3zPDovU7tPl4SDZFP5MB8jn7k11we7FjSI2Ggq/1S2nhtHt\nzgD66Mn/qTT+6khLqdwiAzSAIQKBgQDMv1G4Kg8m2M+CSuQy5X0EP78JFBvBUTuL\nL+7CAS62VpKjnbtlxD7ctBU6gqWLl3XIo1OXWmnzz0H11mwGfRjCuUrVITJoYcuu\n5cO0IR5NtkMP1YWHIkvBBlDeLudqGStEmk0w7tNdlKKRDC+UJTIdtyki4Mq3xfOa\nEGeOjuWytwKBgQCzBbJtKB5c1jd/w4QjU2pug9xEPRFAy7pR3Rz3dS800nReK3YL\nxrN0oZlwWG/7l1VMPnCKPbvoonL6h2IAq8LoZxIedJvHTCIOSP6sJPCTwY0QVIpt\n/69p9uFE89mW0IrVMF9UQMsv6nsmfoYinwLaaA3UewmphVTXVE+k5Rh2oQKBgGuT\nslozLxbYH99zfgcH8PHElJkuiY6/Iav2GVqxyFthjVaOT6IexHCt5eGCN3zqraYn\nuonxpW3G3f9PFB8sp0/Yj2sAMD4L9DsG2hbQt91ZAE9XfvsLmAXpTaAPwONMKiG3\neQtW0JOAvxG691y9VmGqlOCQf7KjPWUbbW3HwwRtAoGBALtfl/cgAnTAJrVsBUaz\nFR9weZu4OyMHwKLhh2umaP0GDdJ3ID4KHo6Fomz5Mudlp0LZc1AycNleRNh3NA1q\nuP9y3UxVx1iDoivARgR0o/MEayLVZdbI227dQ9dzbgYaiPY6D+gPh90kUs5XCqmA\ntmvqgXLx8oPg5c6OOtlxzfHr\n-----END PRIVATE KEY-----\n",
+  				email: "newagent-xjie-iam@newagent-xjie.iam.gserviceaccount.com",	
+				id: "newagent-xjie"
+	
+			}
+
 
 	async function InferIntents(msgs, callback)													// GET RESPONSE FROM AI
 	{
@@ -405,102 +417,6 @@ return;
 		return "";																					// No previous response
 	}
 
-	function MakeStories(mask)																	// MAKE ALL FILES
-	{
-		let ints=[],doms=[],sess=[],dupes=[];
-		let rType,keys=[],resps=[];
-		let i,inc,o,c,ss,re,who,id,sid,tot;
-		let test=$("#lz-holdOut").val()/100;														// Percent to test
-		let level=$("#lz-series").val();															// Level of intents
-		let num=$("#lz-num").val();																	// Max per intent
-		
-		for (i=0;i<rawData.length;++i) {															// For each line
-			o=rawData[i];																			// Point at it
-			if ((o.intent < 180) || ((o.intent > 181) && (o.intent < 250))) continue;				// Cull 0-250
-			if (nlp.Tokenize(o.text).length < 4)			continue;								// Skip if short
-			if (level == "Decimals") 		id=o.intent;											// Make full intent id name
-			else if (level == "Tens")		id=Math.floor(o.intent);								// Cap at 10s					
-			else							id=Math.floor(o.intent/100)*100;						// Cap at 100s
-			
-			sid="session-"+o.rerid;																	// Session id
-			if (!sess[sid]) 			  	sess[sid]=[];											// Alloc session holder
-			if (o.speaker == "Teacher") {															// If remark
-				keys=nlp.Tokenize(o.text).filter(value => keyWords.includes(value));				// Get keys mentioned
-				if (id < 100)	continue;															// Skip if uncoded
-				id="r"+id;																			// Prefix id
-				if (!ints[id]) ints[id]=[];															// Alloc intent holder
-				sess[sid].push("  - intent: "+id+"\n");												// Add intent to story
-				ss=nlp.CleanRemark(o.text,FindPreviousResponse(i));									// Get clean text
-				who=nlp.GetWho(o.text);																// Get who
-				ints[id].push("    - "+ss.trim());													// Add it
-				} 
-			else{																					// Response
-				rType="agree";
-				if (isNaN(id)) {																	// Ignore numbered responses for now
-					resps.push( { intent:id,text: o.text.trim().replace(/:|"/g,""),keys:keys,type:rType,turn:Math.floor(i/2),speaker:who.split(":")[1] });
-					sess[sid].push("  - action: utter_r"+i+"\n");									// Add response to story
-					doms.push(`\n  utter_r${i}:\n  - text: "${o.text.trim().replace(/:|"/g,"")}"\n`);	// Add to domain file
-				}
-			}
-		}
-
-		for (k in ints)	ints[k]=[... new Set(ints[k])];												// Make unique																		// For each intent
-		let str="version: \"3.0\"\n\nnlu:\n";														// NLU header
-		let v=[],j,str2=str;		
-		for (k in ints)	v.push(k);																	// Make normal array of intents
-		v=v.sort();																					// Sort them
-		for (j=0;j<v.length;++j)	{																// For each intent
-			k=v[j];																					// intent name
-			tot=Math.floor(Math.min(num,ints[k].length)*(1-test));									// Get amount to train
-			inc=Math.max(ints[k].length/num,1);														// Sampling increment, at least 1
-			str+="- intent: "+k+"\n  examples: |\n";												// Add header
-			str2+="- intent: "+k+"\n  examples: |\n";												// Add header
-			for (i=0;i<tot*inc;i+=inc) 																// For each one wanted
-				str+=ints[k][Math.floor(i)]+"\n";													// Get it
-			for (i=0;i<Math.min(num,ints[k].length)-tot;++i) 										// For each test example
-				str2+=ints[k][Math.floor(i+tot)]+"\n";												// Get it
-			}
-		if (mask&1) 			  SaveTextAsFile("nlu.yml",str);									// Write training file
-		if (mask&1 && (test > 0)) SaveTextAsFile("test.yml",str2);									// Write testing file
-
-/* 		ORIGINAL DATA 200-500
-		v=[];
-		for (i=0;i<rawData.length;++i) {															// For each line
-			o=rawData[i];																			// Point at it
-			if  (o.intent < 200) 				 continue;											// Cull 0-200
-			if  (o.intent ==  250.1) 			 continue;											// Cull made up 200s)
-			if  (o.intent ==  550.1) 			 continue;											// Cull made up 500s)
-			if (nlp.Tokenize(o.text).length < 4) continue;											// Skip if short
-			o.tags=nlp.GetIntentTags(o.text) 														// Get intent tags
-			if (o.speaker == "Teacher") v.push(o);													// If remark, add
-			}
-		v.sort((a,b)=>{ return a.intent-b.intent }); 												// Sort
-		let fields=["id","intent","text","tags"];													// Field names
-		str=Papa.unparse(v,{ header:true, skipEmptyLines:true, columns:fields });					// Make CSV using lib
-		SaveTextAsFile("data.csv",str);																// Write file
-*/
-
-/*		DIALOGFLOW	
-		
-		for (j=0;j<v.length;++j) {																// For each intent
-			str="[\n";
-			k=v[j];																					// intent name
-			tot=Math.floor(Math.min(num,ints[k].length)*(1-test));									// Get amount to train
-			inc=Math.max(ints[k].length/num,1);														// Sampling increment, at least 1
-			for (i=0;i<tot*inc;i+=inc) {															// For each one wanted
-				ss=ints[k][Math.floor(i)].slice(6,-1);												// Remove yaml header
-				ss=ss.replace(/"/g,"");																// No quotes
-				ss=ss.replace(/'/g,"\\u0027");														// Escape apos
-				str+=`{ "data": [{ "text": "${ss}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
-				}
-			str=str.slice(0,-2)+"\n]";
-			SaveTextAsFile(k.substr(1)+"_usersays_en.json",str);													// Write file
-		}
-*/
-
-	}
-
-
 	function DeleteTrainingData()															// DELETE TRAINING DATA
 	{
 		if (window.location.host != "localhost") 	return;										// Only local can delete
@@ -508,43 +424,6 @@ return;
 			WitGetUtterances((d)=>{
 				WitDeleteUtternances(d,(r)=>{ trace(r);	});
 				});
-			})
-	}
-
-	async function MakeSession()																// CREATE SESSION FILE
-	{
-		let i=0,o,n=rawData.length,data=[];
-		let speaker,remark="",response="",intent,student;
-		while (i < n) {																				// For each item
-			o=rawData[i++];																			// Point at line
-			if (o.speaker == "Teacher") {															// If a teacher
-				if (!o.intent) continue;															// Skip uncodeds
-				remark+=o.text+" ";																	// Add remark
-				intent=o.intent;																	// Set last intent
-				}				
-			else{																					// A student
-				--i;
-				while (i < n) {																		// Collect all responses
-					o=rawData[i];																	// Point at line
-					if (o.speaker == "Teacher") break;												// Quit at next remark
-					response+=o.text+" ",student=o.speaker;											// Add response and set last student
-					++i;																			// Advance
-					}
-				data.push({ id:o.id,intent:intent,student:student,code:"",remark:remark,response:response} );	// Add to data
-				remark=response="";
-				}
-			}
-		let fields=["id","intent","student","remark","response"];							// Field names
-		let str=Papa.unparse(data,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
-		SaveTextAsFile("session.csv",str);														// Write file
-		Sound("ding");																				// Sound
-	}
-
-	function GetResponse(msg)																	// GET RESPONSE FROM AI
-	{
-		return fetch("https://lizasim.com:5005/model/parse", {										// Fetch data
-			method:"POST",	
-			body: JSON.stringify({text:msg})		
 			})
 	}
 
@@ -634,6 +513,47 @@ return;
 		if (msgs.length) setTimeout(()=>{ WitTrain(msgs, callback) },500);							// Recurse, if not last
 	}
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// DIALOGFLOW
+/////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	function TrainDialog(e)																		// MAKE DIALOGFLOW INTENT FILE
+	{
+		let intent,str,i,s;
+		let file=e.target.files[0];																	// Point at file
+		if (!file) 	return;																			// Quit if bad
+		let reader=new FileReader();																// Init reader
+		reader.readAsText(file);																	// Read file
+		reader.onload=(e)=>{ 																		// When loaded
+			let d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			for (i=0;i<d.length;++i) if (d[i].type == "hold")	d.splice(i,1);						// Remove holds
+			let v=groupBy(d,"intent");
+			for (intent in v) {
+				str="[\n";
+				for (i=0;i<v[intent].length;++i) {													// For each one wanted
+					s=v[intent][i].text.replace(/"/g,"");											// No quotes
+					s=s.replace(/'/g,"\\u0027");													// Escape apos
+					str+=`{ "data": [{ "text": "${s}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
+					}
+				str=str.slice(0,-2)+"\n]";
+				SaveTextAsFile(intent+"_usersays_en.json",str);										// Write intent file
+				}
+			};
+
+		function groupBy(arr, property) {
+			return arr.reduce((acc, cur) => {
+				acc[cur[property]] = [...acc[cur[property]] || [], cur];
+				return acc;
+				}, {});
+			}
+	
+	}	
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// OPENAI
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
 /*
 
 {
@@ -670,6 +590,8 @@ return;
 	  	.then(res => res.json()).then(res =>{ trace(res); })
 	}
 */
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -758,8 +680,6 @@ return;
 				});
 	}
 
-
-
 	function TimecodeToSeconds(timecode) 														// CONVERT TIMECODE TO MILLISECONDS
 	{
 		if (!timecode)	return 0;
@@ -821,32 +741,7 @@ return;
 		v=(`reflect,contemplate,think,consider,interpret,decide,decision,characterize,argue,claim,advocate,suggest,remember,remind,recollect,invoke,
 		theorize,suspect,scrutinize,conclude,conclusion,concede,ponder`).replace(/\t|\n|\r/g,"").split(",");
 		for (i=0;i<v.length;++i) keySyns[v[i]]="key_500";
-		
 		}
-
-	function Test500s()
-	{
-		let i,j,k,o,v,num;
-		trace(Object.keys(keySyns).length)
-
-		for (i=0;i<rawData.length;++i) {															// For each line
-			o=rawData[i];																			// Point at it
-			if (o.speaker != "Teacher") continue;
-			v=nlp.Tokenize(o.text);
-			if (v.length < 4) 			continue;													// Skip if short
-			if (o.intent < 100)			continue;
-			num=0;
-			for (k=0;k<v.length;++k) if (keySyns[v[k]]) num++;
-			o.keyVal=num/Object.keys(keySyns).length;
-			trace(Math.floor(o.intent/100)*100+"\t"+o.keyVal);
-			
-		}
-	}
-
-
-
-
-
 
 </script>
 </body>
