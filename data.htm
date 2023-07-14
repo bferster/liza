@@ -28,10 +28,13 @@
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/logo.png" style="width:25%">
 			<hr>
-			Activity: &nbsp;<select class="lz-is" id="lz-dataset">
-				<option>Fiction</option><option>Space</option>
+			AI: &nbsp;<select class="lz-is" id="lz-aiType">
+				<option>Wit</option><option>Dialog</option>
 				</select>&nbsp &nbsp; 
-			<!--
+			Activity: &nbsp;<select class="lz-is" id="lz-dataset">
+					<option>Activity3</option><option>Fiction</option><option>Space</option>
+					</select>&nbsp &nbsp; 
+				<!--
 				&nbsp &nbsp; Series: <select class="lz-is" id="lz-series">
 				<option>Hundreds</option><option>Tens</option><option>Decimals</option><option>
 			</select>
@@ -57,13 +60,14 @@
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
 	let ws=null;																					// Socket server				
-	let aiType="dialog";																			// AI type
+	let aiType="wit";																			// AI type
 
-	let modelName="Fiction";																		// AI Model to use
+	let modelName="Activity3";																		// AI Model to use
 	let witToken={};
 	witToken.Space=  "ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");				// Space service access token
-	witToken.Fiction="VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z".replace(/-X-/g,"");				// FB fiction service access token
+//	witToken.Fiction="VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z".replace(/-X-/g,"");				// FB fiction service access token
 	witToken.Fiction="AH7-X-LA4QMUA-X-K6C4JCH7V7SH6-X-ULUGH6WTE".replace(/-X-/g,"");				// Fiction service access token
+	witToken.Activity3="CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO".replace(/-X-/g,"");
 	
 	$(document).ready(function() {								           						// ON PAGE LOADED
 		LoadConfig();																				// Load config file
@@ -73,6 +77,7 @@
 		$("#lz-trainData").on("click", ()=>   { if (window.location.host == "localhost") $("#lz-trainFile").trigger("click")}); 	// ON TRAIN DATA		
 		$("#lz-importData").on("click",()=>   { $("#lz-tempFile").trigger("click"); 	});			// ON IMPORT
 		$("#lz-dataset").on("change", ()=>    { modelName=$("#lz-dataset").val()		});			// ON DATASET CHANGE
+		$("#lz-aiType").on("change", ()=>     { aiType=$("#lz-aiType").val().toLowerCase()	});		// ON AI CHANGE
 				
 		$("#lz-tempFile").on("change",(e)=>{														// ON TEMP FILE LOAD
 			ImportCSV(e);																			// Read file
@@ -502,6 +507,8 @@ return;
 		let inference={ text:"", intent:0, confidence:0 };											// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
+		trace(msgs)
+		
 		let body=[{ text:m.text.substring(0,255), intent:m.intent.toLowerCase(), entities:[], traits: [] }];	// Make body
 		const response=await fetch(url, { 															// Send remark to wit
 			  method:"POST",

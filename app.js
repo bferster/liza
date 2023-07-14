@@ -7,8 +7,6 @@ class App  {
 	constructor()   																			// CONSTRUCTOR
 	{
 		app=this;
-		
-this.dan=0;		
 		this.role="Teacher";																		// User's role in simulation
 		this.sessionId="2";																			// Session id
 		this.activityId="2";																		// Activity id
@@ -17,6 +15,7 @@ this.dan=0;
 		this.poses=[];																				// Holds poses
 		this.seqs=[];																				// Holds pose sequences
 		this.desks=[];																				// Holds desks	
+		this.deskModel=""
 		this.animateData=[];																		// Holds animation data
 		this.students=[];																			// Holds students	
 		this.studex=[];																				// Student name to index array
@@ -179,9 +178,11 @@ this.dan=0;
 					else if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
 					else if (d[i].type == "string")   this.strings[d[i].id]=d[i].text;				// Strings
 					else if (d[i].type == "seat")  	  this.sc.AddSeat(d[i]);						// Add seat position
+					else if (d[i].type == "desk") 	  this.deskModel=d[i].id;						// Desk model
 					else if (d[i].type == "session") {												// Session settings
 						if (d[i].id == "data")		  this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];	// Get trt
 						}
+
 					else if (d[i].type == "dialogflow") {											// Dialogflow settings
 						if (d[i].id == "key")		  this.df.key=d[i].text;						// Add params
 						if (d[i].id == "id")		  this.df.id=d[i].text;							// Add params
@@ -363,9 +364,11 @@ this.dan=0;
 			o.base[4]=d.data.match(/,u=(.+?)\D/)[1]-0;												// U
 			o.seat=d.data.match(/seat=(.+?)\D/)[1]-0;												// Get seat
 			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
-			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set skin
-
-if (this.dan) o.tex="#ffffff",o.src="assets/body3.dae";	// *DAN*
+			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set default skin
+			if (d.data.match(/mod=(.+?)\W/)) {														// If model spec'd
+				o.src="assets/"+d.data.match(/mod=(.+?)\W/)[1]+".dae";								// Use it
+ 				o.tex="assets/avatar3.png";
+				}
 			if (o.id != "Class") {																	// Only students
 				this.students.push(o); 																// Add to students array
 				this.studex[o.id]=this.students.length;												// Add index finder 
@@ -568,11 +571,9 @@ if (this.dan) o.tex="#ffffff",o.src="assets/body3.dae";	// *DAN*
 		//WTF
 		//LOOK DOWN
 
-
-		for (i=0;i<10;++i) 																		// For each desk
-if (this.dan) 		this.desks.push({ id:"desk"+i, src:"assets/desk3.dae", seat:3, s:20, tex:"0xdddddd"} ); else	// Add desk *DAN*
-			this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/deskskin.png" : 0xdddddd} );	// Add desk
-
+		for (i=0;i<this.sc.seats.length;++i) 														// For each desk
+			if (this.deskModel)	this.desks.push({ id:"desk"+i, src:"assets/"+this.deskModel+".dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/desk3.png" : "assets/desk3empty.png"} ); 
+			else				this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/deskskin.png" : 0xdddddd} );	// Add desk
 		this.LoadModels();										  									// Load 3D models
 	}
 
