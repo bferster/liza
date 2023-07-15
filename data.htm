@@ -507,9 +507,7 @@ return;
 		let inference={ text:"", intent:0, confidence:0 };											// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
-		trace(msgs)
-		
-		let body=[{ text:m.text.substring(0,255), intent:m.intent.toLowerCase(), entities:[], traits: [] }];	// Make body
+		let body=[{ text:m.remark.substring(0,255), intent:m.intent.toLowerCase(), entities:[], traits: [] }];	// Make body
 		const response=await fetch(url, { 															// Send remark to wit
 			  method:"POST",
 			  headers: { Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'}, 

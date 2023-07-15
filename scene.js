@@ -8,7 +8,7 @@ class Scene {
 	{
 		this.seats=[];
 		this.lastTime=0;																			// Used to throttle rendring
-		this.cartoonScene=window.location.search.match(/real/i) ?  true : false;					// Render scene as cartoon?	   		
+		this.cartoonScene=window.location.search.match(/real/i) ?  false : true;					// Render scene as cartoon?	   		
 		this.models=[];																				// Holds models
 		this.container=$("#"+div)[0];																// Div container														
 		this.camera=null;																			// Camera object

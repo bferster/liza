@@ -113,28 +113,27 @@ class NLP {
 
 	AddResponses(d)																					// ADD RESPONSES FROM CSV DATA
 	{
-		let i,k,o;
+		let i,o,s;
 		this.responses=[];																				// Fresh
 		for (i=0;i<d.length;++i) {																		// For each line
-			if (!d[i]["Student"])	continue;															// Skip if no student
-			o={ bakt:[]};																				// Init object
-			k=d[i]["Student"].split(" ")[0];															// Get first name
-			if (!this.responses[k]) this.responses[k]=[];												// Add base array
-			o.bakt[0]=getVariant(d[i]["Belonging (200)"]);												// Get B factor
-			o.bakt[1]=getVariant(d[i]["Academic Language (400)"]);										// A
-			o.bakt[2]=getVariant(d[i]["Knowledge (400)"]);												// K
-			o.bakt[3]=getVariant(d[i]["Thinking (500)"]);												// T
-			o.bakt[4]=getVariant(d[i]["Understanding (300)"]);											// U
-			o.bakt[5]=d[i]["Intent"];																	// Intent
-			o.text=d[i]["Response"];																	// Get response
-			o.label=d[i]["Response category"];															// Get response category
-			if (d[i]["Type of Student Response"]) o.type=d[i]["Type of Student Response"];				// Get type
-			o.intent=d[i]["Intent"];																	// Get intent
-			o.MP3=d[i]["MP3"];																			// Get mps file, if any
-			o.action=d[i]["Student Physical Action"];													// Get action
-			o.index=this.responses[k].length;															// Add index
-			this.responses[k].push(o);																	// Add to list
-			}
+			s=d[i]["student"];																			// Get student
+			if (!s)	continue;																			// Skip if no student
+			o={ bakt:[] };																				// Init object
+			if (!this.responses[s]) this.responses[s]=[];												// Add base array
+			o.bakt[0]=getVariant(d[i]["valued"]);														// Get B factor
+			o.bakt[1]=getVariant(d[i]["language"]);														// A
+			o.bakt[2]=getVariant(d[i]["knowledge"]);													// K
+			o.bakt[3]=getVariant(d[i]["thinking"]);														// T
+			o.bakt[4]=getVariant(d[i]["understanding"]);												// U
+			o.bakt[5]=d[i]["intent"];																	// Intent
+			o.text=d[i]["response"];																	// Get response
+			if (d[i]["ResponseType"]) o.type=d[i]["ResponseType"];										// Get type
+			o.intent=d[i]["intent"];																	// Get intent
+			o.MP3=d[i]["mp3"];																			// Get mps file, if any
+			o.action=d[i]["action"];																	// Get action
+			o.index=this.responses[s].length;															// Add index
+			this.responses[s].push(o);																	// Add to list
+		}
 
 		function getVariant(v) {																		// GET VARIENT FROM RESPONSE
 			if (!v)						return 0;														// Not set
@@ -150,18 +149,19 @@ class NLP {
 		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0], MP3:"" };										// Default response
 	trace("getresponse",o,intent)
 		if (student == "Class")	student="Chris"
+		
 		if (!(i=app.studex[student])) 	return res;														// Quit if not a valid student
 		--i;																							// Zero base
-		if (this.intentCaps.cap400 && (app.students[i].highestIntent == 400)) intent=Math.max(intent,400); 	// At least 400	if last intent was 400+			
-		if (this.intentCaps.cap500 && (app.students[i].highestIntent == 500)) intent=Math.max(intent,500); 	// 500+				
+//		if (this.intentCaps.cap400 && (app.students[i].highestIntent == 400)) intent=Math.max(intent,400); 	// At least 400	if last intent was 400+			
+//		if (this.intentCaps.cap500 && (app.students[i].highestIntent == 500)) intent=Math.max(intent,500); 	// 500+				
 		if (intent < 600)																				// If an AI generated intent
        		app.students[i].highestIntent=Math.max(app.students[i].highestIntent,intent);				// Set student's highest intent	
 		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
 		if (intent == "ANDYOU") {																		// Ask another student same question as before
 			student=app.curStudent;																		// Redirect to new student
 			res.intent=intent=lastIntent;																// Use last intent
-		trace("andyou",lastIntent)	
-		}
+			trace("andyou",lastIntent)	
+			}
 		o=app.nlp.responses[student];																	// Isolate student
 		if (!o || (student == "Class"))	return res;														// Null response
 		for (i=0;i<o.length;++i) {																		// For each response
@@ -174,6 +174,7 @@ class NLP {
 			else if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);							// Add full intent
 			}
 		i=Math.floor(Math.random()*d.length);															// Pick random match 
+	trace("response",d[i] ? d[i] : res)
 		return d[i] ? d[i] : res;																		// Return response object
 	}
 

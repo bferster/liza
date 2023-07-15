@@ -402,7 +402,7 @@ class App  {
 			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
-				trace("infer",intent);
+				trace("infer",intent,text);
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				this.lastIntent=intent;																// Save last intent
 				app.SendEvent(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
