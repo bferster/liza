@@ -8,7 +8,7 @@ class Scene {
 	{
 		this.seats=[];
 		this.lastTime=0;																			// Used to throttle rendring
-		this.cartoonScene=window.location.search.match(/real/i) ?  false : true;					// Render scene as cartoon?	   		
+		this.real3D=window.location.search.match(/real/i) ?  true : false;							// Render scene as cartoon?	   		
 		this.models=[];																				// Holds models
 		this.container=$("#"+div)[0];																// Div container														
 		this.camera=null;																			// Camera object
@@ -18,9 +18,9 @@ class Scene {
 		this.outliner=null;																			// Outline renderer
 		this.floor="assets/wood.jpg";																// Floor texture
 		this.backWall="assets/blackboard.png";														// Back wall texture
-		this.frontWall=this.cartoonScene ? "" : "assets/blackboard.png";							// Front wall texture
-		this.leftWall= this.cartoonScene ? "" : "assets/windowwall.png";							// Side wall texture
-		this.rightWall=this.cartoonScene ? "" : "assets/windowwall.png";							// Side wall texture
+		this.frontWall=!this.real3D ? "" : "assets/blackboard.png";									// Front wall texture
+		this.leftWall= !this.real3D ? "" : "assets/windowwall.png";									// Side wall texture
+		this.rightWall=!this.real3D ? "" : "assets/windowwall.png";									// Side wall texture
 		this.aniTimer=0;																			// Timer for talking and fidgeting
 		this.Init();																				// Init 3D system
 	}
@@ -28,7 +28,7 @@ class Scene {
 	Init()																						// INIT 3D SYSTEM
 	{
 		this.scene=new THREE.Scene();																// Alloc new scene
-		if (this.cartoonScene) 	this.scene.background=new THREE.Color(0xffffff);					// White background
+		if (!this.real3D) 	this.scene.background=new THREE.Color(0xffffff);						// White background
 		this.manager=new THREE.LoadingManager();													// Loading manager
 		this.textureLoader=new THREE.TextureLoader();												// Texture loader
 		this.AddCamera(0,150,500);																	// Add camera
@@ -80,7 +80,7 @@ class Scene {
 	AddRoom()																					// ADD ROOM TO SCENE
 	{	
 		var _this=this;																				// Save context
-		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,this.cartoonScene);	// If a floor spec'd
+		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,!this.real3D);		// If a floor spec'd
 		if (this.frontWall) 	addWall(0,128,512,0,Math.PI,0,256,this.frontWall,0,0);				// If a front wall spec'd
 		if (this.backWall) 		addWall(0,128,-512,0,0,0,256,this.backWall,0,0);					// If a back wall spec'd
 		if (this.leftWall) 		addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0,0);			// If a left wall spec'd

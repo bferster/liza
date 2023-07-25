@@ -1,46 +1,33 @@
-intent,student,response,valued,language,knowledge,500,action,understanding,responseType
-200,Chris,"I recently read, The Chronicles of Narnia, to my younger sister. The book made me think about wrong and right, and nature, too.",3,2,3,2,Talk,,Tell
-200,Chris,My dad and I just got into the Harry Potter books. We're kind of late to the party!,3,2,1,2,Talk,,Tell
-200,Chris,"We watched, Charlotte's Web, that is a book. It's a made-up story about friendships.",3,2,3,3,Talk,,Tell
-200,Farrah,I've been reading A Wrinkle in Time. I thought they did a pretty good job with the movie.,2,2,2,1,Talk,,Tell
-200,Farrah,"I like the magic in The Lion, the Witch and the Wardrobe, by C.S. Lewis.",2,1,1,0,Talk,,Tell
-200,Farrah,I think the Diary of a Wimpy Kid is so funny.,2,1,1,1,Talk,,Tell
-200,Jazmin,I like to read National Geographic Kids. They have some great articles about how we can take care of our planet and what animals are endangered because people are destroying their habitats.,2,3,3,2,Talk,,Tell
-200,Jazmin,"I like adventures to different times and places, like the Magic Tree House series.",2,2,2,2,Talk,,Tell
-200,Jazmin,I love stories of real people and things that happened.,2,2,3,2,Talk,,Tell
-200,Luis,I read the cafeteria menu everyday. I'm always waiting for them to bring the chicken sandwich back.,1,1,2,2,Talk,,Tell
-200,Luis,I like to read signs on the street. It lets me know what's happening. I read about a lost dog this morning that I am going to watch out for.,1,3,3,3,Talk,,Tell
-200,Luis,"I like to read manuals and then match them up to the youtube video, if I can.",1,3,2,3,Talk,,Tell
-200,Oliver,"I like the Percy Jackson books, but not the graphic novels. You can't really use your imagination when they give you all the pictures, especially when it's not like how I imagined it when I was reading the books.",2,3,3,3,Talk,,Tell
-200,Oliver,I've been enjoying the The Chronicles of Narnia series. Who wouldn't like to live in a world full of talking animals?,2,2,2,1,Talk,,Tell
-200,Oliver,I like the Series of Unfortunate Events books because of the mystery.,2,3,2,2,Talk,,Tell
-200,Sharleen,Oh I can answer that easily. I love the Vampire Diaries because it's so romantic.,2,2,1,2,Talk,,Tell
-200,Sharleen,I read the whole Percy Jackson and the Olympians series.,2,1,1,1,Talk,,Tell
-200,Sharleen,I love Harry Potter because of the magic and the way the friends take care of each other!,2,2,1,3,Talk,,Tell
-200,Chris,I like both fiction and non-fiction.,2,1,1,2,Talk,,Prefer
-200,Chris,I like both but I think fiction is a little more interesting.,2,2,2,1,Talk,,Prefer
-200,Farrah,I don't like non-fiction much,2,1,1,1,Talk,,Prefer
-200,Farrah,"For me, I like fiction.",2,1,1,1,Talk,,Prefer
-200,Jazmin,I like non-fiction just fine!,2,1,1,1,Talk,,Prefer
-200,Jazmin,"I like reading about real events, so I would say non-fiction but I do like some fiction too",2,2,3,2,Talk,,Prefer
-200,Luis,"I'm not sure, but I like to read lots of signs and manuals.",1,1,2,2,Talk,,Prefer
-200,Luis,I think I prefer non-fiction,1,1,1,1,Talk,,Prefer
-200,Oliver,I like some kinds of non-fiction but I think fiction is better.,1,1,1,1,Talk,,Prefer
-200,Oliver,I like fiction more. ,2,1,1,1,Talk,,Prefer
-200,Sharleen,I like fiction. Non-fiction is too boring.,2,1,1,1,Talk,,Prefer
-200,Sharleen,Fiction is my favorite. I don't really like non-fiction.,2,1,1,1,Talk,,Prefer
-500,Farrah,"I think nonfiction feels like schoolwork and I'd rather read for fun, not work.",2,2,3,3,Talk,,Think
-500,Farrah,Fiction just seems more fun to me because I can read about magic.,2,2,3,3,Talk,,Think
-500,Jazmin,Good question! I like both but I really like nonfiction when the topic is animals and our planet.,2,2,2,2,Talk,,Think
-500,Jazmin,I like to read about adventures which is like I sometimes like fiction but I prefer non-fiction because I like learning about real people.,2,2,3,3,Talk,,Think
-500,Chris,I like mostly fiction but I'm into space travel so I guess if it's a book about astronomy then I'm into that.,2,3,3,3,thank,,Think
-500,Luis,"Give me action stuff anyday. Wait, nonfiction books are about real people. I read minecraft blogs.",2,2,2,2,Talk,,Think
-500,Luis,I like reading about things I can use in my daily life so I guess that's why I prefer non-fiction.,2,2,2,3,Talk,,Think
-500,Chris,I like fiction alot,2,1,1,1,Talk,,Think
-500,Oliver,"Hmm, I guess I prefer fiction, but I'm into historical fiction too, which is kind of like non-fiction, except not everything is exactly true.",2,2,3,1,Talk,,Think
-500,Oliver,I usually like fiction stories because I love mysteries but I guess mysteries could be real events too.,2,2,3,1,Talk,,Think
-500,Sharleen,I like stories about people that are like me.,2,1,2,2,Talk,,Think
-500,Sharleen,I like fiction because I love reading about magic stories.,2,1,2,2,Talk,,Think
+intent,student,response,valued,language,knowledge,thinking,action,understanding,responseType
+100,Oliver,I circled the same as Savannah.,1 (acknowledged),0 (not present),0 (not present),1 (Incomplete),,0,Repeat Initial Response,Start
+100,Oliver,I circled the word microscope.,1 (acknowledged),0 (not present),0 (not present),1 (Incomplete),Talk,0,Repeat Initial Response,Start
+100,Oliver,We got the same answer.,1 (acknowledged),0 (not present),0 (not present),1 (Incomplete),Talk,0,Repeat Initial Response,Start
+100,Sharleen,I didn't complete the activity.,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Repeat Initial Response,Start
+100,Sharleen,I didn't do it.,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Repeat Initial Response,Start
+200,Oliver ,"Um, yeah, okay. So question one is what equipment did scientists use to discover water on the moon.",0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
+200,Oliver ,What equipment did scientists use to discover water on the moon?,0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
+200,Oliver,"Yeah, sure. Okay. The question was what equipment did scientists use to discover water on the moon",0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
+200,Sharleen,Ok. It says what equipment did scientists use to discover water on the moon? ,0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
+200,Sharleen,The question says what equipment did scientists use to discover water on the moon? ,0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
+500,Oliver,Well we've been talking about scientists and the moon for the last week in science class.,2 (valued),0 (not present),1 (prior knowledge),3 (elaborative),Talk,0,Reflect on previous learning,
+500,Oliver,We talked about this same topic in science class.,2 (valued),0 (not present),1 (prior knowledge),2 (careful),Talk,0,Reflect on previous learning,
+500,Sharleen,We've done lots of questions like this in ELA when we use a story to answer the question.,2 (valued),0 (not present),1 (prior knowledge),3 (elaborative),Talk,0,Reflect on previous learning,
+500,Sharleen,I think we've done this before when we read a text and answer questions,2 (valued),0 (not present),1 (prior knowledge),3 (elaborative),Talk,0,Reflect on previous learning,
+300,Oliver ,"Thank you, teacher",2 (valued),0 (not present),1 (prior knowledge),1 (incomplete),Talk,0,Response to 300 level feedback from teacher,
+300,Oliver,"Thank you, we love talking about activities we've done.",2 (valued),0 (not present),1 (prior knowledge),1 (incomplete),Talk,0,Response to 300 level feedback from teacher,
+300,Sharleen,It's easy for us to talk about things we already did.,2 (valued),0 (not present),1 (prior knowledge),1 (incomplete),Talk,0,Response to 300 level feedback from teacher,
+300,Sharleen,We like talking about our experiences.,2 (valued),0 (not present),1 (prior knowledge),1 (incomplete),Talk,0,Response to 300 level feedback from teacher,
+200,Oliver,"I think the words discover, equipment, and water are important.",1 (acknowledged),1 (vocabulary),2 (evidence from text),2 (Careful),Talk,0,Identify key words,
+200,Oliver,"Some keywords are scientists, equipment, and water.",1 (acknowledged),1 (vocabulary),2 (evidence from text),2 (Careful),Talk,0,Identify key words,
+200,Sharleen,"I think scientists, equipment, and discover are important",1 (acknowledged),1 (vocabulary),2 (evidence from text),2 (Careful),Talk,0,Identify key words,
+200,Sharleen,"The words water, equipment, and discover are some keywords. ",1 (acknowledged),1 (vocabulary),2 (evidence from text),2 (Careful),Talk,0,Identify key words,
+400,Oliver,Ok yeah yeah sure we can do that. ,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Talk,Student response to 400 level feedback from teacher
+400,Sharleen,Ok we'll go back and do that. ,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Talk,Student response to 400 level feedback from teacher
+500,Oliver,I learned that we need to look at the key words.,2 (valued),2 (V + details),2 (evidence),2 (careful),Talk,0,Reflection,
+500,Oliver,It can be helpful to think about similar activities we've done in the past so we can make connections,2 (valued),3 (V + complex sentence),3 (evidence + explain),3 (elaborative),Talk,0,Reflection,
+500,Sharleen,I learned that sometimes we need to re-read texts so we fully understand them.,2 (valued),3 (V + complex sentence),3 (evidence + explain),3 (elaborative),Talk,0,Reflection,
+500,Sharleen,It's important to highlight key words in the prompt.,2 (valued),2 (V + details),2 (evidence),2 (careful),Talk,0,Reflection,
+
 1101,Class,The answer is 4 of course,0,0,0,0,Talk,,Add
 1101,Class,Would you believe 22?,0,0,0,0,Talk,0,,Add
 1101,Class,The answer is 4 of course,0,0,0,0,Talk,,Add

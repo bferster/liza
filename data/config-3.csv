@@ -1,18 +1,18 @@
 type,id,text,data
-student,Sharleen,"sharleen,charlene,shar,charlie","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=9,mod=body3,"
-student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=8,mod=body3,"
-student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=7,mod=body3,"
-student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=6,mod=body3,"
-student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=1,mod=body3,"
-student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=2,mod=body3,"
+student,Sharleen,"sharleen,charlene,shar,charlie","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=9,mod!=body3,"
+student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=8,mod!=body3,"
+student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=7,mod!=body3,"
+student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=6,mod!=body3,"
+student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=1,mod!=body3,"
+student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=2,mod!=body3,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children,friends","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
-desk,desk3
+ddesk,desk3
 session,data,"trt=300,",
 string,multi,"Start,Explain,Question,Discover,Reflect	",
 string,variance,"Belonging,Academic,Knowledge,Thinking										",
 seat,0,"x=250,y=125,z=0,r=-25,",
-seat,1,"x=250,y=-100,z=0,r=-15,																							",
-seat,2,"x=30,y=200,z=0,r=-25,",
+seat,1,"x=250,y=-100,z=0,r=-15",																							",
+seat,2,"x=30,y=125,z=0,r=-25,",
 seat,3,"x=-50,y=75,z=0,r=5,",
 seat,4,"x=-150,y=100,z=0,r=15,",
 seat,5,"x=-250,y=125,z=0,r=25,"                                                  
@@ -68,48 +68,5 @@ picture,Lunar orbiter,assets/rover.png
 picture,Blank board,assets/blankBB.png
 
 session,data,"trt=300,"
-aimodel,wit,AH7-X-LA4QMUA-X-K6C4JCH7V7SH6-X-ULUGH6WTE
-trigger,time,"who=Chris,when=.5,do=say:Welcome teacher, we're glad that you're here today.+act:interrupt"
-trigger,time,"who=Jazmin,when=6,do=say:In the next 3 minutes, we are going to give you a tour of our classroom and invite you to learn from us what we like to read.+act:interrupt"
-trigger,time,"who=Luis,when=15,do=say:Before we get started let's take a couple deep breaths together.+act:interrupt"
-trigger,time,"who=Farrah,when=21,do=say:Breathe in through your nose, hold your breath, now breathe out. Go ahead and take another breath. Breathing helps us relax and learn from our practice.+act:interrupt"
-trigger,time,"who=Chris,when=23,do=act:breathe"
-trigger,time,"who=Farrah,when=23,do=act:breathe"
-trigger,time,"who=Jazmin,when=23,do=act:breathe"
-trigger,time,"who=Oliver,when=23,do=act:breathe"
-trigger,time,"who=Sharleen,when=23,do=act:breathe"
-trigger,time,"who=Jazmin,when=32,do=say:Okay, now, drag your mouse to walk around our classroom.+act:interrupt"
-trigger,time,"who=Luis,when=45,do=say:Teacher, Do you like to read fiction or nonfiction? Click on the pencil icon on the toolbar to write on our blackboard. Circle the one you you most like to read.+act:interrupt+slide:0Draw+camera:0,150,500,0,0,0,0,0"
-
-trigger,time,"who=Farrah,when=66,do=say:We'd like to show you our Domino Discover routine - today we will each share our name and our favorite subject at school.+act:interrupt+close:blackboard"
-trigger,time,"who=Oliver,when=73,do=say:I'm Oliver I like independent work in social studies, I could have skipped a grade.+act:interrupt"
-trigger,time,"who=Chris,when=79,do=say:I'm Chris - I like every class when we talk with partners.+act:interrupt"
-trigger,time,"who=Farrah,when=85,do=say:I'm Farrah - I like P.E. and basketball after school.+act:interrupt"
-trigger,time,"who=Luis,when=90,do=say:I'm Luis - Lunch is the best.+act:interrupt"
-trigger,time,"who=Jazmin,when=93,do=say:I'm Jazmin - I like science because we do experiments.+act:interrupt"
-trigger,time,"who=Sharleen,when=99,do=say:I'm Sharleen - um, I agree with Jazmin.+act:interrupt"
-
-trigger,time,"who=Chris,when=108,do=say:Get to know more about us by pressing the space bar and asking us to tell you about what we like to read. You can also ask us why we like fiction or nonfiction books.+act:interrupt+slide:0Question1+slide:1Question2"
-trigger,time,"who=Farrah,when=227,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see what we did today+act:interrupt"
-trigger,time,"who=Luis,when=237,do=say:Look for the green line to see the type of feedback you used to interact with us.+act:interrupt"
-trigger,time,"who=Jazmin,when=247,do=say:Click on a colored dot see the differences in our responses.+act:interrupt"
-trigger,time,"who=Chris,when=253,do=say:At the end of this session you can press the play button to replay the types of feedback you have given to students.+act:interrupt"
-trigger,time,"who=Luis,when=272,do=say:Now, you can use what you learned about our reading habits to plan future lessons for us.+close:graph"
-trigger,time,"who=Sharleen,when=279,do=say:Click on the notebook in the toolbar to download more teaching resources"
-!trigger,time,"who=Oliver,when=287,do=act:standUp"
-!trigger,time,"who=Jazmin,when=287,do=act:twistRight"
-!trigger,time,"who=Chris,when=287,do=act:write"
-!trigger,time,"who=Luis,when=287,do=act:twistLeft"
-!trigger,time,"who=Farrah,when=287,do=act:write"
-trigger,time,"who=Sharleen,when=287,do=act:close:resources"
-trigger,time,"who=random,when=290,do=end:"
-trigger,time,"who=Farrah,when=298,do=say:You can continue to talk with us after this survey, if you'd like,+assess:demopoll"
-trigger,time,"who=Oliver,when=299,do=act:interrupt"
-trigger,time,"who=Chris,when=299,do=act:interrupt"
-trigger,time,"who=Farrah,when=299,do=act:interrupt"
-trigger,time,"who=Luis,when=299,do=act:interrupt"
-trigger,time,"who=Jazmin,when=299,do=act:interrupt"
-trigger,time,"who=Sharleen,when=299,do=act:interrupt"
-
-
-
+aimodel,wit,"CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO",
+trigger,time,"who=Oliver,when=.5,do=say:Welcome teacher, we're glad that you're here today.+act:interrupt"

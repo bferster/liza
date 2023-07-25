@@ -39,7 +39,10 @@ class Feedback {
 		$("#lz-variance").remove();																	// Remove old one
 		let i,j,s;
 		let labs=["Belonginh","Language","Knowledge","Thinking"];
-		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px">`;
+		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px`;			// Container div
+	//	str+=";background-color:#eee;padding:4px;border-radius:6px";									// Make visible?
+		str+=`">`;																					// End div
+		
 		if (!(i=app.studex[app.curStudent]))	return;												// Quit if bad name
 		s=app.students[i-1]; 																		// Point at student data
 		str+=this.GetVarianceMarkup(v);																// Get dot display
@@ -76,7 +79,7 @@ class Feedback {
 
 	GetVarianceMarkup(v, prefix="")																// DRAW VARIANCE GRAPH
 	{
-		let i,j,c=[];
+		let i,j,col,c=[];
 		for (i=0;i<4;++i) {																			// For each factor
 			if (v[i] == -1)		c[i]=1;																// Set bit, cap to 1st
 			else if (v[i] == 1)	c[i]=2;																// 2nd
@@ -86,17 +89,19 @@ class Feedback {
 			}		
 		let labs=["Belonging","Language","Knowledge","Thinking"];
 		let str="<table style='margin-bottom:10px'>";	
+		let dark=app.sc.real3D;																		// Render dark?
 		for (i=0;i<4;++i) {																			// For each row
 			str+="<tr>";																			// Start row
-			for (j=0;j<4;++j) {																		// For each column
+			col=dark ? "#333" : app.fb.cols[i];														// Ser frame color
+				for (j=0;j<4;++j) {																		// For each column
 				str+="<td";																			// Start column
-				if (!j)	str+=" style='border-right:1px solid #999'";								// Add border
-				str+=`><div id="${prefix}vdot${i}${j}" class="lz-vardot": style="border:1px solid ${app.fb.cols[i]}60`;// Add dot frame
+				if (!j)	str+=` style="border-right:1px solid ${col}"`;								// Add border
+				str+=`><div id="${prefix}vdot${i}${j}" class="lz-vardot": style="border:1px solid ${col}`;// Add dot frame
 				if (prefix)	str+=";cursor:pointer";													// Pointer?
 				if ((1<<j)&c[i] ) str+=`;background-color:${app.fb.cols[i]}`;						// Color it?
 				str+=`;color:#000;width:15px;height:15px">${!j ? "-" : ""}</div></td>`;				// Finish dot
 				}
-			str+=`<td style='padding-left:8px;color:${app.fb.cols[i]}'>${labs[i]}</td></tr>`;		// Add label and end row
+			str+=`<td style='padding-left:8px;color:${col}'>${labs[i]}</td></tr>`;				// Add label and end row
 			}
 		str+=`</tr></table>`;
 		return str;

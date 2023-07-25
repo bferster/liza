@@ -242,19 +242,19 @@ class NLP {
 	{
 		if (msg && msg.length < 2)	return;																// Too small
 		if ("wit" == "wit") {																			// WIT
-			let url="https://api.wit.ai/message?v=20210922&q="+msg.substring(0,255);					// URL
-			let token=this.aiToken.replace(/-X-/g,"");													// Get sever token 100s
-				fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })	// Send remark to wit
+			let url="https://api.wit.ai/message?v=20210922&n=3&q="+msg.substring(0,255);				// URL
+			let token=this.aiToken.replace(/-X-/g,"");													// Get server token 100s
+			fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })	// Send remark to wit
 			.then(res => res.json()).then(res =>{ 														// Process result
+				trace(res)
 				let inference={ text:msg, intent:{name:"r0"}, type:"wit" };								// Null inference
 				if (res.intents.length) {																// If an intent found
 					inference.intent.name=res.intents[0].name;											// Get intent (mimic Rasa format )																	
 					inference.intent.confidence=res.intents[0].confidence;								// Confidence
-					if (inference.intent.name == "clarify")			inference.intent.name="r200";		// Convert clarify to r100
+					if (inference.intent.name == "clarify")			inference.intent.name="r200";		// Convert clarify to r200
 					else if (inference.intent.name == "reflect")	inference.intent.name="r300";		// Reflect	
 					else if (inference.intent.name == "redirect")	inference.intent.name="r400";		// Redirect			
 					else if (inference.intent.name == "thinking")	inference.intent.name="r500";		// Thinking			
-					else 											inference.intent.name="r100";		// Low			
 					}	
 				else{																					// No intent foubd
 					inference.intent.name="r100";														// Force it 100	

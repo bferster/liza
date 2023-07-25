@@ -60,16 +60,15 @@
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
 	let nlp=new NLP();																				// Alloc NLP class
 	let ws=null;																					// Socket server				
-	let aiType="wit";																			// AI type
+	let aiType="wit";																				// AI type
 
 	let modelName="Activity3";																		// AI Model to use
 	let witToken={};
 	witToken.Space=  "ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");				// Space service access token
-//	witToken.Fiction="VUL-X-2NTEAPG-X-VOF7CR4TGCBOZ-X-6NN5QJO3Z".replace(/-X-/g,"");				// FB fiction service access token
 	witToken.Fiction="AH7-X-LA4QMUA-X-K6C4JCH7V7SH6-X-ULUGH6WTE".replace(/-X-/g,"");				// Fiction service access token
-	witToken.Activity3="CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO".replace(/-X-/g,"");
+	witToken.Activity3="CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO".replace(/-X-/g,"");				// Avitivity 3
 	
-	$(document).ready(function() {								           						// ON PAGE LOADED
+	$(document).ready(function() {								           							// ON PAGE LOADED
 		LoadConfig();																				// Load config file
 		InitSocketServer();
 		$("#lz-testData").on("click",()=>  	  { $("#lz-testFile").trigger("click");    } );			// ON TEST TRAINING DATA
@@ -271,7 +270,7 @@ return;
 					if (!d.length) {																// If last one
 						Sound("ding");																// Ding				
 						LoadingIcon(false);															// Hide loading icon
-						let fields=["intent","text","note","confidence","infer","match"];			// Field names
+						let fields=["intent","remark","note","confidence","infer","match"];			// Field names
 						str=Papa.unparse(orig,{ header:true, skipEmptyLines:true, columns:fields });// Make CSV using lib
 						SaveTextAsFile("test.csv",str);												// Write file
 						let results=[];
@@ -381,7 +380,7 @@ return;
 					});
 			}
 		else if (aiType == "wit") {																	// If WIT
-			let url="https://api.wit.ai/message?v=20210922&n=3&q="+m.text.substring(0,255);				// URL			
+			let url="https://api.wit.ai/message?v=20210922&n=3&q="+m.text.substring(0,255);			// URL			
 			const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
@@ -506,6 +505,7 @@ return;
 	{
 		let inference={ text:"", intent:0, confidence:0 };											// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
+		if (!isNaN(m.intent)) m.intent="r"+m.intent;												// Numbers need to be prefixed with a letter
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
 		let body=[{ text:m.remark.substring(0,255), intent:m.intent.toLowerCase(), entities:[], traits: [] }];	// Make body
 		const response=await fetch(url, { 															// Send remark to wit
