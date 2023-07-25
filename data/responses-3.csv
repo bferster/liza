@@ -1,32 +1,32 @@
 intent,student,response,valued,language,knowledge,thinking,action,understanding,responseType
-100,Oliver,I circled the same as Savannah.,1 (acknowledged),0 (not present),0 (not present),1 (Incomplete),,0,Repeat Initial Response,Start
-100,Oliver,I circled the word microscope.,1 (acknowledged),0 (not present),0 (not present),1 (Incomplete),Talk,0,Repeat Initial Response,Start
-100,Oliver,We got the same answer.,1 (acknowledged),0 (not present),0 (not present),1 (Incomplete),Talk,0,Repeat Initial Response,Start
-100,Sharleen,I didn't complete the activity.,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Repeat Initial Response,Start
-100,Sharleen,I didn't do it.,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Repeat Initial Response,Start
-200,Oliver ,"Um, yeah, okay. So question one is what equipment did scientists use to discover water on the moon.",0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
-200,Oliver ,What equipment did scientists use to discover water on the moon?,0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
-200,Oliver,"Yeah, sure. Okay. The question was what equipment did scientists use to discover water on the moon",0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
-200,Sharleen,Ok. It says what equipment did scientists use to discover water on the moon? ,0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
-200,Sharleen,The question says what equipment did scientists use to discover water on the moon? ,0 (not present),0 (not present),0 (not present),0 (not present),Read,0,Repeat Question,Repeat Question
-500,Oliver,Well we've been talking about scientists and the moon for the last week in science class.,2 (valued),0 (not present),1 (prior knowledge),3 (elaborative),Talk,0,Reflect on previous learning,
-500,Oliver,We talked about this same topic in science class.,2 (valued),0 (not present),1 (prior knowledge),2 (careful),Talk,0,Reflect on previous learning,
-500,Sharleen,We've done lots of questions like this in ELA when we use a story to answer the question.,2 (valued),0 (not present),1 (prior knowledge),3 (elaborative),Talk,0,Reflect on previous learning,
-500,Sharleen,I think we've done this before when we read a text and answer questions,2 (valued),0 (not present),1 (prior knowledge),3 (elaborative),Talk,0,Reflect on previous learning,
-300,Oliver ,"Thank you, teacher",2 (valued),0 (not present),1 (prior knowledge),1 (incomplete),Talk,0,Response to 300 level feedback from teacher,
-300,Oliver,"Thank you, we love talking about activities we've done.",2 (valued),0 (not present),1 (prior knowledge),1 (incomplete),Talk,0,Response to 300 level feedback from teacher,
-300,Sharleen,It's easy for us to talk about things we already did.,2 (valued),0 (not present),1 (prior knowledge),1 (incomplete),Talk,0,Response to 300 level feedback from teacher,
-300,Sharleen,We like talking about our experiences.,2 (valued),0 (not present),1 (prior knowledge),1 (incomplete),Talk,0,Response to 300 level feedback from teacher,
-200,Oliver,"I think the words discover, equipment, and water are important.",1 (acknowledged),1 (vocabulary),2 (evidence from text),2 (Careful),Talk,0,Identify key words,
-200,Oliver,"Some keywords are scientists, equipment, and water.",1 (acknowledged),1 (vocabulary),2 (evidence from text),2 (Careful),Talk,0,Identify key words,
-200,Sharleen,"I think scientists, equipment, and discover are important",1 (acknowledged),1 (vocabulary),2 (evidence from text),2 (Careful),Talk,0,Identify key words,
-200,Sharleen,"The words water, equipment, and discover are some keywords. ",1 (acknowledged),1 (vocabulary),2 (evidence from text),2 (Careful),Talk,0,Identify key words,
-400,Oliver,Ok yeah yeah sure we can do that. ,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Talk,Student response to 400 level feedback from teacher
-400,Sharleen,Ok we'll go back and do that. ,1 (acknowledged),0 (not present),0 (not present),0 (not present),Talk,0,Talk,Student response to 400 level feedback from teacher
-500,Oliver,I learned that we need to look at the key words.,2 (valued),2 (V + details),2 (evidence),2 (careful),Talk,0,Reflection,
-500,Oliver,It can be helpful to think about similar activities we've done in the past so we can make connections,2 (valued),3 (V + complex sentence),3 (evidence + explain),3 (elaborative),Talk,0,Reflection,
-500,Sharleen,I learned that sometimes we need to re-read texts so we fully understand them.,2 (valued),3 (V + complex sentence),3 (evidence + explain),3 (elaborative),Talk,0,Reflection,
-500,Sharleen,It's important to highlight key words in the prompt.,2 (valued),2 (V + details),2 (evidence),2 (careful),Talk,0,Reflection,
+200,Oliver,"Well, I already finished the worksheet.",0 (not present),0 (not present),0 (not present),0 (not present),Talk,0
+200,Oliver,I have an answer.,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0
+200,Oliver,I read the whole article.,0 (not present),0 (not present),0 (not present),0 (not present),Talk,0
+210,Oliver,I circled the same as Farrah.,1 (acknowledged),1(V),0 (not present),1 (Incomplete),Talk,0
+210,Oliver,I circled the word microscope.,1 (acknowledged),1(V),0 (not present),1 (Incomplete),Talk,0
+210,Oliver,We got the same answer.,1 (acknowledged),1(V),0 (not present),1 (Incomplete),Talk,0
+220,Oliver,We use a microscope in science class.,1 (acknowledged),1 (vocabulary),0 (not present),0 (not present),Talk,0
+220,Oliver," I thought, equipment and tool was the same thing. So that's why I said the microscope.",1 (acknowledged),2 (V + Complex sentence),1 (prior knowledge),1 (Incomplete),Talk,0
+220,Oliver,"Well, I thought that the question asked about equipment and so I was looking for, like, an equipment and and I saw the microscope, and I know that that's equipment. Of course, we use it in science class.",1 (acknowledged),2 (V + Complex sentence),2 (evidence from text),2 (Careful),Talk,0
+220,Oliver,"Well, I was looking in the story for equipment and looking for water, and in paragraph three, it says that the crater is where they found the water and that the water they found is microscopic so the equipment has to be the microscope.",1 (acknowledged),1 (vocabulary),3 (evidence + explain),1 (Incomplete),Talk,0
+230,Oliver,"Um, yeah, okay. So question one is what equipment did scientists use to discover water on the moon.",0 (not present),0 (not present),0 (not present),0 (not present),Read,0
+230,Oliver,What equipment did scientists use to discover water on the moon?,0 (not present),0 (not present),0 (not present),0 (not present),Read,0
+230,Oliver,"Yeah, sure. Okay. The question was what equipment did scientists use to discover water on the moon",0 (not present),0 (not present),0 (not present),0 (not present),Read,0
+240,Oliver,The name of the equipment that was used to discover water on the moon.,0 (not present),0 (not present),0 (not present),0 (not present),Read,0
+240,Oliver,The equipment that found water on the moon.,0 (not present),0 (not present),0 (not present),0 (not present),Read,0
+300,Oliver,"Thank you, teacher",2 (Valued),0 (not present),0 (not present),0 (not present),Talk,0
+300,Oliver,Yeah I tried to use that vocabulary to help me. ,2 (Valued),0 (not present),0 (not present),0 (not present),Talk,0
+410,Oliver,It says what equipment did scientists use to discover water on the moon?,1 (acknowledged),0 (not present),0 (not present),0 (not present),Read,0
+410,Oliver,The verbs in the question are use and discover. I see that the question is talking about equipment.,1 (acknowledged),0 (not present),0 (not present),0 (not present),Read,0
+410,Oliver,The question asks what was used to discover water on the moon,1 (acknowledged),0 (not present),0 (not present),0 (not present),Read,0
+500,Oliver,I learned to take more time to understand the question before I start to answer it.,1,1,2,2,Talk,0
+500,Oliver,I learned to think about how the question tells you what you have to have in the answer.,1,1,2,2,Talk,0
+510,Oliver,"I was hurrying to find an answer, now I see I have to understand the question.",2,2,2,2,Talk,0
+510,Oliver,I was hurrying to find an answer and now I see that I need to spend time with the question.,2,2,2,2,Talk,0
+510,Oliver,I realize that my answer might be wrong if I didn't understand the question.,2,2,2,2,Talk,0
+520,Oliver,"Ok, next time I'll try to read the question really carefully because I might miss what it is asking.",2,0 (not present),1,2 (Careful),Talk,0
+520,Oliver,"Next time, I pay more attention to the question.",2,0 (not present),1,2 (Careful),Talk,0
+520,Oliver,I could try saying the question in my own words to make sure that I understand it.,2,0 (not present),1,2 (Careful),Talk,0
 
 1101,Class,The answer is 4 of course,0,0,0,0,Talk,,Add
 1101,Class,Would you believe 22?,0,0,0,0,Talk,0,,Add

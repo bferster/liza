@@ -468,7 +468,11 @@ return;
 		reader.onload=(e)=>{ 																		// When loaded
 			LoadingIcon(true);																		// Show loading icon
 			let i,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
-			for (i=0;i<d.length;++i) if (d[i].note == "hold")	d.splice(i,1);						// Remove holds
+			for (i=0;i<d.length;++i) {																// For each remark
+				if (d[i].note == "hold") { d.splice(i,1); continue; }								// Remove holds
+				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
+				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
+			}
 			let tot=d.length;																		// Total
 			WitTrain(d, (r1,r2)=>{																	// Start sending via recursion		
 				trace(r1,r2);																		// Log	
