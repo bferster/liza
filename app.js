@@ -21,6 +21,7 @@ class App  {
 		this.studex=[];																				// Student name to index array
 		this.startTime;																				// Start of session in ms
 		this.trt=0;																					// Total running time in seconds
+		this.endPoll="";																			// Name of endpoll
 		this.unSaved=true;																			// Not databased yet
 		this.curTime=0;																				// Time in session in seconds
 		this.totTime=0;																				// Session time in seconds
@@ -87,7 +88,7 @@ class App  {
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 	// Are you sure?
 					if (this.role == "Teacher") {
 						app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
-						}
+						}talkTimeonph
 					this.StartSession();															// Init session
 					$("#startBut").trigger("click");												// Trigger start								
 				});									
@@ -109,7 +110,7 @@ class App  {
 				}
 			});
 		$("#talkInput").on("change", ()=> { 														// ON ENTER OF TEXT
-			app.talkTime=(new Date().getTime()-app.talkTime)/1000;									// Compute talk time in seconds
+			app.talkTime=$("#talkInput").val().length*.08;											// Fake talk time 
 			if (app.inSim)	app.OnPhrase($("#talkInput").val());									// Act on text, if in sim
 			$("#talkInput").val("");																// Clear text
 			});	
@@ -164,7 +165,7 @@ class App  {
 
 	LoadFiles()																					// LOAD CONFIG FILE
 	{	
-		fetch('data/config-'+this.activityId+'.csv')												// Load file
+		fetch('data/config-'+this.activityId+'.csv?rnd='+Math.floor(Math.random()*100000))			// Load file
 			.then(res =>  res.text())																// Get as text
 			.then(res =>{ 																				
 				let i,o,v;
@@ -180,13 +181,12 @@ class App  {
 					else if (d[i].type == "seat")  	  this.sc.AddSeat(d[i]);						// Add seat position
 					else if (d[i].type == "desk") 	  this.deskModel=d[i].id;						// Desk model
 					else if (d[i].type == "session") {												// Session settings
-						if (d[i].id == "data")		  this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];	// Get trt
-						}
-
-					else if (d[i].type == "dialogflow") {											// Dialogflow settings
-						if (d[i].id == "key")		  this.df.key=d[i].text;						// Add params
-						if (d[i].id == "id")		  this.df.id=d[i].text;							// Add params
-						if (d[i].id == "email")		  this.df.email=d[i].text;						// Add params
+						if (d[i].id == "data")	{													// Get data	  
+							if (d[i].text.match(/trt=(.+?)\W/i))									// If set
+								this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];					// Get trt
+							if (d[i].text.match(/endpoll=(.+?)\W/i))								// If set
+								this.endPoll=d[i].text.match(/endpoll=(.+?)\W/i)[1];				// Get end poll
+							}
 						}
 					else if (d[i].type == "trigger") {												// Triggers
 						o={type:d[i].id, done:0 };													// Set type
@@ -210,7 +210,7 @@ class App  {
 				this.StartSession();																// Start session
 			});	
 
-		fetch('data/responses-'+this.activityId+'.csv')												// Load response file
+		fetch('data/responses-'+this.activityId+'.csv?rnd='+Math.floor(Math.random()*100000))		// Load response file
 			.then(res =>  res.text())																// Get as text
 			.then(res =>{ 																			// Process																			
 				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV
@@ -268,7 +268,7 @@ class App  {
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
 	{
 		let i,s;
-		if (this.inRemark)	return;																	// Not while teacher is talking
+			if (this.inRemark)	return;																	// Not while teacher is talking
 		if (e.done)	return;																			// Already handled
 		e.done=1;																					// Flag it done
 		let student=e.who;																			// Get speaker
@@ -278,6 +278,7 @@ class App  {
 
 		let v=e.do.split("+");																		// Split do items
 		
+	trace(e,v)
 		for (i=0;i<v.length;++i) {																	// For each do item
 			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
@@ -320,7 +321,14 @@ class App  {
 				}
 			else if (v[i].match(/assess:/i)) ShowAssess(v[i].substring(7));							// ASSESSMENT
 			else if (v[i].match(/camera:/i)) this.sc.SetCamera(...v[i].substring(7).split(","));	// CAMERA POSITION
+			else if (v[i].match(/var:/i)) {															// SHOW VARIANCE
+				s=v[i].substring(4);																// Get text
+				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,s.split(",")); 	// Show variance
+				
+				trace(this.sessionLog[this.sessionLog.length-1])
 			}
+
+		}
 
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
 			if (this.eventTriggers[i].type == "time" && !this.eventTriggers[i].done) {				// Am undone time event
@@ -402,14 +410,23 @@ class App  {
 			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
+				if (intent == 1000) {																// Ending event
+					this.HandleEventTrigger({ do:"end:", who:"current" });							// Trigger end reponse
+					if (this.endPoll) {																// If an end poll
+						setTimeout(()=>{															// Wait for remark
+							 this.HandleEventTrigger({ do:"assess:"+app.endPoll });					// Run poll
+							},9000)	
+						}
+					return;																			// Quit 
+					}
 				trace("infer",intent,text);
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				this.lastIntent=intent;																// Save last intent
 				app.SendEvent(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent >= 300) {																// If an intent detected
-					let s="Feedback to "+app.curStudent+": ";											// Student name
-					s+=app.fb.intentLabels[intent/100];												// Get intent label
+					let s="Feedback to "+app.curStudent+": ";										// Student name
+					s+=app.fb.intentLabels[Math.floor(intent/100)];									// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
 					$("#feedbackDiv").html(s);														// Show in feedback area
 					}	
@@ -750,7 +767,8 @@ class App  {
 	{
 		let o={ to:"", data:"", text:"", intent:""};												// Event stub
 		if (e[2] == "ADMIN")			return;														// Ignore admin
-		o.time=e[1];	o.from=e[2];	o.what=e[3];												// Add basics
+		o.time=Math.max(0,e[1]);																	// Cap time at 0
+		o.from=e[2];	o.what=e[3];																// Add basics
 		if (e[3] == "START") 			o.data=e[4];												// START
 		else if (e[3] == "ACT") 		o.from=e[4],o.data=e[5];									// ACT 																			
 		else if (e[3] == "PIC") 		o.data=`${e[4]}:${e[5]}`;									// PIC 																			

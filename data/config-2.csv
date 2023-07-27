@@ -68,7 +68,7 @@ picture,Blank board,assets/blankBB.png
 
 session,data,"trt=300,"
 aimodel,wit,AH7-X-LA4QMUA-X-K6C4JCH7V7SH6-X-ULUGH6WTE
-trigger,time,"who=Chris,when=.5,do=say:Welcome teacher, we're glad that you're here today.+act:interrupt"
+trigger,time,"who=Chris,when=.5,do=say:Welcome teacher, we're glad that you're here today.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Jazmin,when=6,do=say:In the next 3 minutes, we are going to give you a tour of our classroom and invite you to learn from us what we like to read.+act:interrupt"
 trigger,time,"who=Luis,when=15,do=say:Before we get started let's take a couple deep breaths together.+act:interrupt"
 trigger,time,"who=Farrah,when=21,do=say:Breathe in through your nose, hold your breath, now breathe out. Go ahead and take another breath. Breathing helps us relax and learn from our practice.+act:interrupt"
@@ -89,6 +89,7 @@ trigger,time,"who=Jazmin,when=93,do=say:I'm Jazmin - I like science because we d
 trigger,time,"who=Sharleen,when=99,do=say:I'm Sharleen - um, I agree with Jazmin.+act:interrupt"
 
 trigger,time,"who=Chris,when=108,do=say:Get to know more about us by pressing the space bar and asking us to tell you about what we like to read. You can also ask us why we like fiction or nonfiction books.+act:interrupt+slide:0Question1+slide:1Question2"
+trigger,time,"who=Farrah,when=222,"prompt:5 seconds to finish your last question!"
 trigger,time,"who=Farrah,when=227,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see what we did today+act:interrupt"
 trigger,time,"who=Luis,when=237,do=say:Look for the green line to see the type of feedback you used to interact with us.+act:interrupt"
 trigger,time,"who=Jazmin,when=247,do=say:Click on a colored dot see the differences in our responses.+act:interrupt"

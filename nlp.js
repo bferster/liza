@@ -145,6 +145,8 @@ class NLP {
 
 	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
 	{
+	
+	trace(remark, student, intent)
 		let i,o=intent,d=[];
 		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0], MP3:"" };										// Default response
 	trace("getresponse",o,intent)
