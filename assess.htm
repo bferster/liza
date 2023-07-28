@@ -106,8 +106,8 @@
 					});													
 				}
 		if (p[i].match(/test/i))	{											// Get JSONP script
-				let e={};														
-				e.data='AssessAct=data|{"pages":[';
+				let e={data:'AssessAct=data|{"pages":['};						// Headee								
+
 				e.data+='{"title":"Radio choice images","skip":"true"';
 				e.data+=',"text":"Choose the one that will get PacMan home"';
 				e.data+=',"whyRight":" "';
@@ -122,6 +122,10 @@
 				e.data+=',"whyWrong":"Yes does not mean no or maybe"';
 				e.data+=',"optionType":"checkbox","options":["*Yes","No","Maybe"]},';
 
+				e.data+='{"title":"Link"';
+				e.data+=',"text":"Are you done with this activity?"';
+				e.data+=',"optionType":"link","options":["Yes","No"]}';
+/*
 				e.data+='{"title":"Radio choice","skip":"true"';
 				e.data+=',"text":"Choose the one that says &quot;No&quot"';
 				e.data+=',"whyRight":" "';
@@ -149,7 +153,7 @@
 				e.data+='{"title":"Slider","skip":"true"';
 				e.data+=',"text":"Choose a rating on the scale"';
 				e.data+=',"optionType":"slider","options":["Very Low:Very High"]}'
-
+*/
 				e.data+="]}"
 				AssessEventHandler(e);													
 				}
@@ -203,7 +207,7 @@
 		$("#promptDiv").html(curPrompt);										// Prompt
 
 		$("#containerDiv").css("font-size",fontSize+"px");						// Set fontsize
-		if ((d.options) &&  (d.optionType == "radio" || d.optionType == "checkbox")) {	// CHECK/RADIO OPTIONS
+		if ((d.options) &&  (d.optionType == "radio" || d.optionType == "checkbox" || d.optionType == "link")) {	// CHECK/RADIO/COMFIRM OPTIONS
 //			d.options=Shuffle(d.options);										// Shuffle options
 			for (i=0;i<d.options.length;++i) {									// For each option
 				if (showRight) {												// If showing correct answers
@@ -225,7 +229,8 @@
 					pic=pic[0].substr(4,pic[0].length-5);						// Get payload
 			 		str+="<br>&nbsp; &nbsp;<img style='vertical-align:top' src='"+pic+"'><br>";	 // Add pic
 					}	
-				str+="&nbsp;&nbsp; <input type='"+d.optionType+"' name='opt' id='opt"+i+"'value='"+d.options[i].replace(/^\*/,"")+"'>&nbsp;"+lab+"</span>";	// Add line
+				let ty=(d.optionType == "link")	? "checkbox" : d.optionType;	// Get type
+				str+="&nbsp;&nbsp; <input type='"+ty+"' name='opt' id='opt"+i+"'value='"+d.options[i].replace(/^\*/,"")+"'>&nbsp;"+lab+"</span>";	// Add line
 				if (d.options[i].toLowerCase() == "*other")						// If an other option
 		 			str+="&nbsp <input class='is' style='width:6em;' type='text' id='otherOpt'><br></span>";	// Add line
 				else	str+="<br>";											// Add break
@@ -332,6 +337,12 @@
 				Draw(curPage+1);												// Move on
 				return;															// Quit
 				}
+			else if (d.optionType == "link") {									// Link style
+				SendMessage("link",curAssess+"|"+curPage+"|"+$("#opt0").prop("checked"));	// Send link message
+				Draw(curPage+1);												// Move on
+				return;															// Quit
+				}
+
 			let correct=0,wrong=0,requiredCorrect=0;
 			
 			if (d.optionType != "write") {										// Anything but write
@@ -357,9 +368,17 @@
 					if (j == v.length)											// Didn't find it
 						wrong++;												// Add to wrongs
 					}
+
 				ans="wrong";													// Assume wrong
 				if (correct == i)				ans="right";					// Correct				
 				if (correct && correct < i)		ans="partial"					// Partial
+				}
+			else if (d.optionType == "link") {									// Link
+				for (i=0;i<d.options.length;++i) {								// For each option
+					v=d.options[i].split(";");									// Get parts
+					ans=$("#opt"+i).val();										// Get answer
+					trace(ans)	
+					}
 				}
 			else if ((d.optionType == "sort") || (d.optionType == "match")) {	// Sort/Match
 				for (i=0;i<d.options.length;++i) 								// For each option

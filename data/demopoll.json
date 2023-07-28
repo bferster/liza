@@ -26,8 +26,9 @@
 	"options":["A new teaching practice","Increased attention to student variance","Greater confidence in teaching","Not taking away anything useful"]},
 
 	{"title":"<br>All done!",
-	"text":"You can continue to talk with the class, if you'd like",
-	"options":[]}
+	"optionType":"link",
+	"text":"You can continue to talk with the class, or go back to the main site",
+	"options":["Go back","Stay here"]}
 ]}
 
 

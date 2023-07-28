@@ -231,6 +231,11 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 				$("#lz-assess").remove();															// Remove assessment
 				$("#startBut").trigger("click");													// Toggle start button to restart	
 				}
+			else if (e.data && e.data.match(/Assess\|link/)) {										// Assessment link	
+				$("#lz-assess").remove();															// Remove assessment
+			trace(e.data.match(/true/i),app.endUrl)
+				if (app.endUrl && e.data.match(/true/i))	window.location=app.endUrl;				// Go to link
+				}
 		}	
 
 	});

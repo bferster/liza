@@ -22,6 +22,7 @@ class App  {
 		this.startTime;																				// Start of session in ms
 		this.trt=0;																					// Total running time in seconds
 		this.endPoll="";																			// Name of endpoll
+		this.endUrl="";																				// Link to end url
 		this.unSaved=true;																			// Not databased yet
 		this.curTime=0;																				// Time in session in seconds
 		this.totTime=0;																				// Session time in seconds
@@ -185,7 +186,9 @@ class App  {
 							if (d[i].text.match(/trt=(.+?)\W/i))									// If set
 								this.totTime=d[i].text.match(/trt=(.+?)\W/i)[1];					// Get trt
 							if (d[i].text.match(/endpoll=(.+?)\W/i))								// If set
-								this.endPoll=d[i].text.match(/endpoll=(.+?)\W/i)[1];				// Get end poll
+								this.endPoll=d[i].text.match(/endpoll=(.+?)\W/i)[1];				// Get end url
+							if (d[i].text.match(/endurl=(.+?),/i))									// If set
+								this.endUrl=d[i].text.match(/endurl=(.+?),/i)[1];					// Get end url
 							}
 						}
 					else if (d[i].type == "trigger") {												// Triggers
@@ -268,7 +271,7 @@ class App  {
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
 	{
 		let i,s;
-			if (this.inRemark)	return;																	// Not while teacher is talking
+			if (this.inRemark)	return;																// Not while teacher is talking
 		if (e.done)	return;																			// Already handled
 		e.done=1;																					// Flag it done
 		let student=e.who;																			// Get speaker
@@ -276,9 +279,9 @@ class App  {
 		else if (student == "random")  	student=this.students[Math.floor(Math.random()*this.students.length)].id;	// Get random student
 		this.curStudent=student;																	// Set as current student
 
+		trace(e)
 		let v=e.do.split("+");																		// Split do items
-		
-	trace(e,v)
+
 		for (i=0;i<v.length;++i) {																	// For each do item
 			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
@@ -324,10 +327,7 @@ class App  {
 			else if (v[i].match(/var:/i)) {															// SHOW VARIANCE
 				s=v[i].substring(4);																// Get text
 				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,s.split(",")); 	// Show variance
-				
-				trace(this.sessionLog[this.sessionLog.length-1])
 			}
-
 		}
 
 		for (i=0;i<this.eventTriggers.length;++i) {													// For each trigger
@@ -412,14 +412,12 @@ class App  {
 				let intent=res.intent.name.substring(1);											// Get intent
 				if (intent == 1000) {																// Ending event
 					this.HandleEventTrigger({ do:"end:", who:"current" });							// Trigger end reponse
-					if (this.endPoll) {																// If an end poll
-						setTimeout(()=>{															// Wait for remark
-							 this.HandleEventTrigger({ do:"assess:"+app.endPoll });					// Run poll
-							},9000)	
-						}
+					setTimeout(()=>{																// Wait for remark to end
+						if (this.endPoll)	  this.HandleEventTrigger({do:"assess:"+app.endPoll}); 	// Run poll, if set
+						else if (this.endUrl) ConfirmBox("","Are you finished with this activity?",()=>{ ; });	// If an endurl, go there
+						},9000);																	// Timer
 					return;																			// Quit 
 					}
-				trace("infer",intent,text);
 				intent=isNaN(intent) ? 0 : intent;													// Validate
 				this.lastIntent=intent;																// Save last intent
 				app.SendEvent(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark

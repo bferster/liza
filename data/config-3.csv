@@ -67,6 +67,6 @@ picture,Question2,assets/demoQ3.png
 picture,Lunar orbiter,assets/rover.png
 picture,Blank board,assets/blankBB.png
 
-session,data,"trt=300,endpoll=demopoll,"
+session,data,"trt=300,endpoll=demopoll,endurl=https://agileteacher.org/teaching-with-grace/practice,"
 aimodel,wit,"CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO",
 trigger,time,"who=Oliver,when=.5,do=say:Teacher, why did you want to talk with me?+act:interrupt"
