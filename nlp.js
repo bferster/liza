@@ -166,15 +166,11 @@ class NLP {
 			}
 		o=app.nlp.responses[student];																	// Isolate student
 		if (!o || (student == "Class"))	return res;														// Null response
-		for (i=0;i<o.length;++i) {																		// For each response
-			if ((intent%100) && (intent == o[i].intent)) 		d.push(o[i]);							// Add sub intent
-			else if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);							// Add full intent
-			}
+		for (i=0;i<o.length;++i) 																		// For each response
+			if (intent == o[i].intent)  d.push(o[i]);													// Add response
 		o=app.nlp.responses["Class"];																	// Isolate class-wide responses
-		for (i=0;i<o.length;++i) {																		// For each responss
-			if ((intent%100) && (intent == o[i].intent)) 		d.push(o[i]);							// Add sub intent
-			else if (intent == Math.floor(o[i].intent/100)*100) d.push(o[i]);							// Add full intent
-			}
+		for (i=0;i<o.length;++i) 																		// For each responss
+			if (intent == o[i].intent)  d.push(o[i]);													// Add response
 		i=Math.floor(Math.random()*d.length);															// Pick random match 
 	trace("response",d[i] ? d[i] : res)
 		return d[i] ? d[i] : res;																		// Return response object

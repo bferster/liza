@@ -57,14 +57,11 @@ keyrule,ANDYOU,"what,you,think|say",,
 keyrule,ANDYOU,"lets|let's,hear,from",,
 keyrule,1101,"2,\+|plus|and,2",,
 
-picture,Welcome,assets/demoWelcome.png
-picture,whowhat,assets/whowhat.png
-picture,Draw,assets/demoDraw.png
-picture,Question1,assets/demoQ1.png
-picture,Question2,assets/demoQ2.png
-picture,Question2,assets/demoQ3.png
+picture,Question,assets/Discussion.png
+picture,Important vocabulary,assets/ImportantWords.png
 picture,Lunar orbiter,assets/rover.png
-picture,Blank board,assets/blankBB.png
+picture,Sample response,assets/SampleResponse.png
+picture,Misleading words,assets/MisleadingWords.png
 
 session,data,"trt=300,endpoll=demopoll,endurl=https://agileteacher.org/teaching-with-grace,"
 aimodel,wit,"CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO",
