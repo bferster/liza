@@ -32,15 +32,8 @@
 				<option>Wit</option><option>Dialog</option>
 				</select>&nbsp &nbsp; 
 			Activity: &nbsp;<select class="lz-is" id="lz-dataset">
-					<option>Activity3</option><option>Fiction</option><option>Space</option>
+					<option>Test</option><option>Activity3</option><option>Fiction</option><option>Space</option>
 					</select>&nbsp &nbsp; 
-				<!--
-				&nbsp &nbsp; Series: <select class="lz-is" id="lz-series">
-				<option>Hundreds</option><option>Tens</option><option>Decimals</option><option>
-			</select>
-			&nbsp &nbsp; Max per intent: <input type="input" class="lz-is" style="width:40px" value="500" id="lz-num"/>
-			&nbsp &nbsp; Test % <input type="input" class="lz-is" style="width:40px" value="0" id="lz-holdOut"/>
-			<hr><p-->
 				<div class="lz-bs" id="lz-testData">Test data</div>
 				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-trainData">Train data</div>
 				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-deleteData">Delete data</div>
@@ -62,14 +55,14 @@
 	let ws=null;																					// Socket server				
 	let aiType="wit";																				// AI type
 
-	let modelName="Activity3";																		// AI Model to use
+	let modelName="Test";																		// AI Model to use
 	let witToken={};
 	witToken.Space=  "ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");				// Space service access token
 	witToken.Fiction="AH7-X-LA4QMUA-X-K6C4JCH7V7SH6-X-ULUGH6WTE".replace(/-X-/g,"");				// Fiction service access token
-	witToken.Activity3="CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO".replace(/-X-/g,"");				// Avitivity 3
-	
+	witToken.Activity3="CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO".replace(/-X-/g,"");				// Acitivity 3/4
+	witToken.Test="GF34C42CT4-X-6PWFV5XKG-X-OO7URKYE-X-KT4EH".replace(/-X-/g,"");					// Test 
+
 	$(document).ready(function() {								           							// ON PAGE LOADED
-		LoadConfig();																				// Load config file
 		InitSocketServer();
 		$("#lz-testData").on("click",()=>  	  { $("#lz-testFile").trigger("click");    } );			// ON TEST TRAINING DATA
 		$("#lz-deleteData").on("click", ()=>  { DeleteTrainingData();     } );						// ON DELETE TRAINING DATA
@@ -100,145 +93,50 @@
 
 		$(window).on("keydown",function(e) {														// HANDLE KEYPRESS
 			if ((e.which == 81) && e.ctrlKey)	{										// Test key (CTL-Q)
-				Test500s();
 				}
 			});
 	});
 
-	function LoadConfig(dataset="Newdata")														// LOAD CONFIG FILE
-	{	
-		let i;
-		rawData=[]; intents=[]; keyWords=[]; vocab=[];												// Reset
-		fetch('data/config-1.csv')																	// Load file
-			.then(res => res.text())																// Get as text
-			.then(res =>{																			// Process																	
-				let d=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
-				for (i=0;i<d.length;++i) 															// For each line
-					 nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 							// Add synonyms, keywords, keytags, vocab
-				LoadRawData("data/"+dataset+".csv");												// Load raw data file
-			});
-		}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-////////////////////////////////////////////////////////////////////////////////////////////////////////// RASA	
-	
-	
-	function LoadRawData(file)																	// LOAD RAW DATA CSV
-	{
-		fetch(file)																					// Load file
-			.then(res => res.text())																// Get as text
-			.then(res =>{																			// Process																	
-				rawData=Papa.parse(res, { header:true, skipEmptyLines:true }).data;					// Parse CSV using papa lib
-				GetKeyWords();																		// Get keywords
-				ParseData();																		// Parse data and show stats
-			});
-	}
-
-	function ParseData()																		// PARSE DATA AND SHOW DATA STATS
-	{
-		let i,o,kill;
-		let nRemarks=0, nResponses=0; 																// Counts
-		for (i=0;i<rawData.length;++i) {															// For each entry
-			kill=0;																					// Assume we keep it
-			o=rawData[i];																			// Point at line
-			o.text=nlp.CleanText(o.text);															// Clean text
-			if (o.speaker == "Teacher") {															// A remark
-				if (o.text.split(" ").length < 4)	continue;										// Skip short remarks
-				if (!o.clean_intent)				o.text=nlp.CleanText(o.text);					// No flag set
-				else if (o.clean_intent <= 0)		{ rawData.splice(i,1); continue; }				// Remove bad remark
-				else if (o.clean_intent == 1)		o.text=nlp.CleanText(o.clean_text);				// Get cleaned text			
-				else if (o.clean_intent == 2)		o.text=nlp.CleanText(o.revised);				// Get revised text			
-				++nRemarks;																			// Add to count											
-				if (!intents["r"+Math.floor(o.intent)]) intents["r"+Math.floor(o.intent)]=[];		// Create base intent holder
-				if (!intents["r"+o.intent]) intents["r"+o.intent]=[];								// Create full holder
-				intents["r"+Math.floor(o.intent)].push(i);											// Add base index
-				intents["r"+o.intent].push(i);														// Add full
-				}
-			else{																					// A student response
-				++nResponses;																		// Add response
-				}
-			}
-		
-		let str=`<table>
-		<tr><td><b>Number of remarks</b>:</td><td>${nRemarks}</td></tr>
-		<tr><td><b>Number of responses</b>: &nbsp; </td><td>${nResponses}</td></tr>`
-		str+=getIntents()+"</table>";																// Get number of intents
-	//	$("#outp").html(str.replace(/\t|\n|\r/g,""));												// Show stats
-
-		function getIntents() {																		// GET INTENTS
-			let i,j,s="";
-			for (i=0;i<1000;i+=10) 																	// For each intent
-				if (intents["r"+i]) 																// If it exists	
-					s+=`<tr><td><b>Intent ${i}</b>:</td><td>${intents["r"+i].length}</td><td>${getSubIntents(i)}</td></tr>`;
-			return s;																				// Return intent line
-			}
-
-		function getSubIntents(base) {																// GET NUMBER OF SUB INTENTS
-			let i,s="( &nbsp;";
-			for (i=1;i<10;++i) 																		// For for subs
-				if (intents["r"+base+"."+i]) 														// If it exists	
-					s+=i+"="+intents["r"+base+"."+i].length+" &nbsp;";								// Add to string
-			return s+")";																			// Return subs
-			}
-	}		
-
-	function GetKeyWords()																		// GET UNIQUE LIST OF WORDS
-	{
-		let i,j,k,v,s;
-		keyWords=[];																				// Clear array
-		for (i=0;i<rawData.length;++i) {															// For each line
-			if (!rawData[i].text) continue;															// Nothing there
-			v=nlp.Tokenize(rawData[i].text);														// Clean and tokenize line
-			for (j=0;j<v.length;++j) 																// For each word															
-				keyWords.push(v[j]);																// Add to key word list	
-			}
-		keyWords=[... new Set(keyWords)];															// Make unique
-
-		for (k=100;k<600;k+=100) {																	// Top series
-			vocab["r"+k]=[];																		// Start fresh
-			for (i=0;i<rawData.length;++i) {														// For each line
-				if (!rawData[i].text)										continue;				// Nothing there
-				if (rawData[i].speaker != "Teacher") 						continue;				// Only teachers
-				if (Math.floor(Math.floor(rawData[i].intent/100)*100) != k) continue;				// Only this intent's 100s level
-				v=nlp.Tokenize(rawData[i].text.toLowerCase());										// Tokenize line
-				for (j=0;j<v.length;++j)  if (v[j].length > 4) vocab["r"+k].push(v[j]);				// Add to key word list	
-				}
-			vocab["r"+k]=[... new Set(vocab["r"+k])];												// Make unique
-			}
-return;
-		uvocab=[];
-		uvocab["r500"]=vocab["r500"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r300"],...vocab["r400"]].includes(x));
-		uvocab["r400"]=vocab["r400"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r300"],...vocab["r500"]].includes(x));
-		uvocab["r300"]=vocab["r300"].filter(x => ![...vocab["r100"],...vocab["r200"],...vocab["r400"],...vocab["r500"]].includes(x));
-		uvocab["r200"]=vocab["r200"].filter(x => ![...vocab["r100"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
-		uvocab["r100"]=vocab["r100"].filter(x => ![...vocab["r200"],...vocab["r300"],...vocab["r400"],...vocab["r500"]].includes(x));
-		}
-	
 	async function TrainData(e)																	// TRAIN DATA
 	{	
-		if (aiType == "wit") {
-			TrainWit(e);																			// Load and train data	
-			return;
-			}
-		else if (aiType == "dialog") {
-			TrainDialog(e);																			// Load and make training data	
-			return;
-			}
+		let file=e.target.files[0];																	// Point at file
+		if (!file) 	return;																			// Quit if bad
+		let reader=new FileReader();																// Init reader
+		reader.readAsText(file);																	// Read file
+		reader.onload=(e)=>{ 																		// When loaded
+			let uniqueIntents=[];																	// Hold unique intents used
+			let i,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			SaveResponseFile(d);																	// Save student responses to new CSV file			
+			for (i=0;i<d.length;++i) {																// For each remark
+				if (d[i].intent) uniqueIntents.push(d[i].intent);									// Get intent
+				if (d[i].note == "hold") { d.splice(i,1); continue; }								// Remove holds
+				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
+				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
+				}
+			uniqueIntents=[... new Set(uniqueIntents)];												// Make unique
+
+			if (aiType == "wit") {																	// WIT.AI
+				TrainWit(d,uniqueIntents);															// Add intents and utterances	
+				}
+			else if (aiType == "dialog") {															// DIALOGFFLOW
+				TrainDialog(d);																		// Load and make training data	
+				}
+			};
+	}
+
+	function DeleteTrainingData()															// DELETE TRAINING DATA
+	{
+		if (window.location.host != "localhost") 	return;											// Only local can delete
+			ConfirmBox("Are your sure?","",()=>{													// Confirm
+				if (aiType == "wit") {																// WIT.AI
+					WitGetUtterances((d)=>{															// Get utterance list		
+						WitDeleteUtternances(d,(r)=>{ trace(r);	});									// Delete existing utterances									
+						});
+					WitGetIntents((d)=>{															// Get intents list		
+						WitDeleteIntents(d,(r)=>{ trace(r);	});										// Delete existing intents
+						});
+					}
+				});
 	}
 
 	async function TestData(e)																	// TEST DATA
@@ -251,7 +149,6 @@ return;
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			LoadingIcon(true);																		// Show loading icon
-			if (aiType == "wit") {																	// If wit
 				let count=0,notFound=0;																// Counts
 				let d=[],orig=[];
 				let v=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
@@ -291,61 +188,11 @@ return;
 						s+="<br>"+Math.round(count/tot*100)+"% total accuracy";						// Total accuracy
 						s+="<br>"+notFound+" Not categorized";										// Uncategorized
 						$("#outp").html(s.replace(/\t|\n|\r/g,""));									// Show stats
-						return;
 					}
 					});
-				return;
 				}
 
-			let nums=[]; nums["*100"]=0; nums["*200"]=0; nums["*300"]=0;	nums["*400"]=0;	nums["*500"]=0;	
-			let oks=[];  oks["*100"]=0; oks["*200"]=0;	oks["*300"]=0;	oks["*400"]=0;	oks["*500"]=0	;
-			let tots=[],report=[],msgs=[];
-			v=e.target.result.split("\n");															// Divide by LF
-			for (i=0;i<v.length;++i) {																// For each line
-				if (!v[i]) 						continue;											// Skip is nothing there
-				if (v[i].match(/- intent: r/))	k=v[i].substr(11).trim();							// Get series
-				if (v[i].match(/^   /)) 		msgs.push({ text:v[i].substr(5), intent:k });		// Add if an example
-				}
-			let tot=msgs.length;																	// Get total to detect
-			InferIntents(msgs, (res)=>{ 															// On each inference
-				trace(res)
-				id=res.intent;																		// Get id	
-				nums["*"+Math.floor(id/100)*100]++;													// Advance total count at 100 level
-				if (Math.floor(id/100)*100 == Math.floor(res.labeled/100)*100)	oks["*"+Math.floor(id/100)*100]++;	// Add if a match at 100 level
-				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(msgs.length/tot*100))+"%</b>");	// Show progress
-				str=id+"\t";																		// Coded intent
-				str+=(id == res.labeled) ? "   " : " X ";											// Right or wrong?
-				str+="\t"+res.labeled;																// Labeled intent
-				str+="\t | \t"+res.text;															// Text
-				report.push(str);																	// Add to report
-				if (!msgs.length) {																	// If last one
-					tots["*100"]=oks["*100"]+"/"+nums["*100"]+"="+Math.floor(oks["*100"]/nums["*100"]*100)+"%"; // 100s tally
-					tots["*200"]=oks["*200"]+"/"+nums["*200"]+"="+Math.floor(oks["*200"]/nums["*200"]*100)+"%";	// 200s
-					tots["*300"]=oks["*300"]+"/"+nums["*300"]+"="+Math.floor(oks["*300"]/nums["*300"]*100)+"%";	// 300s
-					tots["*400"]=oks["*400"]+"/"+nums["*400"]+"="+Math.floor(oks["*400"]/nums["*400"]*100)+"%";	// 400s
-					tots["*500"]=oks["*500"]+"/"+nums["*500"]+"="+Math.floor(oks["*500"]/nums["*500"]*100)+"%";	// 500s
-					Sound("ding");																	// Ding				
-					LoadingIcon(false);																// Hide loading icon
-					report.sort(); 																	// Sort
-					trace(report.join("\n"));														// Show repoport
-					trace(tots);																	// Show results
-					trace(nums,oks)
-					}
-				});
-			};
 	}
-
-	let df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDNg4lVhiuu5Bgy\nimKeyXmb24phJg3yDHZI1YV/SlUq6ZzEX/tgQCPrzHzn6REr4rnbq3Jx54Hi3Wrw\nQY5EDAcSRQPK/6eDFAA1kibsYdlyaeQeUm/qs5cK2vf7c4fIsgGGsCQNzPQZ7Ojp\nwnI7t/+w2LsV1gLprLXDGMkXBRi53OyFExLE9E6ENZMuXdF6dfuD2zuz3Afw43Ej\nxnnqff3o722yWunSo5V22aDmVKVis2lZ1QnRZnqRIHZ/KzzrkTn+A8UnAFwWLAqR\nfff38P4i1bltJyJj0NAGdPqH6Wqv+HwtvV9PvKa01cJQZPzwiQcj9weTCyQOEnhS\nV4bNPzFlAgMBAAECggEAVlBpbK8WR7Tq6McwVmpeFfSl8Nlvv/o1768mC2knzgch\n3WRGio1FyPIwf6JmoNzvnHAsd+R4q9S85j1SSAgZLDYqOqcXLrlGwTkp+du63Q/W\nTFnpQVS+GkQPJN/H5qXEeFIgQl+TIhRbWlpdafGEhTzxjmE9BfGQwWj2hCGS2fRL\n+i8c0L3R4wPkIW/TuuoqzhnQXXyHRhHba1H3LY+jLWcg48LVFUg8m0k+73AIN/wF\nD6cA8B9OmG/mux5tDOTLxABv8TrjwrPrnnRDDqgLskPHuDGhnOP4WMpYQ3jut4So\n6P0on5oRIKflLLefogTVjxO0wIEZrCgXDMn5Ynd9HQKBgQDpjwxUMo2GhDCdUSdr\nz3kufO6HUUtdkgqHsvsvVB7HctQ3Gc3pFkZC9dMcWUlWZOUS7HTOHrNraimjdu5J\nnVcmMOShUJNm9TEe1Q81B9qo2B7o0+6MHqmLdDFiNT9HaJlWYmknGCiInoqTRvL7\n/aCRkPDA8pVNky/P4oMBSMBh4wKBgQDhQqdIXxfgzA8M3I1zFPNaotNPP0LIwmjO\niD8p0Px6yJAZ1uB/AmxaZ5lRI9XvduXnrabpnAWwTCJZiaxvgNekgJ88+JRAuAjl\njpTmDGqAKjaYru9MvmZ9yoRkXKk0u12eS+s/NqH/ILqR2bdiGOpXiLnrVG3Rq1Dl\nfyOHYgTiFwKBgQC1FQ++CCPqc3stvcoOsKGIBZz6lXEVbzFy3LYbj+D9Sm52+i7H\n1VlMeUPg6ukNbtScw3Acj3kUgw8digxeTvtOxQG+gLaIUPpwqUhNGXXTCx2L7yU4\nxl01njTbq+UP/G1GqK5WfUiQBDv0zEGAVrizo+jF8E8KAmBDkZ9402s1eQKBgQCQ\nMDgf7S69qCDiHLM2POzg0WTtTxMSqs6nlTLJM4rJlWQYBiFBa22sGLBc7dFdLQBQ\n4ij7U/GYPcOnCKcl4JUoKWTEhGFxY9veBPxunPf2/g5ggWmP+DhmwKEqFN4CcQSl\n9PaqSfA7/NkvzurBki0+xrgrWKnLEhwAKve1CxsRFQKBgQC6SQ9FjLHrPgODWWhI\nGQaQV5IUtCLCopbkLz4iIDtkVCHBJPjObM+LS6UCY863pEmVe+p+vjAI8FAK4qYB\nWrNFpx7KlpFR39B5n2DVvldLM8/3blEjg/DynxqMe5JcymDHnDEed4RnM7B2D9RX\n0JFxGQCsnmGUPtv/h6gQtls+TQ==\n-----END PRIVATE KEY-----\n",
-			 email:"bferster@newagent-xjie.iam.gserviceaccount.com",
-			 id: "newagent-xjie"
-			}
-
-			df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDNg4lVhiuu5Bgy\nimKeyXmb24phJg3yDHZI1YV/SlUq6ZzEX/tgQCPrzHzn6REr4rnbq3Jx54Hi3Wrw\nQY5EDAcSRQPK/6eDFAA1kibsYdlyaeQeUm/qs5cK2vf7c4fIsgGGsCQNzPQZ7Ojp\nwnI7t/+w2LsV1gLprLXDGMkXBRi53OyFExLE9E6ENZMuXdF6dfuD2zuz3Afw43Ej\nxnnqff3o722yWunSo5V22aDmVKVis2lZ1QnRZnqRIHZ/KzzrkTn+A8UnAFwWLAqR\nfff38P4i1bltJyJj0NAGdPqH6Wqv+HwtvV9PvKa01cJQZPzwiQcj9weTCyQOEnhS\nV4bNPzFlAgMBAAECggEAVlBpbK8WR7Tq6McwVmpeFfSl8Nlvv/o1768mC2knzgch\n3WRGio1FyPIwf6JmoNzvnHAsd+R4q9S85j1SSAgZLDYqOqcXLrlGwTkp+du63Q/W\nTFnpQVS+GkQPJN/H5qXEeFIgQl+TIhRbWlpdafGEhTzxjmE9BfGQwWj2hCGS2fRL\n+i8c0L3R4wPkIW/TuuoqzhnQXXyHRhHba1H3LY+jLWcg48LVFUg8m0k+73AIN/wF\nD6cA8B9OmG/mux5tDOTLxABv8TrjwrPrnnRDDqgLskPHuDGhnOP4WMpYQ3jut4So\n6P0on5oRIKflLLefogTVjxO0wIEZrCgXDMn5Ynd9HQKBgQDpjwxUMo2GhDCdUSdr\nz3kufO6HUUtdkgqHsvsvVB7HctQ3Gc3pFkZC9dMcWUlWZOUS7HTOHrNraimjdu5J\nnVcmMOShUJNm9TEe1Q81B9qo2B7o0+6MHqmLdDFiNT9HaJlWYmknGCiInoqTRvL7\n/aCRkPDA8pVNky/P4oMBSMBh4wKBgQDhQqdIXxfgzA8M3I1zFPNaotNPP0LIwmjO\niD8p0Px6yJAZ1uB/AmxaZ5lRI9XvduXnrabpnAWwTCJZiaxvgNekgJ88+JRAuAjl\njpTmDGqAKjaYru9MvmZ9yoRkXKk0u12eS+s/NqH/ILqR2bdiGOpXiLnrVG3Rq1Dl\nfyOHYgTiFwKBgQC1FQ++CCPqc3stvcoOsKGIBZz6lXEVbzFy3LYbj+D9Sm52+i7H\n1VlMeUPg6ukNbtScw3Acj3kUgw8digxeTvtOxQG+gLaIUPpwqUhNGXXTCx2L7yU4\nxl01njTbq+UP/G1GqK5WfUiQBDv0zEGAVrizo+jF8E8KAmBDkZ9402s1eQKBgQCQ\nMDgf7S69qCDiHLM2POzg0WTtTxMSqs6nlTLJM4rJlWQYBiFBa22sGLBc7dFdLQBQ\n4ij7U/GYPcOnCKcl4JUoKWTEhGFxY9veBPxunPf2/g5ggWmP+DhmwKEqFN4CcQSl\n9PaqSfA7/NkvzurBki0+xrgrWKnLEhwAKve1CxsRFQKBgQC6SQ9FjLHrPgODWWhI\nGQaQV5IUtCLCopbkLz4iIDtkVCHBJPjObM+LS6UCY863pEmVe+p+vjAI8FAK4qYB\nWrNFpx7KlpFR39B5n2DVvldLM8/3blEjg/DynxqMe5JcymDHnDEed4RnM7B2D9RX\n0JFxGQCsnmGUPtv/h6gQtls+TQ==\n-----END PRIVATE KEY-----\n",
-  				email: "newagent-xjie-iam@newagent-xjie.iam.gserviceaccount.com",	
-				id: "newagent-xjie"
-	
-			}
-
 
 	async function InferIntents(msgs, callback)													// GET RESPONSE FROM AI
 	{
@@ -421,19 +268,6 @@ return;
 		return "";																					// No previous response
 	}
 
-	function DeleteTrainingData()															// DELETE TRAINING DATA
-	{
-		if (window.location.host != "localhost") 	return;											// Only local can delete
-		ConfirmBox("Are your sure?","",()=>{
-			WitGetUtterances((d)=>{
-				WitDeleteUtternances(d,(r)=>{ trace(r);	});
-				});
-			WitGetIntents((d)=>{
-				WitDeleteIntents(d,(r)=>{ trace(r);	});
-				});
-			})
-	}
-
 	function ImportCSV(e) {																		// IMPORT SESSION FROM CSV
 		let i,d="";
 		let file=e.target.files[0];																	// Point at file
@@ -467,40 +301,47 @@ return;
 		SaveTextAsFile("responses.csv",str);														// Write file
 	}
 
-//
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // WIT
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	async function TrainWit(e)																	// TRAIN WIT
+	async function TrainWit(d, newIntents)														// TRAIN WIT
 	{	
-		let file=e.target.files[0];																	// Point at file
-		if (!file) 	return;																			// Quit if bad
-		let reader=new FileReader();																// Init reader
-		reader.readAsText(file);																	// Read file
-		reader.onload=(e)=>{ 																		// When loaded
-			LoadingIcon(true);																		// Show loading icon
-			let i,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
-			SaveResponseFile(d);																	// Save student responses to new CSV file			
-			for (i=0;i<d.length;++i) {																// For each remark
-				if (d[i].note == "hold") { d.splice(i,1); continue; }								// Remove holds
-				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
-				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
+		LoadingIcon(true);																			// Show loading icon
+		let tot=d.length;																			// Total to train
+		WitGetIntents((ins)=>{																		// Get intents list		
+			if (ins.length) {
+				WitDeleteIntents(ins,(r)=>{},()=>{													// Delete intents recursively
+				WitAddIntents(newIntents,()=>{},()=>{												// Add intents recursively
+					WitTrain(d, (r1,r2)=>{															// Start sending via recursion		
+						trace(r1,r2);																// Log	
+						$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>"); // Show progress
+						if (!d.length) {															// If last one
+							Sound("ding");															// Ding				
+							LoadingIcon(false);														// Hide loading icon
+							}
+						});											
+					});											
+				});
 			}
-			let tot=d.length;																		// Total
+			else{
+				WitAddIntents(newIntents,()=>{},()=>{												// Add intents recursively
+						WitTrain(d, (r1,r2)=>{															// Start sending via recursion		
+						trace(r1,r2);																// Log	
+						$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>"); // Show progress
+						if (!d.length) {															// If last one
+							Sound("ding");															// Ding				
+							LoadingIcon(false);														// Hide loading icon
+							}
+						});											
+					});											
+				}
+			});
 
-			
-			WitTrain(d, (r1,r2)=>{																	// Start sending via recursion		
-				trace(r1,r2);																		// Log	
-				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>");	// Show progress
-				if (!d.length) {																	// If last one
-					Sound("ding");																	// Ding				
-					LoadingIcon(false);																// Hide loading icon
-					}
-				});											
-			};
+}
 
-	}
+
+
 	
 	function WitGetUtterances(callback)															// GET ARRAY OF UTTERANCES
 	{
@@ -511,7 +352,7 @@ return;
 			.then(res => res.json()).then(res =>{callback(res); });									// Send data back
 	}
 
-	function WitGetIntents(callback)																// GET ARRAY OF INTNTS
+	async function WitGetIntents(callback)														// GET ARRAY OF INTENTS
 	{
 		const url="https://api.wit.ai/intents?v=20210922&limit=10000";								// URL 
 		const response=fetch(url, { 																// Send command to wit
@@ -520,7 +361,7 @@ return;
 			.then(res => res.json()).then(res =>{callback(res); });									// Send data back
 	}
 
-	function WitDeleteUtternances(utterances, callback)											// DELETE UTTERANCES FROM< SERVER
+	function WitDeleteUtternances(utterances, callback)											// DELETE UTTERANCES FROM SERVER
 	{
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
 		const response=fetch(url, { 																// Send command to wit
@@ -531,24 +372,25 @@ return;
 		  .then(res => res.json()).then(res =>{callback(res); });									// Send data back
 	}
 
-	function WitDeleteIntents(intebts, callback)												// DELETE UTTERANCES FROM SERVER
+	async function WitDeleteIntents(msgs, callback, done)										// DELETE INTENT FROM SERVER
 	{
-	return
-		const url="https://api.wit.ai/intents?v=20210922";											// URL 
-		const response=fetch(url, { 																// Send command to wit
+		let m=msgs.shift();																			// Remove from list and save first
+		if (!m)	return;																				// Nothing to do
+		trace("Deleted: "+m.name);																	// Log
+		const url="https://api.wit.ai/intents/"+m.name+"?v=20210922";								// URL 
+		const response=await fetch(url, { 															// Send remark to wit
 			  method:"DELETE",
 			  headers: { Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'}, 
-			  body: JSON.stringify(intents)
-			  })	
-		  .then(res => res.json()).then(res =>{callback(res); });									// Send data back
+			  });	
+		let res=await response.json();																// Get response
+		if (msgs.length) setTimeout(()=>{ WitDeleteIntents(msgs, callback, done) },500);			// Recurse, if not last
+		else done(123);
 	}
 
-	async function WitTrain(msgs, callback)														// SEND REMARK TO WIT TO TRAIN
+	async function WitTrain(msgs, callback, done)												// SEND REMARK TO WIT TO TRAIN
 	{
-	
 //		for (let i=480;i<600;i+=10) 	SaveTextAsFile("r"+i+".json",`{ "name": "r${i}" }`);	
-		
-		let inference={ text:"", intent:0, confidence:0 };											// Null inference
+		let res=null,inference={ text:"", intent:0, confidence:0 };									// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
 		if (!isNaN(m.intent)) m.intent="r"+m.intent;												// Numbers need to be prefixed with a letter
 		const url="https://api.wit.ai/utterances?v=20210922";										// URL 
@@ -558,27 +400,28 @@ return;
 			  headers: { Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'}, 
 			  body: JSON.stringify(body)
 			  });	
-		let res=await response.json();																// Get response
+		res=await response.json();																	// Get response
 		callback(m,res);																			// Return responss
-		if (msgs.length) setTimeout(()=>{ WitTrain(msgs, callback) },500);							// Recurse, if not last
+		if (msgs.length) setTimeout(()=>{ WitTrain(msgs, callback, done) },500);						// Recurse, if not last
 	}
 
-	async function WitAddIntents(msgs, callback)												// SEND REMARK TO WIT TO TRAIN
+	async function WitAddIntents(msgs, callback, done)												// SEND REMARK TO WIT TO TRAIN
 	{
-	return;
-		let inference={ text:"", intent:0, confidence:0 };											// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
-		if (!isNaN(m.intent)) m.intent="r"+m.intent;												// Numbers need to be prefixed with a letter
+		if (!m)	return;																				// Nothing to do
+		if (!isNaN(m)) m="r"+m;																		// Numbers need to be prefixed with a letter
 		const url="https://api.wit.ai/intents?v=20210922";											// URL 
-		let body=[{ name:m.intent.toLowerCase()}];													// Make body
+		let body={ name:m.toLowerCase()};															// Make body
 		const response=await fetch(url, { 															// Send remark to wit
 			  method:"POST",
 			  headers: { Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'}, 
 			  body: JSON.stringify(body)
 			  });	
 		let res=await response.json();																// Get response
-		callback(m,res);																			// Return responss
-		if (msgs.length) setTimeout(()=>{ WitAddIntents(msgs, callback) },500);						// Recurse, if not last
+		trace(res)
+		if (msgs.length) setTimeout(()=>{ WitAddIntents(msgs, callback, done) },500);				// Recurse, if not last
+		else done(123);
+
 	}
 
 
@@ -586,6 +429,19 @@ return;
 // DIALOGFLOW
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	
+let df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDNg4lVhiuu5Bgy\nimKeyXmb24phJg3yDHZI1YV/SlUq6ZzEX/tgQCPrzHzn6REr4rnbq3Jx54Hi3Wrw\nQY5EDAcSRQPK/6eDFAA1kibsYdlyaeQeUm/qs5cK2vf7c4fIsgGGsCQNzPQZ7Ojp\nwnI7t/+w2LsV1gLprLXDGMkXBRi53OyFExLE9E6ENZMuXdF6dfuD2zuz3Afw43Ej\nxnnqff3o722yWunSo5V22aDmVKVis2lZ1QnRZnqRIHZ/KzzrkTn+A8UnAFwWLAqR\nfff38P4i1bltJyJj0NAGdPqH6Wqv+HwtvV9PvKa01cJQZPzwiQcj9weTCyQOEnhS\nV4bNPzFlAgMBAAECggEAVlBpbK8WR7Tq6McwVmpeFfSl8Nlvv/o1768mC2knzgch\n3WRGio1FyPIwf6JmoNzvnHAsd+R4q9S85j1SSAgZLDYqOqcXLrlGwTkp+du63Q/W\nTFnpQVS+GkQPJN/H5qXEeFIgQl+TIhRbWlpdafGEhTzxjmE9BfGQwWj2hCGS2fRL\n+i8c0L3R4wPkIW/TuuoqzhnQXXyHRhHba1H3LY+jLWcg48LVFUg8m0k+73AIN/wF\nD6cA8B9OmG/mux5tDOTLxABv8TrjwrPrnnRDDqgLskPHuDGhnOP4WMpYQ3jut4So\n6P0on5oRIKflLLefogTVjxO0wIEZrCgXDMn5Ynd9HQKBgQDpjwxUMo2GhDCdUSdr\nz3kufO6HUUtdkgqHsvsvVB7HctQ3Gc3pFkZC9dMcWUlWZOUS7HTOHrNraimjdu5J\nnVcmMOShUJNm9TEe1Q81B9qo2B7o0+6MHqmLdDFiNT9HaJlWYmknGCiInoqTRvL7\n/aCRkPDA8pVNky/P4oMBSMBh4wKBgQDhQqdIXxfgzA8M3I1zFPNaotNPP0LIwmjO\niD8p0Px6yJAZ1uB/AmxaZ5lRI9XvduXnrabpnAWwTCJZiaxvgNekgJ88+JRAuAjl\njpTmDGqAKjaYru9MvmZ9yoRkXKk0u12eS+s/NqH/ILqR2bdiGOpXiLnrVG3Rq1Dl\nfyOHYgTiFwKBgQC1FQ++CCPqc3stvcoOsKGIBZz6lXEVbzFy3LYbj+D9Sm52+i7H\n1VlMeUPg6ukNbtScw3Acj3kUgw8digxeTvtOxQG+gLaIUPpwqUhNGXXTCx2L7yU4\nxl01njTbq+UP/G1GqK5WfUiQBDv0zEGAVrizo+jF8E8KAmBDkZ9402s1eQKBgQCQ\nMDgf7S69qCDiHLM2POzg0WTtTxMSqs6nlTLJM4rJlWQYBiFBa22sGLBc7dFdLQBQ\n4ij7U/GYPcOnCKcl4JUoKWTEhGFxY9veBPxunPf2/g5ggWmP+DhmwKEqFN4CcQSl\n9PaqSfA7/NkvzurBki0+xrgrWKnLEhwAKve1CxsRFQKBgQC6SQ9FjLHrPgODWWhI\nGQaQV5IUtCLCopbkLz4iIDtkVCHBJPjObM+LS6UCY863pEmVe+p+vjAI8FAK4qYB\nWrNFpx7KlpFR39B5n2DVvldLM8/3blEjg/DynxqMe5JcymDHnDEed4RnM7B2D9RX\n0JFxGQCsnmGUPtv/h6gQtls+TQ==\n-----END PRIVATE KEY-----\n",
+			 email:"bferster@newagent-xjie.iam.gserviceaccount.com",
+			 id: "newagent-xjie"
+			}
+
+			df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDNg4lVhiuu5Bgy\nimKeyXmb24phJg3yDHZI1YV/SlUq6ZzEX/tgQCPrzHzn6REr4rnbq3Jx54Hi3Wrw\nQY5EDAcSRQPK/6eDFAA1kibsYdlyaeQeUm/qs5cK2vf7c4fIsgGGsCQNzPQZ7Ojp\nwnI7t/+w2LsV1gLprLXDGMkXBRi53OyFExLE9E6ENZMuXdF6dfuD2zuz3Afw43Ej\nxnnqff3o722yWunSo5V22aDmVKVis2lZ1QnRZnqRIHZ/KzzrkTn+A8UnAFwWLAqR\nfff38P4i1bltJyJj0NAGdPqH6Wqv+HwtvV9PvKa01cJQZPzwiQcj9weTCyQOEnhS\nV4bNPzFlAgMBAAECggEAVlBpbK8WR7Tq6McwVmpeFfSl8Nlvv/o1768mC2knzgch\n3WRGio1FyPIwf6JmoNzvnHAsd+R4q9S85j1SSAgZLDYqOqcXLrlGwTkp+du63Q/W\nTFnpQVS+GkQPJN/H5qXEeFIgQl+TIhRbWlpdafGEhTzxjmE9BfGQwWj2hCGS2fRL\n+i8c0L3R4wPkIW/TuuoqzhnQXXyHRhHba1H3LY+jLWcg48LVFUg8m0k+73AIN/wF\nD6cA8B9OmG/mux5tDOTLxABv8TrjwrPrnnRDDqgLskPHuDGhnOP4WMpYQ3jut4So\n6P0on5oRIKflLLefogTVjxO0wIEZrCgXDMn5Ynd9HQKBgQDpjwxUMo2GhDCdUSdr\nz3kufO6HUUtdkgqHsvsvVB7HctQ3Gc3pFkZC9dMcWUlWZOUS7HTOHrNraimjdu5J\nnVcmMOShUJNm9TEe1Q81B9qo2B7o0+6MHqmLdDFiNT9HaJlWYmknGCiInoqTRvL7\n/aCRkPDA8pVNky/P4oMBSMBh4wKBgQDhQqdIXxfgzA8M3I1zFPNaotNPP0LIwmjO\niD8p0Px6yJAZ1uB/AmxaZ5lRI9XvduXnrabpnAWwTCJZiaxvgNekgJ88+JRAuAjl\njpTmDGqAKjaYru9MvmZ9yoRkXKk0u12eS+s/NqH/ILqR2bdiGOpXiLnrVG3Rq1Dl\nfyOHYgTiFwKBgQC1FQ++CCPqc3stvcoOsKGIBZz6lXEVbzFy3LYbj+D9Sm52+i7H\n1VlMeUPg6ukNbtScw3Acj3kUgw8digxeTvtOxQG+gLaIUPpwqUhNGXXTCx2L7yU4\nxl01njTbq+UP/G1GqK5WfUiQBDv0zEGAVrizo+jF8E8KAmBDkZ9402s1eQKBgQCQ\nMDgf7S69qCDiHLM2POzg0WTtTxMSqs6nlTLJM4rJlWQYBiFBa22sGLBc7dFdLQBQ\n4ij7U/GYPcOnCKcl4JUoKWTEhGFxY9veBPxunPf2/g5ggWmP+DhmwKEqFN4CcQSl\n9PaqSfA7/NkvzurBki0+xrgrWKnLEhwAKve1CxsRFQKBgQC6SQ9FjLHrPgODWWhI\nGQaQV5IUtCLCopbkLz4iIDtkVCHBJPjObM+LS6UCY863pEmVe+p+vjAI8FAK4qYB\nWrNFpx7KlpFR39B5n2DVvldLM8/3blEjg/DynxqMe5JcymDHnDEed4RnM7B2D9RX\n0JFxGQCsnmGUPtv/h6gQtls+TQ==\n-----END PRIVATE KEY-----\n",
+  				email: "newagent-xjie-iam@newagent-xjie.iam.gserviceaccount.com",	
+				id: "newagent-xjie"
+	
+			}
+
+
+
 	function TrainDialog(e)																		// MAKE DIALOGFLOW INTENT FILE
 	{
 		let intent,str,i,s;

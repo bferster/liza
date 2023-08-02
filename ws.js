@@ -36,11 +36,12 @@
 	ps -ef (kill PID) to remove
 	nohup rasa run -m models --enable-api --cors "*" --ssl-certificate /opt/bitnami/letsencrypt/certificates/www.lizasim.com.crt --ssl-keyfile /opt/bitnami/letsencrypt/certificates/www.lizasim.com.key --port 5006?
 
- 	RENEW LETSENCRYPT SSL:
+ 	RENEW LETSENCRYPT SSL (installed with bncert-tool)
 	sudo /opt/bitnami/ctlscript.sh stop
 	sudo /opt/bitnami/letsencrypt/lego --tls --email="bferster@stagetools.com" --domains="agileteacher.org" --path="/opt/bitnami/letsencrypt" renew --days 90
 	sudo /opt/bitnami/letsencrypt/lego --path /opt/bitnami/letsencrypt list
-	sudo /opt/bitnami/ctlscript.sh start
+ 	sudo /opt/bitnami/ctlscript.sh start
+    restart grace/ws/ja, game/ws.js, db/sql.js
 
 	ssh -i c:/Bill/CC/js/agile.pem bitnami@54.88.128.161
 
