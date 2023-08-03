@@ -1,60 +1,60 @@
 intent,student,response,valued,language,knowledge,thinking,action,understanding,responseType
-200,Oliver,Check and Circle sounds like a game.,,-1 Casual language/conversation,0 Not present,0 Not present,Talk,0,
-200,Oliver,I'm ready.,,-1 Casual language/conversation,0 Not present,0 Not present,Talk,0,
-200,Oliver,"Okay, Check and Circle sounds good.",,-1 Casual language/conversation,0 Not present,0 Not present,Talk,0,
-200,Sharleen,I haven't started. I am nervous because I didn't read the story.,,-1 Casual language/conversation,0 Not present,0 Not present,Talk,0,
-200,Sharleen,"I'll give it a try, I wasn't here yesterday. I have to hurry to catch up.",,-1 Casual language/conversation,0 Not present,0 Not present,Talk,0,
-200,Sharleen,"Okay, I am worried because I haven't read the paragraph.",,-1 Casual language/conversation,0 Not present,0 Not present,Talk,0,
-310,Oliver,"Teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,Talk,0,
-310,Oliver,"Teacher, I think we could use a couple breaths to get focused.",,2 Vocabulary+Details,1 Prior knowledge,3 Elaborative,Talk,0,
-310,Oliver,"Teacher, can we pause for a couple of breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,Talk,0,
-310,Sharleen,I need a moment to calm my nerves.,,2 Vocabulary+Details,1 Prior knowledge,3 Elaborative,Talk,0,
-310,Sharleen,I need to get focused.,,1 Vocabulary,1 Prior knowledge,2 Careful,Talk,0,
-310,Sharleen,I want to stop worrying.,,1 Vocabulary,1 Prior knowledge,2 Careful,Talk,0,
-410,Oliver,"This breathing is very helpful, teacher.",,-1 Casual language/conversation,0 Not present,0 Not present,Breathe,0,
-410,Oliver,Thank you for letting us do this breathing exercise.,,-1 Casual language/conversation,0 Not present,0 Not present,Breathe,0,
-410,Sharleen,"This was super helpful, teacher.",,-1 Casual language/conversation,0 Not present,0 Not present,Breathe,,
-410,Sharleen,"I like doing these type of calming activities. ",,-1 Casual language/conversation,0 Not present,0 Not present,Breathe,,
-230,Oliver,"Um, yeah, okay. So question one is what equipment did scientists use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,Read,0,
-230,Oliver,What equipment did scientists use to discover water on the moon.,,1 Vocabulary,2 Evidence from source,2 Careful,Read,0,
-230,Oliver,"Yeah, sure. Okay. The question was what equipment did scientists use to discover water on the moon",,1 Vocabulary,2 Evidence from source,2 Careful,Read,0,
-230,Oliver,"Okay, What equipment did scientist use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,Read,0,
-230,Sharleen,The question says what equipment did scientists use to discover water on the moon.,,1 Vocabulary,2 Evidence from source,2 Careful,Read,0,
-230,Sharleen,"Okay, yes, I can read it. It says what equipment did scientists use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,Read,0,
-410,Oliver,Water,,1 Vocabulary,0 Not present,1 Incomplete,Talk,0,
-410,Oliver,Tool,,1 Vocabulary,0 Not present,1 Incomplete,Talk,0,
-410,Oliver,Equipment,,1 Vocabulary,0 Not present,1 Incomplete,Talk,0,
-410,Sharleen,I checked scientists and moon because those are important nouns in the question.,,1 Vocabulary,0 Not present,1 Incomplete,Talk,0,
-410,Sharleen,I checked scientists because scientists are the only people mentioned in the question.,,1 Vocabulary,0 Not present,1 Incomplete,Talk,0,
-410,Sharleen,I checked moon because the question is talking about scientists on the moon.,,1 Vocabulary,0 Not present,1 Incomplete,Talk,0,
-300,Oliver,I got it.,,-1 Casual language/conversation,2 Evidence from source,2 Careful,Talk,0,
-300,Oliver,"Okay, I will focus on equipment and water",,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-300,Oliver,"Great, I got the checks",,-1 Casual language/conversation,2 Evidence from source,2 Careful,Talk,0,
-300,Sharleen,"Oh, so the WH question word we are focused on is what.",,0 Not Present,0 Not present,1 Incomplete,Talk,0,
-300,Sharleen,"Oh, I wasn't thinking about what being the WH question word to focus on. I see what is the equipment needed to find the water.",,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,Talk,0,
-300,Sharleen,I didn't realize it had to be about the equipment. Now I see the answer to what the question is about is the equipment since that's the object.,,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,Talk,0,
-300,Sharleen,I see the word what in the question tell us that we are looking for nouns that are things - like equipment and water.,,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,Talk,0,
-410,Oliver,"I think the action word is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,Read,0,
-410,Oliver,"The verb the question wants us to investigate is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,Read,0,
-410,Sharleen,"The question wants us to focus on the verb discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,Read,0,
-410,Sharleen,"Ok I think the action word is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,Read,0,
-300,Oliver,We're great at this.,,-1 Casual language/conversation,0 Not present,0 Not present,Talk,0,
-300,Oliver,I knew discover was an important word.,,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-300,Sharleen,"We make a good team, Oliver.",,-1 Casual language/conversation,0 Not present,0 Not present,Talk,0,
-300,Sharleen,"Discover seemed like it was important for us to focus on. ",,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-500,Oliver,I learned to look for the action words and the WH question words in questions.,,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-500,Oliver,I learned to take more time to understand the question before I start to answer it.,,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-500,Oliver,I learned to think about how the question tells you what you have to have in the answer.,,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-500,Oliver,I learned to highlight the important words.,,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-500,Sharleen,"I learned that I need to look for key words, including the WH question words.",,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-500,Sharleen,"I learned that I need to take time to read the question carefully and focus on the WH questions like what. ",,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-520,Oliver,"Ok, next time I'll try to read the question really carefully because I might miss what it is asking.",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,Talk,0,
-520,Oliver,"Next time, I'll take time to highlight the important words in the question and remember I will need them in my answer.",,1 Vocabulary,2 Evidence from source,2 Careful,Talk,0,
-520,Oliver,"I could try focusing on the WH question words to help me understand the question. ",,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,Talk,0,
-520,Oliver,I will highlight the important words and remember that those words should be in my answer.,,2 Vocabulary+Details,2 Evidence from source,3 Elaborative,Talk,0,
-520,Sharleen,Next time I will take time to look at the key words and the WH question words in the question.,,2 Vocabulary+Details,2 Evidence from source,3 Elaborative,Talk,0,
-520,Sharleen,Next time I will read the question carefully and highlight key words that answer our WH questions like what.,,2 Vocabulary+Details,2 Evidence from source,3 Elaborative,Talk,0,
-520,Sharleen,"Next time I will focus on looking for the WH question words when I read questions. ",,,,,,0,
+200,Oliver,Check and Circle sounds like a game.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
+200,Oliver,I'm ready.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
+200,Oliver,"Okay, Check and Circle sounds good.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
+200,Sharleen,I haven't started. I am nervous because I didn't read the story.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
+200,Sharleen,"I'll give it a try, I wasn't here yesterday. I have to hurry to catch up.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
+200,Sharleen,"Okay, I am worried because I haven't read the paragraph.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
+310,Oliver,"Teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
+310,Oliver,"Teacher, I think we could use a couple breaths to get focused.",,2 Vocabulary+Details,1 Prior knowledge,3 Elaborative,,0,Engage
+310,Oliver,"Teacher, can we pause for a couple of breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
+310,Sharleen,I need a moment to calm my nerves.,,2 Vocabulary+Details,1 Prior knowledge,3 Elaborative,,0,Engage
+310,Sharleen,I need to get focused.,,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
+310,Sharleen,I want to stop worrying.,,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
+410,Oliver,"This breathing is very helpful, teacher.",,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
+410,Oliver,Thank you for letting us do this breathing exercise.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
+410,Sharleen,"This was super helpful, teacher.",,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
+410,Sharleen,"I like doing these type of calming activities. ",,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
+230,Oliver,"Um, yeah, okay. So question one is what equipment did scientists use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
+230,Oliver,What equipment did scientists use to discover water on the moon.,,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
+230,Oliver,"Yeah, sure. Okay. The question was what equipment did scientists use to discover water on the moon",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
+230,Oliver,"Okay, What equipment did scientist use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
+230,Sharleen,The question says what equipment did scientists use to discover water on the moon.,,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
+230,Sharleen,"Okay, yes, I can read it. It says what equipment did scientists use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
+411,Oliver,Water,,1 Vocabulary,0 Not present,1 Incomplete,write,0,Learn
+411,Oliver,Tool,,1 Vocabulary,0 Not present,1 Incomplete,write,0,Learn
+411,Oliver,Equipment,,1 Vocabulary,0 Not present,1 Incomplete,write,0,Learn
+411,Sharleen,I checked scientists and moon because those are important nouns in the question.,,1 Vocabulary,0 Not present,1 Incomplete,write,0,Learn
+411,Sharleen,I checked scientists because scientists are the only people mentioned in the question.,,1 Vocabulary,0 Not present,1 Incomplete,write,0,Learn
+411,Sharleen,I checked moon because the question is talking about scientists on the moon.,,1 Vocabulary,0 Not present,1 Incomplete,write,0,Learn
+320,Oliver,I got it.,,-1 Casual language/conversation,2 Evidence from source,2 Careful,,0,Learn
+320,Oliver,"Okay, I will focus on equipment and water",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
+320,Oliver,"Great, I got the checks",,-1 Casual language/conversation,2 Evidence from source,2 Careful,,0,Learn
+320,Sharleen,"Oh, so the WH question word we are focused on is what.",,0 Not Present,0 Not present,1 Incomplete,,0,Learn
+320,Sharleen,"Oh, I wasn't thinking about what being the WH question word to focus on. I see what is the equipment needed to find the water.",,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,,0,Learn
+320,Sharleen,I didn't realize it had to be about the equipment. Now I see the answer to what the question is about is the equipment since that's the object.,,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,,0,Learn
+320,Sharleen,I see the word what in the question tell us that we are looking for nouns that are things - like equipment and water.,,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,,0,Learn
+412,Oliver,"I think the action word is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
+412,Oliver,"The verb the question wants us to investigate is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
+412,Sharleen,"The question wants us to focus on the verb discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
+412,Sharleen,"Ok I think the action word is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
+330,Oliver,We're great at this.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Learn
+330,Oliver,I knew discover was an important word.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
+330,Sharleen,"We make a good team, Oliver.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Learn
+330,Sharleen,"Discover seemed like it was important for us to focus on. ",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
+500,Oliver,I learned to look for the action words and the WH question words in questions.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
+500,Oliver,I learned to take more time to understand the question before I start to answer it.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
+500,Oliver,I learned to think about how the question tells you what you have to have in the answer.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
+500,Oliver,I learned to highlight the important words.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
+500,Sharleen,"I learned that I need to look for key words, including the WH question words.",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
+500,Sharleen,"I learned that I need to take time to read the question carefully and focus on the WH questions like what. ",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
+520,Oliver,"Ok, next time I'll try to read the question really carefully because I might miss what it is asking.",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,,0,Reflect
+520,Oliver,"Next time, I'll take time to highlight the important words in the question and remember I will need them in my answer.",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
+520,Oliver,"I could try focusing on the WH question words to help me understand the question. ",,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,,0,Reflect
+520,Oliver,I will highlight the important words and remember that those words should be in my answer.,,2 Vocabulary+Details,2 Evidence from source,3 Elaborative,,0,Reflect
+520,Sharleen,Next time I will take time to look at the key words and the WH question words in the question.,,2 Vocabulary+Details,2 Evidence from source,3 Elaborative,,0,Reflect
+520,Sharleen,Next time I will read the question carefully and highlight key words that answer our WH questions like what.,,2 Vocabulary+Details,2 Evidence from source,3 Elaborative,,0,Reflect
+520,Sharleen,"Next time I will focus on looking for the WH question words when I read questions. ",,2 Vocabulary+Details,2 Evidence from source,3 Elaborative,,0,Reflect
 
 1101,Class,The answer is 4 of course,0,0,0,0,Talk,,Add
 1101,Class,Would you believe 22?,0,0,0,0,Talk,0,,Add

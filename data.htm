@@ -133,7 +133,7 @@
 						WitDeleteUtternances(d,(r)=>{ trace(r);	});									// Delete existing utterances									
 						});
 					WitGetIntents((d)=>{															// Get intents list		
-						WitDeleteIntents(d,(r)=>{ trace(r);	});										// Delete existing intents
+						WitDeleteIntents(d,(r)=>{ trace(r);	},(r)=>{ trace(r);	});					// Delete existing intents
 						});
 					}
 				});
@@ -326,7 +326,7 @@
 			}
 			else{
 				WitAddIntents(newIntents,()=>{},()=>{												// Add intents recursively
-						WitTrain(d, (r1,r2)=>{															// Start sending via recursion		
+					WitTrain(d, (r1,r2)=>{															// Start sending via recursion		
 						trace(r1,r2);																// Log	
 						$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>"); // Show progress
 						if (!d.length) {															// If last one

@@ -448,9 +448,11 @@ class App  {
 				this.students[i].first="";															// Fulfilled
 				}
 			} 
-		if (res.text) 																				// If one
+		if (res.text) 																				// If text
 			app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")+(res.MP3 ? "|"+res.MP3 : "")); // Send response
-		return res;										S											// Return it
+		if (res.action) 																			// If a response action
+			app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|ACT|"+this.curStudent+"|"+res.action); // Send action
+			return res;										S										// Return it
 	}
 
 	UpdateVariance(student, bakt)																// UPDATE STUDENT VARIANCE FROM RESPONSE

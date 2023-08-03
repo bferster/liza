@@ -20,11 +20,11 @@ seat,7,"x=-100,y=-100,z=0,r=0,"
 seat,8,"x=0,y=-100,z=0,r=70,"
 seat,9,"x=150,y=-100,z=0,r=-90,"
 
+resource,Scene Overview,assets/overview.pdf
+resource,Student Task Materials,assets/student.pdf
+resource,Teaching Strategy Support,assets/supports.pdf
+resource,About student variances,assets/variances.pdf
 
-resource,Identifying differences,assets/identifying.pdf
-resource,Questions for your teaching,assets/questions.pdf
-resource,Scene Overview,assets/meet.pdf
-resource,Strategy supports,assets/supports.pdf
 action,sleep,"sleep,snooze"
 action,headCenter,"eyes front,head center"
 action,headRight,head right

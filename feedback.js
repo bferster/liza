@@ -13,7 +13,7 @@ class Feedback {
 		this.interval=null;																			// Timer
 		this.maxTime=0;																				// TRT of session
 		this.curMove=-1;																			// Current move
-		this.intentLabels=["Student","General","Clarify","Reflect","Redirect","Think"];				// Intent labels
+		this.intentLabels=["Student","General","Clarify","Reflect","Teach","Think"];				// Intent labels
 		this.cols=["#b0263e","#ea7f1d","#256caa","#25aa54"];										// BAKT colors
 	}
 
@@ -38,7 +38,7 @@ class Feedback {
 	{
 		$("#lz-variance").remove();																	// Remove old one
 		let i,j,s;
-		let labs=["Belonginh","Language","Knowledge","Thinking"];
+		let labs=["Belonging","Language","Knowledge","Thinking"];
 		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px`;			// Container div
 	//	str+=";background-color:#eee;padding:4px;border-radius:6px";									// Make visible?
 		str+=`">`;																					// End div
@@ -305,6 +305,9 @@ class ResponsePanel  {
 	{
 		let i,tabs=[]
 		$("#lz-rpback").remove();																	// Remove old one
+		$("#mainDiv").css("margin-left",0);															// No shift												
+		app.sc.Resize();																			// Resize renderer
+		if (app.role == "Teacher")	return;															// No panel for teacher
 		$("#mainDiv").css("margin-left","15%");														// Shift right													
 		app.sc.Resize();																			// Resize renderer
 		app.sc.SetCamera(0,200,600,0,0,0);															// Reset camera	
@@ -317,9 +320,9 @@ class ResponsePanel  {
 			return;																					// Quit
 			}
 		let o=app.nlp.responses[app.role];															// Point at responses
-		for (i=0;i<o.length;++i) tabs.push(o[i].label)												// Add all tabs
+		if (o) for (i=0;i<o.length;++i) if (o[i].responseType) tabs.push(o[i].responseType)			// Add all tabs
 		tabs=[... new Set(tabs)];																	// Make unique
-
+	
 		let str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:110px;padding:8px">
@@ -335,15 +338,10 @@ class ResponsePanel  {
 					<div id="lzNo"		class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">No</div>
 					<div id="lzYes"		class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Yes</div>
 					<div id="lzFidget"	class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Fidget</div>
-				</div>
-				<span id="lztab-0" class="lz-rptab">${tabs[0]}</span>
-				<span id="lztab-1" class="lz-rptab">${tabs[1]}</span> 
-				<span id="lztab-2" class="lz-rptab">${tabs[2]}</span> 
-				<span id="lztab-3" class="lz-rptab">${tabs[3]}</span> 
-				<span id="lztab-4" class="lz-rptab">${tabs[4]}</span> 
-				<div id="lz-rplist" class="lz-rplist"></div>
-				</div>
-				<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">`;
+				</div>`;
+		for (i=0;i<tabs.length;++i) str+=`<span id="lztab-${i}" class="lz-rptab">${tabs[i]}</span>`;
+		str+=`<div id="lz-rplist" class="lz-rplist"></div></div>
+		<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">`;
 
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
 		addSeqs();																					// Add possible moves to select
@@ -390,23 +388,33 @@ class ResponsePanel  {
 			});
 	
 		function fillList(tab) {																	// FILL RESPONSE LIST
+	
+	
+	
 			let i,j,heads=[],v=[],str="";
+			if (!o) return;																			// Nothing to show
 			for (i=0;i<o.length;++i) {																// For each response
 				if (o[i].label == tabs[tab]) {														// In this tab
 					v.push(o[i]);																	// Add to list to draw	
-					heads.push(o[i].type);															// Add all heads in tab
+//					heads.push(o[i].responseType);													// Add all heads in tab
 					}
 				}
-			heads=[... new Set(heads)];																// Make unique
+/*			heads=[... new Set(heads)];																// Make unique
 			for (i=0;i<heads.length;++i) {															// For each heading
 				str+=`<p><b>${heads[i]}</b></p>`; 													// Add new section head	
 				for (j=0;j<v.length;++j) {															// For each item
-					if (v[j].type == heads[i])  {															
+					if (v[j].responseType == heads[i]) {											// The same															
 						if (app.role == "Teacher")	str+=`<p>&bull; ${v[j].text}</p>`; 				// Add response only
-						else						str+=`<p><img id="resp-${v[j].index}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px" title="Click to play"> ${v[j].text}</p>`; // add response
+						else						str+=`<p><img id="resp-${v[j].index}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px" title="Click to play"> &nbsp; ${v[j].text}</p>`; // add response
 						}
 					}	
 				}
+*/
+			str="<br>"
+			for (i=0;i<o.length;++i) 																// For each response
+				if (o[i].responseType == tabs[tab]) 												// In this tab
+					str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px" title="Click to play"> &nbsp;${o[i].text}</p>`; // add response
+
 			$("#lz-rplist").html(str);																// Add responses
 			$("[id^=resp-]").on("click", (e)=>{ 													// ON PLAY CLICK (after fillList())
 				let id=e.target.id.substr(5);														// Get id

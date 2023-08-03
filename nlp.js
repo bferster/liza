@@ -127,7 +127,7 @@ class NLP {
 			o.bakt[4]=getVariant(d[i]["understanding"]);												// U
 			o.bakt[5]=d[i]["intent"];																	// Intent
 			o.text=d[i]["response"];																	// Get response
-			if (d[i]["ResponseType"]) o.type=d[i]["ResponseType"];										// Get type
+			if (d[i]["responseType"]) o.responseType=d[i]["responseType"];								// Get type
 			o.intent=d[i]["intent"];																	// Get intent
 			o.MP3=d[i]["mp3"];																			// Get mps file, if any
 			o.action=d[i]["action"];																	// Get action
@@ -148,14 +148,11 @@ class NLP {
 	
 	trace(remark, student, intent)
 		let i,o=intent,d=[];
-		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0], MP3:"" };										// Default response
+		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0], MP3:"", responseType:"" };						// Default response
 	trace("getresponse",o,intent)
 		if (student == "Class")	student="Chris"
-		
 		if (!(i=app.studex[student])) 	return res;														// Quit if not a valid student
 		--i;																							// Zero base
-//		if (this.intentCaps.cap400 && (app.students[i].highestIntent == 400)) intent=Math.max(intent,400); 	// At least 400	if last intent was 400+			
-//		if (this.intentCaps.cap500 && (app.students[i].highestIntent == 500)) intent=Math.max(intent,500); 	// 500+				
 		if (intent < 600)																				// If an AI generated intent
        		app.students[i].highestIntent=Math.max(app.students[i].highestIntent,intent);				// Set student's highest intent	
 		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
