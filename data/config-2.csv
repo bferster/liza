@@ -46,6 +46,7 @@ action,wave,wave
 action,wave2,interrupt
 action,pair,"pair,pare,pier,pear"
 action,read,"read,reed,red,re-read,reread"
+action,breathe,breathe
 
 keyrule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy",,
 keyrule,600,"nice|good|great,to,see|meet",,

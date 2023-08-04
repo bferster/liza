@@ -243,8 +243,8 @@ class NLP {
 			.then(res => res.json()).then(res =>{ 														// Process result
 				trace(res)
 				let inference={ text:msg, intent:{name:"r0"}, type:"wit" };								// Null inference
-				if (res.intents.length) {																// If an intent found
-					inference.intent.name=res.intents[0].name;											// Get intent (mimic Rasa format )																	
+				if (res.intents.length && res.intents[0].confidence) {									// If an intent found
+					inference.intent.name=res.intents[0].name;											// Get intent 																
 					inference.intent.confidence=res.intents[0].confidence;								// Confidence
 					if (inference.intent.name == "clarify")			inference.intent.name="r200";		// Convert clarify to r200
 					else if (inference.intent.name == "reflect")	inference.intent.name="r300";		// Reflect	

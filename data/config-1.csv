@@ -53,6 +53,8 @@ action,wave,"wave",
 action,wave2,"interrupt",
 action,pair,"pair,pare,pier,pear",
 action,read,"read,reed,red,re-read,reread",
+action,breathe,breathe
+
 keyword,space,"nasa,base,sun,moon,rover,mars,land,earth,pole,ship,ships,lunar,orbiter,shuttle,tank,tanks,mask,masks,suit,crater,craters,spaceship,fuel,rocket,rockets"
 keyword,text,"story,sentence,sentences,prompt,paragraph,book,article,essay,passage,section,sections,word,words,headings,information,vocabulary"
 keyword,tool,"microscope,machine,machinery,equipment,gizmo,gadget,mechanism,device,utensil,binocular,binoculars"
