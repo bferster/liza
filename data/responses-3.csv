@@ -1,5 +1,5 @@
 intent,student,response,valued,language,knowledge,thinking,action,understanding,responseType
-2200,Oliver,Check and Circle sounds like a game.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
+220,Oliver,Check and Circle sounds like a game.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
 200,Oliver,I'm ready.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
 200,Oliver,"Okay, Check and Circle sounds good.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
 200,Sharleen,I haven't started. I am nervous because I didn't read the story.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
@@ -62,9 +62,18 @@ intent,student,response,valued,language,knowledge,thinking,action,understanding,
 1101,Class,Math is hard,0,0,0,0,Talk,,Add
 600,Class,"Hi, how are you?",1,0,0,0,Talk,,Talk
 600,Class,"Hi, we're excited to work with you",3,0,0,0,Talk,,Greeting
-600,,Class,"We're doing well, how are you?",0,0,0,Talk,,Greeting
+600,Class,"We're doing well, how are you?",0,0,0,0,Talk,,Greeting
 720,Class,"I wanted to thank you for when you called on us",,0 (not present),0 (not present),0 (not present),Talk,,Ending
 730,Class,"I wanted to thank you for how you asked us about our answer.",,0 (not present),0 (not present),0 (not present),Talk,,,Ending
 740,Class,"I wanted to thank you for being interested in our answers.",,0 (not present),0 (not present),0 (not present),Talk,,,Ending
 750,Class,"I wanted to thank you for how you explained what we needed to work on and gave us ideas on how to improve our answer",,0 (not present),0 (not present),0 (not present),Talk,0,,Ending
 760,Class,"I wanted to thank you for when you helped us think about our ideas",,0 (not present),0 (not present),0 (not present),Talk,,,Ending
+
+1001,Class,"I didn't understand what you said",0,0,0,0,Talk,,Missed
+1001,Class,"Could you say that in a different way?",0,0,0,0,Talk,,Missed
+1001,Class,"I am not sure what you were talking about.",0,0,0,0,Talk,,Missed
+1001,Class,"What did you want me to understand?",0,0,0,0,Talk,,Missed
+1001,Class,"It would help me if you could repeat that with different words.",0,0,0,0,Talk,,Missed
+1001,Class,"I didn't understand those words.",0,0,0,0,Talk,,Missed
+1001,Class,"I need to hear that in a different way.",0,0,0,0,Talk,,Missed
+

@@ -144,7 +144,13 @@ looks for ice deposits in a large polar crater. These ice deposits are very smal
 found is microscopic, meaning you wouldn’t be able to see it if you were looking straight
 at it! You'd need a scientific tool called a microscope to look really closely.",,,,,,,,,
 
-
+1001,Class,"I didn't understand what you said",0,0,0,0,Talk,,Missed
+1001,Class,"Could you say that in a different way?",0,0,0,0,Talk,,Missed
+1001,Class,"I am not sure what you were talking about.",0,0,0,0,Talk,,Missed
+1001,Class,"What did you want me to understand?",0,0,0,0,Talk,,Missed
+1001,Class,"It would help me if you could repeat that with different words.",0,0,0,0,Talk,,Missed
+1001,Class,"I didn't understand those words.",0,0,0,0,Talk,,Missed
+1001,Class,"I need to hear that in a different way.",0,0,0,0,Talk,,Missed
 
 
 

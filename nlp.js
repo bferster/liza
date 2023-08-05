@@ -243,7 +243,7 @@ class NLP {
 			.then(res => res.json()).then(res =>{ 														// Process result
 				trace(res)
 				let inference={ text:msg, intent:{name:"r0"}, type:"wit" };								// Null inference
-				if (res.intents.length && res.intents[0].confidence) {									// If an intent found
+				if (res.intents.length && (res.intents[0].confidence > .4)) {							// If an intent found
 					inference.intent.name=res.intents[0].name;											// Get intent 																
 					inference.intent.confidence=res.intents[0].confidence;								// Confidence
 					if (inference.intent.name == "clarify")			inference.intent.name="r200";		// Convert clarify to r200
@@ -252,7 +252,7 @@ class NLP {
 					else if (inference.intent.name == "thinking")	inference.intent.name="r500";		// Thinking			
 					}	
 				else{																					// No intent foubd
-					inference.intent.name="r100";														// Force it 100	
+					inference.intent.name="r1001";														// Force it 100	
 					inference.intent.confidence=0;														// No confidence
 					}								
 				trace(inference.intent.name,inference.intent.confidence)

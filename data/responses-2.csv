@@ -54,3 +54,11 @@ intent,student,response,valued,language,knowledge,language,action,understanding,
 740,Class,"I wanted to thank you for being interested in our answers.",,0 (not present),0 (not present),0 (not present),Talk,,,Ending
 750,Class,"I wanted to thank you for how you explained what we needed to work on and gave us ideas on how to improve our answer",,0 (not present),0 (not present),0 (not present),Talk,0,,Ending
 760,Class,"I wanted to thank you for when you helped us think about our ideas",,0 (not present),0 (not present),0 (not present),Talk,,,Ending
+
+1001,Class,"I didn't understand what you said",0,0,0,0,Talk,,Missed
+1001,Class,"Could you say that in a different way?",0,0,0,0,Talk,,Missed
+1001,Class,"I am not sure what you were talking about.",0,0,0,0,Talk,,Missed
+1001,Class,"What did you want me to understand?",0,0,0,0,Talk,,Missed
+1001,Class,"It would help me if you could repeat that with different words.",0,0,0,0,Talk,,Missed
+1001,Class,"I didn't understand those words.",0,0,0,0,Talk,,Missed
+1001,Class,"I need to hear that in a different way.",0,0,0,0,Talk,,Misse

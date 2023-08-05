@@ -103,8 +103,9 @@ class App  {
 			$("#blackboardDiv").toggle("slide",{ direction:"down"}) 								// Slide
 			});
 		$("#videoBut").on("click", ()=> { app.SendEvent(this.sessionId+"|"+this.curTime+"|"+this.userId+"|VIDEO|Class|on");	}); // ON VIDEO CHAT CLICK
-		$("#talkInput").on("keydown", ()=> { 														// ON ENTER OF TEXT
+		$("#talkInput").on("keydown", (e)=> { 														// ON ENTER OF TEXT
 			if (($("#talkInput").val().length == 1) && this.inSim) {								// If first key struck while in sim
+				if (e.which == 32)	{ $("#talkBut").trigger("mousedown"); return; }					// If space, set focus to main to capture voice
 				let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";					// Student always talk to teacher and vice versa
 				app.SendEvent(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|1|TEXT"); // Alert others to talking
 				this.talkTime=new Date().getTime();													// Get time 
@@ -410,7 +411,7 @@ class App  {
 			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
-				if (intent == 1000) {																// Ending event
+				if (intent == 1000) {																// Eding event
 					this.HandleEventTrigger({ do:"end:", who:"current" });							// Trigger end reponse
 					setTimeout(()=>{																// Wait for remark to end
 						if (this.endPoll)	  this.HandleEventTrigger({do:"assess:"+app.endPoll}); 	// Run poll, if set
@@ -424,7 +425,8 @@ class App  {
 				let r=app.GenerateResponse(text,intent);											// Generate response
 				if (intent >= 300) {																// If an intent detected
 					let s="Feedback to "+app.curStudent+": ";										// Student name
-					s+=app.fb.intentLabels[Math.floor(intent/100)];									// Get intent label
+					if (intent == 1001) s+="Not understood";										// Bad intent
+					else s+=app.fb.intentLabels[Math.floor(intent/100)];							// Get intent label
 					s+=intent ? " "+intent : "";													// Add number
 					$("#feedbackDiv").html(s);														// Show in feedback area
 					}	
