@@ -60,12 +60,13 @@ keyrule,ANDYOU,"lets|let's,hear,from",,
 keyrule,1101,"2,\+|plus|and,2",,
 
 picture,Question,assets/Discussion.png
+picture,Circle and check,assets/CheckandCircle.png
 picture,Important vocabulary,assets/ImportantWords.png
 picture,Lunar orbiter,assets/rover.png
 picture,Sample response,assets/SampleResponse.png
 picture,Misleading words,assets/MisleadingWords.png
 
-session,data,"trt=300,endpoll=demopoll,endurl=https://agileteacher.org/teaching-with-grace,"
+session,data,"trt=420,endpoll=demopoll,endurl=https://agileteacher.org/teaching-with-grace,"
 aimodel,wit,"CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO",
 trigger,time,"who=Sharleen,when=.5,do=say:Teacher, why did you want to talk with us?+act:interrupt"
-trigger,time,"who=Sharleen,when=285,"do=prompt:15 seconds to finish your last question!"
+trigger,time,"who=Sharleen,when=405,"do=prompt:15 seconds to finish your last question!"
