@@ -113,5 +113,4 @@ trigger,time,"who=Luis,when=299,do=act:interrupt"
 trigger,time,"who=Jazmin,when=299,do=act:interrupt"
 trigger,time,"who=Sharleen,when=299,do=act:interrupt"
 
-
-
+lessonplan,Discover Student Reading Strengths,"Engage,Breathe with students,Listen for student interests in their introductions,Walk around the room,Write on the chalkboard+Teach,Ask What do you like to read outside of school?,Ask: Why do you  like fiction or nonfiction?+Take-Away,Explore Timeline tool,Explore Notebook resources,Reflect on your practice through our survey"

@@ -93,7 +93,7 @@ class Feedback {
 		for (i=0;i<4;++i) {																			// For each row
 			str+="<tr>";																			// Start row
 			col=dark ? "#333" : app.fb.cols[i];														// Ser frame color
-				for (j=0;j<4;++j) {																		// For each column
+			for (j=0;j<4;++j) {																		// For each column
 				str+="<td";																			// Start column
 				if (!j)	str+=` style="border-right:1px solid ${col}"`;								// Add border
 				str+=`><div id="${prefix}vdot${i}${j}" class="lz-vardot": style="border:1px solid ${col}`;// Add dot frame
@@ -101,7 +101,7 @@ class Feedback {
 				if ((1<<j)&c[i] ) str+=`;background-color:${app.fb.cols[i]}`;						// Color it?
 				str+=`;color:#000;width:15px;height:15px">${!j ? "-" : ""}</div></td>`;				// Finish dot
 				}
-			str+=`<td style='padding-left:8px;color:${col}'>${labs[i]}</td></tr>`;				// Add label and end row
+			str+=`<td style='padding-left:8px;color:${col}'>${labs[i]}</td></tr>`;					// Add label and end row
 			}
 		str+=`</tr></table>`;
 		return str;
@@ -114,7 +114,7 @@ class Feedback {
 		this.curTime=(time != undefined) ? time*1000 : this.curTime;								// Set time
 		$("#lz-timelinebar").remove();																// Remove old one
 		var str=`<div id="lz-timelinebar" class="lz-timelinebar"> 
-		<img src="img/closedot.gif" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-timelinebar").remove();clearInterval(app.fb.interval);$("#lz-variance").remove();'>
+		<img src="img/closedot.png" style="position:absolute; top:10px;left:calc(100% - 27px);cursor:pointer;" onclick='$("#lz-timelinebar").remove();clearInterval(app.fb.interval);$("#lz-variance").remove();'>
 		<div class='lz-timelineback'>
 			<div style="width:225px;margin:16px 0 0 16px"> 
 				<select class="lz-is" id="lz-chooseStudent" style="width:160px"></select>

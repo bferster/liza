@@ -150,7 +150,7 @@
 		<img id="restartBut" src="img/restart.png" style="margin-left:6px;cursor:pointer;;display:none" title="Restart class">
 		<input id="talkInput" type="text" class="lz-is" style="margin-left:6px;vertical-align:8px;display:none" placeholder="Type or click on icon">
 		<img id="talkBut" src="img/talkbut.png" style="cursor:pointer;display:none;width:32px;margin-left:-35px;vertical-align:5px" title="Click and hold to talk">
-		<img id="lessonBut" src="img/lessonplan.png" title="Show lesson plan" style="cursor:pointer;position:absolute;left:calc(50% - 8px);width:24px;">
+		<img id="lessonPlanBut" src="img/lessonplan.png" title="Show lesson plan" style="cursor:pointer;position:absolute;left:calc(50% - 8px);width:24px;">
 		<span id="promptSpan" style="margin-left:16px;color:#333;vertical-align:8px">CLICK START TO BEGIN NEW SESSION</span>
 		<img id="helpBut" src="img/helpicon.gif" title="Help" style="cursor:pointer;margin-right:4px;float:right">
 		<!--img id="feedbackBut" src="img/feedback.png" title="Feedback" style="cursor:pointer;margin-right:16px;float:right"-->
@@ -249,6 +249,7 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 			border:1px solid #999;width:${pct}vw;height:${pct}vh">
 			<iframe style="width:100%;height:100%" src="${url}" frameborder="0" ></iframe></div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add it
+		app.fb.Draw(0)
 	}
  
 	function ShowHelp() 																		// SHOW HELP
@@ -260,7 +261,7 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 		var h=window.innerHeight;
 		var str="<div id='helpDiv' class='lz-dialog'style='height:"+(h-106)+"px;overflow:hidden;display:none;;left:calc(100vw - 646px)'>";
 		str+="<img src='img/smlogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>"
-		str+="help</span><img src='img/closedot.gif' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
+		str+="help</span><img src='img/closedot.png' style='float:right' onclick='$(\"#helpDiv\").remove()'><br><br>";	
 		str+="<iframe src='https://docs.google.com/document/d/e/2PACX-1vTXAsMJ-YlQaNtT49RtKvEnT5v5Xzz-TKPyVlo2px-23vDt-4lZFB7JujSKyDXs38hiSMISQoulYXB5/pub?embedded=true' ";
 		str+="style='border: 1px solid #999;width:100%;height:"+(h-154)+"px' scrolling='yes'></iframe></div>";
 		$("body").append(str);																		// Add to body
@@ -361,7 +362,7 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 		style="background-color:#ccc;width:324px;overflow:hidden;display:none;padding:8px;left:${x}px">
 		&nbsp;<img src="img/smlogo.png" style="vertical-align:-6px;width:64px">
 		<span style="font-size:18px;margin-left:8px;padding-bottom:30p">${title}</span>
-		<img src="img/closedot.gif"' style="float:right" onclick='$("#lz-slideUp").remove()'>	
+		<img src="img/closedot.png"' style="float:right" onclick='$("#lz-slideUp").remove()'>	
 		<div style="height:50vh;width:292px;background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px">
 		${content}</div>`;
 		$("body").append(str);																			// Add to body
@@ -379,7 +380,7 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 		str+="<div id='popupDiv' class='lz-popup'>"; 													// Add div
 		if (time == -1) {																				// If has close but
 			time=100000;																				// Increase time
-			str+="<img id='pu-close' src='img/closedot.gif' style='float:right;cursor:pointer'>";		// Add close button
+			str+="<img id='pu-close' src='img/closedot.png' style='float:right;cursor:pointer'>";		// Add close button
 			}
 		str+=msg+"</div>"; 																				// Add div
 		$(div ? "#"+div : "body").append(str);															// Add popup to div or body

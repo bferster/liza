@@ -40,6 +40,7 @@ class App  {
 		this.userId="";																				// User ID
 		this.said="";																				// Current remark
 		this.df={};																					// Dialog flow init data (null for Rasa) 
+		this.lessonPlan="";																			// Lesson plan
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
 		this.points=0;																				// Gamer points
@@ -64,6 +65,7 @@ class App  {
 		this.Draw();																				// Start 
 		if (this.multi) $("#lz-rolePick").css("display","block");									// Show role picker
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
+		$("#lessonPlanBut").on("click", ()=> { this.ShowLessonPlan(); });							// ON LESSON PLAN	
 		$("#timelineBut").on("click", ()=> {  $("#blackboardDiv").hide(); this.fb.Draw(); });		// ON FEEDBACK
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
 		$("#startBut").on("click",    ()=> { 														// ON START 
@@ -75,7 +77,7 @@ class App  {
 			this.inSim=!this.inSim;																	// Toggle sim flag
 			if (isNaN(this.curTime)) 	this.curTime=0;												// Start at 0
 			app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|START|"+this.inSim+"| ");  	// Send sim status
-			Prompt(this.inSim ? "PRESS AND HOLD SPACEBAR TO TALK" : "CLICK START TO RESUME SESSION","on");	// Directions
+			Prompt(this.inSim ? "HOLD SPACEBAR TO TALK" : "CLICK START TO RESUME SESSION","on");	// Directions
 			$("#restartBut").css("display","inline-block");											// Show restart
 			$("#talkInput").css("display",this.inSim ? "inline-block": "none");						// Show input field if in sim
 			$("#talkBut").css("display",this.inSim ? "inline-block": "none");						// Talk but
@@ -158,7 +160,7 @@ class App  {
 			this.voice.StopListening();																// STT off						
 			$("#talkBut").prop("src","img/talkbut.png");											// Green button
 			this.talkTime=(new Date().getTime()-this.talkTime)/1000;								// Compute talk time in seconds
-			$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("PRESS AND HOLD SPACEBAR TO TALK") }).fadeIn(200);		// Animate in and out
+			$("#promptSpan").fadeIn(200).delay(4000).fadeOut(200,()=>{ $("#promptSpan").html("HOLD SPACEBAR TO TALK") }).fadeIn(200);		// Animate in and out
 			this.inRemark=false;																	// Teacher is not talking
 			let talkTo=(this.role == "Teacher") ? this.curStudent : "Teacher";						// Student always talk to teacher and vice versa
 			if (this.multi) app.SendEvent(this.sessionId+"|"+(this.curTime-0.0).toFixed(2)+"|ADMIN|SPEAKING|"+this.role+"|"+talkTo+"|0"); // Alert others to not talking
@@ -207,6 +209,9 @@ class App  {
 						app.nlp.aiType=d[i].id;														// Set type of AI model used to train
 						app.nlp.aiToken=d[i].text;													// Set token
 						}
+					else if (d[i].type == "lessonplan") {											// Lesson plan 
+							app.lessonPlan=d[i];													// Save ;esson plan
+							}
 					}
 				this.InitClassroom();																// Init classroom
 				$("#lz-rolePick").append("<option>Teacher</option><option>Gamer</option>");			// Add teacher & gamer roles
@@ -272,11 +277,11 @@ class App  {
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
 	{
 		let i,s;
-			if (this.inRemark)	return;																// Not while teacher is talking
+		if (this.inRemark)	return;																	// Not while teacher is talking
 		if (e.done)	return;																			// Already handled
 		e.done=1;																					// Flag it done
 		let student=e.who;																			// Get speaker
-		if (student == "current") 		student=this.curStudent;									// Use current student
+		if (!student || (student == "current"))	student=this.curStudent;							// Use current student
 		else if (student == "random")  	student=this.students[Math.floor(Math.random()*this.students.length)].id;	// Get random student
 		this.curStudent=student;																	// Set as current student
 
@@ -619,7 +624,7 @@ class App  {
 			}
 		var str="<div id='settingsEditor' class='lz-dialog' style='display:none;left:calc(100vw - 648px) '>";
 		str+="<img src='img/smlogo.png' style='vertical-align:-6px' width='64'><span style='font-size:18px;margin-left:8px'>settings</span>";	
-		str+="<img src='img/closedot.gif' style='float:right' onclick='$(\"#settingsEditor\").remove();'><br><br>";
+		str+="<img src='img/closedot.png' style='float:right' onclick='$(\"#settingsEditor\").remove();'><br><br>";
 		str+="<table>";
 		str+="<tr><td>Pose editor</td><td><div id='setPose'class='lz-bs'>Set</div></td></tr>";
 		str+="</table><br>";																			
@@ -640,6 +645,40 @@ class App  {
 			});
 	}
 
+
+	ShowLessonPlan()																				// SHOW TEACHER RESOUCES
+	{
+		let i,j,v;
+		if (!this.lessonPlan)	return;																// No lesson plan set
+		if ($("#lz-resources").length) {															// If already up, bring it down
+			$("#lz-resources").hide("slide",{ direction:"down", complete: ()=>{ $("#lz-resources").remove(); } }); // Slide down
+			return;																					// Quit																					
+			}
+		let sets=this.lessonPlan.text.split("+");													// Get data		
+		let cols=["#b0263e","#256caa","#25aa54","#ea7f1d"];											// Colors
+		let str=`<div class="lz-dialog" id="lz-resources" 
+		style="background-color:#ccc;width:50%;overflow:hidden;display:none;padding:8px 8px 0 8px;left:25%">
+		&nbsp;<img src="img/smlogo.png" style="vertical-align:-6px" width="64">
+		<img id="trclose" src="img/closedot.png" style="float:right">	
+		<span style="font-size:18px;margin:7px 0 0 12px">${this.lessonPlan.id}</span>
+		<div id='resourcesDiv' style='height:50vh;width:calc(100% - 32px);background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'>`;
+		for (i=0;i<sets.length;++i) {																// For each set
+			v=sets[i].split(",");																	// Get members
+			str+=`<div style="font-size:24px;color:${cols[i%4]}"><b>${v[0]}</b></div><ol>`;			// Add header
+			for (j=1;j<v.length;++j) str+=`<li>${v[j]}</li>`;										// Add members
+			str+="</ol>";																			// Close set
+			}
+			
+		str+=`</div><div style="width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0">`;
+		$("body").append(str.replace(/\t|\n|\r/g,""));													// Add to body
+		$("#trclose").on("click", ()=>{ this.ShowLessonPlan(); });										// ON CLOSE
+	
+		var h=window.innerHeight-$("#lz-resources").height()-86;										// Calc top
+		$("#lz-resources").css("top",h+"px");															// Set top
+		$("#lz-resources").show("slide",{ direction:"down" });											// Slide up
+		$("#lz-resources").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } );	// Don't move orbiter
+	}
+
 	ShowResources()																				// SHOW TEACHER RESOUCES
 	{
 		if ($("#lz-resources").length) {															// If already up, bring it down
@@ -649,7 +688,7 @@ class App  {
 		let str=`<div class="lz-dialog" id="lz-resources" 
 		style="background-color:#ccc;width:50%;overflow:hidden;display:none;padding:8px 8px 0 8px;left:calc(50% - 32px)">
 		&nbsp;<img src="img/smlogo.png" style="vertical-align:-6px" width="64">
-		<img id="trclose" src="img/closedot.gif" style="float:right">	
+		<img id="trclose" src="img/closedot.png" style="float:right">	
 		<span style="font-size:18px;margin:7px 0 0 12px">Teacher resources</span>
 		<div id='resourcesDiv' style='height:50vh;width:calc(100% - 32px);background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div> 
 		<div style="width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0">`;

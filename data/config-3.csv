@@ -53,6 +53,8 @@ key-rule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy"
 key-rule,600,"nice|good|great,to,see|meet",,
 key-rule,600,"how,are,you",,
 key-rule,600,"good,morning|afternoon|evening|day",,
+keyrule,1002,"thank,you",,
+keyrule,1002,"your|you,welcome",,
 
 keyrule,ANDYOU,"how|what,about,you",,
 keyrule,ANDYOU,"what,you,think|say",,
@@ -70,3 +72,4 @@ session,data,"trt=420,endpoll=demopoll,endurl=https://agileteacher.org/teaching-
 aimodel,wit,"CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO",
 trigger,time,"who=Oliver,when=.5,do=say:Teacher, why did you want to talk with me?+act:interrupt"
 trigger,time,"who=Oliver,when=405,"do=prompt:15 seconds to finish your last question!"
+
