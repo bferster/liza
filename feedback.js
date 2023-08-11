@@ -110,7 +110,8 @@ class Feedback {
 	Draw(time)																						// DRAW FEEDBACK PANEL
 	{
 		let i;
-		this.maxTime=app.curTime*1000;																// Swet max time
+		this.maxTime=app.curTime*1000;																// Set max time
+		if (app.loadId)this.maxTime=app.sessionLog[app.sessionLog.length-2].time*1000;				// Playback time
 		this.curTime=(time != undefined) ? time*1000 : this.curTime;								// Set time
 		$("#lz-timelinebar").remove();																// Remove old one
 		var str=`<div id="lz-timelinebar" class="lz-timelinebar"> 
@@ -126,7 +127,6 @@ class Feedback {
 		<div id="timeSlider" class="lz-timeslider"></div>
 		<img id="playerButton" src="img/playbut.png" style="position:absolute;left:calc(100% - 56px);top:174px;width:32px;cursor:pointer">`;
 		$("body").append(str.replace(/\t|\n|\r/g,"")+"</div>");										// Add to body
-
 		for (i=0;i<app.students.length;++i) 														// For each student
 			$("#lz-chooseStudent").append(`<option>${app.students[i].id}</option`);					// Add to choser
 		$("#lz-chooseStudent").val(app.curStudent);													// Point at current student	
@@ -138,7 +138,7 @@ class Feedback {
 			let id=e.target.id.substr(6);															// Get id
 			let p=$("#lzDot-"+id).position();														// Get pos
 			let o=app.sessionLog[id];																// Point at element
-			$("#lz-dlg").remove();																	// Clear exiting
+				$("#lz-dlg").remove();																	// Clear exiting
 			if (o.from == "Teacher") col="#0099ffc";												// Teacher color
 			else					 col=app.students.find(x => x.id == o.from).color;				// Student color
 			let str=`<div id="lz-dlg" style="position:absolute;top:${p.top-12}px;left:${p.left+6}px">

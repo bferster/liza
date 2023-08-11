@@ -40,6 +40,7 @@ class App  {
 		this.userId="";																				// User ID
 		this.said="";																				// Current remark
 		this.df={};																					// Dialog flow init data (null for Rasa) 
+		this.loadId=0;																				// Nothing to load
 		this.lessonPlan="";																			// Lesson plan
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
@@ -52,6 +53,7 @@ class App  {
 //			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session id
 			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get activity id	
+			if (v[i] && v[i].match(/v=/)) 	 this.loadId=v[i].substring(2) 								// Get load id	
 			}
 
 		this.nlp=new NLP();																			// Add NLP
@@ -63,6 +65,15 @@ class App  {
 		this.fb=new Feedback();																		// Alloc Feedback	
 		this.rp=new ResponsePanel();																// Alloc ResponsePanel	
 		this.Draw();																				// Start 
+		if (this.loadId) {																			// If loading a file
+			fetch(`//${window.location.host}:8081?q=load&id=`+this.loadId)							// Get session data
+			.then(res => res.json()).then(res =>{ 													// On loaded
+				res[0].data=res[0].data.replace(/\&apos;/g,"'");									// Remove apos
+				res[0].data=res[0].data.replace(/\&apos/g,"'");										// With ; too
+				this.sessionLog=JSON.parse(res[0].data);
+				});
+		}
+		
 		if (this.multi) $("#lz-rolePick").css("display","block");									// Show role picker
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
 		$("#lessonPlanBut").on("click", ()=> { this.ShowLessonPlan(); });							// ON LESSON PLAN	
@@ -232,10 +243,9 @@ class App  {
 	{
 		let i;
 		app.unSaved=false;																			// Set saved flag
-		for (i=0;i<app.sessionLog.length;++i) app.sessionLog[i].text=app.sessionLog[i].text.replace(/\'/g,"&apos");	// 
-		fetch(`//${window.location.host}:8081?q=save&type=TWG&email=${app.userId}&password=${app.activityId}`,	
+		for (i=0;i<app.sessionLog.length;++i) app.sessionLog[i].text=app.sessionLog[i].text.replace(/\'/g,"&apos;");	 
+		fetch(//${window.location.ho`st}:8081?q=save&type=TWG&email=${app.userId}&password=${app.activityId}`,	
 		{ method:"POST", "Content-Type":"application/json", body:JSON.stringify(app.sessionLog)}); 	// Save to DB
-	
 	}
 	
 	StartSession()																				// START/RESTART SESSION
@@ -301,7 +311,7 @@ class App  {
 				}
 			else if (v[i].match(/prompt:/i)) {														// PROMPT
 				s=v[i].substring(7);																// Get text
-				app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PROMPT|"+s); 	// Send prompt	
+				app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|PROMPT|"+s); // Send prompt	
 				}
 			else if (v[i].match(/end:/i)) {															// END
 				let i,remarkLevels=[0,0,0,0,0];														// Remarks per level
@@ -421,6 +431,7 @@ class App  {
 					setTimeout(()=>{																// Wait for remark to end
 						if (this.endPoll)	  this.HandleEventTrigger({do:"assess:"+app.endPoll}); 	// Run poll, if set
 						else if (this.endUrl) ConfirmBox("","Are you finished with this activity?",()=>{ ; });	// If an endurl, go there
+						if (app.unSaved)  	  app.SaveSession();									// Save session
 						},9000);																	// Timer
 					return;																			// Quit 
 					}
