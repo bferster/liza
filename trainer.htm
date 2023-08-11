@@ -106,8 +106,13 @@ class App  {
 		app=this;																					// App global pointer
 		this.curType="TWG";																			// Current type of data to load
 		this.InitGrid();																			// Init grid
+		this.activityId=0;																			// Activity to sort by
 		this.trainingData=[];																		// Holds raw data
 		$("#jsGrid-data").jsGrid("option","data",[]);												// Add lines to grid
+		let v=window.location.search.substring(1).split("&");						   				// Get query string
+			for (let i=0;i<v.length;++i) {															// For each param
+			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get activity id	
+			}
 	}
 
 	InitGrid()																					// INIT JS GRID
@@ -118,11 +123,11 @@ class App  {
 			{ name:"remark", type:"text", width:250 },
 			{ name:"save", type:"checkbox", width:25},
 			{ type: "control", deleteButton: false}];
-
+			
 		$("#jsGrid-data").jsGrid({ width:"100%", height:"calc(100vh - 168px)",
 				inserting:true, editing:true, sorting:true,
 				fields: this.pFields, data:[],
-				onItemEditing: function(args) { trace (1);app.curRow=args.itemIndex;  },
+				onItemEditing: function(args) { trace (1);app.curRow=args.itemIndex; },
 				});
 		$("#jsGrid-data").css({padding:0, "font-size":"12px"});										// Style		
 		this.Load();																				// Load data	
@@ -137,6 +142,7 @@ class App  {
 				this.trainingData=[];																// Clear
 				for (i=0;i<data.length;++i) {														// Look at each
 					if (data[i].type != "TWG") continue;											// Only Grace
+					if (this.activityId && (data[i].password != this.activityId)) continue;			// Limit by activity
 					o=JSON.parse(data[i].data);														// Objectify
 					for (j=0;j<o.length;++j) {														// Look at each
 						if (o[j].from != "Teacher") continue;										// Only remarks
