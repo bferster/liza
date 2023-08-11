@@ -69,7 +69,6 @@ class App  {
 			fetch(`//${window.location.host}:8081?q=load&id=`+this.loadId)							// Get session data
 			.then(res => res.json()).then(res =>{ 													// On loaded
 				res[0].data=res[0].data.replace(/\&apos;/g,"'");									// Remove apos
-				res[0].data=res[0].data.replace(/\&apos/g,"'");										// With ; too
 				this.sessionLog=JSON.parse(res[0].data);
 				});
 		}
@@ -244,8 +243,10 @@ class App  {
 		let i;
 		app.unSaved=false;																			// Set saved flag
 		for (i=0;i<app.sessionLog.length;++i) app.sessionLog[i].text=app.sessionLog[i].text.replace(/\'/g,"&apos;");	 
-		fetch(//${window.location.ho`st}:8081?q=save&type=TWG&email=${app.userId}&password=${app.activityId}`,	
-		{ method:"POST", "Content-Type":"application/json", body:JSON.stringify(app.sessionLog)}); 	// Save to DB
+		fetch(`//${window.location.host}:8081?q=save&type=TWG&email=${app.userId}&password=${app.activityId}`,	
+		{ method:"POST", "Content-Type":"application/json", body:JSON.stringify(app.sessionLog)})	// Save to DB
+			.then(res =>  res.text())																// Get response as text
+			.then(res =>{ trace("Saved at #"+res) });												// Report where it was save to																				
 	}
 	
 	StartSession()																				// START/RESTART SESSION
@@ -429,9 +430,9 @@ class App  {
 				if (intent == 1000) {																// Eding event
 					this.HandleEventTrigger({ do:"end:", who:"current" });							// Trigger end reponse
 					setTimeout(()=>{																// Wait for remark to end
+						if (app.unSaved)  	  app.SaveSession();									// Save session
 						if (this.endPoll)	  this.HandleEventTrigger({do:"assess:"+app.endPoll}); 	// Run poll, if set
 						else if (this.endUrl) ConfirmBox("","Are you finished with this activity?",()=>{ ; });	// If an endurl, go there
-						if (app.unSaved)  	  app.SaveSession();									// Save session
 						},9000);																	// Timer
 					return;																			// Quit 
 					}
