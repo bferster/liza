@@ -162,22 +162,45 @@ try{
 		} catch(e) { console.log(e) }
 	}
 
-	async function InferIntent(d, client, sessionId="123456789") 							// INFER INTENT VIA AI
+	const dfKey=JSON.parse(fs.readFileSync("./assets/keys/dialogflow.json"));
+
+// DIALOGFLOW //////////////////////////
+
+	const dfClient=new dialogflow.SessionsClient({ private_key:dfKey.private_key,client_email:dfKey.client_email });
+	const detectIntent = async (queryText, sessionId="123456789") => {
+		let sessionPath=dfClient.projectAgentSessionPath(dfKey.project_id, sessionId);
+		let request = {	session: sessionPath, queryInput:{ text: {	text: queryText, languageCode: "en"	} }	};
+		const responses = await dfClient.detectIntent(request);
+		console.log(responses);
+		const result = responses[0].queryResult;
+		console.log(result);
+		return { response: result.fulfillmentText };
+		}
+	detectIntent("How are you")
+
+
+
+	function InferIntent(d, client)															// INFER INTENT FROM REMARK
 	{
 		try{
-			if (d[1] == "DIALOGFLOW") {															// Dialogflow													
-				const dfClient=new dialogflow.SessionsClient({ project_id:d[4], keyFilename:"assets/keys/dialogflow.json" });
-				let sessionPath=dfClient.projectAgentSessionPath(d[4], sessionId);
-				const request = { session: sessionPath, queryInput:{ text: { text: d[5], languageCode:"en" }}};
-				const responses = await dfClient.detectIntent(request);
-				let msg=d[0]+"|DIALOGFLOW|"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+d[5];
-				if (client)	SendData(client, msg);												// Send back 
-				trace(msg)
-				}
+			if (d[1] == "DIALOGFLOW") {															// Get session data
+				const detectIntent = async (q)=> {																																												
+					d[6]=d[6].replace(/\\n/g,"\n");												// Convert to true LFs
+					q=q.trim();												
+					const sessionClient=new dialogflow.SessionsClient({ private_key:dfKey.private_key,client_email:dfKey.client_email });
+					const sessionPath=sessionClient.projectAgentSessionPath(dfKey.project_id,"123456789");	// Make path
+					const request={ session: sessionPath, queryInput:{ text: { text:q, languageCode:"en-US" }}};	// Make request
+					const responses = await sessionClient.detectIntent(request);				// Detect
+					let msg=d[0]+"|DIALOGFLOW|r"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+q;	// return data
+					SendData(client, msg);														// Send back 
+					trace(msg)
+					}
+				async function infer() { await detectIntent(d[7]); }							// Async function
+				infer();																		// Do it
+			}
 		} catch(e) { console.log(e) }
-		}
-	
-//	let d=("3|DIALOGFLOW|ADMIN|INFER|activity3-viod|How are you").split("|");	InferIntent(d,"")
+	}
+
 
 	function SendData(client, data) 														// SEND DATA TO CLIENT
 	{

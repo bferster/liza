@@ -101,6 +101,7 @@
 	{	
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
+		let holds=[];
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
@@ -109,17 +110,28 @@
 			SaveResponseFile(d);																	// Save student responses to new CSV file			
 			for (i=0;i<d.length;++i) {																// For each remark
 				if (d[i].intent) uniqueIntents.push(d[i].intent);									// Get intent
-				if (d[i].note == "hold") { d.splice(i,1); continue; }								// Remove holds
+				if (d[i].note == "hold") { 															// Remove/save holds
+					holds.push(d[i]);																// Save hold
+					d.splice(i,1); 																	// Remove from training
+					continue; 																		// Contineu
+					}								
 				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
 				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
 				}
 			uniqueIntents=[... new Set(uniqueIntents)];												// Make unique
 
 			if (aiType == "wit") {																	// WIT.AI
-				TrainWit(d,uniqueIntents);															// Add intents and utterances	
+				ConfirmBox("Are your sure?","Old data must be deleted first.",()=>{					// Confirm
+					TrainWit(d,uniqueIntents);														// Add intents and utterances	
+					});
 				}
 			else if (aiType == "dialog") {															// DIALOGFFLOW
-				TrainDialog(d);																		// Load and make training data	
+				TrainDialog(d,uniqueIntents);														// Load and make training data	
+				}
+			if (holds.length) {																		// If any holds
+				let fields=["intent","remark","note"];												// Field names
+				let str=Papa.unparse(holds,{ header:true, skipEmptyLines:true, columns:fields });	// Make CSV using lib
+				SaveTextAsFile("holds.csv",str);													// Write file
 				}
 			};
 	}
@@ -152,17 +164,18 @@
 				let count=0,notFound=0;																// Counts
 				let d=[],orig=[];
 				let v=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
-				for (i=0;i<v.length;++i)if (v[i].note == "hold")	d.push(v[i]),orig.push(v[i]);	// Only holds
+				for (i=0;i<v.length;++i) if (v[i].note == "hold")	d.push(v[i]),orig.push(v[i]);	// Only holds
 				let tot=d.length;																	// Total
 				InferIntents(d, (res)=>{ 															// On each inference
 					i=(tot-d.length-1);																// Current index
+					if (res.intent == "efault Fallback Intent") res.intent=res.confidence=0;		// Not found
 					orig[i].intent=orig[i].intent.toLowerCase();									// Force LC
 					orig[i].confidence=res.confidence;												// Save confidence
 					orig[i].infer=res.intent;														// Save inferred intent
+					
 					orig[i].match=(res.intent == orig[i].intent) ? 1 : 0;							// Do they match?
 					if (res.confidence < .4)	 orig[i].match=-1;									// Not properly inferred
 					count+=orig[i].match;															// Add to count
-					trace(res);
 					$("#lz-loadingIconText").html("<b>"+Math.floor(i/tot*100)+"%</b>");				// Show progress
 					if (!d.length) {																// If last one
 						Sound("ding");																// Ding				
@@ -177,11 +190,11 @@
 								results[orig[i].intent].tot=0;										// Init
 								results[orig[i].intent].match=0;	
 								}
-							if (orig[i].match != -1) {												// If confidence is high enough
-								results[orig[i].intent].match+=orig[i].match;						// Add match
-								results[orig[i].intent].tot++;										// Add to count
-								}
-							else notFound++;														// Add to bad count
+							if (orig[i].match == 1) results[orig[i].intent].match++;				// If a match
+							if (orig[i].match == -1) notFound++;									// Add to bad count
+							
+							
+							results[orig[i].intent].tot++;											// Add to count
 							}
 						for (o in results) 
 							s+=o.toUpperCase()+" "+results[o].match+"/"+results[o].tot+" has "+Math.round(results[o].match/results[o].tot*100)+"% accuracy<br>";	// Intent accuracy
@@ -202,7 +215,7 @@
 		if (aiType == "rasa") {																		// If RASA
 			const response=await fetch("https://lizasim.com:5005/model/parse", {					// Fetch data
 				method:"POST",																		// POST
-				body: JSON.stringify({text:m.text})													// Payload	
+				body: JSON.stringify({text:m.remark})													// Payload	
 				});
 			let res=await response.json();															// Get response 
 			inference.intent=res.intent.name.substr(1);												// Intent																		
@@ -213,7 +226,8 @@
 			}
 		else if (aiType == "dialog") {																// If DIALOGFLOW
 			let p=new Promise((resolve, reject) => {
-				setTimeout(()=>{ws.send("1|DIALOGFLOW|ADMIN|INFER|"+df.id+"|"+df.email+"|"+df.key+"|"+m.text.substring(0,255))},500);
+				trace(m)
+				setTimeout(()=>{ws.send("Test|DIALOGFLOW|ADMIN|INFER|activity3-viod|"+m.remark.substring(0,255))},500);
 				ws.onmessage=(e)=>{ 																// If a ws message
 					if (!e.data)			 return;												// Quit if no data
 					let v=event.data.split("|");													// Get params
@@ -227,21 +241,16 @@
 					});
 			}
 		else if (aiType == "wit") {																	// If WIT
-			let url="https://api.wit.ai/message?v=20210922&n=3&q="+m.text.substring(0,255);			// URL			
-			const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
+			let url="https://api.wit.ai/message?v=20210922&n=3&q="+m.text.substring(0,255);		// URL			
+				const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
-				inference.intent=res.intents[0].name;												// Get intent																		
+				inference.intent=res.intents[0].name.substring(1);									// Get intent																		
 				inference.confidence=res.intents[0].confidence;										// Confidence
 				}	
 			trace(res)
-			let str="<b>OTHER INTENTS:</b><br>";
-			for (let i=1;i<res.intents.length;++i) 
-				str+=Math.floor(res.intents[i].confidence*100)+"% "+res.intents[i].name+"<br>";
-			$("#outp").html(str);
-
-			callback(inference);																// Return response
-			if (msgs.length) setTimeout(()=>{ InferIntents(msgs, callback);},200);				// Recurse, if not last and add delay
+			callback(inference);																	// Return response
+			if (msgs.length) setTimeout(()=>{ InferIntents(msgs, callback);},200);					// Recurse, if not last and add delay
 			}
 		} catch(e) {trace(e)}
 	} 
@@ -338,11 +347,8 @@
 				}
 			});
 
-}
+	}
 
-
-
-	
 	function WitGetUtterances(callback)															// GET ARRAY OF UTTERANCES
 	{
 		const url="https://api.wit.ai/utterances?v=20210922&limit=10000";							// URL 
@@ -389,7 +395,7 @@
 
 	async function WitTrain(msgs, callback, done)												// SEND REMARK TO WIT TO TRAIN
 	{
-//		for (let i=480;i<600;i+=10) 	SaveTextAsFile("r"+i+".json",`{ "name": "r${i}" }`);	
+		for (let i=480;i<600;i+=10) 	SaveTextAsFile("r"+i+".json",`{ "name": "r${i}", }`);	
 		let res=null,inference={ text:"", intent:0, confidence:0 };									// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
 		if (!isNaN(m.intent)) m.intent="r"+m.intent;												// Numbers need to be prefixed with a letter
@@ -429,43 +435,24 @@
 // DIALOGFLOW
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	
-let df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDNg4lVhiuu5Bgy\nimKeyXmb24phJg3yDHZI1YV/SlUq6ZzEX/tgQCPrzHzn6REr4rnbq3Jx54Hi3Wrw\nQY5EDAcSRQPK/6eDFAA1kibsYdlyaeQeUm/qs5cK2vf7c4fIsgGGsCQNzPQZ7Ojp\nwnI7t/+w2LsV1gLprLXDGMkXBRi53OyFExLE9E6ENZMuXdF6dfuD2zuz3Afw43Ej\nxnnqff3o722yWunSo5V22aDmVKVis2lZ1QnRZnqRIHZ/KzzrkTn+A8UnAFwWLAqR\nfff38P4i1bltJyJj0NAGdPqH6Wqv+HwtvV9PvKa01cJQZPzwiQcj9weTCyQOEnhS\nV4bNPzFlAgMBAAECggEAVlBpbK8WR7Tq6McwVmpeFfSl8Nlvv/o1768mC2knzgch\n3WRGio1FyPIwf6JmoNzvnHAsd+R4q9S85j1SSAgZLDYqOqcXLrlGwTkp+du63Q/W\nTFnpQVS+GkQPJN/H5qXEeFIgQl+TIhRbWlpdafGEhTzxjmE9BfGQwWj2hCGS2fRL\n+i8c0L3R4wPkIW/TuuoqzhnQXXyHRhHba1H3LY+jLWcg48LVFUg8m0k+73AIN/wF\nD6cA8B9OmG/mux5tDOTLxABv8TrjwrPrnnRDDqgLskPHuDGhnOP4WMpYQ3jut4So\n6P0on5oRIKflLLefogTVjxO0wIEZrCgXDMn5Ynd9HQKBgQDpjwxUMo2GhDCdUSdr\nz3kufO6HUUtdkgqHsvsvVB7HctQ3Gc3pFkZC9dMcWUlWZOUS7HTOHrNraimjdu5J\nnVcmMOShUJNm9TEe1Q81B9qo2B7o0+6MHqmLdDFiNT9HaJlWYmknGCiInoqTRvL7\n/aCRkPDA8pVNky/P4oMBSMBh4wKBgQDhQqdIXxfgzA8M3I1zFPNaotNPP0LIwmjO\niD8p0Px6yJAZ1uB/AmxaZ5lRI9XvduXnrabpnAWwTCJZiaxvgNekgJ88+JRAuAjl\njpTmDGqAKjaYru9MvmZ9yoRkXKk0u12eS+s/NqH/ILqR2bdiGOpXiLnrVG3Rq1Dl\nfyOHYgTiFwKBgQC1FQ++CCPqc3stvcoOsKGIBZz6lXEVbzFy3LYbj+D9Sm52+i7H\n1VlMeUPg6ukNbtScw3Acj3kUgw8digxeTvtOxQG+gLaIUPpwqUhNGXXTCx2L7yU4\nxl01njTbq+UP/G1GqK5WfUiQBDv0zEGAVrizo+jF8E8KAmBDkZ9402s1eQKBgQCQ\nMDgf7S69qCDiHLM2POzg0WTtTxMSqs6nlTLJM4rJlWQYBiFBa22sGLBc7dFdLQBQ\n4ij7U/GYPcOnCKcl4JUoKWTEhGFxY9veBPxunPf2/g5ggWmP+DhmwKEqFN4CcQSl\n9PaqSfA7/NkvzurBki0+xrgrWKnLEhwAKve1CxsRFQKBgQC6SQ9FjLHrPgODWWhI\nGQaQV5IUtCLCopbkLz4iIDtkVCHBJPjObM+LS6UCY863pEmVe+p+vjAI8FAK4qYB\nWrNFpx7KlpFR39B5n2DVvldLM8/3blEjg/DynxqMe5JcymDHnDEed4RnM7B2D9RX\n0JFxGQCsnmGUPtv/h6gQtls+TQ==\n-----END PRIVATE KEY-----\n",
-			 email:"bferster@newagent-xjie.iam.gserviceaccount.com",
-			 id: "newagent-xjie"
-			}
-
-/*			df={ key:"-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDNg4lVhiuu5Bgy\nimKeyXmb24phJg3yDHZI1YV/SlUq6ZzEX/tgQCPrzHzn6REr4rnbq3Jx54Hi3Wrw\nQY5EDAcSRQPK/6eDFAA1kibsYdlyaeQeUm/qs5cK2vf7c4fIsgGGsCQNzPQZ7Ojp\nwnI7t/+w2LsV1gLprLXDGMkXBRi53OyFExLE9E6ENZMuXdF6dfuD2zuz3Afw43Ej\nxnnqff3o722yWunSo5V22aDmVKVis2lZ1QnRZnqRIHZ/KzzrkTn+A8UnAFwWLAqR\nfff38P4i1bltJyJj0NAGdPqH6Wqv+HwtvV9PvKa01cJQZPzwiQcj9weTCyQOEnhS\nV4bNPzFlAgMBAAECggEAVlBpbK8WR7Tq6McwVmpeFfSl8Nlvv/o1768mC2knzgch\n3WRGio1FyPIwf6JmoNzvnHAsd+R4q9S85j1SSAgZLDYqOqcXLrlGwTkp+du63Q/W\nTFnpQVS+GkQPJN/H5qXEeFIgQl+TIhRbWlpdafGEhTzxjmE9BfGQwWj2hCGS2fRL\n+i8c0L3R4wPkIW/TuuoqzhnQXXyHRhHba1H3LY+jLWcg48LVFUg8m0k+73AIN/wF\nD6cA8B9OmG/mux5tDOTLxABv8TrjwrPrnnRDDqgLskPHuDGhnOP4WMpYQ3jut4So\n6P0on5oRIKflLLefogTVjxO0wIEZrCgXDMn5Ynd9HQKBgQDpjwxUMo2GhDCdUSdr\nz3kufO6HUUtdkgqHsvsvVB7HctQ3Gc3pFkZC9dMcWUlWZOUS7HTOHrNraimjdu5J\nnVcmMOShUJNm9TEe1Q81B9qo2B7o0+6MHqmLdDFiNT9HaJlWYmknGCiInoqTRvL7\n/aCRkPDA8pVNky/P4oMBSMBh4wKBgQDhQqdIXxfgzA8M3I1zFPNaotNPP0LIwmjO\niD8p0Px6yJAZ1uB/AmxaZ5lRI9XvduXnrabpnAWwTCJZiaxvgNekgJ88+JRAuAjl\njpTmDGqAKjaYru9MvmZ9yoRkXKk0u12eS+s/NqH/ILqR2bdiGOpXiLnrVG3Rq1Dl\nfyOHYgTiFwKBgQC1FQ++CCPqc3stvcoOsKGIBZz6lXEVbzFy3LYbj+D9Sm52+i7H\n1VlMeUPg6ukNbtScw3Acj3kUgw8digxeTvtOxQG+gLaIUPpwqUhNGXXTCx2L7yU4\nxl01njTbq+UP/G1GqK5WfUiQBDv0zEGAVrizo+jF8E8KAmBDkZ9402s1eQKBgQCQ\nMDgf7S69qCDiHLM2POzg0WTtTxMSqs6nlTLJM4rJlWQYBiFBa22sGLBc7dFdLQBQ\n4ij7U/GYPcOnCKcl4JUoKWTEhGFxY9veBPxunPf2/g5ggWmP+DhmwKEqFN4CcQSl\n9PaqSfA7/NkvzurBki0+xrgrWKnLEhwAKve1CxsRFQKBgQC6SQ9FjLHrPgODWWhI\nGQaQV5IUtCLCopbkLz4iIDtkVCHBJPjObM+LS6UCY863pEmVe+p+vjAI8FAK4qYB\nWrNFpx7KlpFR39B5n2DVvldLM8/3blEjg/DynxqMe5JcymDHnDEed4RnM7B2D9RX\n0JFxGQCsnmGUPtv/h6gQtls+TQ==\n-----END PRIVATE KEY-----\n",
-  				email: "newagent-xjie-iam@newagent-xjie.iam.gserviceaccount.com",	
-				id: "newagent-xjie"
-	
-				}
-
-	*/
-
-	function TrainDialog(e)																		// MAKE DIALOGFLOW INTENT FILE
+	function TrainDialog(d, uniqueIntents)													// MAKE DIALOGFLOW INTENT FILE
 	{
 		let intent,str,i,s;
-		let file=e.target.files[0];																	// Point at file
-		if (!file) 	return;																			// Quit if bad
-		let reader=new FileReader();																// Init reader
-		reader.readAsText(file);																	// Read file
-		reader.onload=(e)=>{ 																		// When loaded
-			let d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
-			for (i=0;i<d.length;++i) if (d[i].type == "hold")	d.splice(i,1);						// Remove holds
-			let v=groupBy(d,"intent");
-			for (intent in v) {
-				str="[\n";
-				for (i=0;i<v[intent].length;++i) {													// For each one wanted
-					s=v[intent][i].remark.replace(/"/g,"");											// No quotes
-					s=s.replace(/'/g,"\\u0027");													// Escape apos
-					str+=`{ "data": [{ "text": "${s}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
-					}
-				str=str.slice(0,-2)+"\n]";
-				SaveTextAsFile(intent+"_usersays_en.json",str);										// Write intent file
+		for (i=0;i<uniqueIntents.length;i++) 	SaveTextAsFile("r"+uniqueIntents[i]+".json",`{ "name":"r${uniqueIntents[i]}", "auto":true }`);	
+		let v=groupBy(d,"intent");																// Group by intent																
+		for (intent in v) {																		// For each intent
+			trace(intent)
+			str="[\n";
+			for (i=0;i<v[intent].length;++i) {													// For each one wanted
+				s=v[intent][i].remark.replace(/"/g,"");											// No quotes
+				s=s.replace(/'/g,"\\u0027");													// Escape apos
+				str+=`{ "data": [{ "text": "${s}", "userDefined": false }], "isTemplate": false, "count": 1, "lang": "en", "updated": 0 },\n`;
 				}
-			};
+			str=str.slice(0,-2)+"\n]";
+			SaveTextAsFile("r"+intent+"_usersays_en.json",str);									// Write intent file
+			}
 
-		function groupBy(arr, property) {
+		function groupBy(arr, property) {														// GROUP
 			return arr.reduce((acc, cur) => {
 				acc[cur[property]] = [...acc[cur[property]] || [], cur];
 				return acc;
