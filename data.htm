@@ -21,9 +21,9 @@
 	</style>
 	<body>
 		<input type="file" id="lz-tempFile" accept=".csv,.CSV" style="display:none">
-		<!--div class="lz-bs" id="lz-importData" style="margin:12px">Load session</div-->
 		<input type="file" id="lz-trainFile" accept=".csv,.CSV,.yml" style="display:none">
 		<input type="file" id="lz-testFile" accept=".csv,.CSV,.yml" style="display:none">
+		<input type="file" id="lz-augmentFile" accept=".csv,.CSV,.yml" style="display:none">
 
 		<div style="width:66%;margin:0 auto;text-align:center">
 			<img src="img/logo.png" style="width:25%">
@@ -37,6 +37,7 @@
 				<div class="lz-bs" id="lz-testData">Test data</div>
 				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-trainData">Train data</div>
 				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-deleteData">Delete data</div>
+				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-augmentData">Augment data</div>
 			</p>
 			<hr><br>
 			Type test remark here: <input type="input" class="lz-is" style="width:50%" id="lz-utter"/> &nbsp; <span id="lz-result"></span>
@@ -64,12 +65,12 @@
 
 	$(document).ready(function() {								           							// ON PAGE LOADED
 		InitSocketServer();
-		$("#lz-testData").on("click",()=>  	  { $("#lz-testFile").trigger("click");    } );			// ON TEST TRAINING DATA
-		$("#lz-deleteData").on("click", ()=>  { DeleteTrainingData();     } );						// ON DELETE TRAINING DATA
-		$("#lz-trainData").on("click", ()=>   { if (window.location.host == "localhost") $("#lz-trainFile").trigger("click")}); 	// ON TRAIN DATA		
-		$("#lz-importData").on("click",()=>   { $("#lz-tempFile").trigger("click"); 	});			// ON IMPORT
-		$("#lz-dataset").on("change", ()=>    { modelName=$("#lz-dataset").val()		});			// ON DATASET CHANGE
-		$("#lz-aiType").on("change", ()=>     { aiType=$("#lz-aiType").val().toLowerCase()	});		// ON AI CHANGE
+		$("#lz-testData").on("click",()=>  	  { $("#lz-testFile").trigger("click"); } );			// ON TEST TRAINING DATA
+		$("#lz-deleteData").on("click", ()=>  { DeleteTrainingData(); } );							// ON DELETE TRAINING DATA
+		$("#lz-trainData").on("click", ()=>   { if (window.location.host == "localhost") $("#lz-trainFile").trigger("click"); }); 	// ON TRAIN DATA		
+		$("#lz-augmentData").on("click", ()=> { $("#lz-augmentFile").trigger("click")});			// ON AUGMENT TRAINING DATA
+		$("#lz-dataset").on("change", ()=>    { modelName=$("#lz-dataset").val(); });				// ON DATASET CHANGE
+		$("#lz-aiType").on("change", ()=>     { aiType=$("#lz-aiType").val().toLowerCase(); });		// ON AI CHANGE
 				
 		$("#lz-tempFile").on("change",(e)=>{														// ON TEMP FILE LOAD
 			ImportCSV(e);																			// Read file
@@ -78,6 +79,10 @@
 		$("#lz-trainFile").on("change",(e)=>{														// ON TRAIN FILE LOAD
 			TrainData(e);																			// Read file
 			$("#lz-trainFile").val("");																// Clear value		
+			});
+		$("#lz-augmentFile").on("change",(e)=>{														// ON AUGMENT FILE LOAD
+			AugmentData(e);																			// Read file
+			$("#lz-augmentFile").val("");																// Clear value		
 			});
 		$("#lz-testFile").on("change",(e)=>{														// ON TEST FILE LOAD
 			TestData(e);																			// Read file
@@ -135,6 +140,26 @@
 				}
 			};
 	}
+
+	async function AugmentData(e)																// AuGMENT DATA
+	{	
+		let file=e.target.files[0];																	// Point at file
+		if (!file) 	return;																			// Quit if bad
+		let reader=new FileReader();																// Init reader
+		reader.readAsText(file);																	// Read file
+		reader.onload=(e)=>{ 																		// When loaded
+			let i,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			SaveResponseFile(d);																	// Save student responses to new CSV file			
+			for (i=0;i<d.length;++i) {																// For each remark
+				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
+				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
+				}
+			let fields=["intent","remark","note"];													// Field names
+			let str=Papa.unparse(d,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
+			SaveTextAsFile("augmented.csv",str);													// Write file
+			};
+	}
+
 
 	function DeleteTrainingData()															// DELETE TRAINING DATA
 	{
