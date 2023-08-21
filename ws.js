@@ -4,7 +4,7 @@
 	const fs = require('fs');
 	const WebSocket = require('ws');
 	const os = require("os");	
-//	const dialogflow = require('@google-cloud/dialogflow-cx');
+	const dialogflow = require('@google-cloud/dialogflow-cx');
 	let webSocketServer;																		// Holds socket server	
 	let local=os.hostname().match(/^bill|desktop/i);											// Running on localhost?
 	let sessionData=[];																			// Holds session data
@@ -17,7 +17,7 @@
 	npm install fs
 	npm install os
 	npm install ws
-	npm install @google-cloud/dialogflow
+	npm install @google-cloud/dialogflow-cx
 	
 	node ws.js
 
@@ -164,27 +164,27 @@ try{
 	async function InferIntent(d, client, sessionId="123456789") 							// INFER INTENT VIA AI
 	{
 		try{
-			if (d[1] == "DIALOGFLOW") {															// Dialogflow ES													
-				const dfClient=new dialogflow.SessionsClient({ project_id:d[4], keyFilename:"assets/keys/dialogflow.json", apiEndpoint: 'us-central1-dialogflow.googleapis.com' });
-				let sessionPath=dfClient.projectAgentSessionPath(d[4], sessionId);
+			if (d[1] == "DIALOGFLOW-ES") {															// Dialogflow ES													
+				const session=new dialogflow.SessionsClient({ project_id:d[4], keyFilename:"assets/keys/dialogflow.json", apiEndpoint: 'us-central1-dialogflow.googleapis.com' });
+				let sessionPath=session.projectAgentSessionPath(d[4], sessionId);
 				const request = { session: sessionPath, queryInput:{ text: { text: d[5], languageCode:"en" }}};
-				const responses = await dfClient.detectIntent(request);
+				const responses = await session.detectIntent(request);
 				let msg=d[0]+"|DIALOGFLOW|"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+d[5];
 				if (client)	SendData(client, msg);												// Send back 
 				trace(msg)
 				}
 			else if (d[1] == "DIALOGFLOW-CX") {													// Dialogflow CX												
-				const dfClient=new dialogflow.SessionsClient({ project_id:"activity3-viod", keyFilename:"assets/keys/dialogflow.json" });
-				const sessionPath = dfClient.projectLocationAgentSessionPath("activity3-viod","global",d[4], sessionId);
-					
-				const request = { dfClient: sessionPath, queryInput:{ text: { text: d[5], languageCode:"en" }}};
-				const responses = await dfClient.detectIntent(request);
+				const session=new dialogflow.SessionsClient({ project_id:"activity3-viod", keyFilename:"assets/keys/dialogflow.json" });
+				const sessionPath = session.projectLocationAgentSessionPath("activity3-viod","us-central1",d[4],sessionId);
+				const request = { session: sessionPath, queryInput:{  languageCode:"en-US" ,text: { text: d[5], languageCode:"en-US" }}};
+				const responses = await session.detectIntent(request);
 				let msg=d[0]+"|DIALOGFLOW|"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+d[5];
 				if (client)	SendData(client, msg);												// Send back 
 				trace(msg)
 				}
 			} catch(e) { console.log(e) }
 		}
+
 	
 //	let d=("3|DIALOGFLOW-CX|ADMIN|INFER|Test-CX|How are you").split("|");	InferIntent(d,"")
 

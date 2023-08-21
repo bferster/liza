@@ -29,7 +29,7 @@
 			<img src="img/logo.png" style="width:25%">
 			<hr>
 			AI: &nbsp;<select class="lz-is" id="lz-aiType">
-				<option>Wit</option><option>Dialog</option>
+				<option>Wit</option><option>Dialog-CX</option><option>Dialog-ES</option>
 				</select>&nbsp &nbsp; 
 			Activity: &nbsp;<select class="lz-is" id="lz-dataset">
 					<option>Test</option><option>Activity3</option><option>Fiction</option><option>Space</option>
@@ -130,8 +130,11 @@
 					TrainWit(d,uniqueIntents);														// Add intents and utterances	
 					});
 				}
-			else if (aiType == "dialog") {															// DIALOGFFLOW
+			else if (aiType == "dialog-es") {														// DIALOGFLOW-ES
 				TrainDialog(d,uniqueIntents);														// Load and make training data	
+				}
+			else if (aiType == "dialogcx") {														// DIALOGFLOW-CX
+				TrainDialogCX(d,uniqueIntents);														// Load and make training data	
 				}
 			if (holds.length) {																		// If any holds
 				let fields=["intent","remark","note"];												// Field names
@@ -249,10 +252,26 @@
 			callback(inference);																	// Return inference object
 			if (msgs.length) InferIntents(msgs, callback)											// Recurse, if not last
 			}
-		else if (aiType == "dialog") {																// If DIALOGFLOW
+			else if (aiType == "dialog-es") {														// If DIALOGFLOW
 			let p=new Promise((resolve, reject) => {
 				trace(m)
-				setTimeout(()=>{ws.send("Test|DIALOGFLOW|ADMIN|INFER|activity3-viod|"+m.remark.substring(0,255))},500);
+				setTimeout(()=>{ws.send("Test|DIALOGFLOW-ES|ADMIN|INFER|activity3-viod|"+m.text.substring(0,255))},500);
+				ws.onmessage=(e)=>{ 																// If a ws message
+					if (!e.data)			 return;												// Quit if no data
+					let v=event.data.split("|");													// Get params
+					if (v[1] != "DIALOGFLOW") return;												// Not a dialogflow inference
+					resolve(v) };																	// Resolve promise
+				}).then(res =>{ 																	// On resolution
+					inference.intent=res[2].substr(1);												// Intent																		
+					inference.confidence=res[3];													// Confidence
+					callback(inference); 															// Return inference
+					if (msgs.length) InferIntents(msgs, callback)									// Recurse, if not last
+					});
+			}
+		else if (aiType == "dialog-cx") {															// If DIALOGFLOW-CX
+			let p=new Promise((resolve, reject) => {
+				trace(m)
+				setTimeout(()=>{ws.send("Test|DIALOGFLOW-CX|ADMIN|INFER|Test-CX|"+m.text.substring(0,255))},500);
 				ws.onmessage=(e)=>{ 																// If a ws message
 					if (!e.data)			 return;												// Quit if no data
 					let v=event.data.split("|");													// Get params
@@ -466,7 +485,6 @@
 		for (i=0;i<uniqueIntents.length;i++) 	SaveTextAsFile("r"+uniqueIntents[i]+".json",`{ "name":"r${uniqueIntents[i]}", "auto":true }`);	
 		let v=groupBy(d,"intent");																// Group by intent																
 		for (intent in v) {																		// For each intent
-			trace(intent)
 			str="[\n";
 			for (i=0;i<v[intent].length;++i) {													// For each one wanted
 				s=v[intent][i].remark.replace(/"/g,"");											// No quotes
@@ -485,6 +503,30 @@
 			}
 	
 	}	
+
+	function TrainDialogCX(data, uniqueIntents)													// MAKE DIALOGFLOW INTENT FILE
+	{
+		let intent,i,j,s,d=[];
+		let v=groupBy(data,"intent");															// Group by intent																
+		let fields=["Intent Display Name","Language","Phrase"];									// Field names
+		for (intent in v) {																		// For each intent			
+			for (i=0;i<v[intent].length;++i) {													// For each one wanted
+				s=v[intent][i].remark.trim();													// No trim phrase
+				if (s) d.push({ "Intent Display Name":i ? "" : "r"+intent, Language:i ? "" : "en", Phrase:s});	// Add intent/lang on 1st, phrase 
+				}
+			}
+		let str=Papa.unparse(d,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
+		SaveTextAsFile("dfcx-training.csv",str);												// Write training file
+	
+		function groupBy(arr, property) {														// GROUP
+			return arr.reduce((acc, cur) => {
+				acc[cur[property]] = [...acc[cur[property]] || [], cur];
+				return acc;
+				}, {});
+		}
+	}
+	
+	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // OPENAI
