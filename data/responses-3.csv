@@ -1,12 +1,18 @@
 intent,student,response,valued,language,knowledge,thinking,action,understanding,responseType
+100,Oliver,"I'm feeling rushed, teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
+100,Oliver,"I'm feeling stressed, teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
 200,Oliver,"I am worried about time, I haven't started and I want to find the answer.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
 200,Oliver,I need more time so that I can find the right answer.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
 200,Oliver,"I haven't finsihed the reading or question, but, I really want to learn this.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
-100,Oliver,"I'm feeling rushed, teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
-100,Oliver,"I'm feeling stressed, teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
 310,Oliver,"Teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
 310,Oliver,"Teacher, I think we could use a couple breaths to get focused.",,2 Vocabulary+Details,1 Prior knowledge,3 Elaborative,,0,Engage
 310,Oliver,"Teacher, can we pause for a couple of breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
+320,Oliver,I got checks on the nouns.,,-1 Casual language/conversation,2 Evidence from source,2 Careful,,0,Learn
+320,Oliver,"Okay, I will focus on equipment and water.",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
+320,Oliver,Checks help me see the nouns.,,-1 Casual language/conversation,3 Evidence + reasoning,2 Careful,,0,Learn
+330,Oliver,I found the verb.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Learn
+330,Oliver,I knew discover was an important word.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
+330,,We need to find the name of the equipment used to discover water.,,,,,,,
 410,Oliver,"This breathing is very helpful, teacher.",,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
 410,Oliver,Thank you for doing the breathing exercise.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
 410,Oliver,I feel ready now.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,,
@@ -16,41 +22,15 @@ intent,student,response,valued,language,knowledge,thinking,action,understanding,
 411,Oliver,"Yeah, sure. Okay. The question was what equipment did scientists use to discover water on the moon",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
 411,Oliver,"Okay, What equipment did scientist use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
 412,Oliver,Water,,1 Vocabulary,0 Not present,1 Incomplete,write,0,Learn
-412,Oliver,Tool,,,,,,,
-412,Oliver,Equipment,,,,,,,
-320,Oliver,I got checks on the nouns.,,-1 Casual language/conversation,2 Evidence from source,2 Careful,,0,Learn
-320,Oliver,"Okay, I will focus on equipment and water.",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
-320,Oliver,Checks help me see the nouns.,,-1 Casual language/conversation,3 Evidence + reasoning,2 Careful,,0,Learn
 413,Oliver,"I think the action word is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
-413,Oliver,"The verb the question wants us to investigate is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
-330,Oliver,I found the verb.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Learn
-330,Oliver,I knew discover was an important word.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
-330,,We need to find the name of the equipment used to discover water.,,,,,,,
+413,Oliver,"The verb the question wants us to investigate is discover.",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
 500,Oliver,I learned to look for the action words and to look for words that are nouns.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
 500,Oliver,I learned to take more time to understand the question before I start to answer it.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
 500,Oliver,I learned to think about how the question tells you what you have to have in the answer.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
 500,Oliver,I learned to highlight the important words.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
 520,Oliver,"Ok, next time I'll try to read the question really carefully because I might miss what it is asking.",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,,0,Reflect
 520,Oliver,"Next time, I'll take time to highlight the important words in the question and remember I will need them in my answer.",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
-520,Oliver,"I could try focusing on the WH question words to help me understand the question. ",,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,,0,Reflect
-520,Oliver,I will highlight the important words and remember that those words should be in my answer.,,2 Vocabulary+Details,2 Evidence from source,3 Elaborative,,0,Reflect
-1000,Class,I'm ready to move on.,,,,,,,
-1000,Class,I'm done.,,,,,,,
-1000,Class,I'm ready for the next group.,,,,,,,
-1000,Class,You can go back to your seat now.,,,,,,,
-1000,Class,You have a good plan to finish this assignment.,,,,,,,
-1000,Class,Why don't you work alone now.,,,,,,,
-1000,Class,"I am moving on to other students, you can continue your learning.",,,,,,,
-1000,Class,"I am moving on, but you should continue this work.",,,,,,,
-1000,Class,Go ahead and finish without me.,,,,,,,
-1000,Class,It's time for me to go.,,,,,,,
-1000,Class,I have to stop now.,,,,,,,
-1000,Class,Head back to your seat.,,,,,,,
-1000,Class,I am glad that you learned so much today.,,,,,,,
-1000,Class,I will look forward to seeing you use this strategy with the next question.,,,,,,,
-1000,Class,Thank you for talking with me and being open to trying new strategies.,,,,,,,
-1000,Class,I am glad that we had this time to talk together.,,,,,,,
-1001,Class,I didn't understand what you said,,,,,,,
+520,Oliver,"I pay attention to the noun and the verb. ",,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,,0,Reflect
 1001,Class,Could you say that in a different way.,,,,,,,
 1001,Class,I am not sure what you were talking about,,,,,,,
 1001,Class,What did you want me to understand,,,,,,,

@@ -119,8 +119,8 @@ class App  {
 	{
 		this.pFields=[ 	{ name:"date", type:"text", width:50 },
 			{ name:"email", type:"text", width:50 },
-			{ name:"intent", type:"text", width:50 },
 			{ name:"remark", type:"text", width:250 },
+			{ name:"intent", type:"text", width:50 },
 			{ name:"save", type:"checkbox", width:25},
 			{ type: "control", deleteButton: false}];
 			
@@ -161,10 +161,11 @@ class App  {
 	SaveAsCSV()																					// SAVE AS CSV FILE
 	{
 		let i,cData=[];
+		let fields=["remark","intent"];																// Field names
 		let data=$("#jsGrid-data").jsGrid("option","data");											// Get from grid													
 			for (i=0;i<data.length;++i)																// For each line		
 			if (data[i].save)	cData.push({intent:data[i].intent, remark:data[i].remark});			// Add if saving
-		let str=Papa.unparse(cData,{ header:true, skipEmptyLines:true, });							// Make CSV using lib
+		let str=Papa.unparse(cData,{ header:true, skipEmptyLines:true, columns:fields  });			// Make CSV using lib
 		SaveTextAsFile("*.csv", str);																// Save to file
 	}
 

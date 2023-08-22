@@ -56,12 +56,15 @@
 	let ws=null;																					// Socket server				
 	let aiType="wit";																				// AI type
 
-	let modelName="Test";																		// AI Model to use
-	let witToken={};
+	let modelName="Test";																			// AI Model to use
+	let witToken={},dfToken={};
 	witToken.Space=  "ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");				// Space service access token
 	witToken.Fiction="AH7-X-LA4QMUA-X-K6C4JCH7V7SH6-X-ULUGH6WTE".replace(/-X-/g,"");				// Fiction service access token
 	witToken.Activity3="CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO".replace(/-X-/g,"");				// Acitivity 3/4
-	witToken.Test="GF34C42CT4-X-6PWFV5XKG-X-OO7URKYE-X-KT4EH".replace(/-X-/g,"");					// Test 
+	witToken.Test="GF34C42CT4-X-6PWFV5XKG-X-OO7URKYE-X-KT4EH".replace(/-X-/g,"");					// Wit test 
+	dfToken.Test="ceadb93e-da17-448f-beb4-638fe5a367df";											// DF test 
+
+	let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah","Class"];				// Student names
 
 	$(document).ready(function() {								           							// ON PAGE LOADED
 		InitSocketServer();
@@ -82,7 +85,7 @@
 			});
 		$("#lz-augmentFile").on("change",(e)=>{														// ON AUGMENT FILE LOAD
 			AugmentData(e);																			// Read file
-			$("#lz-augmentFile").val("");																// Clear value		
+			$("#lz-augmentFile").val("");															// Clear value		
 			});
 		$("#lz-testFile").on("change",(e)=>{														// ON TEST FILE LOAD
 			TestData(e);																			// Read file
@@ -90,7 +93,7 @@
 			});
 
 		$("#lz-utter").on("change",(e)=>{															// ON TEST REMARK
-			InferIntents([{text:$("#lz-utter").val()}],(r)=>{
+			InferIntents([{remark:$("#lz-utter").val()}],(r)=>{
 				trace(r)
 				$("#lz-result").html(`<b>${r.intent}</b> at ${Math.round(r.confidence*100)}%`);
 				});
@@ -111,9 +114,13 @@
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			let uniqueIntents=[];																	// Hold unique intents used
-			let i,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			let i,j,re,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
 			SaveResponseFile(d);																	// Save student responses to new CSV file			
 			for (i=0;i<d.length;++i) {																// For each remark
+				for (j=0;j<studentNames.length;++j) {												// For each name
+					re=new RegExp(studentNames[j],"ig");											// Make name regex
+					d[i].remark=d[i].remark.replace(re,"Student");									// Replace nmes with generic
+					}
 				if (d[i].intent) uniqueIntents.push(d[i].intent);									// Get intent
 				if (d[i].note == "hold") { 															// Remove/save holds
 					holds.push(d[i]);																// Save hold
@@ -133,7 +140,7 @@
 			else if (aiType == "dialog-es") {														// DIALOGFLOW-ES
 				TrainDialog(d,uniqueIntents);														// Load and make training data	
 				}
-			else if (aiType == "dialogcx") {														// DIALOGFLOW-CX
+			else if (aiType == "dialog-cx") {														// DIALOGFLOW-CX
 				TrainDialogCX(d,uniqueIntents);														// Load and make training data	
 				}
 			if (holds.length) {																		// If any holds
@@ -254,8 +261,7 @@
 			}
 			else if (aiType == "dialog-es") {														// If DIALOGFLOW
 			let p=new Promise((resolve, reject) => {
-				trace(m)
-				setTimeout(()=>{ws.send("Test|DIALOGFLOW-ES|ADMIN|INFER|activity3-viod|"+m.text.substring(0,255))},500);
+				setTimeout(()=>{ws.send("Test|DIALOGFLOW-ES|ADMIN|INFER|activity3-viod|"+m.remark.substring(0,255))},500);
 				ws.onmessage=(e)=>{ 																// If a ws message
 					if (!e.data)			 return;												// Quit if no data
 					let v=event.data.split("|");													// Get params
@@ -271,7 +277,7 @@
 		else if (aiType == "dialog-cx") {															// If DIALOGFLOW-CX
 			let p=new Promise((resolve, reject) => {
 				trace(m)
-				setTimeout(()=>{ws.send("Test|DIALOGFLOW-CX|ADMIN|INFER|Test-CX|"+m.text.substring(0,255))},500);
+				setTimeout(()=>{ws.send("Test|DIALOGFLOW-CX|ADMIN|INFER|"+dfToken[modelName]+"|"+m.remark.substring(0,255))},500);
 				ws.onmessage=(e)=>{ 																// If a ws message
 					if (!e.data)			 return;												// Quit if no data
 					let v=event.data.split("|");													// Get params
@@ -285,7 +291,7 @@
 					});
 			}
 		else if (aiType == "wit") {																	// If WIT
-			let url="https://api.wit.ai/message?v=20210922&n=3&q="+m.text.substring(0,255);		// URL			
+			let url="https://api.wit.ai/message?v=20210922&n=3&q="+m.remark.substring(0,255);		// URL			
 				const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
@@ -439,7 +445,7 @@
 
 	async function WitTrain(msgs, callback, done)												// SEND REMARK TO WIT TO TRAIN
 	{
-		for (let i=480;i<600;i+=10) 	SaveTextAsFile("r"+i+".json",`{ "name": "r${i}", }`);	
+//		for (let i=480;i<600;i+=10) 	SaveTextAsFile("r"+i+".json",`{ "name": "r${i}", }`);	
 		let res=null,inference={ text:"", intent:0, confidence:0 };									// Null inference
 		let m=msgs.shift();																			// Remove from list and save first
 		if (!isNaN(m.intent)) m.intent="r"+m.intent;												// Numbers need to be prefixed with a letter

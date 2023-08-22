@@ -4,7 +4,7 @@
 	const fs = require('fs');
 	const WebSocket = require('ws');
 	const os = require("os");	
-	const dialogflow = require('@google-cloud/dialogflow-cx');
+	const {SessionsClient} = require('@google-cloud/dialogflow-cx');							// DialogFlow CX
 	let webSocketServer;																		// Holds socket server	
 	let local=os.hostname().match(/^bill|desktop/i);											// Running on localhost?
 	let sessionData=[];																			// Holds session data
@@ -56,7 +56,8 @@
 		}
 	else webSocketServer = new WebSocket.Server({ port:8080 });									// Open in debug
 	setInterval(()=>{ SaveSessionData(); },1000*60*60);											// 60 minute timer
-	
+	const dfClient=new SessionsClient({ keyFilename:"assets/keys/dialogflow.json", apiEndpoint: 'us-central1-dialogflow.googleapis.com' });
+
 try{
 	webSocketServer.on('connection', (webSocket, req) => {										// ON CONNECTION
 		let d=new Date();																		// Get UTC time
@@ -105,6 +106,7 @@ try{
 		for (s in sessionData) {																// For each session
 			try{																				// Try
 			if (sessionChanged[s]) {															// If new data
+				trace("Saved "+s);																// Log
 				fs.writeFile('data/sessions/'+s+'.json',JSON.stringify(sessionData[s]), err =>{	// Write file
 					if (err) 	console.error(err);												// Show error
 					else 		{ sessionChanged[s]=false; trace("Saved "+s); }					// Log
@@ -161,32 +163,31 @@ try{
 		} catch(e) { console.log(e) }
 	}
 
-	async function InferIntent(d, client, sessionId="123456789") 							// INFER INTENT VIA AI
+	async function InferIntent(d, client, sessionId="5356345") 							// INFER INTENT VIA AI
 	{
 		try{
 			if (d[1] == "DIALOGFLOW-ES") {															// Dialogflow ES													
-				const session=new dialogflow.SessionsClient({ project_id:d[4], keyFilename:"assets/keys/dialogflow.json", apiEndpoint: 'us-central1-dialogflow.googleapis.com' });
 				let sessionPath=session.projectAgentSessionPath(d[4], sessionId);
 				const request = { session: sessionPath, queryInput:{ text: { text: d[5], languageCode:"en" }}};
 				const responses = await session.detectIntent(request);
 				let msg=d[0]+"|DIALOGFLOW|"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+d[5];
 				if (client)	SendData(client, msg);												// Send back 
-				trace(msg)
 				}
 			else if (d[1] == "DIALOGFLOW-CX") {													// Dialogflow CX												
-				const session=new dialogflow.SessionsClient({ project_id:"activity3-viod", keyFilename:"assets/keys/dialogflow.json" });
-				const sessionPath = session.projectLocationAgentSessionPath("activity3-viod","us-central1",d[4],sessionId);
+				const sessionPath = dfClient.projectLocationAgentSessionPath("activity3-viod","us-central1",d[4],sessionId);
 				const request = { session: sessionPath, queryInput:{  languageCode:"en-US" ,text: { text: d[5], languageCode:"en-US" }}};
-				const responses = await session.detectIntent(request);
-				let msg=d[0]+"|DIALOGFLOW|"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+d[5];
+				const [response] = await dfClient.detectIntent(request);						// Query AI
+				let o=response.queryResult;														// Point at intent result
+				let intent=o.intent ? o.intent.displayName : 0;									// Get intent
+				let confidence=o.intent ? o.intentDetectionConfidence : 0;						// Get confidence
+				let msg=d[0]+"|DIALOGFLOW|"+intent+"|"+confidence+"|"+d[5];						// Make msg
 				if (client)	SendData(client, msg);												// Send back 
-				trace(msg)
+				trace(msg)											
 				}
 			} catch(e) { console.log(e) }
 		}
 
-	
-//	let d=("3|DIALOGFLOW-CX|ADMIN|INFER|Test-CX|How are you").split("|");	InferIntent(d,"")
+//	let d=("3|DIALOGFLOW-CX|ADMIN|INFER|ceadb93e-da17-448f-beb4-638fe5a367df|I'm going to portant words in the question using the routine Check and Circle").split("|");	InferIntent(d,"")
 
 	function SendData(client, data) 														// SEND DATA TO CLIENT
 	{

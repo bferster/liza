@@ -1,6 +1,26 @@
 {"pages":[
 
-	{"title":"<br>Feelings of belonging",
+	{"title":"<br>Your practice goal",
+	"text":"What type of teacher feedback did you plan to practice in today's session?",
+	"optionType":"radio",
+	"options":["Clarify - Ask for specific information or provide a purpose","Reflect - Share back student feelings, knowledge, or thinking","Teach - Provide students with fact statements, directions, strategies","Think - Prompt student thinking"]},
+
+	{"title":"<br>Explore the Timeline Tool (below)",
+	"text":"How effective was this practice session toward reaching your goal?",
+	"optionType":"radio",
+	"options":["Very effective","Effective","Not effective","Not at all effective"]},
+
+	{"title":"<br>Your thinking effort",
+	"text":"Describe your thinking effort during your practice",
+	"optionType":"radio",
+	"options":["Minimal mental energy","Focused","Deep concentration","Drained your mental energy"]},
+
+	{"title":"<br>How effective was this practice session at strengthening your awareness of teacher feedback",
+	"text":"What did you hear in the student responses?",
+	"optionType":"radio",
+	"options":["Not at all effective","Not effective","Effective","Very effective"]},
+
+	{"title":"<br>Belonging",
 	"text":"What did you hear in the student responses?",
 	"optionType":"radio",
 	"options":["Isolation","Acknowledged","Valued","Belonging"]},
@@ -8,12 +28,7 @@
 	{"title":"<br>Academic language",
 	"text":"What did you hear in the student responses?",
 	"optionType":"radio",
-	"options":["Conversational Language","Vocabulary","Vocabulary + Details","Vocabulary + Compound Sentence"]},
-
-	{"title":"<br>Knowledge",
-	"text":"What did you hear in the student responses?",
-	"optionType":"radio",
-	"options":["Tangential/off topic information","Prior Knowledge","Evidence","Evidence + Reasoning"]},
+	"options":["Conversational language","Vocabulary","Vocabulary + details","Vocabulary + complex sentence"]},
 
 	{"title":"<br>Thinking",
 	"text":"What did you hear in the student responses?",
@@ -30,5 +45,3 @@
 	"text":"You can continue to talk with the class, or go back to the main site",
 	"options":["Return to Agile Teacher Website","Stay in this classroom"]}
 ]}
-
-

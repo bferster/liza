@@ -235,7 +235,12 @@ class NLP {
 
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
-		if (msg && msg.length < 2)	return;																// Too small
+		let i,re;
+		if (msg && msg.length < 4)	return;																// Too small
+		for (i=0;i<app.students.length;++i) {															// For each name
+			re=new RegExp(app.students[i].id,"ig");														// Make name regex
+			msg=msg.replace(re,"Student");																// Replace names with generic
+			}
 		if ("wit" == "wit") {																			// WIT
 			let url="https://api.wit.ai/message?v=20210922&n=3&q="+msg.substring(0,255);				// URL
 			let token=this.aiToken.replace(/-X-/g,"");													// Get server token 100s
