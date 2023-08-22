@@ -151,25 +151,38 @@
 			};
 	}
 
+	nData=[];
+
 	async function AugmentData(e)																// AuGMENT DATA
 	{	
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
+		let i;
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
-			let i,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
-			SaveResponseFile(d);																	// Save student responses to new CSV file			
+			let d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
 			for (i=0;i<d.length;++i) {																// For each remark
 				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
 				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
 				}
-			let fields=["intent","remark","note"];													// Field names
-			let str=Papa.unparse(d,{ header:true, skipEmptyLines:true, columns:fields });			// Make CSV using lib
-			SaveTextAsFile("augmented.csv",str);													// Write file
-			};
-	}
 
+	let dd=d.slice(0,3)	
+			let tot=dd.length;																		// Total
+			Augment(dd,(r1)=>{
+				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>");	 // Show progress
+},
+			
+				(r2)=>{																				// Done
+					let fields=["intent","remark","note"];											// Field names
+					let str=Papa.unparse(nData,{ header:true, skipEmptyLines:true, columns:fields });	// Make CSV using lib
+					SaveTextAsFile("augmented.csv",str);											// Write file
+					Sound("ding");																	// Ding				
+					LoadingIcon(false);																// Hide loading icon
+					});
+			};
+	
+	}
 
 	function DeleteTrainingData()															// DELETE TRAINING DATA
 	{
@@ -396,7 +409,6 @@
 					});											
 				}
 			});
-
 	}
 
 	function WitGetUtterances(callback)															// GET ARRAY OF UTTERANCES
@@ -507,7 +519,6 @@
 				return acc;
 				}, {});
 			}
-	
 	}	
 
 	function TrainDialogCX(data, uniqueIntents)													// MAKE DIALOGFLOW INTENT FILE
@@ -532,49 +543,45 @@
 		}
 	}
 	
-	
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // OPENAI
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*
-
-{
-  "queryParams": {
-    "sentimentAnalysisRequestConfig": {
-      "analyzeQueryTextSentiment": true
-    }
-  },
-  "queryInput": {
-    "text": {
-      "text": "please reserve an amazing meeting room for six people",
-      "languageCode": "en-US"
-    }
-  }
-}
-	function OAIGet(msg)																	// GET RESPONSE FROM AI
+	function OpenAIPrompt(prompt, callback)													// GET RESPONSE FROM AI
 	{
-		let body={
-		"prompt": "The following is a list of companies and the categories they fall into\n\nFacebook: Social media, Technology\nLinkedIn: Social media, Technology, Enterprise, Careers\nUber: Transportation, Technology, Marketplace\nUnilever: Conglomerate, Consumer Goods\nMcdonalds: Food, Fast Food, Logistics, Restaurants\nFedEx:",
-		"temperature": 0,
-		"max_tokens": 6,
-		"top_p": 1.0,
-		"frequency_penalty": 0.0,
-		"presence_penalty": 0.0,
-		"stop": ["\n"]
-		}
-
-		const url="https://api.openai.com/v1/engines/davinci/completions"
-		let token="sk-u4nGW65-X-gajLxEDQlh9OTT3BlbkF-X-JHp7xp1JaQ5HJT7Ca3pqs".replace(/-X-/g,"");	// Get token
+		let body={ messages: [{ role: 'user', content: prompt }], model: "gpt-3.5-turbo", n:1 };
+		const url="https://api.openai.com/v1/chat/completions";
+		let token="sk-SPyelk-X-E2cNhrllzy-X-fRi8T3Bl-X-bkFJ55dW-X-pOjcNEm5D-X-bmKi6oQ".replace(/-X-/g,"");	// Get token
 		fetch(url,{ method:"POST",
 			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
 			  body: JSON.stringify(body)
 			  })	
-	  	.then(res => res.json()).then(res =>{ trace(res); })
-	}
-*/
+	  	.then(res => res.json()).then(res =>{ trace(res);
 
+			callback(res.choices[0].message.content); })
+	}
+
+	async function Augment(msgs, callback, done)												// SEND REMARK TO OPENAI TO AUGMENT
+	{
+		let i,m=msgs.shift();																		// Remove from list and save first
+		let s="Give me 9 other ways to say the following sentence:\""+m.remark+"\"";				// Make prompt
+		let body={ messages: [{ role: 'user', content:s }], model: "gpt-3.5-turbo", n:1 };			// Payload
+		const url="https://api.openai.com/v1/chat/completions";										// Endpoint
+		let token="sk-SPyelk-X-E2cNhrllzy-X-fRi8T3Bl-X-bkFJ55dW-X-pOjcNEm5D-X-bmKi6oQ".replace(/-X-/g,"");	// Get token
+		fetch(url,{ method:"POST",
+			  headers: { Authorization:'Bearer '+token, 'Content-Type':'application/json'}, 
+			  body: JSON.stringify(body)
+			  })	
+		.then(res => res.json()).then(res =>{ 
+			nData.push({ intent: m.intent, remark:m.remark.trim(), note:"---- ORIGINAL -----"});  	// Add original remark
+			let v=res.choices[0].message.content.split("\n");										// Make into array
+			for (i=0;i<v.length;++i) nData.push({ intent:m.intent, remark:v[i].substring(2).trim(), note:"augment"} );	// Add augments
+			trace(v)
+			callback(res);												// Return respones
+			if (msgs.length) setTimeout(()=>{ Augment(msgs, callback, done) },1500);				// Recurse, if not last after waiting
+			else	trace("done"),done(res)
+		})
+	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS 
