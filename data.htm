@@ -52,6 +52,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	let rawData=[], intents=[], session=[], keyWords=[], vocab=[]; uvocab=[];
+	let nData=[];																					// Holds augmented data
 	let nlp=new NLP();																				// Alloc NLP class
 	let ws=null;																					// Socket server				
 	let aiType="wit";																				// AI type
@@ -151,8 +152,6 @@
 			};
 	}
 
-	nData=[];
-
 	async function AugmentData(e)																// AuGMENT DATA
 	{	
 		let file=e.target.files[0];																	// Point at file
@@ -161,20 +160,22 @@
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
+			nData=[];																				// Start fresh
+			LoadingIcon(true);																		// Show loading icon
+			$("#lz-loadingIconText").html("<b>0%</b>");												// Show progress
 			let d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
 			for (i=0;i<d.length;++i) {																// For each remark
 				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
 				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
 				}
-
-	let dd=d.slice(0,3)	
-			let tot=dd.length;																		// Total
-			Augment(dd,(r1)=>{
-				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>");	 // Show progress
-},
-			
+//d=d.slice(0,3)	
+			let tot=d.length;																		// Total
+			Augment(d,(r1)=>{																		// Mid way
+				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>");	// Show progress
+				},
 				(r2)=>{																				// Done
 					let fields=["intent","remark","note"];											// Field names
+					nData=[... new Set(nData)];														// Cull dupes
 					let str=Papa.unparse(nData,{ header:true, skipEmptyLines:true, columns:fields });	// Make CSV using lib
 					SaveTextAsFile("augmented.csv",str);											// Write file
 					Sound("ding");																	// Ding				
@@ -240,8 +241,6 @@
 								}
 							if (orig[i].match == 1) results[orig[i].intent].match++;				// If a match
 							if (orig[i].match == -1) notFound++;									// Add to bad count
-							
-							
 							results[orig[i].intent].tot++;											// Add to count
 							}
 						for (o in results) 
@@ -252,7 +251,6 @@
 					}
 					});
 				}
-
 	}
 
 	async function InferIntents(msgs, callback)													// GET RESPONSE FROM AI
@@ -564,8 +562,9 @@
 	async function Augment(msgs, callback, done)												// SEND REMARK TO OPENAI TO AUGMENT
 	{
 		let i,m=msgs.shift();																		// Remove from list and save first
-		let s="Give me 9 other ways to say the following sentence:\""+m.remark+"\"";				// Make prompt
-		let body={ messages: [{ role: 'user', content:s }], model: "gpt-3.5-turbo", n:1 };			// Payload
+		let s="Give me 7 other ways to say the following sentence and limit to 10 words:\""+m.remark+"\". "; // Make prompt
+		s+="Then give me 3 other ways to say the the same sentence and limit to 5 words. ";
+		let body={ messages: [{ role: 'user', content:s }], model: "gpt-3.5-turbo", n:1};			// Payload
 		const url="https://api.openai.com/v1/chat/completions";										// Endpoint
 		let token="sk-SPyelk-X-E2cNhrllzy-X-fRi8T3Bl-X-bkFJ55dW-X-pOjcNEm5D-X-bmKi6oQ".replace(/-X-/g,"");	// Get token
 		fetch(url,{ method:"POST",
@@ -575,11 +574,11 @@
 		.then(res => res.json()).then(res =>{ 
 			nData.push({ intent: m.intent, remark:m.remark.trim(), note:"---- ORIGINAL -----"});  	// Add original remark
 			let v=res.choices[0].message.content.split("\n");										// Make into array
-			for (i=0;i<v.length;++i) nData.push({ intent:m.intent, remark:v[i].substring(2).trim(), note:"augment"} );	// Add augments
-			trace(v)
-			callback(res);												// Return respones
+			for (i=0;i<v.length;++i) if (v[i]) nData.push({ intent:m.intent, remark:v[i].substring(2).trim(), note:"augment"} );	// Add augments
+			trace(res)
+			callback(res);																			// Return respones
 			if (msgs.length) setTimeout(()=>{ Augment(msgs, callback, done) },1500);				// Recurse, if not last after waiting
-			else	trace("done"),done(res)
+			else			 done(res);																// Call done
 		})
 	}
 
