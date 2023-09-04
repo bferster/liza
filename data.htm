@@ -109,7 +109,7 @@
 
 	async function TrainData(e)																	// TRAIN DATA
 	{	
-		let holdPct=.2;
+		let holdPct=0;
 		let holds=[],d=[];
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
@@ -117,10 +117,10 @@
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			let uniqueIntents=[];																	// Hold unique intents used
-			let i,j,k,re,v=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			let i,j,k,re,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
 			SaveResponseFile(v);																	// Save student responses to new CSV file			
-			if (holdPct) {																			// If holding some out
-				v=groupBy(v,"intent");																// Group by intent																
+				v=groupBy(d,"intent");																// Group by intent																
+				d=[];
 				for (intent in v) {																	// For each intent
 					k=Math.round(v[intent].length/(v[intent].length*holdPct));						// Hold increment
 					trace(Math.round(v[intent].length),k)
