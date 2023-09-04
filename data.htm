@@ -118,9 +118,10 @@
 		reader.onload=(e)=>{ 																		// When loaded
 			let uniqueIntents=[];																	// Hold unique intents used
 			let i,j,k,re,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
-			SaveResponseFile(v);																	// Save student responses to new CSV file			
+			SaveResponseFile(d);																	// Save student responses to new CSV file			
+			if (holdPct) {																			// If holding some out
 				v=groupBy(d,"intent");																// Group by intent																
-				d=[];
+				d=[];																				// Clear array
 				for (intent in v) {																	// For each intent
 					k=Math.round(v[intent].length/(v[intent].length*holdPct));						// Hold increment
 					trace(Math.round(v[intent].length),k)
