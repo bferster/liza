@@ -106,30 +106,43 @@
 			});
 	});
 
+
 	async function TrainData(e)																	// TRAIN DATA
 	{	
+		let holdPct=.2;
+		let holds=[],d=[];
 		let file=e.target.files[0];																	// Point at file
 		if (!file) 	return;																			// Quit if bad
-		let holds=[];
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
 			let uniqueIntents=[];																	// Hold unique intents used
-			let i,j,re,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
-			SaveResponseFile(d);																	// Save student responses to new CSV file			
+			let i,j,k,re,v=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			SaveResponseFile(v);																	// Save student responses to new CSV file			
+			if (holdPct) {																			// If holding some out
+				v=groupBy(v,"intent");																// Group by intent																
+				for (intent in v) {																	// For each intent
+					k=Math.round(v[intent].length/(v[intent].length*holdPct));						// Hold increment
+					trace(Math.round(v[intent].length),k)
+					for (i=0;i<v[intent].length;++i) {												// For each intent
+						if (i%k) 	d.push(v[intent][i]);											// Train this one
+						else		holds.push(v[intent][i]);										// Hold this one
+						}
+					}
+				if (holds.length) {																	// If any holds
+					let fields=["intent","remark","note"];											// Field names
+					let str=Papa.unparse(holds,{ header:true, skipEmptyLines:true, columns:fields });	// Make CSV using lib
+					SaveTextAsFile("holds.csv",str);												// Write file
+					}
+				}			
 			for (i=0;i<d.length;++i) {																// For each remark
 				for (j=0;j<studentNames.length;++j) {												// For each name
 					re=new RegExp(studentNames[j],"ig");											// Make name regex
 					d[i].remark=d[i].remark.replace(re,"Student");									// Replace nmes with generic
 					}
-				if (d[i].intent) uniqueIntents.push(d[i].intent);									// Get intent
-				if (d[i].note == "hold") { 															// Remove/save holds
-					holds.push(d[i]);																// Save hold
-					d.splice(i,1); 																	// Remove from training
-					continue; 																		// Contineu
-					}								
-				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
-				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
+				if (d[i].intent)   uniqueIntents.push(d[i].intent);									// Get intent
+				if (!d[i].remark) { d.splice(i,1); continue; }										// No remark
+				if (!d[i].intent) { d.splice(i,1); continue; }										// No intent
 				}
 			uniqueIntents=[... new Set(uniqueIntents)];												// Make unique
 
@@ -144,12 +157,15 @@
 			else if (aiType == "dialog-cx") {														// DIALOGFLOW-CX
 				TrainDialogCX(d,uniqueIntents);														// Load and make training data	
 				}
-			if (holds.length) {																		// If any holds
-				let fields=["intent","remark","note"];												// Field names
-				let str=Papa.unparse(holds,{ header:true, skipEmptyLines:true, columns:fields });	// Make CSV using lib
-				SaveTextAsFile("holds.csv",str);													// Write file
-				}
 			};
+
+		function groupBy(arr, property) {														// GROUP
+			return arr.reduce((acc, cur) => {
+				acc[cur[property]] = [...acc[cur[property]] || [], cur];
+				return acc;
+				}, {});
+			}
+
 	}
 
 	async function AugmentData(e)																// AuGMENT DATA
@@ -211,9 +227,9 @@
 		reader.onload=(e)=>{ 																		// When loaded
 			LoadingIcon(true);																		// Show loading icon
 				let count=0,notFound=0;																// Counts
-				let d=[],orig=[];
-				let v=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
-				for (i=0;i<v.length;++i) if (v[i].note == "hold")	d.push(v[i]),orig.push(v[i]);	// Only holds
+				let orig=[];
+				let d=Papa.parse(e.target.result, { header:true, skipEmptyLines:true }).data;		// Parse CSV using papa lib
+				for (i=0;i<d.length;++i) orig.push(d[i]);											// Copy
 				let tot=d.length;																	// Total
 				InferIntents(d, (res)=>{ 															// On each inference
 					i=(tot-d.length-1);																// Current index
