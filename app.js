@@ -71,8 +71,7 @@ class App  {
 				res[0].data=res[0].data.replace(/\&apos;/g,"'");									// Remove apos
 				this.sessionLog=JSON.parse(res[0].data);
 				});
-		}
-		
+			}
 		if (this.multi) $("#lz-rolePick").css("display","block");									// Show role picker
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
 		$("#lessonPlanBut").on("click", ()=> { this.ShowLessonPlan(); });							// ON LESSON PLAN	
@@ -227,7 +226,7 @@ class App  {
 				$("#lz-rolePick").append("<option>Teacher</option><option>Gamer</option>");			// Add teacher & gamer roles
 				for (i=0;i<app.students.length;++i) $("#lz-rolePick").append("<option>"+app.students[i].id+"</option>");	// Add option
 				this.StartSession();																// Start session
-			});	
+				});	
 
 		fetch('data/responses-'+this.activityId+'.csv?rnd='+Math.floor(Math.random()*100000))		// Load response file
 			.then(res =>  res.text())																// Get as text
@@ -289,6 +288,7 @@ class App  {
 	{
 		let i,s;
 		if (this.inRemark)	return;																	// Not while teacher is talking
+		if (this.multi)	return;																		// Not in multiplayer mode
 		if (e.done)	return;																			// Already handled
 		e.done=1;																					// Flag it done
 		let student=e.who;																			// Get speaker
@@ -427,6 +427,7 @@ class App  {
 			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
+				intent=this.nlp.MatchKeyRule(text,intent); 											// Reset intent if a keyword match
 				if (intent == 1000) {																// Eding event
 					this.HandleEventTrigger({ do:"end:", who:"current" });							// Trigger end reponse
 					setTimeout(()=>{																// Wait for remark to end
@@ -512,12 +513,13 @@ class App  {
 			}					
 	}
 
-	VideoChat()																					// OPEN VIDEO CHAT
+	VideoChat(pct=75)																			// OPEN VIDEO CHAT
 	{
 		$("#lz-videoChat").remove(); 																// Remove old one
+		let l=(100-pct)/2;																			// Calc left side
 		let link="japp.htm?GraceChat~Session~"+app.sessionId+"&"+app.role;							// Make link
 		let str=`<div id="lz-videoChat" style="position:absolute;background-color:#999;
-			width:75%;height:${$(window).width()*.5625*.75}px;top:50px;left:12.5%;display:none">
+			width:${pct}%;height:${$(window).width()*.5625*pct/100}px;top:50px;left:${l}%;display:none">
 			<span id="co-ift"style="cursor:pointer;margin-left:4px;float:left;pointer-events:auto;color:#fff">Minimize window</span>
 			<img style="cursor:pointer;float:right;margin:4px;pointer-events:auto;width:12px" src="img/closedotw.gif"
 			onclick='$("#lz-videoChat").remove()'>
