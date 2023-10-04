@@ -424,7 +424,9 @@ class App  {
 			}
 		app.DoAction(act,text);																		// If a please + action mentioned, do it
 		if (!act) 																					// If no action happening
-			app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
+		trace("spoke",text)
+		app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
+			trace("spoke cb",res)
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=this.nlp.MatchKeyRule(text,intent); 											// Reset intent if a keyword match
@@ -610,7 +612,7 @@ class App  {
 		//LOOK DOWN
 
 		for (i=0;i<this.sc.seats.length;++i) 														// For each desk
-			if (this.deskModel)	this.desks.push({ id:"desk"+i, src:"assets/"+this.deskModel+".dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/desk3.png" : "assets/desk3empty.png"} ); 
+			if (this.deskModel)	this.desks.push({ id:"desk"+i, src:"assets/"+this.deskModel+".dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/avatar3.png" : "assets/desk3empty.png"} ); 
 			else				this.desks.push({ id:"desk"+i, src:"assets/desk.dae", seat:i, s:20, tex:(i<this.students.length) ? "assets/deskskin.png" : 0xdddddd} );	// Add desk
 		this.LoadModels();										  									// Load 3D models
 	}
