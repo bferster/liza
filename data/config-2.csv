@@ -20,8 +20,10 @@ seat,7,"x=-100,y=-100,z=0,r=0,"
 seat,8,"x=0,y=-100,z=0,r=0,"
 seat,9,"x=250,y=-100,z=0,r=30,"
 
-resource,Identifying differences,assets/identifying.pdf
-resource,Questions for your teaching,assets/questions.pdf
+resource,Scene Overview,assets/checkcircleoliver.pdf
+resource,Student Task Materials,assets/student.pdf
+resource,About student variances,assets/variances.pdf
+
 action,sleep,"sleep,snooze"
 action,headCenter,"eyes front,head center"
 action,headRight,head right

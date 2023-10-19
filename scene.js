@@ -258,7 +258,7 @@ class Scene {
 	
 		str+="</table><br>";																			
 		str+="Sequence:&nbsp;"+MakeSelect("beSeqs",false,[]);																			
-		str+="&nbsp;&nbsp;&nbsp;Fidget?&nbsp;<td><input type='checkbox' id='beFidget'"+(app.students[snum].fidget ? " checked" : "")+">" ;																			
+//		str+="&nbsp;&nbsp;&nbsp;Fidget?&nbsp;<td><input type='checkbox' id='beFidget'"+(app.students[snum].fidget ? " checked" : "")+">" ;																			
 		str+="<div class='lz-bs' id='beReset' style='float:right;margin-right:4px'>Reset</div>";																		
 		str+="</div>";
 
