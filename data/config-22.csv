@@ -1,10 +1,10 @@
 type,id,text,data
-student,Sharleen,"sharleen,charlene,shar,charlie","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=0,"
-student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=1,"
-student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=2,"
-student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=3,"
-student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,"
-student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,"
+student,Sharleen,"sharleen,charlene,shar,charlie","sex=female,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=0,mod=sharleen3,"
+student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=1,mod=jazmin3,"
+student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=2,mod=luis3,"
+student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=3,mod=farrah3,"
+student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,mod=chris3,"
+student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,mod=oliver3,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children,friends","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
 session,data,"trt=300,",
 string,multi,"Start,Explain,Question,Discover,Reflect	",

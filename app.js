@@ -391,8 +391,8 @@ class App  {
 			o.color=d.data.match(/color=(.+?)\W/)[1];												// Get color
 			o.tex="assets/"+o.id.toLowerCase()+"skin.png";											// Set default skin
 			if (d.data.match(/mod=(.+?)\W/)) {														// If model spec'd
-				o.src="assets/"+d.data.match(/mod=(.+?)\W/)[1]+".dae";								// Use it
- 				o.tex="assets/avatar3.png";
+				o.src="assets/"+d.data.match(/mod=(.+?)\W/)[1]+".dae";								// Use model
+				o.tex="assets/"+o.id.toLowerCase()+"skin3.png";										// Add texture
 				}
 			if (o.id != "Class") {																	// Only students
 				this.students.push(o); 																// Add to students array
@@ -509,7 +509,7 @@ class App  {
 
 		function animateIt(student, act) {															// ANIMATE STUDENT
 			let s=app.studex[student]-1;															// Get student index (it's 1-based)
-				if (act == "fidget")			app.students[s].fidget=1;								// Fidget								
+			if (act == "fidget")			app.students[s].fidget=1;								// Fidget								
 			else if (act == "fidgetStop")	app.students[s].fidget=0;								// Off	
 			else 							app.SendEvent(app.sessionId+"|"+app.curTime.toFixed(2)+"|"+app.userId+"|ACT|"+student+"|"+act); 	// Send response
 			}					
@@ -586,7 +586,7 @@ class App  {
 		this.poses["leftArmDesk"]="armL,-60,0,-45,forearmL,0,0,-46";						this.poses["rightArmDesk"]="armR,-60,0,45,forearmR,0,0,46";
 		this.poses["handUp"]="armL,25,0,0,forearmL,68,-25,0,wristL,0,-40,0";				this.poses["handDown"]="armL,-51,0,-44,forearmL,0,0,-45,wristL,0,0,0";	
 		this.poses["handRight"]="forearmL,50,-25,0";	
-		this.poses["twistLeft"]="neck,0,30,0,spine,0,33,0";									this.poses["twistRight"]="neck,0,-30,0,spine,0,-60,0";			
+		this.poses["twistLeft"]="neck,0,30,0,chest,0,33,0";									this.poses["twistRight"]="neck,0,-30,0,chest,0,-33,0";			
 		this.poses["write1"]="wristR,0,-40,0,thumbR,0,-45,0,wristL,0,75,0,neck,45,0,0";		this.poses["write2"]="wristR,0,-40,30,thumbR,0,-45,0";			
 		this.poses["sleep"]="neck,45,62,0,chest,49,0,0,armL,-12,53,0,wristL,0,0,0,forearmL,120,-58,9,armR,0,30,0,forearmR,-90,0,0,wristR,0,0,0";
 		this.poses["standUp"]="armL,-80,0,0,armR,-80,0,0,legL,0,0,0,legR,0,0,0,thighL,0,0,0,thighR,0,0,0,forearmL,0,0,0,forearmR,0,0,0,chest,0,0,0,base,50,0,0";
