@@ -16,7 +16,7 @@ class Scene {
 		this.scene=null;																			// Scene object
 		this.controls=null;																			// Controls object
 		this.outliner=null;																			// Outline renderer
-		this.floor="assets/wood.jpg";																// Floor texture
+		this.floor=!this.real3D ? "" : "assets/wood.jpg";											// Floor texture
 		this.backWall="assets/blackboard.png";														// Back wall texture
 		this.frontWall=!this.real3D ? "" : "assets/blackboard.png";									// Front wall texture
 		this.leftWall= !this.real3D ? "" : "assets/windowwall.png";									// Side wall texture
@@ -37,7 +37,7 @@ class Scene {
 		this.AddLights();																			// Add lights
 		this.Resize();																				// Resize 3D space
 		this.container.appendChild(this.renderer.domElement);										// Add to div
-		this.AddRoom();																				// Add room walls
+//		this.AddRoom();																				// Add room wall (added on config load)
 		this.AddBlackboards();																		// Add blackboards
 		this.raycaster=new THREE.Raycaster(); 														// Alloc raycaster
 		this.mouse=new THREE.Vector2(); 															// Alloc click holder
@@ -80,7 +80,7 @@ class Scene {
 	AddRoom()																					// ADD ROOM TO SCENE
 	{	
 		var _this=this;																				// Save context
-		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,!this.real3D);		// If a floor spec'd
+		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,0);					// If a floor spec'd
 		if (this.frontWall) 	addWall(0,128,512,0,Math.PI,0,256,this.frontWall,0,0);				// If a front wall spec'd
 		if (this.backWall) 		addWall(0,128,-512,0,0,0,256,this.backWall,0,0);					// If a back wall spec'd
 		if (this.leftWall) 		addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0,0);			// If a left wall spec'd

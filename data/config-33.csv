@@ -18,6 +18,7 @@ seat,6,"x=-200,y=-100,z=0,r=0,"
 seat,7,"x=-100,y=-100,z=0,r=0,"
 seat,8,"x=0,y=-100,z=0,r=70,"
 seat,9,"x=150,y=-100,z=0,r=-90,"
+room,room,"backwall3,floor3,sidewall3,sidewall3,"
 
 resource,Scene Overview,assets/overview.pdf
 resource,Student Task Materials,assets/student.pdf

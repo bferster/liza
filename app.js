@@ -53,7 +53,7 @@ class App  {
 //			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session id
 			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get activity id	
-			if (v[i] && v[i].match(/v=/)) 	 this.loadId=v[i].substring(2) 								// Get load id	
+			if (v[i] && v[i].match(/v=/)) 	 this.loadId=v[i].substring(2) 							// Get load id	
 			}
 
 		this.nlp=new NLP();																			// Add NLP
@@ -219,9 +219,17 @@ class App  {
 						app.nlp.aiToken=d[i].text;													// Set token
 						}
 					else if (d[i].type == "lessonplan") {											// Lesson plan 
-							app.lessonPlan=d[i];													// Save ;esson plan
-							}
+						app.lessonPlan=d[i];														// Save lesson plan
+						}
+					else if (d[i].type == "room") {													// Room walls/floor
+						o=d[i].text.split(",");														// Get back, floor, left, & right
+						this.sc.backWall="assets/"+o[0]+".png";										// Set back
+						this.sc.floor="assets/"+o[1]+".png";										// Floor
+						this.sc.leftWall="assets/"+o[2]+".png";										// Left wall
+						this.sc.rightWall="assets/"+o[3]+".png";									// Right
+						}
 					}
+				this.sc.AddRoom();																	// Add room info
 				this.InitClassroom();																// Init classroom
 				$("#lz-rolePick").append("<option>Teacher</option><option>Gamer</option>");			// Add teacher & gamer roles
 				for (i=0;i<app.students.length;++i) $("#lz-rolePick").append("<option>"+app.students[i].id+"</option>");	// Add option
