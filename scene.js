@@ -80,16 +80,16 @@ class Scene {
 	AddRoom()																					// ADD ROOM TO SCENE
 	{	
 		var _this=this;																				// Save context
-		if (this.floor) 		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1,0);					// If a floor spec'd
-		if (this.frontWall) 	addWall(0,128,512,0,Math.PI,0,256,this.frontWall,0,0);				// If a front wall spec'd
-		if (this.backWall) 		addWall(0,128,-512,0,0,0,256,this.backWall,0,0);					// If a back wall spec'd
-		if (this.leftWall) 		addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0,0);			// If a left wall spec'd
-		if (this.rightWall)	 	addWall(512,128,0,0,-Math.PI/2,0,256,this.rightWall,0,0);			// If a right wall spec'd
+		addWall(0,0,0,-Math.PI/2,0,0,1024,this.floor,1);											// Add floor
+		if (this.frontWall) 	addWall(0,128,512,0,Math.PI,0,256,this.frontWall,0);				// If a front wall spec'd
+		if (this.backWall) 		addWall(0,128,-512,0,0,0,256,this.backWall,0);						// If a back wall spec'd
+		if (this.leftWall) 		addWall(-512,128,0,0,Math.PI/2,0,256,this.leftWall,0);				// If a left wall spec'd
+		if (this.rightWall)	 	addWall(512,128,0,0,-Math.PI/2,0,256,this.rightWall,0);				// If a right wall spec'd
 
-		function addWall(x, y, z, xr, yr, zr, h, texture, wrap, cartoon) {							// ADD WALL
+		function addWall(x, y, z, xr, yr, zr, h, texture, wrap) {									// ADD WALL
 			var mat=new THREE.MeshPhongMaterial();													// Make material
-			mat.color=new THREE.Color(cartoon ? 0xeeeeee : 0xffffff);								// Set color
-			if (!cartoon) {																			// If a cartoon scene
+			mat.color=new THREE.Color(wrap ? 0xf0f0f0 : 0xffffff);									// Set color
+			if (texture) {																			// If a texture
 				mat.userData.outlineParameters= { visible: false };									// Hide outline
 				var tex=_this.textureLoader.load(texture);											// Load texture
 				if (wrap) {																			// If wrapping
