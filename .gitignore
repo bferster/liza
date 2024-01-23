@@ -1,3 +1,4 @@
 node_modules/
 assets/keys
 git/
+.git/
