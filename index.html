@@ -140,9 +140,8 @@
 		<br><div id="splashBut"  class="lz-bs" style="font-size:14px" onclick='app.voice.Talk("Welcome to Grace","Teacher")'>Enter classroom</div><br><br>
 		<div style='color:#000'><br>
 			<b>This app ONLY runs in the Chrome Desktop Browser</b><br><br>
-			There is more information in the help (?) button at the bottom of the screen.
-			<br><br><br>
-			<div style="font-size:11px">&copy; 2022 StageTools </div>
+			The name that you log in with will appear on a certificate verifying your professional development participation<br><br><br>
+			<div style="font-size:11px">&copy; 2024 StageTools </div>
 		</div>
 	</div>
 	<div id="controllerDiv" class="lz-controller">
@@ -201,8 +200,9 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 		if (window.location.host != "localhost") {													// Not in debug
 			$("#splashDiv").fadeIn();																// Fade in splash page
 			$("#splashBut").click( ()=> {															// On start button clicked
-				GetTextBox("Please sign in","Please type your email (or <i>guest</i>):","", (s)=>{	// Get id
-					app.userId=s;																	// Set user id
+				Login((name,id)=>{																	// Get name,id
+					app.userName=name;																// Set user name
+					app.userId=id;																	// Set user id
 					$("#splashDiv").fadeOut();														// Fade out splash
 					$("#mainDiv").fadeIn(2000);														// Fade in main
 					$("#controllerDiv").fadeIn(2000);												// Fade in controller
@@ -231,10 +231,12 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 		{
 			if (e.data && e.data.match(/Assess\|done/)) {											// Assessment done	
 				$("#lz-assess").remove();															// Remove assessment
+				app.GetBadge();																		// Ask id they want badge
 				$("#startBut").trigger("click");													// Toggle start button to restart	
 				}
 			else if (e.data && e.data.match(/Assess\|link/)) {										// Assessment link	
 				$("#lz-assess").remove();															// Remove assessment
+				app.GetBadge();																		// Ask id they want badge
 				if (app.endUrl && e.data.match(/true/i))	window.location=app.endUrl;				// Go to link
 				}
 		}	
@@ -315,6 +317,26 @@ if ((location.protocol != 'https:') && (window.location.host != "localhost") && 
 		$("#gtBoxTt").on("change", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ONE ENTER
 		$("#dialogOK").on("click", function() {	callback($("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ON OK 
 		$("#dialogCancel").on("click", function() {	$("#confirmBoxDiv").remove(); });								// ON CANCEL
+	}
+
+	function Login(callback)																		// LOG IN
+	{
+		$("#confirmBoxDiv").remove();																	// Remove 
+		$("body").append("<div class='lz-confirm' id='confirmBoxDiv'></div>");							// Add box								
+		var str="<img src='img/logo.png' width='64' style='vertical-align:-8px'/>&nbsp;&nbsp;";								
+		str+="<span style='font-size:14px; color:#666'><b>Please sign in</b></span><br><br>";
+		str+="<p>Please type your name:<p>";
+		str+="<p><input class='lz-is' style='width:75%' type='text' id='gtBoxTt1'></p>";
+		str+="<p>and email<p>";
+		str+="<p><input class='lz-is' style='width:75%' type='text' id='gtBoxTt'></p>";
+		str+="<div id='dialogOK' class='lz-bs'>OK</div>";
+		str+="<div id='dialogCancel' class='lz-bs' style='margin-left:8px;background-color:#999'>Cancel</div></div>";
+		$("#confirmBoxDiv").html(str);																	// Add to div
+		$("#gtBoxTt").on("click",()=>{ $("#gtBoxTt").focus();});										// Focus on button if clicked
+		$("#gtBoxTt1").on("click",()=>{ $("#gtBoxTt1").focus();});										// Focus on button if clicked
+		$("#gtBoxTt1").focus();																			// Focus on button
+		$("#dialogOK").on("click", function() {	callback($("#gtBoxTt1").val(),$("#gtBoxTt").val()); $("#confirmBoxDiv").remove(); });	// ON OK 
+		$("#dialogCancel").on("click", function() {	$("#confirmBoxDiv").remove(); });					// ON CANCEL
 	}
 
 	function ConfirmBox(title, content, callback, callback2)										// CONFIRMATION BOX

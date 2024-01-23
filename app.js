@@ -37,7 +37,8 @@ class App  {
 		this.inSim=false;																			// In simulation or not
 		this.inRemark=false;																		// Teacher talking flag
 		this.ignoreNextTalk=false;																	// Ignore TALK event flag
-		this.userId="";																				// User ID
+		this.userId="me";																				// User ID
+		this.userName="";																			// User name
 		this.said="";																				// Current remark
 		this.df={};																					// Dialog flow init data (null for Rasa) 
 		this.loadId=0;																				// Nothing to load
@@ -46,7 +47,7 @@ class App  {
 		this.teacherResources=[];																	// Teacher resource documents
 		this.points=0;																				// Gamer points
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
-		if (window.location.host == "localhost") this.userId="bferster";							// Set me if debug										
+		if (window.location.host == "localhost") this.userId="bferster@stagetools.com";				// Set me if debug										
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 			for (let i=0;i<v.length;++i) {															// For each param
 			if (v[i] && v[i].match(/id=/)) 	 this.userId=v[i].substring(3).toLowerCase();  			// Get userId (for debugging only)
@@ -290,6 +291,17 @@ class App  {
 		if (app.curTime >= app.nextTrigger.when) 		app.HandleEventTrigger(app.nextTrigger);	// Handle event trigger
 		if (app.curTime > app.totTime && app.unSaved)  	app.SaveSession();							// If past time
 		return app.curTime;																			// Return elapsed time in seconds
+	}
+
+	GetBadge() 																					// ASK FOR BADGE
+	{
+		let i,d;
+		ConfirmBox("Certificate","Do you want a get a certificate?",()=>{ 							// If yes
+			for (i=0;i<app.sessionLog.length;++i) app.sessionLog[i].text=app.sessionLog[i].text.replace(/\'/g,"&apos;");	 
+			d=`{ "name":"${app.userName}", "email":"${app.userId}", "games": ${JSON.stringify(app.sessionLog)} }`;			// Data
+//			window.open("certificate/index.html?data="+d,"_blank");									// Get badge
+			window.open("//alled.org/certificate/generate.php,?data="+d,"_blank");
+		});
 	}
 
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
