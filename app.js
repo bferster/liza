@@ -298,11 +298,15 @@ class App  {
 		let i,d;
 		ConfirmBox("Certificate","Do you want a get a certificate?",()=>{ 							// If yes
 			for (i=0;i<app.sessionLog.length;++i) app.sessionLog[i].text=app.sessionLog[i].text.replace(/\'/g,"&apos;");	 
-			d=`{ "name":"${app.userName}", "email":"${app.userId}", "games": ${JSON.stringify(app.sessionLog)} }`;			// Data
-//			window.open("certificate/index.html?data="+d,"_blank");									// Get badge
-			window.open("//alled.org/certificate/generate.php,?data="+d,"_blank");
-		});
-	}
+			d=`{ "name":"${app.userName}", "email":"${app.userId}", "games": ${JSON.stringify(app.sessionLog)} }`;	// Data
+			let f=document.createElement("form");													// Create virtual form
+			f.setAttribute('method',"post");														// POST
+			f.dat=d;																				// Add stringified data in to "dat"
+			window.open("//alled.org/certificate/generate.php","_blank");							// Call page
+//			window.open("certificate/index.html"_blank");											// Call page
+			f.submit();																				// POST data
+			});
+ 	}
 
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
 	{
