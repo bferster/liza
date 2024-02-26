@@ -12,11 +12,11 @@ intent,student,response,valued,language,knowledge,thinking,action,understanding,
 320,Oliver,Checks help me see the nouns.,,-1 Casual language/conversation,3 Evidence + reasoning,2 Careful,,0,Learn
 330,Oliver,I found the verb.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Learn
 330,Oliver,I knew discover was an important word.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
-330,,We need to find the name of the equipment used to discover water.,,,,,,,
+330,Oliver,We need to find the name of the equipment used to discover water.,,,,,,,
 410,Oliver,"This breathing is very helpful, teacher.",,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
 410,Oliver,Thank you for doing the breathing exercise.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
 410,Oliver,I feel ready now.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,,
-410,,I am more focused now.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,,
+410,Oliver,I am more focused now.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,,
 411,Oliver,"Um, yeah, okay. So question one is what equipment did scientists use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
 411,Oliver,What equipment did scientists use to discover water on the moon.,,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
 411,Oliver,"Yeah, sure. Okay. The question was what equipment did scientists use to discover water on the moon",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
