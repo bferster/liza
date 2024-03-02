@@ -40,7 +40,7 @@
 	sudo /opt/bitnami/letsencrypt/lego --tls --email="bferster@stagetools.com" --domains="agileteacher.org" --path="/opt/bitnami/letsencrypt" renew --days 90
 	sudo /opt/bitnami/letsencrypt/lego --path /opt/bitnami/letsencrypt list
  	sudo /opt/bitnami/ctlscript.sh start
-    restart grace/ws/ja, game/ws.js, db/sql.js
+    restart grace/ws.js, game/ws.js, db/sql.js
 
 	ssh -i c:/Bill/CC/js/agile.pem bitnami@54.88.128.161
 

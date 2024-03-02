@@ -41,7 +41,7 @@
 	"options":["A new teaching practice","Increased attention to student variance","Greater confidence in teaching","Not taking away anything useful"]},
 
 	{"title":"<br>All done!",
-	"optionType":"link",
+	"optionType":"checkbox",
 	"text":"You can continue to talk with the class, or go back to the main site",
-	"options":["Return to Agile Teacher Website","Stay in this classroom"]}
+	"options":[]}
 ]}
