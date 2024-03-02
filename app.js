@@ -295,16 +295,21 @@ class App  {
 
 	GetBadge() 																					// ASK FOR BADGE
 	{
-		let i,d;
+		let i,d,o,len=0,log={};
 		ConfirmBox("Certificate","Do you want a get a certificate?",()=>{ 							// If yes
-			for (i=0;i<app.sessionLog.length;++i) app.sessionLog[i].text=app.sessionLog[i].text.replace(/\'/g,"&apos;");	 
-			d=`{ "name":"${app.userName}", "email":"${app.userId}", "activity":"${app.activityId}", "games": ${JSON.stringify(app.sessionLog)} }`;	// Data
-			let f=document.createElement("form");													// Create virtual form
-			f.setAttribute('method',"post");														// POST
-			f.dat=d;																				// Add stringified data in to "dat"
-			window.open("//alled.org/certificate/generate.php","_blank");							// Call page
-//			window.open("certificate/index.html"_blank");											// Call page
-			f.submit();																				// POST data
+			for (i=0;i<app.sessionLog.length;++i) {													// Fro each item in log
+				o=app.sessionLog[i];																// Point at item
+				if (o.intent && o.from.toLowerCase() == "teacher") {								// If a teacher remark
+					if (log[""+o.intent])	log[""+o.intent]++;										// Add to count
+					else					log[""+o.intent]=1;										// First one
+					len=Math.max(len,o.time);														// Get max time
+					}
+				}
+			d=`{ "name":"${app.userName}", "email":"${app.userId}", "activity":"${app.activityId}", "length":${len},"intents:"{`;	// Data
+			for (i in log)	d+=`"${i}":${log[i]},`;													// Add intent counts
+			d=d.substring(0,d.length-1)+"}";														// Remove last command and close intents
+			window.open("//alled.org/certificate/generate.php?data="+d,"_blank");					// Call page
+//			window.open("certificate/index.html?data="+d,"_blank");									// Call page
 			});
  	}
 
