@@ -306,9 +306,9 @@ class App  {
 					}
 				}
 			d.name=app.userName;		d.email=app.userId;
-			d.activity=app.activityId;	d.intents=log;			d.len=len;
-			window.open("//alled.org/certificate/generate.php?data="+JSON.stringify(d),"_blank");   // Call page
-//			window.open("certificate/index.html?data="+d,"_blank");									// Call page
+			d.activity=app.activityId;	d.intents=log;			d.len=len;							// Set elements
+//			window.open("//alled.org/certificate/generate.php?data="+JSON.stringify(d),"_blank");   // Call page
+			window.open("certificate/index.html?data="+JSON.stringify(d),"_blank");   				// Call page
 			});
  	}
 
@@ -708,9 +708,9 @@ class App  {
 		<div id='resourcesDiv' style='height:50vh;width:calc(100% - 32px);background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'>`;
 		for (i=0;i<sets.length;++i) {																// For each set
 			v=sets[i].split(",");																	// Get members
-			str+=`<div style="font-size:24px;color:${cols[i%4]}"><b>${v[0]}</b></div><ol>`;			// Add header
+			str+=`<div style="font-size:24px;color:${cols[i%4]}"><b>${v[0]}</b></div><ul>`;			// Add header
 			for (j=1;j<v.length;++j) str+=`<li>${v[j]}</li>`;										// Add members
-			str+="</ol>";																			// Close set
+			str+="</ul>";																			// Close set
 			}
 			
 		str+=`</div><div style="width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0">`;
