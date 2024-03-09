@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
-		<title>dataParser</title>
+		<title>AI Training</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="lib/papaparse.min.js"></script>
@@ -62,10 +62,8 @@
 	witToken.Space=  "ZS2-X-HDBR57B-X-O6JWK37PVPODW-X-RXXMGA4FN".replace(/-X-/g,"");				// Space service access token
 	witToken.Fiction="AH7-X-LA4QMUA-X-K6C4JCH7V7SH6-X-ULUGH6WTE".replace(/-X-/g,"");				// Fiction service access token
 	witToken.Activity3="CK5DKYH-X-DQJJ23R-X-ADW6R5T66BAD-X-ZEE6KO".replace(/-X-/g,"");				// Acitivity 3/4
-	witToken.Test="GF34C42CT4-X-6PWFV5XKG-X-OO7URKYE-X-KT4EH".replace(/-X-/g,"");					// Wit test 
+	witToken.Test="FDFR3T-X-S7ELJPI6QCIGV-X-ZPKEA2X65Q6JS".replace(/-X-/g,"");						// Wit test 
 	dfToken.Test="ceadb93e-da17-448f-beb4-638fe5a367df";											// DF test 
-
-	let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah","Class"];				// Student names
 
 	$(document).ready(function() {								           							// ON PAGE LOADED
 		InitSocketServer();
@@ -137,13 +135,10 @@
 					}
 				}			
 			for (i=0;i<d.length;++i) {																// For each remark
-				for (j=0;j<studentNames.length;++j) {												// For each name
-					re=new RegExp(studentNames[j],"ig");											// Make name regex
-					d[i].remark=d[i].remark.replace(re,"Student");									// Replace nmes with generic
-					}
 				if (d[i].intent)   uniqueIntents.push(d[i].intent);									// Get intent
 				if (!d[i].remark) { d.splice(i,1); continue; }										// No remark
 				if (!d[i].intent) { d.splice(i,1); continue; }										// No intent
+				d[i].remark=CleanRemark(d[i].remark);												// Clean up remark
 				}
 			uniqueIntents=[... new Set(uniqueIntents)];												// Make unique
 
@@ -167,6 +162,19 @@
 				}, {});
 			}
 
+	}
+
+	function CleanRemark(remark)																// CLEAN UP REMARK
+	{
+		let i,re;
+		let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah","Class"];			// Student names
+		if (!remark)  return("");																	// No remark
+		for (i=0;i<studentNames.length;++i) {														// For each name
+			re=new RegExp(studentNames[i],"ig");													// Make name regex
+			remark=remark.replace(re,"Student");													// Replace names with generic
+			}
+		remark=remark.replace(/[\.|\!\?|\'|"]|&apos;/g,"");											// Remove punctuation
+		return remark;																				// Return cleaned remark
 	}
 
 	async function AugmentData(e)																// AuGMENT DATA
@@ -274,6 +282,7 @@
 	{
 		try {
 		let m=msgs.shift();																			// Remove from list
+		m.remark=CleanRemark(m.remark);																// Clean remark	
 		let inference={ text:m.text, labeled:m.intent, intent:0, confidence:0 };					// Null inference
 		if (aiType == "rasa") {																		// If RASA
 			const response=await fetch("https://lizasim.com:5005/model/parse", {					// Fetch data
@@ -589,6 +598,7 @@
 			  body: JSON.stringify(body)
 			  })	
 		.then(res => res.json()).then(res =>{ 
+			trace(res)
 			nData.push({ intent: m.intent, remark:m.remark.trim(), note:"---- ORIGINAL -----"});  	// Add original remark
 			let v=res.choices[0].message.content.split("\n");										// Make into array
 			for (i=0;i<v.length;++i) if (v[i]) nData.push({ intent:m.intent, remark:v[i].substring(2).trim(), note:"augment"} );	// Add augments
