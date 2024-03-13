@@ -28,7 +28,7 @@ class Voice {
 					if (voice.name.match(/Microsoft Mark/i))		_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Male voice for PC
 					if (voice.name == "Google US English")			_this.voices.push(voice),_this.femaleVoice=_this.voices.length-1;			// Female voice for all
 					if (voice.name.match(/Alex/i))					_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Male voice ofr
-					if (voice.name.match(/Junior/i))	_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Mac male voice
+					if (voice.name.match(/Voice 3/i))				_this.voices.push(voice),_this.maleVoice=_this.voices.length-1;				// Mac male voice
 					});
 				};
 			this.tts.onend=()=> { 																		// ON TALKING END
@@ -108,8 +108,8 @@ class Voice {
 			else				 		who=app.students.find(x => x.id == who).sex;					// Get sex
 			if (who == "male")			this.tts.voice=this.voices[this.maleVoice];						// Set male voice
 			else if (who == "female") 	this.tts.voice=this.voices[this.femaleVoice];					// Set female voice
-			this.tts.rate=1.1;																			// Set voice speed rate for girls
-			if (this.mac && (who == "male"))	this.tts.rate=.9;										// Slow down mac for boys
+			this.tts.rate=1.1;																			// Set voice speed rate 
+			if (this.mac && (who == "male"))	this.tts.rate=1.05;										// Slow down mac for boys
 			this.tts.text=text;																			// Set text
 			speechSynthesis.speak(this.tts);															// Speak
 		}
