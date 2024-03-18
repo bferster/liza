@@ -92,7 +92,6 @@ class Voice {
 			return;
 			}
 		try{																							// Try
-			
 			if (who != "Teacher") {																		// Student talking
 				this.talking=who;																		// Trigger mouth animation if a student
 				this.ShowSpeakerText(who,text);															// Show text underneath student										
