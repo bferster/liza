@@ -308,7 +308,8 @@ class App  {
 			d.name=app.userName;		d.email=app.userId;
 			d.activity=app.activityId;	d.intents=log;			d.len=len;							// Set elements
 //			window.open("//alled.org/certificate/generate.php?data="+JSON.stringify(d),"_blank");   // Call page
-			window.open("certificate/index.html?data="+JSON.stringify(d),"_blank");   				// Call page
+trace(d)			
+window.open("certificate/index.html?data="+JSON.stringify(d),"_blank");   				// Call page
 			});
  	}
 
@@ -559,10 +560,10 @@ class App  {
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add it
 		$("#lz-videoChat").show("slide",{ direction:"up" },1000);									// Slide down 
 		$("#co-ift").on("click", ()=>{																// ON SMALLER BUT
-			let w=$(window).width()*.66,h=w*.5625;													// Default size
+			let w=window.innerWidth*.66,h=w*.5625;													// Default size
 			let x=17,y=12;
 			if ($("#co-ift").text() == "Minimize window")	{										// If reducing
-				w=$(window).width();	h=32;	x=0;  y=0;											// Small size
+				w=window.innerWidth/3;	h=window.innerWidth*.6525/3;	x=63.67;  y=3;				// Small size
 				$("#co-ift").text("Maximize");														// Change title
 				}
 			else $("#co-ift").text("Minimize window");												// Restore title		
