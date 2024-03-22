@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
-		<title>AI Training</title>
+		<title>AI Training Data Loader</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="lib/papaparse.min.js"></script>
@@ -218,12 +218,13 @@
 	function DeleteTrainingData()															// DELETE TRAINING DATA
 	{
 			ConfirmBox("Are your sure?","",()=>{													// Confirm
+				LoadingIcon(true);																	// Start loading icon
 				if (aiType == "wit") {																// WIT.AI
 					WitGetUtterances((d)=>{															// Get utterance list		
-						WitDeleteUtternances(d,(r)=>{ trace(r);	});									// Delete existing utterances									
+						WitDeleteUtternances(d,(r)=>{ trace(r); $("#lz-loadingIconText").html("<b>Remarks</b>");	});	// Delete existing utterances									
 						});
 					WitGetIntents((d)=>{															// Get intents list		
-						WitDeleteIntents(d,(r)=>{ trace(r);	},(r)=>{ trace(r);	});					// Delete existing intents
+						WitDeleteIntents(d,(r)=>{ trace(r);	},(r)=>{ trace(r); Sound("ding"); LoadingIcon(false);	});	// Delete existing intents
 						});
 					}
 				});
@@ -415,7 +416,7 @@
 				WitAddIntents(newIntents,()=>{},()=>{												// Add intents recursively
 					WitTrain(d, (r1,r2)=>{															// Start sending via recursion		
 						trace(r1,r2);																// Log	
-						$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>"); // Show progress
+						$("#lz-loadingIconText").html("<b>Added<br>"+r2+"%</b>"); 					// Show progress
 						if (!d.length) {															// If last one
 							Sound("ding");															// Ding				
 							LoadingIcon(false);														// Hide loading icon
@@ -479,8 +480,9 @@
 			  headers: { Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'}, 
 			  });	
 		let res=await response.json();																// Get response
+		$("#lz-loadingIconText").html("<b>"+m.name+"</b>");
 		if (msgs.length) setTimeout(()=>{ WitDeleteIntents(msgs, callback, done) },500);			// Recurse, if not last
-		else done(123);
+		else done("Finished deleting intents");
 	}
 
 	async function WitTrain(msgs, callback, done)												// SEND REMARK TO WIT TO TRAIN
@@ -515,8 +517,9 @@
 			  });	
 		let res=await response.json();																// Get response
 		trace(res)
+		$("#lz-loadingIconText").html("<b>"+res.name+"</b>");
 		if (msgs.length) setTimeout(()=>{ WitAddIntents(msgs, callback, done) },500);				// Recurse, if not last
-		else done(123);
+		else done("Intents trained");
 
 	}
 
