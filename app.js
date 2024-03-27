@@ -307,9 +307,9 @@ class App  {
 				}
 			d.name=app.userName;		d.email=app.userId;
 			d.activity=app.activityId;	d.intents=log;			d.len=len;							// Set elements
-//			window.open("//alled.org/certificate/generate.php?data="+JSON.stringify(d),"_blank");   // Call page
+			window.open("//alled.org/certificate/generate.php?data="+JSON.stringify(d),"_blank");   // Call page
 trace(d)			
-window.open("certificate/index.html?data="+JSON.stringify(d),"_blank");   				// Call page
+//window.open("certificate/index.html?data="+JSON.stringify(d),"_blank");   				// Call page
 			});
  	}
 

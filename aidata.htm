@@ -140,9 +140,10 @@
 					}
 				}			
 			for (i=0;i<d.length;++i) {																// For each remark
-				if (d[i].intent)   uniqueIntents.push(d[i].intent);									// Get intent
-				if (!d[i].remark) { d.splice(i,1); continue; }										// No remark
-				if (!d[i].intent) { d.splice(i,1); continue; }										// No intent
+				if (d[i].remark == "") 	{ d.splice(i,1); continue; }								// No remark
+				if (d[i].intent == "") 	{ d.splice(i,1); continue; }								// No intent
+				if (d[i].intent == "r") { d.splice(i,1); continue; }								// No intent
+				if (d[i].intent)  	 	uniqueIntents.push(d[i].intent);							// Get intent
 				d[i].remark=CleanRemark(d[i].remark);												// Clean up remark
 				}
 			uniqueIntents=[... new Set(uniqueIntents)];												// Make unique
