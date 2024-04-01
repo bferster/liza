@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
   <head>
+      <! -- Grace certificate -->
+
     <title>certificate</title>
   </head>
   <body>
@@ -36,6 +38,7 @@ export const createPDFFromAndOpenInNewTab = (json) =>{
 
     doc.html(getHTMLForPDF(json), {
      callback: function (doc) {
+      doc.save('certificate.pdf')
       openInNewTab(doc.output('bloburl'));
       },
      x: 0, y: 0,
@@ -56,107 +59,107 @@ function openInNewTab(href) {
 
 function getHTMLForPDF (json_object)  {
   const stringCSS = `
-  *{
-    font-family: serif;
-    font-size: 16px;
-    line-height: 1.2;
-  }
-  #container{
-    padding-left: 1in;
-    padding-right: 1in;
-    width: calc(8.5*96)px;
-  }
-  #container{
-    height: 1000px;
-    position: relative;
-  }
-  #container > p, table{
-    width: 100%;
-  }
-  #theme-banner{
-    width: 100%;
-    height: 50px;
-    background-color: #a51c30;
-  }
-  #objectives-standards-table, #objectives-standards-table > tr, td, th{
-    border: 1px solid black;
-    padding: 0em;
-  }
-  p{margin: 1em 0px 1em 0px;}
-  hr{margin: 0px 0px 0px 0px;}
-  a{text-decoration: none;}
-  table, tr, td, th{
-    border-collapse: collapse;
-    border: none;
-  }
-  #objectives-standards-table > tr, td, th{
-    width: 50%;
-  }
-  /* pictures */
-  #signature{
-    height: 50px;
-  }`;
+    *{
+      font-family: serif;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    #container{
+      padding-left: 1in;
+      padding-right: 1in;
+      width: calc(8.5*96)px;
+    }
+    #container{
+      height: 1000px;
+      position: relative;
+    }
+    #container > p, table{
+      width: 100%;
+    }
+    #theme-banner{
+      width: 100%;
+      height: 50px;
+      background-color: #a51c30;
+    }
+    #objectives-standards-table, #objectives-standards-table > tr, td, th{
+      border: 1px solid black;
+      padding: 0em;
+    }
+    p{margin: 1em 0px 1em 0px;}
+    hr{margin: 0px 0px 0px 0px;}
+    a{text-decoration: none;}
+    table, tr, td, th{
+      border-collapse: collapse;
+      border: none;
+    }
+    #objectives-standards-table > tr, td, th{
+      width: 50%;
+    }
+    /* pictures */
+    #signature{
+      height: 50px;
+    }`;
   const stringDOM = `
-  <div id="container">
-<p style="text-align: center; margin-top: 2em;">
-<img style="margin: 0px 0px 0px 0px; padding; 0px 0px 0px 0px;" 
-id="badge" height="110" src="top-badge.png" /><br>
-</p>
-<p>To Whom it May Concern:</p>
-  <p>This letter acknowledges <b><span class="blank-name">$name</span></b> 
-  has completed <span class="blank-time">$time</span> minutes of professional 
-  learning through 
-  <a href="https://agileteacher.org/teaching-with-grace/">Teaching with Grace</a> [0], 
-  a virtual teaching practice classroom. </p>
-  <p>Teaching with Grace provides unlimited practice time and 
-  immediate feedback, developing teachers' capacities to listen and 
-  respond to student learning through meaningful interactions. Virtual 
-  teaching pracice develops educator capacity to be present, exact, 
-  imaginative, 
-  responsive, and strategic.</p>
+    <div id="container">
+      <p style="text-align: center; margin-top: 2em;">
+      <img style="margin: 0px 0px 0px 0px; padding; 0px 0px 0px 0px;" 
+      id="badge" height="110" src="top-badge.png" /><br>
+      </p>
+      <p>To Whom it May Concern:</p>
+        <p>This letter acknowledges <b><span class="blank-name">$name</span></b> 
+        has completed <span class="blank-time">$time</span> minutes of professional 
+        learning through 
+        <a href="https://agileteacher.org/teaching-with-grace/">Teaching with Grace</a> [0], 
+        a virtual teaching practice classroom. </p>
+        <p>Teaching with Grace provides unlimited practice time and 
+        immediate feedback, developing teachers' capacities to listen and 
+        respond to student learning through meaningful interactions. Virtual 
+        teaching pracice develops educator capacity to be present, exact, 
+        imaginative, 
+        responsive, and strategic.</p>
 
-  <p>The <b><span class="blank-activity-id">$activity</span></b> activity developed the ability to provide motivationally and cognitively supportive feedback to students with diverse academic needs. This unique certificate verifies participation and lists the types of feedback practiced in the session.
-</p>
+        <p>The <b><span class="blank-activity-id">$activity</span></b> activity developed the ability to provide motivationally and cognitively supportive feedback to students with diverse academic needs. This unique certificate verifies participation and lists the types of feedback practiced in the session.
+      </p>
 
-  <p>Using the Danielson Rubric, <i>Teaching with Grace</i> aligns to 3d:
-  <a href="https://www.nysed.gov/sites/default/files/danielson-teacher-rubric.pdf#page=81">
-  Using Assessment in Instruction</a> [1] and 3e: 
-  <a href="https://www.nysed.gov/sites/default/files/danielson-teacher-rubric.pdf#page=87">
-  Demonstrating Flexibility and Responsiveness</a> [2]. 
-  <i>Teaching with Grace</i> can be aligned to other state and local standards.</p>
-  <hr>
-  <p>
-  <b><span class="blank-name">$name</span></b> 
-  demonstrated use of the following teaching routines:</p>
-  <p><span class="blank-cards">$cards</span></p>
-    <hr>
-  <p>For additional information about 
-    standards alignment and learning activities, visit 
-    <a href="www.agileteacher.org">Agile Teacher </a> [3].
-    Please contact Rhonda Bondie at 
-    <a href="rb4016@hunter.cuny.edu">rb4016@hunter.cuny.edu</a>
-    with any questions or if you require further information. 
-  </p>
-  <table style="width: 100%;">
-    <tr>
+        <p>Using the Danielson Rubric, <i>Teaching with Grace</i> aligns to 3d:
+        <a href="https://www.nysed.gov/sites/default/files/danielson-teacher-rubric.pdf#page=81">
+        Using Assessment in Instruction</a> [1] and 3e: 
+        <a href="https://www.nysed.gov/sites/default/files/danielson-teacher-rubric.pdf#page=87">
+        Demonstrating Flexibility and Responsiveness</a> [2]. 
+        <i>Teaching with Grace</i> can be aligned to other state and local standards.</p>
+        <hr>
+        <p>
+        <b><span class="blank-name">$name</span></b> 
+        demonstrated use of the following teaching routines:</p>
+        <p><span class="blank-cards">$cards</span></p>
+          <hr>
+        <p>For additional information about 
+          standards alignment and learning activities, visit 
+          <a href="www.agileteacher.org">Agile Teacher </a> [3].
+          Please contact Rhonda Bondie at 
+          <a href="rb4016@hunter.cuny.edu">rb4016@hunter.cuny.edu</a>
+          with any questions or if you require further information. 
+        </p>
+        <table style="width: 100%;">
+          <tr>
+            <td>
+        <p>Sincerely,<br>
+        <img height="50px" id="signature" src="signature.jpg">
+        <br>
+        Rhonda Bondie, Ph.D.<br>
+        Hunter College, City University of New York
+      </p>
+      </td>
       <td>
-  <p>Sincerely,<br>
-  <img height="50px" id="signature" src="signature.jpg">
-  <br>
-  Rhonda Bondie, Ph.D.<br>
-  Hunter College, City University of New York
-</p>
-</td>
-<td>
-</tr>
-</table>
-  <p style="line-height: 1.2">
-[0]: https://agileteacher.org/teaching-with-grace/<br>
-[1]: https://www.nysed.gov/sites/default/files/danielson-teacher-rubric.pdf#page=81 <br>
-[2]: https://www.nysed.gov/sites/default/files/danielson-teacher-rubric.pdf#page=87 <br>
-[3]: https://agileteacher.org/
-  </p>
-  </div>`;
+      </tr>
+      </table>
+        <p style="line-height: 1.2">
+      [0]: https://agileteacher.org/teaching-with-grace/<br>
+      [1]: https://www.nysed.gov/sites/default/files/danielson-teacher-rubric.pdf#page=81 <br>
+      [2]: https://www.nysed.gov/sites/default/files/danielson-teacher-rubric.pdf#page=87 <br>
+      [3]: https://agileteacher.org/
+    </p>
+    </div>`;
 
   let temp = document.implementation.createHTMLDocument("temp");
   temp.open();
@@ -179,13 +182,28 @@ id="badge" height="110" src="top-badge.png" /><br>
   const activity = jsonfile.activity
 
   let billIntents = jsonfile.intents
-  console.log(billIntents)
+  //console.log(billIntents)
+
   let intentStrings = {}
-  for (let i = 1; i < 6; i++){
-     intentStrings[`${i}00`] = 0;
-   }
+
+  // put all number billIntents into intentStrings
+  // 101, 100 --> 100:2
   for (let key in billIntents){
-    intentStrings[`${key.charAt(0)}00`] += billIntents[key]
+    let roundedIntKey = -100;
+
+    // handle strings that need to be converted and rounded
+    if (typeof key === 'string' || key instanceof String){
+      roundedIntKey = 100 * (Math.floor(parseInt(key) / 100))
+    }
+
+    // handle ints that need to be rounded
+    else if (typeof key === 'number' || key instanceof Number){
+      roundedIntKey = 100 * (Math.floor(key / 100))
+    }
+
+    //console.log(`${key}:${billIntents[key]} became ${roundedIntKey}:${billIntents[key]}`)
+
+    intentStrings[roundedIntKey] = billIntents[key]
   }
 
   //console.log(intentStrings)
@@ -216,7 +234,7 @@ temp.querySelectorAll(".blank-activity-id").forEach(e => {
 
 temp.querySelectorAll(".blank-cards").forEach(e => {
   let sum = 0;
-  for (let x in intentStrings){sum += intentStrings[x];}
+  for (let key in intentStrings){ if (key < 501) {sum += intentStrings[key]} }
   e.innerHTML = `
   <div style="display: inline-block; width: 140px;">
     <b>Feedback Type</b><br>
@@ -228,56 +246,56 @@ temp.querySelectorAll(".blank-cards").forEach(e => {
   </div>
   <div style="display: inline-block; width: 140px;">
     <b>Number of Times</b><br>
-    ${intentStrings[100]}<br>
-    ${intentStrings[200]}<br>
-    ${intentStrings[300]}<br>
-    ${intentStrings[400]}<br>
-    ${intentStrings[500]}
+    ${100 in intentStrings ? intentStrings[100] : 0}<br>
+    ${200 in intentStrings ? intentStrings[200] : 0}<br>
+    ${300 in intentStrings ? intentStrings[300] : 0}<br>
+    ${400 in intentStrings ? intentStrings[400] : 0}<br>
+    ${500 in intentStrings ? intentStrings[500] : 0}
   </div>
   <div style="display: inline-block; width: 140px;">
     <b>% of total thinking</b><br>
-    ${Math.round(100*intentStrings["100"] / sum)}%<br>
-    ${Math.round(100*intentStrings["200"] / sum)}%<br>
-    ${Math.round(100*intentStrings["300"] / sum)}%<br>
-    ${Math.round(100*intentStrings["400"] / sum)}%<br>
-    ${Math.round(100*intentStrings["500"] / sum)}%
+    ${100 in intentStrings ? Math.round(100*intentStrings[100] / sum) : 0}%<br>
+    ${200 in intentStrings ? Math.round(100*intentStrings[200] / sum) : 0}%<br>
+    ${300 in intentStrings ? Math.round(100*intentStrings[300] / sum) : 0}%<br>
+    ${400 in intentStrings ? Math.round(100*intentStrings[400] / sum) : 0}%<br>
+    ${500 in intentStrings ? Math.round(100*intentStrings[500] / sum) : 0}%
   </div>
   `;
   let probablyNot = `
-  <table style="width: 400px; text-align: left;">
-    <thead>
+    <table style="width: 400px; text-align: left;">
+      <thead>
+        <tr>
+          <th>Feedback Type</th>
+          <th>Frequency Count</th>
+          <th style="width:70%;">%</th>
+        </tr>
+      </thead>
       <tr>
-        <th>Feedback Type</th>
-        <th>Frequency Count</th>
-        <th style="width:70%;">%</th>
+        <td>Low Information</td>
+        <td>${100 in intentStrings ? intentStrings[100] : 0}</td>
+        <td>${100 in intentStrings ? Math.round(100*intentStrings["100"] / sum) : 0}%</td>
       </tr>
-    </thead>
-    <tr>
-      <td>Low Information</td>
-      <td>${intentStrings[100]}</td>
-      <td>${Math.round(100*intentStrings["100"] / sum)}%</td>
-    </tr>
-    <tr>
-      <td>Clarify</td>
-      <td>${intentStrings[200]}</td>
-      <td>${Math.round(100*intentStrings["200"] / sum)}%</td>
-    </tr>
-    <tr>
-      <td>Value or Reflect</td>
-      <td>${intentStrings[300]}</td>
-      <td>${Math.round(100*intentStrings["300"] / sum)}%</td>
-    </tr>
-    <tr>
-      <td>Correction</td>
-      <td>${intentStrings[400]}</td>
-      <td>${Math.round(100*intentStrings["400"] / sum)}%</td>
-    </tr>
-    <tr>
-      <td>Push Thinking</td>
-      <td>${intentStrings[500]}</td>
-      <td>${Math.round(100*intentStrings["500"] / sum)}%</td>
-    </tr>
-  </table>`;
+      <tr>
+        <td>Clarify</td>
+        <td>${200 in intentStrings ? intentStrings[200] : 0}</td>
+        <td>${200 in intentStrings ? Math.round(100*intentStrings["200"] / sum) : 0}%</td>
+      </tr>
+      <tr>
+        <td>Value or Reflect</td>
+        <td>${300 in intentStrings ? intentStrings[300] : 0}</td>
+        <td>${300 in intentStrings ? Math.round(100*intentStrings["300"] / sum) : 0}%</td>
+      </tr>
+      <tr>
+        <td>Correction</td>
+        <td>${400 in intentStrings ? intentStrings[400] : 0}</td>
+        <td>${400 in intentStrings ? Math.round(100*intentStrings["400"] / sum) : 0}%</td>
+      </tr>
+      <tr>
+        <td>Push Thinking</td>
+        <td>${500 in intentStrings ? intentStrings[500] : 0}</td>
+        <td>${500 in intentStrings ? Math.round(100*intentStrings["500"] / sum) : 0}%</td>
+      </tr>
+    </table>`;
 }) 
 
 

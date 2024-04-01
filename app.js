@@ -101,7 +101,7 @@ class App  {
 				ConfirmBox("Are you sure?", "This will cause the simulation to start completely over.", ()=>{ 	// Are you sure?
 					if (this.role == "Teacher") {
 						app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|RESTART");  	// Send sim status
-						}talkTimeonph
+						}
 					this.StartSession();															// Init session
 					$("#startBut").trigger("click");												// Trigger start								
 				});									
@@ -297,7 +297,7 @@ class App  {
 	{
 		let i,o,d={},len=0,log={};
 		ConfirmBox("Certificate","Do you want a get a certificate?",()=>{ 							// If yes
-			for (i=0;i<app.sessionLog.length;++i) {													// Fro each item in log
+			for (i=0;i<app.sessionLog.length;++i) {													// For each item in log
 				o=app.sessionLog[i];																// Point at item
 				if (o.intent && o.from.toLowerCase() == "teacher") {								// If a teacher remark
 					if (log[""+o.intent])	log[""+o.intent]++;										// Add to count
@@ -307,9 +307,9 @@ class App  {
 				}
 			d.name=app.userName;		d.email=app.userId;
 			d.activity=app.activityId;	d.intents=log;			d.len=len;							// Set elements
-			window.open("//alled.org/certificate/generate.php?data="+JSON.stringify(d),"_blank");   // Call page
-trace(d)			
-//window.open("certificate/index.html?data="+JSON.stringify(d),"_blank");   				// Call page
+trace(d)	
+//			window.open("//alled.org/certificate/generate.php?data="+JSON.stringify(d),"_blank");   // Call page
+			window.open("certificate/index.html?data="+JSON.stringify(d),"_blank");   				// Call page
 			});
  	}
 
@@ -455,7 +455,7 @@ trace(d)
 		if (!act) 																					// If no action happening
 		trace("spoke",text)
 		app.nlp.InferIntent(text,(res)=>{ 														// Get intent from AI
-			trace("spoke cb",res)
+			trace("spoke callback",res)
 				this.lastRemark=text;																// Save last remark
 				let intent=res.intent.name.substring(1);											// Get intent
 				intent=this.nlp.MatchKeyRule(text,intent); 											// Reset intent if a keyword match
@@ -468,10 +468,11 @@ trace(d)
 						},9000);																	// Timer
 					return;																			// Quit 
 					}
-				intent=isNaN(intent) ? 0 : intent;													// Validate
-				this.lastIntent=intent;																// Save last intent
+	
+				if (!isNaN(intent))	this.lastIntent=intent;											// Save last intent
 				app.SendEvent(app.sessionId+"|"+(app.curTime-app.talkTime-0.0).toFixed(2)+"|"+app.userId+"|TALK|"+app.role+"|"+talkingTo+"|"+text+"|"+intent);	// Send remark
-				let r=app.GenerateResponse(text,intent);											// Generate response
+				app.GenerateResponse(text,intent);													// Generate response
+				
 				if (intent >= 300) {																// If an intent detected
 					let s="Feedback to "+app.curStudent+": ";										// Student name
 					if (intent == 1001) s+="Not understood";										// Bad intent
@@ -488,7 +489,11 @@ trace(d)
 		if (this.role == "Gamer") 	return res;														// No responses from gamers
 		let i=this.studex[this.curStudent];															// Get student indez
 		i=i ? i-1 : 0;																				// Zero-base index, if valid
-		trace("generate response",intent,this.curStudent,i)
+		trace("generate response",intent,this.curStudent,this.lastIntent)
+		if (intent == "ANDYOU") {																	// Ask another student same question as before
+			intent=this.lastIntent;																	// Use last intent
+			trace("ANDYOU",this.lastIntent)	
+			}
 		if (!this.multi && (intent > 49)) 															// If a high-enough level and not in multiplayer																					
 			res=app.nlp.GetResponse(text,this.curStudent,intent,this.lastIntent);					// Get response
 		if (!this.multi && this.students[i].first) {												// An initial response set
@@ -503,7 +508,6 @@ trace(d)
 			app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|TALK|"+this.curStudent+"|Teacher|"+res.text+"|"+res.bakt.join(",")+(res.MP3 ? "|"+res.MP3 : "")); // Send response
 		if (res.action) 																			// If a response action
 			app.SendEvent(this.sessionId+"|"+this.curTime.toFixed(2)+"|"+this.userId+"|ACT|"+this.curStudent+"|"+res.action); // Send action
-			return res;										S										// Return it
 	}
 
 	UpdateVariance(student, bakt)																// UPDATE STUDENT VARIANCE FROM RESPONSE

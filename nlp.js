@@ -72,7 +72,7 @@ class NLP {
 			if (text.match(/know|tell|say|no/i))														// Asking for response
 				return "pickme:"+text;																	// Ask to pick back with question
 			}
-		if (text.match(/raise|show of/i) && text.match(/hand/i))return "pickme:"+text;					// Rause your hands if
+		if (text.match(/raise|show of/i) && text.match(/hand/i))  return "pickme:"+text;				// Raise your hands if
 		if (!text.match(/please/i))	return "";															// Got to say please and address whole class
 		for (k in this.actSyns)	{																		// For each action possible
 			re=new RegExp(k,"i");																		// Make regex
@@ -147,29 +147,32 @@ class NLP {
 
 	GetResponse(remark, student, intent, lastIntent=0)												// GET STUDENT RESPONSE
 	{
-	
-	trace(remark, student, intent)
 		let i,o=intent,d=[];
 		let res={ intent:0, text:"", bakt:[0,0,0,0,0,0], MP3:"", responseType:"" };						// Default response
-	trace("getresponse",o,intent)
+	trace("getresponse",o,student)
 		if (student == "Class")	student="Chris"
 		if (!(i=app.studex[student])) 	return res;														// Quit if not a valid student
 		--i;																							// Zero base
+
 		if (intent < 600)																				// If an AI generated intent
        		app.students[i].highestIntent=Math.max(app.students[i].highestIntent,intent);				// Set student's highest intent	
-		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
+//		intent=this.MatchKeyRule(remark,intent); 														// Reset intent if a keyword match
 		if (intent == "ANDYOU") {																		// Ask another student same question as before
 			student=app.curStudent;																		// Redirect to new student
 			res.intent=intent=lastIntent;																// Use last intent
-			trace("andyou",lastIntent)	
+			trace("ANDYOU",lastIntent)	
 			}
+		if (student == "Class")	return res;																// Null response ??
 		o=app.nlp.responses[student];																	// Isolate student
-		if (!o || (student == "Class"))	return res;														// Null response
-		for (i=0;i<o.length;++i) 																		// For each response
+		if (o) {																						// If a student mentioned
+			for (i=0;i<o.length;++i) 																	// For each response
 			if (intent == o[i].intent)  d.push(o[i]);													// Add response
+			}
 		o=app.nlp.responses["Class"];																	// Isolate class-wide responses
-		for (i=0;i<o.length;++i) 																		// For each responss
-			if (intent == o[i].intent)  d.push(o[i]);													// Add response
+		if (o) {																						// If a student mentioned
+			for (i=0;i<o.length;++i) 																	// For each responss
+				if (intent == o[i].intent)  d.push(o[i]);												// Add response
+			}
 		i=Math.floor(Math.random()*d.length);															// Pick random match 
 	trace("response",d[i] ? d[i] : res)
 		return d[i] ? d[i] : res;																		// Return response object
@@ -185,7 +188,10 @@ class NLP {
 				re=new RegExp(this.keyRules[i].ands[j],"ig");											// Make regex
 				if ((r=remark.match(re)))	n+=r.length;												// Add to count if matches
 				}
-			if (n >= this.keyRules[i].ands.length)	return this.keyRules[i].intent;						// Return intent if a complete match 
+			if (n >= this.keyRules[i].ands.length) {													// Return intent if a complete match 
+				trace("Rule Match",this.keyRules[i].intent)	
+				return this.keyRules[i].intent;						
+				}
 			}
 		return originalIntent;																			// Return original intent given
 	}
