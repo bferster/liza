@@ -173,7 +173,7 @@
 	function CleanRemark(remark)																// CLEAN UP REMARK
 	{
 		let i,re;
-		let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah","Class"];			// Student names
+		let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah"];					// Student names
 		if (!remark)  return("");																	// No remark
 		for (i=0;i<studentNames.length;++i) {														// For each name
 			re=new RegExp(studentNames[i],"ig");													// Make name regex

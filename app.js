@@ -45,6 +45,7 @@ class App  {
 		this.lessonPlan="";																			// Lesson plan
 		this.pickMeQuestion="";																		// Whole class 'pick me' question
 		this.teacherResources=[];																	// Teacher resource documents
+		this.teacherMovies=[];																		// Teacher movies
 		this.points=0;																				// Gamer points
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
 		if (window.location.host == "localhost") this.userId="bferster@stagetools.com";				// Set me if debug										
@@ -76,6 +77,7 @@ class App  {
 		if (this.multi) $("#lz-rolePick").css("display","block");									// Show role picker
 		$("#resourceBut").on("click", ()=> { this.ShowResources(); });								// ON RESOURCES	
 		$("#lessonPlanBut").on("click", ()=> { this.ShowLessonPlan(); });							// ON LESSON PLAN	
+		$("#movieBut").on("click", ()=> { this.ShowMovies(); });									// ON MOVIES	
 		$("#timelineBut").on("click", ()=> {  $("#blackboardDiv").hide(); this.fb.Draw(); });		// ON FEEDBACK
 		$("#helpBut").on("click",     ()=> { ShowHelp(); });										// ON HELP
 		$("#startBut").on("click",    ()=> { 														// ON START 
@@ -190,6 +192,7 @@ class App  {
 					else if (d[i].type.match(/action|keyword|vocab|keytag|keyrule/i))				// An nlp item 	
 						app.nlp.AddSyns(d[i].type,d[i].id,d[i].text.split(",")); 					// Add nlp data
 					else if (d[i].type == "picture")  this.bb.AddPic(d[i].id,d[i].text);			// Add BB pic
+					else if (d[i].type == "movie") 	  this.teacherMovies.push({ lab:d[i].id, url:d[i].text }); 	// Add movie
 					else if (d[i].type == "resource") this.teacherResources.push({ lab:d[i].id, url:d[i].text }); // Add resource
 					else if (d[i].type == "string")   this.strings[d[i].id]=d[i].text;				// Strings
 					else if (d[i].type == "seat")  	  this.sc.AddSeat(d[i]);						// Add seat position
@@ -695,6 +698,51 @@ trace(d)
 	}
 
 
+	ShowMovies(id)																				// SHOW MOVIES
+	{
+		if ($("#lz-resources").length) {															// If already up, bring it down
+			$("#lz-resources").hide("slide",{ direction:"down", complete: ()=>{ $("#lz-resources").remove(); } }); // Slide down
+			return;																					// Quit																					
+			}
+		let str=`<div class="lz-dialog" id="lz-resources" 
+		style="background-color:#ccc;width:50%;overflow:hidden;display:none;padding:8px 8px 0 8px;left:calc(25% - 32px)">
+		&nbsp;<img src="img/smlogo.png" style="vertical-align:-6px" width="64">
+		<img id="trclose" src="img/closedot.png" style="float:right">	
+		<span style="font-size:18px;margin:7px 0 0 12px">Movies</span>
+		<div id='resourcesDiv' style='height:calc(50vw * .5625 + 64px);width:calc(100% - 32px);background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'></div>`;
+		$("body").append(str.replace(/\t|\n|\r/g,""));													// Add to body
+		
+
+		let trsty=" style='height:20px;cursor:pointer' onMouseOver='this.style.backgroundColor=\"#dee7f1\"' ";
+		trsty+="onMouseOut='this.style.backgroundColor=\"#fff\"'";
+		str="<b>Choose a movie to watch</b><hr>"
+		for (let i=0;i<this.teacherMovies.length;++i)  str+=`<div ${trsty} id="tres-${i}">${this.teacherMovies[i].lab}</div>`;
+		$("#resourcesDiv").html(str);																	// Add resources	
+		let h=window.innerHeight-$("#lz-resources").height()-100;										// Calc top
+
+		$("#trclose").on("click", (e)=>{																// ON CLOSE
+			if ($("#trIF").length) {
+				$("#resourcesDiv").html(str);															// If a resource, put back file list
+				$("[id^=tres-]").on("click", (e)=>{	playVideo(this.teacherMovies[e.target.id.substring(5)].url); });	// ON CLICK RESOURCE
+				}	
+			else $('#lz-resources').remove();															// Remove whole dialog
+			});
+		$("[id^=tres-]").on("click", (e)=>{	playVideo(this.teacherMovies[e.target.id.substring(5)].url); });	// ON CLICK RESOURCE
+	
+		$("#lz-resources").css("top",h+"px");															// Set top
+		$("#lz-resources").show("slide",{ direction:"down" });											// Slide up
+		$("#lz-resources").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } );	// Don't move orbiter
+		if (id)  playVideo(id);																			// Just playing one
+
+		function playVideo(id) {																		// PLAY VIDEO
+			let ph=$("#resourcesDiv").height()+24;
+			let ifs="<iframe id='trIF' frameborder=0 src='"+id+"&autoplay=1' style='height:"+ph+"px;width:calc(100% + 32px);margin:-16px'></iframe>";	// Load in iframe
+			$("#resourcesDiv").html(ifs)
+			};
+
+	}
+	
+	
 	ShowLessonPlan()																				// SHOW TEACHER RESOUCES
 	{
 		let i,j,v;
