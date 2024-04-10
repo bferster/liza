@@ -24,6 +24,7 @@ resource,Scene Overview,assets/overview.pdf
 resource,Student Task Materials,assets/student.pdf
 resource,Teaching Strategy Support,assets/supports.pdf
 resource,About student variances,assets/variances.pdf
+movie,Grace demo,https://www.youtube.com/embed/7Gc4ZCH6OZc?si=dcQNSQ9CsYvlw2P9
 
 action,sleep,"sleep,snooze"
 action,headCenter,"eyes front,head center"

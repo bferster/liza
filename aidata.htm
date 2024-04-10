@@ -32,7 +32,7 @@
 				<option>Wit</option><option>Dialog-CX</option><option>Dialog-ES</option>
 				</select>&nbsp &nbsp; 
 			Activity: &nbsp;<select class="lz-is" id="lz-dataset">
-					<option>Test</option><option>Activity3</option><option>Activity2</option>
+					<option>Test</option><option>Activity4</option><option>Activity3</option><option>Activity2</option>
 					</select>&nbsp &nbsp; 
 				<div class="lz-bs" id="lz-testData">Test data</div>
 				&nbsp; &nbsp; &nbsp;<div class="lz-bs" id="lz-trainData">Train data</div>
@@ -60,7 +60,8 @@
 	let modelName="Test";																			// AI Model to use
 	let witToken={},dfToken={};
 	witToken.Activity2="3VVZFEZ-X-SKKSSZSOTY-X-53FE2AQMA-X-3MF26W".replace(/-X-/g,"");				// Fiction service access token
-	witToken.Activity3="FDFR3T-X-S7ELJPI6QCIGV-X-ZPKEA2X65Q6JS".replace(/-X-/g,"");					// Activity 3/4
+	witToken.Activity3="FDFR3T-X-S7ELJPI6QCIGV-X-ZPKE-X-A2X65Q6JS".replace(/-X-/g,"");				// Activity 3
+	witToken.Activity4="4XRYT-X-245DCKOI-X-647DEFUBZ3PG6-X-KOGZCI".replace(/-X-/g,"");				// Activity 4
 	witToken.Test="POQILB6-X-KVNPU3PR665-X-V3PPL3CXU-X-CU6E4".replace(/-X-/g,"");					// Wit test 
 	dfToken.Test="ceadb93e-da17-448f-beb4-638fe5a367df";											// DF test 
 
@@ -338,10 +339,10 @@
 				const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
+				trace(res)
 				inference.intent=res.intents[0].name.substring(1);									// Get intent																		
 				inference.confidence=res.intents[0].confidence;										// Confidence
 				}	
-			trace(res)
 			callback(inference);																	// Return response
 			if (msgs.length) setTimeout(()=>{ InferIntents(msgs, callback);},200);					// Recurse, if not last and add delay
 			}

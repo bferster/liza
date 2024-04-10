@@ -21,9 +21,7 @@ seat,8,"x=0,y=-100,z=0,r=0,"
 seat,9,"x=250,y=-100,z=0,r=30,"
 
 resource,Identifying differences,assets/identifying.pdf
-resource,Questions for your teaching,assets/questions.pdf
-movie,Grace demo,https://www.youtube.com/embed/7Gc4ZCH6OZc?si=DpJKwdaUSMgbVNKV
-movie,Sojourner Truth,https://player.vimeo.com/video/486909346?autoplay=1
+movie,Grace demo,https://www.youtube.com/embed/7Gc4ZCH6OZc?si=dcQNSQ9CsYvlw2P9
 
 action,sleep,"sleep,snooze"
 action,headCenter,"eyes front,head center"

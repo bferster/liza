@@ -254,7 +254,7 @@ class NLP {
 			let token=this.aiToken.replace(/-X-/g,"");													// Get server token 100s
 			fetch(url, { headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json'} })	// Send remark to wit
 			.then(res => res.json()).then(res =>{ 														// Process result
-				trace(res)
+				trace(token,res)
 				let inference={ text:msg, intent:{name:"r0"}, type:"wit" };								// Null inference
 				if (res.intents.length && (res.intents[0].confidence > .4)) {							// If an intent found
 					inference.intent.name=res.intents[0].name;											// Get intent 																
