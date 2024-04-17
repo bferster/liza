@@ -3,9 +3,13 @@
 	const https = require('https');
 	const fs = require('fs');
 	const WebSocket = require('ws');
-	const os = require("os");	
-	const {SessionsClient} = require('@google-cloud/dialogflow-cx');							// DialogFlow CX
-	let webSocketServer;																		// Holds socket server	
+	const os = require("os");			
+	const dialogflow = require('@google-cloud/dialogflow').v2;
+	const dfClient = new dialogflow.SessionsClient();
+	// const {DialogFlowCX} = require('@google-cloud/dialogflow-cx');								// DialogFlow CX
+	//const dfClient=new DialogFlowCX({ keyFilename:"assets/keys/dialogflow.json", apiEndpoint: 'us-central1-dialogflow.googleapis.com' });
+
+let webSocketServer;																		// Holds socket server	
 	let local=os.hostname().match(/^bill|desktop/i);											// Running on localhost?
 	let sessionData=[];																			// Holds session data
 	let sessionChanged=[];																		// Holds session data change st
@@ -17,8 +21,7 @@
 	npm install fs
 	npm install os
 	npm install ws
-	npm install @google-cloud/dialogflow-cx
-	
+	npm install @google-cloud/dialogflow
 	node ws.js
 
 	npm install forever
@@ -30,8 +33,6 @@
 	RASA:
 	
 	cd ~/htdocs/rasa
-	
-	
 	ps -ef (kill PID) to remove
 	nohup rasa run -m models --enable-api --cors "*" --ssl-certificate /opt/bitnami/letsencrypt/certificates/www.lizasim.com.crt --ssl-keyfile /opt/bitnami/letsencrypt/certificates/www.lizasim.com.key --port 5006?
 
@@ -42,9 +43,18 @@
  	sudo /opt/bitnami/ctlscript.sh start
     restart grace/ws.js, game/ws.js, db/sql.js
 
+	
 	ssh -i c:/Bill/CC/js/agile.pem bitnami@54.88.128.161
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+	DIALOGFLOW TRAINING:
+		* Download zip file from Export and Import
+		* Remove jsons in Intents folder
+		* Train and move jsons to folder
+		* Upload zip file from Export and Import
+
+
+s///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 	
 	if (!local) {																				// If on web
 		const server = https.createServer({														// Create an https server
@@ -56,7 +66,6 @@
 		}
 	else webSocketServer = new WebSocket.Server({ port:8080 });									// Open in debug
 	setInterval(()=>{ SaveSessionData(); },1000*60*60);											// 60 minute timer
-	const dfClient=new SessionsClient({ keyFilename:"assets/keys/dialogflow.json", apiEndpoint: 'us-central1-dialogflow.googleapis.com' });
 
 try{
 	webSocketServer.on('connection', (webSocket, req) => {										// ON CONNECTION
@@ -166,10 +175,12 @@ try{
 	async function InferIntent(d, client, sessionId="5356345") 							// INFER INTENT VIA AI
 	{
 		try{
-			if (d[1] == "DIALOGFLOW-ES") {															// Dialogflow ES													
-				let sessionPath=session.projectAgentSessionPath(d[4], sessionId);
-				const request = { session: sessionPath, queryInput:{ text: { text: d[5], languageCode:"en" }}};
-				const responses = await session.detectIntent(request);
+			if (d[1] == "DIALOGFLOW-ES") {														// Dialogflow ES													
+				const sessionPath=dfClient.projectAgentSessionPath(d[4], sessionId);			// Make path
+				const request={ session:sessionPath, queryInput:{ text: { text: d[5], languageCode:"en-US" }}};
+				trace(request)
+				const responses=await dfClient.detectIntent(request);
+				
 				let msg=d[0]+"|DIALOGFLOW|"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+d[5];
 				if (client)	SendData(client, msg);												// Send back 
 				}

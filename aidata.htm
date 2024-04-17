@@ -29,7 +29,7 @@
 			<img src="img/logo.png" style="width:25%">
 			<hr>
 			AI: &nbsp;<select class="lz-is" id="lz-aiType">
-				<option>Wit</option><option>Dialog-CX</option><option>Dialog-ES</option>
+				<option>Wit</option><option>Dialog-ES</option><!option>Dialog-CX</!option>
 				</select>&nbsp &nbsp; 
 			Activity: &nbsp;<select class="lz-is" id="lz-dataset">
 					<option>Test</option><option>Activity4</option><option>Activity3</option><option>Activity2</option>
@@ -59,7 +59,7 @@
 
 	let modelName="Test";																			// AI Model to use
 	let witToken={},dfToken={};
-	witToken.Activity2="3VVZ-X-FEZSKKSSZS-X-OTY53FE2-X-AQMA3MF26W".replace(/-X-/g,"");				// Fiction service access token
+	witToken.Activity2="3VVZ-X-FEZSKKSSZS-X-OTY53FE2-X-AQMA3MF26W".replace(/-X-/g,"");				// Activity 2
 	witToken.Activity3="FDFR3T-X-S7ELJPI6QCIGV-X-ZPKE-X-A2X65Q6JS".replace(/-X-/g,"");				// Activity 3
 	witToken.Activity4="4XRYT-X-245DCKOI-X-647DEFUBZ3PG6-X-KOGZCI".replace(/-X-/g,"");				// Activity 4
 	witToken.Test="POQILB6-X-KVNPU3PR665-X-V3PPL3CXU-X-CU6E4".replace(/-X-/g,"");					// Wit test 
@@ -71,7 +71,7 @@
 		$("#lz-deleteData").on("click", ()=>  { 													// ON DELETE TRAINING DATA
 			if ((window.location.host == "localhost") || (modelName == "Test"))						// Only allow localy or the test activity 
 				DeleteTrainingData();																// Delete data
-			});							
+			});							77
 		$("#lz-trainData").on("click", ()=>   { 													// ON TRAIN DATA	
 			if ((window.location.host == "localhost") || (modelName == "Test"))						// Only allow localy or the test activity 
 				 $("#lz-trainFile").trigger("click");  
@@ -180,7 +180,7 @@
 			re=new RegExp(studentNames[i],"ig");													// Make name regex
 			remark=remark.replace(re,"Student");													// Replace names with generic
 			}
-		remark=remark.replace(/[\.|\!\?|\'|"]|&apos;/g,"");											// Remove punctuation
+		remark=remark.replace(/[\-\.|\!\?|\'|"]|&apos;/g,"");										// Remove punctuation
 		return remark;																				// Return cleaned remark
 	}
 
@@ -318,14 +318,13 @@
 					if (msgs.length) InferIntents(msgs, callback)									// Recurse, if not last
 					});
 			}
-		else if (aiType == "dialog-cx") {															// If DIALOGFLOW-CX
+			else if (aiType == "dialog-cx") {														// If DIALOGFLOW-CX
 			let p=new Promise((resolve, reject) => {
-				trace(m)
 				setTimeout(()=>{ws.send("Test|DIALOGFLOW-CX|ADMIN|INFER|"+dfToken[modelName]+"|"+m.remark.substring(0,255))},500);
 				ws.onmessage=(e)=>{ 																// If a ws message
 					if (!e.data)			 return;												// Quit if no data
 					let v=event.data.split("|");													// Get params
-					if (v[1] != "DIALOGFLOW") return;												// Not a dialogflow inference
+					if (v[1] != "DIALOGFLOW-CX") return;											// Not a dialogflow inference
 					resolve(v) };																	// Resolve promise
 				}).then(res =>{ 																	// On resolution
 					inference.intent=res[2].substr(1);												// Intent																		
@@ -334,9 +333,25 @@
 					if (msgs.length) InferIntents(msgs, callback)									// Recurse, if not last
 					});
 			}
+		else if (aiType == "dialog-es") {															// If DIALOGFLOW-ES
+			let p=new Promise((resolve, reject) => {
+				trace(m)
+				setTimeout(()=>{ws.send("Test|DIALOGFLOW-ES|ADMIN|INFER|"+dfToken[modelName]+"|"+m.remark.substring(0,255))},500);
+				ws.onmessage=(e)=>{ 																// If a ws message
+					if (!e.data)			 return;												// Quit if no data
+					let v=event.data.split("|");													// Get params
+					if (v[1] != "DIALOGFLOW-ES") return;											// Not a dialogflow inference
+					resolve(v) };																	// Resolve promise
+				}).then(res =>{ 																	// On resolution
+					inference.intent=res[2].substr(1);												// Intent																		
+					inference.confidence=res[3];													// Confidence
+					callback(inference); 															// Return inference
+					if (msgs.length) InferIntents(msgs, callback)									// Recurse, if not last
+					});
+				}
 		else if (aiType == "wit") {																	// If WIT
 			let url="https://api.wit.ai/message?v=20210922&n=3&q="+m.remark.substring(0,255);		// URL			
-				const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
+			const response=await fetch(url, { headers:{ Authorization:'Bearer '+witToken[modelName], 'Content-Type':'application/json'} });	// Send remark to wit
 			let res=await response.json();															// Get response
 			if (res.intents.length) {																// If an intent found
 				trace(res)
