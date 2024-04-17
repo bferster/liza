@@ -49,16 +49,15 @@ class App  {
 		this.points=0;																				// Gamer points
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
 		if (window.location.host == "localhost") this.userId="bferster@stagetools.com";				// Set me if debug										
+		this.nlp=new NLP();																			// Add NLP
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 			for (let i=0;i<v.length;++i) {															// For each param
-			if (v[i] && v[i].match(/id=/)) 	 this.userId=v[i].substring(3).toLowerCase();  			// Get userId (for debugging only)
-//			if (v[i] && v[i].match(/role=/)) this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
-			if (v[i] && v[i].match(/s=/)) 	 this.sessionId=v[i].substring(2) 						// Get session id
-			if (v[i] && v[i].match(/a=/)) 	 this.activityId=v[i].substring(2) 						// Get activity id	
-			if (v[i] && v[i].match(/v=/)) 	 this.loadId=v[i].substring(2) 							// Get load id	
+			if (v[i] && v[i].match(/id=/)) 	 	this.userId=v[i].substring(3).toLowerCase();  		// Get userId (for debugging only)
+//			if (v[i] && v[i].match(/role=/)) 	this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
+			if (v[i] && v[i].match(/s=/)) 	 	this.sessionId=v[i].substring(2) 					// Get session id
+			if (v[i] && v[i].match(/a=/)) 	 	this.activityId=v[i].substring(2) 					// Get activity id	
+			if (v[i] && v[i].match(/v=/)) 	 	this.loadId=v[i].substring(2) 						// Get load id	
 			}
-
-		this.nlp=new NLP();																			// Add NLP
 		this.InitSocketServer();																	// Init socket server
 		this.LoadFiles();																			// Load config and other files
 		this.bb=new Blackboard();																	// Alloc Blackboard (must be before Scene)	
@@ -221,6 +220,8 @@ class App  {
 					else if (d[i].type == "aimodel") {												// AI model 
 						app.nlp.aiType=d[i].id;														// Set type of AI model used to train
 						app.nlp.aiToken=d[i].text;													// Set token
+						if (window.location.search.match(/ai=test/i))								// If overriding
+							this.nlp.aiToken="POQILB6-X-KVNPU3PR665-X-V3PPL3CXU-X-CU6E4";			// Set  test token
 						}
 					else if (d[i].type == "lessonplan") {											// Lesson plan 
 						app.lessonPlan=d[i];														// Save lesson plan
