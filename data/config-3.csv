@@ -53,8 +53,8 @@ key-rule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy"
 key-rule,600,"nice|good|great,to,see|meet",,
 key-rule,600,"how,are,you",,
 key-rule,600,"good,morning|afternoon|evening|day",,
-keyrule,1002,"thank,you",,
-keyrule,1002,"your|you,welcome",,
+key-rule,1002,"thank,you",,
+key-rule,1002,"your|you,welcome",,
 
 keyrule,ANDYOU,"how|what,about,you",,
 keyrule,ANDYOU,"what,you,think|say",,

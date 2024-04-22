@@ -244,12 +244,10 @@ class NLP {
 
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
-		let i,re;
 		if (msg && msg.length < 4)	return;																// Too small
-		for (i=0;i<app.students.length;++i) {															// For each name
-			re=new RegExp(app.students[i].id,"ig");														// Make name regex
-			msg=msg.replace(re,"Student");																// Replace names with generic
-			}
+		msg=msg.toLowerCase();																			// Make l/c
+		msg=msg.replace(/\,\-\.|\!\?|\'|"]|&apos;/g,"");												// Remove punctuation
+		msg=msg.replace(/&/g,"and");																	// No &
 		if ("wit" == "wit") {																			// WIT
 			let url="https://api.wit.ai/message?v=20210922&n=3&q="+msg.substring(0,255);				// URL
 			let token=this.aiToken.replace(/-X-/g,"");													// Get server token 100s
@@ -257,7 +255,7 @@ class NLP {
 			.then(res => res.json()).then(res =>{ 														// Process result
 				trace(token,res)
 				let inference={ text:msg, intent:{name:"r0"}, type:"wit" };								// Null inference
-				if (res.intents.length && (res.intents[0].confidence > .4)) {							// If an intent found
+				if (res.intents.length && (res.intents[0].confidence > .25)) {							// If an intent found
 					inference.intent.name=res.intents[0].name;											// Get intent 																
 					inference.intent.confidence=res.intents[0].confidence;								// Confidence
 					if (inference.intent.name == "clarify")			inference.intent.name="r200";		// Convert clarify to r200
