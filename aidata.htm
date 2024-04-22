@@ -178,9 +178,11 @@
 		if (!remark)  return("");																	// No remark
 		for (i=0;i<studentNames.length;++i) {														// For each name
 			re=new RegExp(studentNames[i],"ig");													// Make name regex
-			remark=remark.replace(re,"Student");													// Replace names with generic
+			remark=remark.replace(re,"");															// Replace names with blank
 			}
-		remark=remark.replace(/[\-\.|\!\?|\'|"]|&apos;/g,"");										// Remove punctuation
+		remark=remark.toLowerCase();																// Make l/c
+		remark=remark.replace(/\,\-\.|\!\?|\'|"]|&apos;/g,"");										// Remove punctuation
+		remark=remark.replace(/&/g,"and");															// No &
 		return remark;																				// Return cleaned remark
 	}
 

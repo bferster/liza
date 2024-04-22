@@ -176,13 +176,19 @@ try{
 	{
 		try{
 			if (d[1] == "DIALOGFLOW-ES") {														// Dialogflow ES													
-				const sessionPath=dfClient.projectAgentSessionPath(d[4], sessionId);			// Make path
-				const request={ session:sessionPath, queryInput:{ text: { text: d[5], languageCode:"en-US" }}};
-				trace(request)
-				const responses=await dfClient.detectIntent(request);
-				
-				let msg=d[0]+"|DIALOGFLOW|"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+d[5];
-				if (client)	SendData(client, msg);												// Send back 
+				const detectIntent = async (q)=> {																																												
+	
+	//https://stackoverflow.com/questions/50545943/dialogflow-easy-way-for-authorization
+					const config={ credentials:{ private_key:d[6],client_email:d[5] }};			// Make config
+					const sessionClient=new dialogflow.SessionsClient(config);					// Start session
+					const sessionPath=sessionClient.projectAgentSessionPath(d[4],"123456789");	// Make path
+					const request={ session: sessionPath, queryInput:{ text: { text:q, languageCode:"en-US" }}};	// Make request
+					const responses = await sessionClient.detectIntent(request);				// Detect
+					let msg=d[0]+"|DIALOGFLOW|r"+responses[0].queryResult.intent.displayName+"|"+responses[0].queryResult.intentDetectionConfidence+"|"+q;	// return data
+					SendData(client, msg);														// Send back 
+					trace(msg)
+					}
+				await detectIntent(d[7])	
 				}
 			else if (d[1] == "DIALOGFLOW-CX") {													// Dialogflow CX												
 				const sessionPath = dfClient.projectLocationAgentSessionPath("activity3-viod","us-central1",d[4],sessionId);

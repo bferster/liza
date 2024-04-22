@@ -87,7 +87,8 @@ class NLP {
 		if (!text)	return "";																			// Nothing to clean
 		text=text.toLowerCase();																		// Make l/c
 		text=text.replace(/key word/gi,"keyword");														// Key word(s) -> keyword(s)
-		text=text.replace(/[\-\.|\!\?|\'|"]|’|&apos;/g,"");												// Remove punctuation
+		text=text.replace(/\,\-\.|\!\?|\'|"]|&apos;/g,"");												// Remove punctuation
+		text=text.replace(/&/g,"and");																	// No &
 
 		let words=this.Tokenize(text);																	// Tokenize
 		if (!words)	return "";																			// Nothing to clean
