@@ -114,6 +114,21 @@ class NLP {
 		return str.replace(/  /g," ")																	// Remove extra spaces and return
 	}
 
+	CleanIntent(remark)																				// CLEAN UP INTENT
+	{
+		let i,re;
+		if (!remark)  return("");																		// No remark
+		let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah","kids","class","children"];	// Student names
+		for (i=0;i<studentNames.length;++i) {															// For each name
+			re=new RegExp(studentNames[i],"ig");														// Make name regex
+			remark=remark.replace(re,"");																// Replace names with blank
+			}
+		remark=remark.toLowerCase();																	// Make l/c
+		remark=remark.replace(/\,\-\.|\!\?|\'|"]|&apos;/g,"");											// Remove punctuation
+		remark=remark.replace(/&/g,"and");																// No &
+		return remark;																					// Return cleaned remark
+	}
+
 	AddResponses(d)																					// ADD RESPONSES FROM CSV DATA
 	{
 		let i,o,s;
@@ -245,9 +260,7 @@ class NLP {
 	InferIntent(msg, callback)																		// GET INTERENCE FROM AI
 	{
 		if (msg && msg.length < 4)	return;																// Too small
-		msg=msg.toLowerCase();																			// Make l/c
-		msg=msg.replace(/\,\-\.|\!\?|\'|"]|&apos;/g,"");												// Remove punctuation
-		msg=msg.replace(/&/g,"and");																	// No &
+		msg=this.CleanIntent(msg);																		// Clean up so it's the sames as trained remark
 		if ("wit" == "wit") {																			// WIT
 			let url="https://api.wit.ai/message?v=20210922&n=3&q="+msg.substring(0,255);				// URL
 			let token=this.aiToken.replace(/-X-/g,"");													// Get server token 100s

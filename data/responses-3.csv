@@ -12,13 +12,12 @@ intent,student,response,valued,language,knowledge,thinking,action,understanding,
 320,Class,Checks help me see the nouns.,,-1 Casual language/conversation,3 Evidence + reasoning,2 Careful,,0,Learn
 330,Class,I found the verb.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Learn
 330,Class,I knew discover was an important word.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Learn
-330,Class,We need to find the name of the equipment used to discover water.,,,,,,,
 410,Class,"This breathing is very helpful, teacher.",,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
 410,Class,Thank you for doing the breathing exercise.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,0,Engage
 410,Class,I feel ready now.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,,
 410,Class,I am more focused now.,,-1 Casual language/conversation,0 Not present,0 Not present,breathe,,
 411,Class,"Um, yeah, okay. So question one is what equipment did scientists use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
-411,Class,What equipment did scientists use to discover water on the moon.,,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
+411,Class,What equipment 8did scientists use to discover water on the moon.,,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
 411,Class,"Yeah, sure. Okay. The question was what equipment did scientists use to discover water on the moon",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
 411,Class,"Okay, What equipment did scientist use to discover water on the moon.",,1 Vocabulary,2 Evidence from source,2 Careful,read,0,Learn
 412,Class,Water,,1 Vocabulary,0 Not present,1 Incomplete,write,0,Learn
@@ -33,6 +32,7 @@ intent,student,response,valued,language,knowledge,thinking,action,understanding,
 520,Class,"Ok, next time I'll try to read the question really carefully because I might miss what it is asking.",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,,0,Reflect
 520,Class,"Next time, I'll take time to highlight the important words in the question and remember I will need them in my answer.",,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
 520,Class,"I pay attention to the noun and the verb. ",,2 Vocabulary+Details,3 Evidence + reasoning,3 Elaborative,,0,Reflect
+530,Class,We need to find the name of the equipment used to discover water.,,,,,,,
 1001,Class,Could you say that in a different way.,,,,,,,
 1001,Class,I am not sure what you were talking about,,,,,,,
 1001,Class,What did you want me to understand,,,,,,,
