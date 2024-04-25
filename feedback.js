@@ -36,11 +36,10 @@ class Feedback {
 
 	DrawVariance(x, y, v, time)																	// SHOW STUDENT VARIANCE
 	{
-		$("#lz-variance").remove();																	// Remove old one
 		let i,j,s;
-		let labs=["Belonging","Language","Knowledge","Thinking"];
+		$("#lz-variance").remove();																	// Remove old one
+			let labs=["Belonging","Language","Knowledge","Extend"];										// BAKT lavels
 		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px`;			// Container div
-	//	str+=";background-color:#eee;padding:4px;border-radius:6px";									// Make visible?
 		str+=`">`;																					// End div
 		
 		if (!(i=app.studex[app.curStudent]))	return;												// Quit if bad name
@@ -87,7 +86,7 @@ class Feedback {
 			else if (v[i] == 3)	c[i]=14;															// 2nd, 3rd & 4th
 			else 				c[i]=16;															// None
 			}		
-		let labs=["Belonging","Language","Knowledge","Thinking"];
+		let labs=["Belonging","Language","Knowledge","Extend"];
 		let str="<table style='margin-bottom:10px'>";	
 		let dark=app.sc.real3D;																		// Render dark?
 		for (i=0;i<4;++i) {																			// For each row

@@ -17,28 +17,18 @@
 
 	{"title":"<br>How effective was this practice session at strengthening your awareness of teacher feedback",
 	"text":"What did you hear in the student responses?",
-	"optionType":"radio",
-	"options":["Not at all effective","Not effective","Effective","Very effective"]},
-
-	{"title":"<br>Belonging",
-	"text":"What did you hear in the student responses?",
-	"optionType":"radio",
-	"options":["Isolation","Acknowledged","Valued","Belonging"]},
-
-	{"title":"<br>Academic language",
-	"text":"What did you hear in the student responses?",
-	"optionType":"radio",
-	"options":["Conversational language","Vocabulary","Vocabulary + details","Vocabulary + complex sentence"]},
-
-	{"title":"<br>Thinking",
-	"text":"What did you hear in the student responses?",
-	"optionType":"radio",
-	"options":["Careless","Incomplete","Careful","Elaborative"]},
+	"optionType":"checkbox",
+	"options":["<b>Belonging </b> (isolation, acknowledged, valued, belonging)","<b>Academic Language</b> (conversational language, vocabulary, details, complex sentences)","<b>Knowledge</b> (tangential comments, prior knowledge, evidence, evidence with explanation)","<b>Thinking</b> (inaccurate, incomplete, careful, elaborate)"]},
 
 	{"title":"<br>What are you taking away for your teaching practice?",
 	"text":"(check all that apply)",
 	"optionType":"checkbox",
 	"options":["A new teaching practice","Increased attention to student variance","Greater confidence in teaching","Not taking away anything useful"]},
+
+	{"title":"<br>When you try the simulation again, what kind of feedback do you want to increase?",
+	"text":"(check all that apply)",
+	"optionType":"checkbox",
+	"options":["<b>Clarify -</b> questions to ensure you understand student responses","<b>Reflect -</b> statements that share back to students your understanding of their ideas","<b>Teach -</b> cultivate student learning by sparking curiosity, redirecting thinking, providing information, directing careful examination, prompting reflection","<b>Extend - </b>ask students to summarize, articulate thinking (metacognition), synthesize & apply, or engage in related challenge"]},
 
 	{"title":"<br>All done!",
 	"optionType":"checkbox",
