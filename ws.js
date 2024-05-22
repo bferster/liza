@@ -8,6 +8,29 @@
 	const dfClient = new dialogflow.SessionsClient();
 	// const {DialogFlowCX} = require('@google-cloud/dialogflow-cx');								// DialogFlow CX
 	//const dfClient=new DialogFlowCX({ keyFilename:"assets/keys/dialogflow.json", apiEndpoint: 'us-central1-dialogflow.googleapis.com' });
+/*
+	const AssistantV1 = require('ibm-watson/assistant/v1');
+	const { IamAuthenticator } = require('ibm-watson/auth');
+	
+	const assistant = new AssistantV1({
+	  	authenticator: new IamAuthenticator({ apikey:'x_9xUws1srA-iwowF7nnk6Vn-qm4RNWTr70k69VZFu87' }),
+	  	serviceUrl: 'https://api.us-east.assistant.watson.cloud.ibm.com/instances/23c2475b-29a3-4249-9710-50f44a271958',
+	  	version: "2020-04-01" 
+		});
+		
+	const params = { workspaceId: 'dfe73de9-ced1-4cc0-909e-690cc8696c4d', intent: 'hello' };
+
+	assistant.getIntent(params)
+	.then(res => {
+		console.log(JSON.stringify(res.result, null, 2));
+	})
+	.catch(err => {
+		console.log(err)
+	});
+
+*/
+
+
 
 let webSocketServer;																		// Holds socket server	
 	let local=os.hostname().match(/^bill|desktop/i);											// Running on localhost?

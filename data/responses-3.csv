@@ -1,6 +1,8 @@
 intent,student,response,valued,language,knowledge,thinking,action,understanding,responseType
 100,Class,"I'm feeling rushed, teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
 100,Class,"I'm feeling stressed, teacher, can we start with a couple deep breaths.",,1 Vocabulary,1 Prior knowledge,2 Careful,,0,Engage
+110,Class,"I'm good, thank you. Why did you want to talk with me.",,,,,,,
+110,Class,"Hi teacher. I'm good, thanks. What are we doing today.",,,,,,,
 200,Class,"I am worried about time, I haven't started and I want to find the answer.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
 200,Class,I need more time so that I can find the right answer.,,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
 200,Class,"I haven't finished the reading or question, but, I really want to learn this.",,-1 Casual language/conversation,0 Not present,0 Not present,,0,Engage
@@ -25,6 +27,14 @@ intent,student,response,valued,language,knowledge,thinking,action,understanding,
 412,Class,"The moon, equipment, water, and scientists",,1 Vocabulary,0 Not present,0 Not present,write,0,Learn
 413,Class,"I think the action word is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
 413,Class,"The verb the question wants us to investigate is discover. ",,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
+414,Class,Equipment and Water,,3 Vocabulary+Details+Complex sentence),3 Evidence + reasoning,3 Elaborative,write,0,Learn
+414,"Class ","Equipment ",,,,,,,
+415,Class,Should I circle the word discover in the reading.,,,,,,,
+415,Class,Should I circle the action word discover.,,,,,,,
+416,Class,okay - I can circle when scientists discover,,,,,,,
+416,Class,"I understand, so I'll circle when scientists discover",,,,,,,
+417,Class,"I am looking for the name of the equipment used to discover water when I reed ",,,,,,,
+417,Class,"I get it, I need to find the name of the equipment",,,,,,,
 500,Class,I learned to look for the action words and to look for words that are nouns.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
 500,Class,I learned to take more time to understand the question before I start to answer it.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
 500,Class,I learned to think about how the question tells you what you have to have in the answer.,,1 Vocabulary,2 Evidence from source,2 Careful,,0,Reflect
