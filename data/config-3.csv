@@ -20,7 +20,7 @@ seat,7,"x=-100,y=-100,z=0,r=0,"
 seat,8,"x=0,y=-100,z=0,r=70,"
 seat,9,"x=150,y=-100,z=0,r=-90,"
 
-resource,Scene Overview,assets/overview.pdf
+resource,Scene Overview,assets/SceneOverview3.pdf
 resource,Student Task Materials,assets/student.pdf
 resource,Teaching Strategy Support,assets/supports.pdf
 resource,About student variances,assets/variances.pdf
