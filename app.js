@@ -47,6 +47,8 @@ class App  {
 		this.teacherResources=[];																	// Teacher resource documents
 		this.teacherMovies=[];																		// Teacher movies
 		this.points=0;																				// Gamer points
+		this.varLabels=["Belonging","Language","Knowledge","Extend"];								// Variance labels
+		
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
 		if (window.location.host == "localhost") this.userId="bferster@stagetools.com";				// Set me if debug										
 		this.nlp=new NLP();																			// Add NLP
@@ -223,9 +225,10 @@ class App  {
 						if (window.location.search.match(/ai=test/i))								// If overriding
 							this.nlp.aiToken="POQILB6-X-KVNPU3PR665-X-V3PPL3CXU-X-CU6E4";			// Set  test token
 						}
-					else if (d[i].type == "lessonplan") {											// Lesson plan 
+					else if (d[i].type == "lessonplan") 											// Lesson plan 
 						app.lessonPlan=d[i];														// Save lesson plan
-						}
+					else if (d[i].type == "varlabels") 												// Variance label names
+						app.varLabels=d[i].text.split(",");											// Save names
 					else if (d[i].type == "room") {													// Room walls/floor
 						o=d[i].text.split(",");														// Get back, floor, left, & right
 						this.sc.backWall="assets/"+o[0]+".png";										// Set back
@@ -327,11 +330,8 @@ trace(d)
 		let student=e.who;																			// Get speaker
 		if (!student || (student == "current"))	student=this.curStudent;							// Use current student
 		else if (student == "random")  	student=this.students[Math.floor(Math.random()*this.students.length)].id;	// Get random student
-		this.curStudent=student;																	// Set as current student
-
-		trace(e)
+		this.curStudent=student;																	// Set as current student	
 		let v=e.do.split("+");																		// Split do items
-
 		for (i=0;i<v.length;++i) {																	// For each do item
 			if (v[i].match(/say:/i)) {																// SAY
 				s=v[i].substring(4);																// Get text or intent
@@ -376,7 +376,8 @@ trace(d)
 			else if (v[i].match(/camera:/i)) this.sc.SetCamera(...v[i].substring(7).split(","));	// CAMERA POSITION
 			else if (v[i].match(/var:/i)) {															// SHOW VARIANCE
 				s=v[i].substring(4);																// Get text
-				app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,s.split(",")); 	// Show variance
+				if (!$("#lz-timelinebar").length)													// If timeline isn't up		
+					app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,s.split(",")); // Show variance
 			}
 		}
 
@@ -515,7 +516,7 @@ trace(d)
 	}
 
 	UpdateVariance(student, bakt)																// UPDATE STUDENT VARIANCE FROM RESPONSE
-	{
+	{	
 		if ($("#lz-timelinebar").length) app.fb.Draw(this.curTime);									// If timeline up, show new dot and variance
 		else if (this.role != "Gamer")   app.fb.DrawVariance(window.innerWidth-170,window.innerHeight-150,bakt,this.curTime);	// Show variance
 	}

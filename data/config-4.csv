@@ -4,26 +4,23 @@ student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,col
 student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=2,"
 student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=3,"
 student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,"
-student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,"
-student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children,friends","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
-session,data,"trt=300,",
-string,multi,"Start,Explain,Question,Discover,Reflect	",
-string,variance,"Belonging,Academic,Knowledge,Thinking										",
-seat,0,"x=250,y=125,z=0,r=-25,",
-seat,1,"x=150,y=100,z=0,r=-15,																							",
-seat,2,"x=50,y=75,z=0,r=-5,",
-seat,3,"x=-50,y=75,z=0,r=5,",
-seat,4,"x=-150,y=100,z=0,r=15,",
-seat,5,"x=-250,y=125,z=0,r=25,"                                                  
+student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,",
+student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children,friends","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,",,,,,,,,,,,
+session,data,"trt=300,"
+string,multi,"Start,Explain,Question,Discover,Reflect	"
+string,variance,"Belonging,Academic,Knowledge,Thinking										"
+seat,0,"x=250,y=125,z=0,r=-25,"
+seat,1,"x=150,y=100,z=0,r=-15,																							"
+seat,2,"x=50,y=75,z=0,r=-5,"
+seat,3,"x=-50,y=75,z=0,r=5,"
+seat,4,"x=-150,y=100,z=0,r=15,"
+seat,5,"x=-250,y=125,z=0,r=25,"
 seat,6,"x=-200,y=-100,z=0,r=0,"
 seat,7,"x=-100,y=-100,z=0,r=0,"
 seat,8,"x=0,y=-100,z=0,r=0,"
 seat,9,"x=250,y=-100,z=0,r=30,"
 
-resource,Identifying differences,assets/identifying.pdf
-resource,Questions for your teaching,assets/questions.pdf
-movie,Sojourner Truth,https://www.youtube.com/embed/eNofqcdRYgE?si=sfkKpY3IeMpumbCY
-movie,Grace demo,https://www.youtube.com/embed/7Gc4ZCH6OZc?si=dcQNSQ9CsYvlw2P9
+resource,Variance in Student Responses,assets/variances.pdf
 
 action,sleep,"sleep,snooze"
 action,headCenter,"eyes front,head center"
@@ -49,23 +46,75 @@ action,pair,"pair,pare,pier,pear"
 action,read,"read,reed,red,re-read,reread"
 action,breathe,breathe
 
-keyrule,600,"high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy",,
-keyrule,600,"nice|good|great,to,see|meet",,
-keyrule,600,"how,are,you",,
-keyrule,600,"good,morning|afternoon|evening|day",,
+keyrule,600,high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy
+keyrule,600,"nice|good|great,to,see|meet"
+keyrule,600,"how,are,you"
+keyrule,600,"good,morning|afternoon|evening|day"
 
-keyrule,ANDYOU,"how|what,about,you",,
-keyrule,ANDYOU,"what,you,think|say",,
-keyrule,ANDYOU,"lets|let's,hear,from",,
-keyrule,1101,"2,\+|plus|and,2",,
+keyrule,ANDYOU,"how|what,about,you"
+keyrule,ANDYOU,"what,you,think|say"
+keyrule,ANDYOU,"lets|let's,hear,from"
+keyrule,1101,"2,\+|plus|and,2"
 
 picture,Welcome,assets/demoWelcome.png
-picture,whowhat,assets/whowhat.png
-picture,Blank board,assets/blankBB.png
+picture,Whent,assets/loc1when.png
+picture,Draw,assets/demoDraw.png
+picture,Remarks1,assets/loc1Remarks1.png
+picture,Remarks2,assets/loc1Remarks2.png
+picture,Deep1,assets/loc1Deep1.png
+picture,Deep2,assets/loc1Deep2.png
+picture,TruthPic,assets/DrawTruth.png
+picture,Blank,assets/blankBB.png
 
-session,data,"trt=303,endpoll=demopoll,endurl=https://agileteacher.org/practice-library,"
-aimodel,wit,POQILB6-X-KVNPU3PR665-X-V3PPL3CXU-X-CU6E4
+varlabels,data,"Curious,Language,Careful,Reflect"
+session,data,"trt=324,endpoll=demopoll,endurl=https://agileteacher.org/practice-library,"
+aimodel,wit,4XRYT-X-245DCKOI64-X-7DEFUBZ3P-X-G6KOGZCI
+trigger,time,"who=Luis,when=.5,do=say:Welcome teacher, we're glad that you're here today.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Jazmin,when=6,do=say:In the next six minutes, we are going to give you a tour of our classroom+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Chris,when=11,do=say:and we will answer the question on the board. When was this photograph taken?+var:1,2,3,4,5"
+trigger,time,"who=Farrah,when=13,do=Our responses will help you learn more about our thinking+var:1,2,3,4,5"
+trigger,time,"who=Luis,when=15,do=say:Before we get started let's take a couple deep breaths together.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Farrah,when=21,do=say:Breathe in through your nose, hold your breath, now breathe out. Go ahead and take another breath. Breathing helps us relax and learn from our practice.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Chris,when=23,do=act:breathe"
+trigger,time,"who=Farrah,when=28,do=act:breathe"
+trigger,time,"who=Luis,when=23,do=act:breathe"
+trigger,time,"who=Jazmin,when=23,do=act:breathe"
+trigger,time,"who=Oliver,when=23,do=act:breathe"
+trigger,time,"who=Sharleen,when=23,do=act:breathe"
+trigger,time,"who=Jazmin,when=34,do=say:Teacher, Click on the pencil icon on the toolbar and circle details in the image that may tell you when the photograph was taken.+var:1,2,3,4,5+act:interrupt+slide:0TruthPic+camera:0,150,500,0,0,0,0,0+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Luis,when=55,do=say:Thanks teacher, we can see your ideas about when this photograph was taken, now we'd like to share our ideas.+var:1,2,3,4,5+close:blackboard",
+trigger,time,"who=Farrah,when=64,do=say:We'd like to show you our Domino Discover routine - today we will each share our name and when we think the photograph was taken.+var:1,2,3,4,5"
+trigger,time,"who=Oliver,when=74,do=say:I'm Oliver, It looks like it was taken a long time ago.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Chris,when=79,do=say:I'm Chris, You can see she's dressed the way people were during slavery time.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Farrah,when=85,do=say:I'm Farrah, Maybe in the olden days?+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Luis,when=90,do=say:I'm Luis, The title underneath says Sojourner Truth. She was alive hundreds of years ago.+var:1,2,3,4,5"
+trigger,time,"who=Jazmin,when=97,do=say:I'm Jazmin, Maybe during my grandma’s time?+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Sharleen,when=101,do=say:I'm Sharleen, I think the photograph is from one of those festivals with the costumes and photo booth.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Farrah,when=108,do=say:Look on the blackboard. You can see the answers that we just shared.+var:1,2,3,4,5+act:interrupt+slide:0Remarks1+slide:1Remarks2"
+trigger,time,"who=Chris,when=116,do=say:Ask us about our answers by pressing the space bar and asking us the clarifying question, What makes you say that? or ask us to tell you about the details we see.+var:1,2,3,4,5+act:interrupt+slide:Deep+slide:0Deep1"
+trigger,time,"who=Oliver,when=125,do=say:You can reflect back what you heard us say in our responses with a statement that starts with ""You noticed"", or ""You are bringing""+var:1,2,3,4,5+act:interrupt+slide:0Question1+slide:1Deep2"
+trigger,time,"who=Sharleen,when=132,do=say:Reflecting back our responses confirms that you understood our response+var:1,2,3,4,5+act:interrupt+slide:0Question1+slide:1Question2"
+trigger,time,"who=Farrah,when=233,do=prompt:5 seconds to finish your clarifying questions and reflections!""+var:1,2,3,4,5"
+trigger,time,"who=Chris,when=238,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see a timeline of our lesson and our interactions+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Luis,when=247,do=say:Look for the green line to see the type of feedback you used to interact with us.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Oliver,when=252,do=say:The green line shows your clarify question, What makes you say that and statements that Reflect back to us what we shared with you+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Jazmin,when=261,do=say:Click on a colored dot see the differences in our responses.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Chris,when=267,do=say:At the end of this session you can press the play button to replay a recording of your interactions with us.+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Luis,when=286,do=say:Now, you can use what you learned to join us in another lesson where we explore more deeply the meaning of this primary source and you can practice more teaching strategies that nurture deeper learning .+var:1,2,3,4,5+close:graph"
+trigger,time,"who=Sharleen,when=297,do=say:Click on the notebook in the toolbar to download more teaching resources+var:1,2,3,4,5"
+!trigger,time,"who=Oliver,when=300,do=act:standUp"
+!trigger,time,"who=Jazmin,when=300,do=act:twistRight"
+!trigger,time,"who=Chris,when=300,do=act:write"
+!trigger,time,"who=Luis,when=300,do=act:twistLeft"
+!trigger,time,"who=Farrah,when=300,do=act:write"
+trigger,time,"who=Sharleen,when=300,do=act:close:resources"
+trigger,time,"who=random,when=310,do=end:"
+trigger,time,"who=Farrah,when=317,do=say:You can practice more and print a participation certificate after this survey.+var:1,2,3,4,5+assess:demopoll",,,,,,,,0 Not Present,0 - Not present,0 - Not present,0 - Not present,5
+trigger,time,"who=Oliver,when=322,do=act:interrupt"
+trigger,time,"who=Chris,when=322,do=act:interrupt"
+trigger,time,"who=Farrah,when=322,do=act:interrupt"
+trigger,time,"who=Luis,when=322,do=act:interrupt"
+trigger,time,"who=Jazmin,when=322,do=act:interrupt"
+trigger,time,"who=Sharleen,when=322,do=act:interrupt"
 
-
-lessonplan,Discover Student Reading Strengths Lesson Plan,"Engage the Student,<i>Students state purpose:</i> &quot;We’ll introduce you to classroom and share what we like to read outside of school.&quot;,<i>Breathe:</i> &quot;Let’s breathe in, hold the breath and then breathe out&quot;,<i>Listen:</i> Students share their interests during the Domino routine,<i>Walk:</i> Use your mouse to walk around the classroom,<i>Write:</i> Click on the chalk to write and eraser to erase the chalkboard+Understand Student Thinking,<b>Step 1.  Clarify:</b> &quot;What do you like to read outside of school?&quot;,<b>Step 2.  Reflect:</b> &quot;You enjoy (fiction or nonfiction)&quot;+Prompt Deeper Learning,<b>Step 3. Teach:</b>  The students will teach you today,<b>Step 4. Extend:</b> &quot;Why to you like fiction/nonfiction?&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending - Stop asking questions,<i>Reflect:</i> Complete our survey,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacher.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."
-
+lessonplan,Discover Student Thinking About the Portrait,"Engage the Student,<i>Students state purpose:</i> &quot;We will answer the question on the board so you learn more about our thinking.&quot;,<i>Breathe:</i> &quot;Let’s breathe in, hold the breath and then breathe out&quot;,<i>Listen:</i> Students share their thinking during the Domino routine,+Understand Student Thinking,<b>Step 1a.  Clarify:</b> &quot;When do you think this photograph was taken?&quot;,<b>Step 1b.  Clarify:</b> &quot;What makes you say that? or Tell us more about the details that you see&quot;,<b>Step 2.  Reflect:</b> &quot;You are noticing details in the picture.&quot or &quot;You are using your knowledge or experiences to guide your thinking.&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending - Stop asking questions,<i>Reflect:</i> Complete our survey,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacher.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."

@@ -38,10 +38,10 @@ class Feedback {
 	{
 		let i,j,s;
 		$("#lz-variance").remove();																	// Remove old one
-			let labs=["Belonging","Language","Knowledge","Extend"];										// BAKT lavels
+		let labs=app.varLabels;																		// Get variance labels
 		let str=`<div id="lz-variance" style="position:absolute;top:${y}px;left:${x}px`;			// Container div
 		str+=`">`;																					// End div
-		
+	
 		if (!(i=app.studex[app.curStudent]))	return;												// Quit if bad name
 		s=app.students[i-1]; 																		// Point at student data
 		str+=this.GetVarianceMarkup(v);																// Get dot display
@@ -73,7 +73,7 @@ class Feedback {
 				}
 			}
 			str+="</div>";
-		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
+			$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
 	}
 
 	GetVarianceMarkup(v, prefix="")																// DRAW VARIANCE GRAPH
@@ -85,13 +85,14 @@ class Feedback {
 			else if (v[i] == 2)	c[i]=6;																// 2nd & 3rd
 			else if (v[i] == 3)	c[i]=14;															// 2nd, 3rd & 4th
 			else 				c[i]=16;															// None
-			}		
-		let labs=["Belonging","Language","Knowledge","Extend"];
+			}	
+
+		let labs=app.varLabels;																		// Get variance labels
 		let str="<table style='margin-bottom:10px'>";	
 		let dark=app.sc.real3D;																		// Render dark?
 		for (i=0;i<4;++i) {																			// For each row
 			str+="<tr>";																			// Start row
-			col=dark ? "#333" : app.fb.cols[i];														// Ser frame color
+			col=dark ? "#333" : app.fb.cols[i];														// Set frame color
 			for (j=0;j<4;++j) {																		// For each column
 				str+="<td";																			// Start column
 				if (!j)	str+=` style="border-right:1px solid ${col}"`;								// Add border
@@ -191,7 +192,7 @@ class Feedback {
 			if (app.sessionLog[i].time >= time) 			{ d=app.sessionLog[i].data; break; }	// Past now
 			}
 		app.fb.DrawVariance(27,window.innerHeight-193,d ? d : [0,0,0,0,0,0],time);					// Show variance
-		}
+	}
 
 	DrawMovesGraph()																			// DRAW MOVES GRAPH
 	{
