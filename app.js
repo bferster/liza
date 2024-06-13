@@ -48,6 +48,7 @@ class App  {
 		this.teacherMovies=[];																		// Teacher movies
 		this.points=0;																				// Gamer points
 		this.varLabels=["Belonging","Language","Knowledge","Extend"];								// Variance labels
+		this.modelId=0;																			// New model flag
 		
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
 		if (window.location.host == "localhost") this.userId="bferster@stagetools.com";				// Set me if debug										
@@ -58,6 +59,7 @@ class App  {
 //			if (v[i] && v[i].match(/role=/)) 	this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) 	 	this.sessionId=v[i].substring(2) 					// Get session id
 			if (v[i] && v[i].match(/a=/)) 	 	this.activityId=v[i].substring(2) 					// Get activity id	
+			if (v[i] && v[i].match(/m=/)) 	 	this.modelId=v[i].substring(2) 						// Get model id
 			if (v[i] && v[i].match(/v=/)) 	 	this.loadId=v[i].substring(2) 						// Get load id	
 			}
 		this.InitSocketServer();																	// Init socket server
@@ -428,13 +430,16 @@ trace(d)
 				o.src="assets/"+d.data.match(/mod=(.+?)\W/)[1]+".dae";								// Use model
 				o.tex="assets/"+o.id.toLowerCase()+"skin3.png";										// Add texture
 				}
+			if (app.modelId == 3) {																	// If using new model
+				o.src="assets/"+o.id.toLowerCase()+app.modelId+".dae";								// Use model
+				o.tex="assets/"+o.id.toLowerCase()+"skin"+app.modelId+".png";						// Add texture
+				}
 			if (o.id != "Class") {																	// Only students
 				this.students.push(o); 																// Add to students array
 				this.studex[o.id]=this.students.length;												// Add index finder 
 				}
 			this.nlp.AddSyns("student",d.id,d.text.split(","));										// Add student synonyms
 		} catch(e) { trace(e) }																		// Catch error
-
 	}
 
 	OnPhrase(text) 																				// ON PHRASE UTTERED

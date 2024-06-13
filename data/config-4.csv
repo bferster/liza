@@ -66,6 +66,10 @@ picture,Deep2,assets/loc1Deep2.png
 picture,TruthPic,assets/DrawTruth.png
 picture,Blank,assets/blankBB.png
 
+movie,Sojourner's Activities,https://www.youtube.com/embed/eNofqcdRYgE?si=f_SfyTDtZXtBv4yG
+movie,The Truth is Powerful,https://player.vimeo.com/video/953664260?h=b04632be2f&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479
+movie,Grace demo,https://www.youtube.com/embed/7Gc4ZCH6OZc?si=dcQNSQ9CsYvlw2P9 
+
 varlabels,data,"Curious,Language,Careful,Reflect"
 session,data,"trt=324,endpoll=demopoll,endurl=https://agileteacher.org/practice-library,"
 aimodel,wit,4XRYT-X-245DCKOI64-X-7DEFUBZ3P-X-G6KOGZCI
