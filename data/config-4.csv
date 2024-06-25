@@ -52,12 +52,11 @@ keyrule,600,"how,are,you"
 keyrule,600,"good,morning|afternoon|evening|day"
 
 keyrule,ANDYOU,"how|what,about,you"
-keyrule,ANDYOU,"what,you,think|say"
 keyrule,ANDYOU,"lets|let's,hear,from"
 keyrule,1101,"2,\+|plus|and,2"
 
 picture,Welcome,assets/demoWelcome.png
-picture,Whent,assets/loc1when.png
+picture,When,assets/loc1when.png
 picture,Draw,assets/demoDraw.png
 picture,Remarks1,assets/loc1Remarks1.png
 picture,Remarks2,assets/loc1Remarks2.png

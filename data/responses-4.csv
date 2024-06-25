@@ -1,50 +1,52 @@
 intent,student,response,valued,language,knowledge,thinking,action,understanding,responseType
+110,Class,Good thank you. We're ready to talk about our responses to the question now ,,,,,,,
+110,Class,We're good. We are excited to talk about the photograph with you.,,,,,,,
 100,Oliver,It looks like it was taken a long time ago.,0 - Not present,0 Not Present,0 - Not present,0 - Not present,,,
 100,Chris,You can see she's dressed the way people were during slavery time.,0 - Not present,0 Not Present,0 - Not present,0 - Not present,,,
 100,Farrah,Maybe in the olden days.,0 - Not present,0 Not Present,0 - Not present,0 - Not present,,,
 100,Luis,The title underneath says Sojourner Truth. She was alive hundreds of years ago.,0 - Not present,0 Not Present,0 - Not present,0 - Not present,,,
 100,Jazmin,Maybe during my grandma's time.,0 - Not present,1 Vocabulary,1 - One piece of evidence,1 - Make connection,,,
-220,Sharleen,"I think the photograph is from one of those festivals with the costumes and photo booth.",0 - Not present,-1 Casual language/conversation,-1  General guess - misunderstanding.,0 - Not present,,,
+100,Sharleen,"I think the photograph is from one of those festivals with the costumes and photo booth.",0 - Not present,-1 Casual language/conversation,-1  General guess - misunderstanding.,0 - Not present,,,
 220,Oliver,"The portrait is brown, like an app filter, and her clothes look really old.",0 - Not present,1 Vocabulary,1 - One piece of evidence,1 - Make connection,,,
-220,Chris,"It says ""Sojourner Truth""at the bottom of the portrait. I learned about her. She was an activist during slavery.",0 - Not present,-1 Casual language/conversation,-1  General guess - misunderstanding.,0 - Not present,,,
-220,Farrah,Because of the color of the portrait and her clothes and hat.,0 - Not present,2 Vocabulary+Details,2 - Corroborate two or more pieces of evidence,1 - Make connection,,,
-220,Luis,It has her name on the bottom of the photo.,0 - Not present,0 Not Present,1 - One piece of evidence,0 - Not present,,,
+220,Farrah,Everything about the picture looks old timey. Even the words.,0 - Not present,2 Vocabulary+Details,2 - Corroborate two or more pieces of evidence,1 - Make connection,,,
 220,Jazmin,She looks old like my grandma.,0 - Not present,0 Not Present,0 - Not present,1 - Make connection,,,
-220,Sharleen,I went to a festival with my family and we dressed up in old costumes and the portrait was brown like this one.,0 - Not present,0 Not Present,2 - Corroborate two or more pieces of evidence,1 - Make connection,,,
 220,Oliver,"In history class, we see portraits of people dressed like this from long time ago.",0 - Not present,1 Vocabulary,1 - One piece of evidence,1 - Make connection,,,
-220,Chris,"I think during slavery is when people dressed like this. ",0 - Not present,1 Vocabulary,0 - Not present,0 - Not present,,,
-220,Farrah,Everything about the picture looks old timey. Even the words.,0 - Not present,0 Not Present,1 - One piece of evidence,0 - Not present,,,
+220,Chris,"It says ""Sojourner Truth""at the bottom of the portrait. I learned about her. She was an activist during slavery.",0 - Not present,-1 Casual language/conversation,-1  General guess - misunderstanding.,0 - Not present,,,
+220,Farrah,"Because of the color of the portrait and her clothes and hat.",0 - Not present,0 Not Present,1 - One piece of evidence,0 - Not present,,,
 220,Luis,We learned about her in class.,0 - Not present,0 Not Present,0 - Not present,0 - Not present,,,
-220,Jazmin,She is wearing this big dress and knitting something and my grandma knits too.,0 - Not present,0 Not Present,2 - Corroborate two or more pieces of evidence,2 - Create comparison,,,
-220,Sharleen,It could be an app filter. But nobody dresses like that now.,0 - Not present,0 Not Present,1 - One piece of evidence,2 - Create comparison,,,
-300,Oliver,"Yes, you can make that color using a filter or it could just be an old picture.",0 - Not present,0 Not Present,1 - One piece of evidence,1 - Make connection,,,
-300,Chris,Yeah I read a book about Sojourner Truth earlier this year.,0 - Not present,1 Vocabulary,0 - Not present,1 - Make connection,,,
-300,Farrah,"Thank you, teacher.",0 - Not present,0 Not Present,0 - Not present,0 - Not present,,,
-300,Luis,"Yeah, at first I was looking at the picture, then I saw the name at the bottom.",0 - Not present,0 Not Present,1 - One piece of evidence,0 - Not present,,,
-300,Jazmin,I feel like I've seen pictures like this in the old family albums.,0 - Not present,0 Not Present,0 - Not present,1 - Make connection,,,
-300,Sharleen,"Yeah, it looks really similar so it could be old or it could be recent.",0 - Not present,0 Not Present,0 - Not present,2 - Create comparison,,,
-1001,Class,Could you say that in a different way.,,,,,,,
-1001,Class,I am not sure what you were talking about,,,,,,,
-1001,Class,What did you want me to understand,,,,,,,
-1001,Class,It would help me if you could repeat that with different words,,,,,,,
-1001,Class,I didn't understand those words,,,,,,,
-1001,Class,I didn't understand that,,,,,,,
-1001,Class,I need to hear that in a different way,,,,,,,
-1101,Class,The answer is 4 of course,,,,,,,
-1101,Class,Would you believe 22.,,,,,,,
-1101,Class,The answer is 4 of course,,,,,,,
-1101,Class,I don't know how to add yet,,,,,,,
-1101,Class,Math is hard,,,,,,,
-1000,Class,I'm ready to move on.,,,,,,,
-1000,Class,I'm done.,,,,,,,
-1000,Class,I'm ready for the next group.,,,,,,,
-1000,Class,You can go back to your seat now.,,,,,,,
-1000,Class,You have a good plan to finish this assignment.,,,,,,,
-1000,Class,"I am moving on to other students, you can continue your learning.",,,,,,,
-1000,Class,"I am moving on, but you should continue this work.",,,,,,,
-1000,Class,It's time for me to go.,,,,,,,
-1000,Class,I have to stop now.,,,,,,,
-1000,Class,Head back to your seat.,,,,,,,
-1000,Class,I am glad that you learned so much today.,,,,,,,
-1000,Class,I will look forward to seeing you use this strategy with the next question.,,,,,,,
-1000,Class,Thank you for talking with me and being open to trying new strategies.,,,,,,,
+220,Jazmin,She is wearing this big dress and knitting something and my grandma knits too.,0 - Not present,0 Not Present,2 - Corroborate two or more pieces of evidence,2 - Create comparison
+220,Sharleen,It could be an app filter. But nobody dresses like that now.,0 - Not present,0 Not Present,1 - One piece of evidence,2 - Create comparison
+220,Chris,I think during slavery is when people dressed like this. ,0 - Not present,1 Vocabulary,0 - Not present,0 - Not present
+220,Luis,It has her name on the bottom of the photo.,0 - Not present,0 Not Present,1 - One piece of evidence,0 - Not present
+220,Sharleen,I went to a festival with my family and we dressed up in old costumes and the portrait was brown like this one.,0 - Not present,0 Not Present,2 - Corroborate two or more pieces of evidence,1 - Make connection
+300,Oliver,"Yes, you can make that color using a filter or it could just be an old picture.",0 - Not present,0 Not Present,1 - One piece of evidence,1 - Make connection
+300,Luis,"Yeah, at first I was looking at the picture, then I saw the name at the bottom.",0 - Not present,0 Not Present,1 - One piece of evidence,0 - Not present
+300,Farrah,"Thank you, teacher.",0 - Not present,0 Not Present,0 - Not present,0 - Not present
+300,Chris,Yeah I read a book about Sojourner Truth earlier this year.,0 - Not present,1 Vocabulary,0 - Not present,1 - Make connection
+300,Jazmin,I feel like I've seen pictures like this in the old family albums.,0 - Not present,0 Not Present,0 - Not present,1 - Make connection
+300,Sharleen,"Yeah, it looks really similar so it could be old or it could be recent.",0 - Not present,0 Not Present,0 - Not present,2 - Create comparison
+1001,Class,Could you say that in a different way.,,,,
+1001,Class,I am not sure what you were talking about,,,,
+1001,Class,What did you want me to understand,,,,
+1001,Class,It would help me if you could repeat that with different words,,,,
+1001,Class,I didn't understand those words,,,,
+1001,Class,I didn't understand that
+1001,Class,I need to hear that in a different way
+1101,Class,The answer is 4 of course
+1101,Class,Would you believe 22.
+1101,Class,The answer is 4 of course
+1101,Class,I don't know how to add yet
+1101,Class,Math is hard
+1000,Class,I'm ready to move on.
+1000,Class,I'm done.
+1000,Class,I'm ready for the next group.
+1000,Class,You can go back to your seat now.
+1000,Class,You have a good plan to finish this assignment.
+1000,Class,"I am moving on to other students, you can continue your learning."
+1000,Class,"I am moving on, but you should continue this work."
+1000,Class,It's time for me to go.
+1000,Class,I have to stop now.
+1000,Class,Head back to your seat.
+1000,Class,I am glad that you learned so much today.
+1000,Class,I will look forward to seeing you use this strategy with the next question.
+1000,Class,Thank you for talking with me and being open to trying new strategies.
