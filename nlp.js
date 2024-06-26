@@ -118,7 +118,7 @@ class NLP {
 	{
 		let i,re;
 		if (!remark)  return("");																		// No remark
-		let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah","kids","class","children"];	// Student names
+		let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah","kids","class","children","student"];	// Student names
 		for (i=0;i<studentNames.length;++i) {															// For each name
 			re=new RegExp(studentNames[i],"ig");														// Make name regex
 			remark=remark.replace(re,"");																// Replace names with blank

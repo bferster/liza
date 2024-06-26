@@ -184,6 +184,8 @@
 		remark=remark.toLowerCase();																// Make l/c
 		remark=remark.replace(/\,\-\.|\!\?|\'|"]|&apos;/g,"");										// Remove punctuation
 		remark=remark.replace(/&/g,"and");															// No &
+		remark=remark.replace(/r/g,"");																// No CR 
+		remark=remark.replace(/n/g,"");																// No LF
 		return remark;																				// Return cleaned remark
 	}
 
@@ -203,7 +205,6 @@
 				if (!d[i].remark) 		 { d.splice(i,1); continue; }								// No remark
 				if (!d[i].intent) 		 { d.splice(i,1); continue; }								// No intent
 				}
-//d=d.slice(0,3)	
 			let tot=d.length;																		// Total
 			Augment(d,(r1)=>{																		// Mid way
 				$("#lz-loadingIconText").html("<b>"+(100-Math.floor(d.length*100/tot))+"%</b>");	// Show progress

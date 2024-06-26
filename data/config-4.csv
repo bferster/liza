@@ -6,7 +6,7 @@ student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","
 student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=4,"
 student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=5,",
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children,friends","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,",,,,,,,,,,,
-session,data,"trt=300,"
+session,data,"trt=3240,"
 string,multi,"Start,Explain,Question,Discover,Reflect	"
 string,variance,"Belonging,Academic,Knowledge,Thinking										"
 seat,0,"x=250,y=125,z=0,r=-25,"
