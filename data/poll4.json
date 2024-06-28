@@ -1,0 +1,42 @@
+{"pages":[
+
+	{"title":"<br>Your practice goal",
+	"text":"What type of teacher feedback did you plan to practice in today's session?",
+	"optionType":"radio",
+	"options":["Clarify - Ask students to provide more information or explain their reasoning to understand their thinking","Reflect - Share back student feelings, knowledge, or thinking","Teach - Provide students with fact statements, directions, strategies","Think - Prompt student thinking"]},
+
+	{"title":"<br>Explore the Timeline Tool (below)",
+	"text":"How effective was this practice session toward reaching your goal?",
+	"optionType":"radio",
+	"options":["Very effective","Effective","Not effective","Not at all effective"]},
+
+	{"title":"<br>Curious",
+	"text":"What did you hear in the student responses?",
+	"optionType":"checkbox",
+	"options":["Expressed disinterest","Asked general question - (e.g. What is this?)","Asked specific question - (e.g. “Why is the book open?)","Noticed a tension (e.g. I wonder if the woman was a teacher then would she have had enough money to pay for this photograph?)"]},
+
+	{"title":"<br>Academic Language",
+	"text":"What did you hear in the student responses?",
+	"optionType":"checkbox",
+	"options":["Conversational language","Vocabulary","Vocabulary + details","Vocabulary + complex sentence"]},
+
+	{"title":"<br>Careful Thinking",
+	"text":"What did you hear in the student responses?",
+	"optionType":"checkbox",
+	"options":["Offered a guess","Provided one piece of evidence","Corroborated two or more pieces of evidence","Checked for errors or linking to background knowledge"]},
+
+	{"title":"<br>Reflective Thinking",
+	"text":"What did you hear in the student responses?",
+	"optionType":"checkbox",
+	"options":["Unconnected or isolated learning","Made connection","Created a comparison","Linked to an abstract idea"]},
+
+	{"title":"<br>What are you taking away for your teaching practice?",
+	"text":"(check all that apply)",
+	"optionType":"checkbox",
+	"options":["A new teaching practice","Increased attention to student variance","Greater confidence in teaching","Not taking away anything useful"]},
+
+	{"title":"<br>All done!",
+	"optionType":"checkbox",
+	"text":"You can continue to talk with the class, or go back to the main site.<br>Start over or move on to <b>Deeper Learning with Primary Sources</b> (Steps 3 & 4 )",
+	"options":[]}
+]}

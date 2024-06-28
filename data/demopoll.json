@@ -3,7 +3,7 @@
 	{"title":"<br>Your practice goal",
 	"text":"What type of teacher feedback did you plan to practice in today's session?",
 	"optionType":"radio",
-	"options":["Clarify - Ask for specific information or provide a purpose","Reflect - Share back student feelings, knowledge, or thinking","Teach - Provide students with fact statements, directions, strategies","Think - Prompt student thinking"]},
+	"options":["Clarify - Ask students to provide more information or explain their reasoning to understand their thinking","Reflect - Share back student feelings, knowledge, or thinking","Teach - Provide students with fact statements, directions, strategies","Think - Prompt student thinking"]},
 
 	{"title":"<br>Explore the Timeline Tool (below)",
 	"text":"How effective was this practice session toward reaching your goal?",
