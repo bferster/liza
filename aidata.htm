@@ -184,8 +184,8 @@
 		remark=remark.toLowerCase();																// Make l/c
 		remark=remark.replace(/\,\-\.|\!\?|\'|"]|&apos;/g,"");										// Remove punctuation
 		remark=remark.replace(/&/g,"and");															// No &
-		remark=remark.replace(/r/g,"");																// No CR 
-		remark=remark.replace(/n/g,"");																// No LF
+	//	remark=remark.replace(/\r/g,"");															// No CR 
+	//	remark=remark.replace(/\n/g,"");															// No LF
 		return remark;																				// Return cleaned remark
 	}
 

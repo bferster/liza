@@ -46,18 +46,21 @@ let webSocketServer;																		// Holds socket server
 	npm install ws
 	npm install @google-cloud/dialogflow
 	node ws.js
-
 	npm install forever
-	cd ~/htdocs/go | forever stopall | forever start ws.js | forever logs | sudo cat /home/bitnami/.forever/<id>.log
+
 	open port:8082
 
-	ID|TIME|SENDER|OP|DATA-0 ... DATA-N
-	
-	RASA:
-	
-	cd ~/htdocs/rasa
-	ps -ef (kill PID) to remove
-	nohup rasa run -m models --enable-api --cors "*" --ssl-certificate /opt/bitnami/letsencrypt/certificates/www.lizasim.com.crt --ssl-keyfile /opt/bitnami/letsencrypt/certificates/www.lizasim.com.key --port 5006?
+	cd /opt/bitnami/wordpress/game
+	forever stop ws.js 
+	forever start ws.js
+	cd /opt/bitnami/wordpress/grace
+	forever stop ws.js 
+	forever start ws.js
+ 	cd /opt/bitnami/wordpress/db
+	forever stop sql.js
+	forever start sql.js 
+
+	Ports: 8080, 8081, 8082, 8085
 
  	RENEW LETSENCRYPT SSL (installed with bncert-tool)
 	sudo /opt/bitnami/ctlscript.sh stop
@@ -65,6 +68,10 @@ let webSocketServer;																		// Holds socket server
 	sudo /opt/bitnami/letsencrypt/lego --path /opt/bitnami/letsencrypt list
  	sudo /opt/bitnami/ctlscript.sh start
     restart grace/ws.js, game/ws.js, db/sql.js
+
+	NEW SERVER:
+	ssh rhobon@agileteacherlab.org
+	cd /var/www/wordpress/grace
 
 	
 	ssh -i c:/Bill/CC/js/agile.pem bitnami@54.88.128.161
@@ -81,8 +88,10 @@ s///////////////////////////////////////////////////////////////////////////////
 	
 	if (!local) {																				// If on web
 		const server = https.createServer({														// Create an https server
-			cert: fs.readFileSync("/opt/bitnami/apache/conf/agileteacher.org.crt"),				// Point at cert
-			key: fs.readFileSync("/opt/bitnami/apache/conf/agileteacher.org.key")				// And key
+//			cert: fs.readFileSync("/opt/bitnami/apache/conf/agileteacher.org.crt"),				// Point at cert
+//			key: fs.readFileSync("/opt/bitnami/apache/conf/agileteacher.org.key")				// And key
+			cert: fs.readFileSync("/etc/letsencrypt/live/agileteacherlab.org/cert.pem"), 		// Point at cert
+			key: fs.readFileSync("/etc/letsencrypt/live/agileteacherlab.org/privkey.pem") 		// And key
 			});
 		webSocketServer= new WebSocket.Server({ server });										// Open it
 		server.listen(8082);																	// Listen on port 8082
