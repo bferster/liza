@@ -28,6 +28,12 @@
 		console.log(err)
 	});
 
+	DIALOGFLOW TRAINING:
+		* Download zip file from Export and Import
+		* Remove jsons in Intents folder
+		* Train and move jsons to folder
+		* Upload zip file from Export and Import
+
 */
 
 
@@ -50,38 +56,11 @@ let webSocketServer;																		// Holds socket server
 
 	open port:8082
 
-	cd /opt/bitnami/wordpress/game
-	forever stop ws.js 
-	forever start ws.js
-	cd /opt/bitnami/wordpress/grace
-	forever stop ws.js 
-	forever start ws.js
- 	cd /opt/bitnami/wordpress/db
-	forever stop sql.js
-	forever start sql.js 
+	All Agile Ports: 8080, 8081, 8082, 8085
 
-	Ports: 8080, 8081, 8082, 8085
-
- 	RENEW LETSENCRYPT SSL (installed with bncert-tool)
-	sudo /opt/bitnami/ctlscript.sh stop
-	sudo /opt/bitnami/letsencrypt/lego --tls --email="bferster@stagetools.com" --domains="agileteacher.org" --path="/opt/bitnami/letsencrypt" renew --days 90
-	sudo /opt/bitnami/letsencrypt/lego --path /opt/bitnami/letsencrypt list
- 	sudo /opt/bitnami/ctlscript.sh start
-    restart grace/ws.js, game/ws.js, db/sql.js
-
-	NEW SERVER:
+ 	NEW AGILETEACHERLAB SERVER:
 	ssh rhobon@agileteacherlab.org
 	cd /var/www/wordpress/grace
-
-	
-	ssh -i c:/Bill/CC/js/agile.pem bitnami@54.88.128.161
-
-
-	DIALOGFLOW TRAINING:
-		* Download zip file from Export and Import
-		* Remove jsons in Intents folder
-		* Train and move jsons to folder
-		* Upload zip file from Export and Import
 
 
 s///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/

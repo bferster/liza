@@ -48,7 +48,7 @@ class App  {
 		this.teacherMovies=[];																		// Teacher movies
 		this.points=0;																				// Gamer points
 		this.varLabels=["Belonging","Language","Knowledge","Extend"];								// Variance labels
-		this.modelId=0;																			// New model flag
+		this.modelId=0;																				// New model flag
 		
 		this.multi=window.location.search.match(/multi/i) ? true : false;							// Multi-player mode
 		if (window.location.host == "localhost") this.userId="bferster@stagetools.com";				// Set me if debug										
@@ -238,6 +238,12 @@ class App  {
 						this.sc.leftWall="assets/"+o[2]+".png";										// Left wall
 						this.sc.rightWall="assets/"+o[3]+".png";									// Right
 						}
+					}
+				if (app.modelId == 3) {																// If using new model
+					this.sc.backWall="assets/backwall3.png";											// Set back
+					this.sc.floor="assets/floor3.png";												// Floor
+					this.sc.leftWall="assets/sidewall3.png";										// Left wall
+					this.sc.rightWall="assets/sidewall3.png";										// Right	
 					}
 				this.sc.AddRoom();																	// Add room info
 				this.InitClassroom();																// Init classroom

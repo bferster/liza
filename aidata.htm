@@ -120,8 +120,13 @@
 		let reader=new FileReader();																// Init reader
 		reader.readAsText(file);																	// Read file
 		reader.onload=(e)=>{ 																		// When loaded
+			let s=e.target.result;																	// Point at raw data
 			let uniqueIntents=[];																	// Hold unique intents used
-			let i,j,k,re,d=Papa.parse(e.target.result.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
+			s=s.replace(/\(V1\).+?,/,"valued,");													// Normalize V1 variance name													
+			s=s.replace(/\(V2\).+?,/,"language,");													// V2												
+			s=s.replace(/\(V3\).+?,/,"knowledge,");													// V3													
+			s=s.replace(/\(V4\).+?,/,"thinking,");													// V4												
+			let i,j,k,re,d=Papa.parse(s.replace(/[!|?]/g,"."),{ header:true, skipEmptyLines:true }).data;	// Parse CSV using papa lib
 			SaveResponseFile(d);																	// Save student responses to new CSV file			
 			if (holdPct) {																			// If holding some out
 				v=groupBy(d,"intent");																// Group by intent																
