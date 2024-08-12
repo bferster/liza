@@ -758,7 +758,7 @@ trace(d)
 	
 	ShowLessonPlan()																				// SHOW TEACHER RESOUCES
 	{
-		let i,j,v;
+		let i,j,v,col;
 		if (!this.lessonPlan)	return;																// No lesson plan set
 		if ($("#lz-resources").length) {															// If already up, bring it down
 			$("#lz-resources").hide("slide",{ direction:"down", complete: ()=>{ $("#lz-resources").remove(); } }); // Slide down
@@ -773,8 +773,10 @@ trace(d)
 		<span style="font-size:18px;margin:7px 0 0 12px">${this.lessonPlan.id}</span>
 		<div id='resourcesDiv' style='height:50vh;width:calc(100% - 32px);background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'>`;
 		for (i=0;i<sets.length;++i) {																// For each set
+			col=cols[i%4];																			// Get color
+			if (i == sets.length-1)	col="#333", str+="<br><br><br>";								// Tips are black and lowered
 			v=sets[i].split(",");																	// Get members
-			str+=`<div style="font-size:24px;color:${cols[i%4]}"><b>${v[0]}</b></div><ul>`;			// Add header
+			str+=`<div style="font-size:24px;color:${col}"><b>${v[0]}</b></div><ul>`;				// Add header
 			for (j=1;j<v.length;++j) str+=`<li>${v[j]}</li>`;										// Add members
 			str+="</ul>";																			// Close set
 			}
