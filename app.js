@@ -56,7 +56,7 @@ class App  {
 		let v=window.location.search.substring(1).split("&");						   				// Get query string
 			for (let i=0;i<v.length;++i) {															// For each param
 			if (v[i] && v[i].match(/id=/)) 	 	this.userId=v[i].substring(3).toLowerCase();  		// Get userId (for debugging only)
-//			if (v[i] && v[i].match(/role=/)) 	this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
+			if (v[i] && v[i].match(/role=/)) 	this.role=v[i].charAt(5).toUpperCase()+v[i].substring(6).toLowerCase();  // Get role	
 			if (v[i] && v[i].match(/s=/)) 	 	this.sessionId=v[i].substring(2) 					// Get session id
 			if (v[i] && v[i].match(/a=/)) 	 	this.activityId=v[i].substring(2) 					// Get activity id	
 			if (v[i] && v[i].match(/m=/)) 	 	this.modelId=v[i].substring(2) 						// Get model id
@@ -322,10 +322,8 @@ class App  {
 				}
 			d.name=app.userName;		d.email=app.userId;
 			d.activity=app.activityId;	d.intents=log;			d.len=len;							// Set elements
-trace(d)	
-//			window.open("//alled.org/certificate/generate.php?data="+JSON.stringify(d),"_blank");   // Call page
-			window.open("certificate/index.html?data="+JSON.stringify(d),"_blank");   				// Call page
-			});
+			window.open(window.location.host+"/utilities/certificates/grace/index.html?data="+d,"_blank"); // Get badge
+		});
  	}
 
 	HandleEventTrigger(e)																		// HANDLE EVENT TRIGGER
