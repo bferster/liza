@@ -249,6 +249,7 @@ class App  {
 				this.InitClassroom();																// Init classroom
 				$("#lz-rolePick").append("<option>Teacher</option><option>Gamer</option>");			// Add teacher & gamer roles
 				for (i=0;i<app.students.length;++i) $("#lz-rolePick").append("<option>"+app.students[i].id+"</option>");	// Add option
+				$("#lz-rolePick").val(this.role);													// Set pulldown
 				this.StartSession();																// Start session
 				});	
 

@@ -131,7 +131,7 @@ class NLP {
 
 	AddResponses(d)																					// ADD RESPONSES FROM CSV DATA
 	{
-		let i,o,s;
+		let i,o,s,r;
 		this.responses=[];																				// Fresh
 		for (i=0;i<d.length;++i) {																		// For each line
 			s=d[i]["student"];																			// Get student
@@ -145,8 +145,10 @@ class NLP {
 			o.bakt[4]=getVariant(d[i]["understanding"]);												// U
 			o.bakt[5]=d[i]["intent"];																	// Intent
 			o.text=d[i]["response"];																	// Get response
-			if (d[i]["responseType"]) o.responseType=d[i]["responseType"];								// Get type
 			o.intent=d[i]["intent"];																	// Get intent
+			r=Math.floor(o.intent/100)-1;																// Create response type from intent
+			if ((r < 0) || (r >= app.varLabels.length)) 	o.responseType="IGNORE";					// Ignore these
+			else											o.responseType=app.varLabels[r];			// Set reponse type
 			o.MP3=d[i]["mp3"];																			// Get mps file, if any
 			o.action=d[i]["action"];																	// Get action
 			o.index=this.responses[s].length;															// Add index

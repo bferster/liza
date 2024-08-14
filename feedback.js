@@ -303,7 +303,7 @@ class ResponsePanel  {
 
 	Draw(remark="",student="Student", mode)														// DRAW
 	{
-		let i,tabs=[]
+		let i;
 		$("#lz-rpback").remove();																	// Remove old one
 		$("#mainDiv").css("margin-left",0);															// No shift												
 		app.sc.Resize();																			// Resize renderer
@@ -319,10 +319,9 @@ class ResponsePanel  {
 			this.DrawGamer(remark,student,mode);													// Draw game panel
 			return;																					// Quit
 			}
-		let o=app.nlp.responses[app.role];															// Point at responses
-		if (o) for (i=0;i<o.length;++i) if (o[i].responseType) tabs.push(o[i].responseType)			// Add all tabs
-		tabs=[... new Set(tabs)];																	// Make unique
-	
+		let o=app.nlp.responses[app.role];															// Point at individual responses
+		if (!o)	o=[];																				// Alloc array, if none
+		o=o.concat(app.nlp.responses["Class"]);														// Add whole class reponses			
 		let str=`<div id="lz-rpback" class="lz-rpback"> 
 			<div class="lz-rpinner"> 
 				<div style="width:calc(50% - 25px);border-right:1px solid #999;height:110px;padding:8px">
@@ -339,7 +338,7 @@ class ResponsePanel  {
 					<div id="lzYes"		class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Yes</div>
 					<div id="lzFidget"	class="lz-bs" style="float:right;margin:1px 4px 0 0;padding:-top:3px;background-color:#999;height:16px">Fidget</div>
 				</div>`;
-		for (i=0;i<tabs.length;++i) str+=`<span id="lztab-${i}" class="lz-rptab">${tabs[i]}</span>`;
+		for (i=0;i<app.varLabels.length;++i) str+=`<span id="lztab-${i}" class="lz-rptab">${app.varLabels[i]}</span>`;
 		str+=`<div id="lz-rplist" class="lz-rplist"></div></div>
 		<input id="lz-chat" class="lz-is" placeholder="Private message teacher" style="width:50%;margin:-6px 0 0 12px;float:left">`;
 
@@ -388,31 +387,15 @@ class ResponsePanel  {
 			});
 	
 		function fillList(tab) {																	// FILL RESPONSE LIST
-	
-	
-	
-			let i,j,heads=[],v=[],str="";
+			let i,v=[],str="";
 			if (!o) return;																			// Nothing to show
 			for (i=0;i<o.length;++i) {																// For each response
-				if (o[i].label == tabs[tab]) {														// In this tab
+				if (o[i].label == app.varLabels[tab]) {												// In this tab
 					v.push(o[i]);																	// Add to list to draw	
-//					heads.push(o[i].responseType);													// Add all heads in tab
-					}
 				}
-/*			heads=[... new Set(heads)];																// Make unique
-			for (i=0;i<heads.length;++i) {															// For each heading
-				str+=`<p><b>${heads[i]}</b></p>`; 													// Add new section head	
-				for (j=0;j<v.length;++j) {															// For each item
-					if (v[j].responseType == heads[i]) {											// The same															
-						if (app.role == "Teacher")	str+=`<p>&bull; ${v[j].text}</p>`; 				// Add response only
-						else						str+=`<p><img id="resp-${v[j].index}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px" title="Click to play"> &nbsp; ${v[j].text}</p>`; // add response
-						}
-					}	
-				}
-*/
 			str="<br>"
 			for (i=0;i<o.length;++i) 																// For each response
-				if (o[i].responseType == tabs[tab]) 												// In this tab
+				if (o[i].responseType == app.varLabels[tab]) 												// In this tab
 					str+=`<p><img id="resp-${i}" src="img/playbut.png" style="width:16px;cursor:pointer;vertical-align:-4px" title="Click to play"> &nbsp;${o[i].text}</p>`; // add response
 
 			$("#lz-rplist").html(str);																// Add responses
@@ -422,6 +405,7 @@ class ResponsePanel  {
 				app.SendEvent(s);
 				});
 			}		
+		}
 
 		function addSeqs() {																		// FILL SEQS PULLDOWN
 			var v=[];

@@ -1,50 +1,50 @@
-intent,student,response,valued,language,knowledge,thinking,action,understanding,responseType
-210,Chris,"I recently read, The Chronicles of Narnia, to my younger sister. The book made me think about wrong and right, and nature, too.",3 Belonging,2,3,2,talk,,
-210,Chris,My dad and I just got into the Harry Potter books. We're kind of late to the party.,3 Belonging,2,1,2,,,
-210,Chris,"We watched, Charlotte's Web, that is a book. It's a made-up story about friendships.",3 Belonging,2,3,3,,,
-210,Farrah,I've been reading A Wrinkle in Time. I thought they did a pretty good job with the movie.,2 Valued,2,2,1,,,
-210,Farrah,"I like the magic in The Lion, the Witch and the Wardrobe, by C.S. Lewis.",2 Valued,1,1,0,,,
-210,Farrah,I think the Diary of a Wimpy Kid is so funny.,2 Valued,1,1,1,,,
-210,Jazmin,I like to read National Geographic Kids. They have some great articles about how we can take care of our planet and what animals are endangered because people are destroying their habitats.,2 Valued,3,3,2,,,
-210,Jazmin,"I like adventures to different times and places, like the Magic Tree House series.",2 Valued,2,2,2,,,
-210,Jazmin,I love stories of real people and things that happened.,2 Valued,2,3,2,,,
-210,Luis,I read the cafeteria menu everyday. I'm always waiting for them to bring the chicken sandwich back.,1 Acknowledged,1,2,2,,,
-210,Luis,I like to read signs on the street. It lets me know what's happening. I read about a lost dog this morning that I am going to watch out for.,1 Acknowledged,3,3,3,,,
-210,Luis,"I like to read manuals and then match them up to the youtube video, if I can.",1 Acknowledged,3,2,3,,,
-210,Oliver,"I like the Percy Jackson books, but not the graphic novels. You can't really use your imagination when they give you all the pictures, especially when it's not like how I imagined it when I was reading the books.",2 Valued,3,3,3,,,
-210,Oliver,I've been enjoying the The Chronicles of Narnia series. Who wouldn't like to live in a world full of talking animals.,2 Valued,2,2,1,,,
-210,Oliver,I like the Series of Unfortunate Events books because of the mystery.,2 Valued,3,2,2,,,
-210,Sharleen,Oh I can answer that easily. I love the Vampire Diaries because it's so romantic.,2 Valued,2,1,2,,,
-210,Sharleen,I read the whole Percy Jackson and the Olympians series.,2 Valued,1,1,1,,,
-210,Sharleen,I love Harry Potter because of the magic and the way the friends take care of each other.,2 Valued,2,1,3,,,
-210,Chris,I like both fiction and non-fiction.,2 Valued,1,1,2,,,
-210,Chris,I like both but I think fiction is a little more interesting.,2 Valued,2,2,1,,,
-210,Farrah,I don't like non-fiction much,2 Valued,1,1,1,,,
-210,Farrah,"For me, I like fiction.",2 Valued,1,1,1,,,
-210,Jazmin,I like non-fiction just fine.,2 Valued,1,1,1,,,
-210,Jazmin,"I like reading about real events, so I would say non-fiction but I do like some fiction too",2 Valued,2,3,2,,,
-210,Luis,"I'm not sure, but I like to read lots of signs and manuals.",1 Acknowledged,1,2,2,,,
-210,Luis,I think I prefer non-fiction,1 Acknowledged,1,1,1,,,
-210,Oliver,I like some kinds of non-fiction but I think fiction is better.,1 Acknowledged,1,1,1,,,
-210,Oliver,"I like fiction more. ",1 Acknowledged,1,1,1,,,
-210,Sharleen,I like fiction. Non-fiction is too boring.,2 Valued,1,1,1,,,
-210,Sharleen,"Fiction is my favorite. I don't really like non-fiction. ",2 Valued,1,1,1,,,
-500,Farrah,"I think nonfiction feels like schoolwork and I'd rather read for fun, not work.",2 Valued,2,3,3,,,
-500,Farrah,Fiction just seems more fun to me because I can read about magic.,2 Valued,2,3,3,,,
-500,Jazmin,Good question. I like both but I really like nonfiction when the topic is animals and our planet.,2 Valued,2,2,2,,,
-500,Jazmin,I like to read about adventures which is like I sometimes like fiction but I prefer non-fiction because I like learning about real people.,2 Valued,2,3,3,,,
-500,Chris,I like mostly fiction but I'm into space travel so I guess if it's a book about astronomy then I'm into that.,2 Valued,3,3,3,,,
-500,Luis,"Give me action stuff anyday. Wait, nonfiction books are about real people. I read minecraft blogs.",2 Valued,2,2,2,,,
-500,Luis,I like reading about things I can use in my daily life so I guess that's why I prefer non-fiction.,2 Valued,2,2,3,,,
-500,Chris,I like feeling like I am on an adventure when I am reading.,2 Valued,1,1,1,,,
-500,Oliver,"Hmm, I guess I prefer fiction, but I'm into historical fiction too, which is kind of like non-fiction, except not everything is exactly true.",2 Valued,2,3,1,,,
-500,Oliver,I usually like fiction stories because I love mysteries but I guess mysteries could be real events too.,2 Valued,2,3,1,,,
-500,Sharleen,I like stories about people that are like me.,2 Valued,1,2,2,,,
-500,Sharleen,"I like fiction because I love reading about magic stories. ",2 Valued,1,2,2,,,
-100,Class,"Good thank you. We're ready to talk about what we like to read outside of school now. ",,,,,,,
-100,Class,We're good. We are excited to tell you what we like to read,,,,,,,
-1101,Class,The answer is 4 of course,,,,,,,
-1101,Class,Would you believe 22.,,,,,,,
-1101,Class,The answer is 4 of course,,,,,,,
-1101,Class,I don't know how to add yet,,,,,,,
-1101,Class,Math is hard,,,,,,,
+intent,student,response,valued,language,knowledge,thinking,action,understanding
+210,Chris,"I recently read, The Chronicles of Narnia, to my younger sister. The book made me think about wrong and right, and nature, too.",3 Belonging,2,3,2,talk,
+210,Chris,My dad and I just got into the Harry Potter books. We're kind of late to the party.,3 Belonging,2,1,2,,
+210,Chris,"We watched, Charlotte's Web, that is a book. It's a made-up story about friendships.",3 Belonging,2,3,3,,
+210,Farrah,I've been reading A Wrinkle in Time. I thought they did a pretty good job with the movie.,2 Valued,2,2,1,,
+210,Farrah,"I like the magic in The Lion, the Witch and the Wardrobe, by C.S. Lewis.",2 Valued,1,1,0,,
+210,Farrah,I think the Diary of a Wimpy Kid is so funny.,2 Valued,1,1,1,,
+210,Jazmin,I like to read National Geographic Kids. They have some great articles about how we can take care of our planet and what animals are endangered because people are destroying their habitats.,2 Valued,3,3,2,,
+210,Jazmin,"I like adventures to different times and places, like the Magic Tree House series.",2 Valued,2,2,2,,
+210,Jazmin,I love stories of real people and things that happened.,2 Valued,2,3,2,,
+210,Luis,I read the cafeteria menu everyday. I'm always waiting for them to bring the chicken sandwich back.,1 Acknowledged,1,2,2,,
+210,Luis,I like to read signs on the street. It lets me know what's happening. I read about a lost dog this morning that I am going to watch out for.,1 Acknowledged,3,3,3,,
+210,Luis,"I like to read manuals and then match them up to the youtube video, if I can.",1 Acknowledged,3,2,3,,
+210,Oliver,"I like the Percy Jackson books, but not the graphic novels. You can't really use your imagination when they give you all the pictures, especially when it's not like how I imagined it when I was reading the books.",2 Valued,3,3,3,,
+210,Oliver,I've been enjoying the The Chronicles of Narnia series. Who wouldn't like to live in a world full of talking animals.,2 Valued,2,2,1,,
+210,Oliver,I like the Series of Unfortunate Events books because of the mystery.,2 Valued,3,2,2,,
+210,Sharleen,Oh I can answer that easily. I love the Vampire Diaries because it's so romantic.,2 Valued,2,1,2
+210,Sharleen,I read the whole Percy Jackson and the Olympians series.,2 Valued,1,1,1
+210,Sharleen,I love Harry Potter because of the magic and the way the friends take care of each other.,2 Valued,2,1,3
+210,Chris,I like both fiction and non-fiction.,2 Valued,1,1,2
+210,Chris,I like both but I think fiction is a little more interesting.,2 Valued,2,2,1
+210,Farrah,I don't like non-fiction much,2 Valued,1,1,1
+210,Farrah,"For me, I like fiction.",2 Valued,1,1,1
+210,Jazmin,I like non-fiction just fine.,2 Valued,1,1,1
+210,Jazmin,"I like reading about real events, so I would say non-fiction but I do like some fiction too",2 Valued,2,3,2
+210,Luis,"I'm not sure, but I like to read lots of signs and manuals.",1 Acknowledged,1,2,2
+210,Luis,I think I prefer non-fiction,1 Acknowledged,1,1,1
+210,Oliver,I like some kinds of non-fiction but I think fiction is better.,1 Acknowledged,1,1,1
+210,Oliver,I like fiction more. ,1 Acknowledged,1,1,1
+210,Sharleen,I like fiction. Non-fiction is too boring.,2 Valued,1,1,1
+210,Sharleen,Fiction is my favorite. I don't really like non-fiction. ,2 Valued,1,1,1
+500,Farrah,"I think nonfiction feels like schoolwork and I'd rather read for fun, not work.",2 Valued,2,3,3
+500,Farrah,Fiction just seems more fun to me because I can read about magic.,2 Valued,2,3,3
+500,Jazmin,Good question. I like both but I really like nonfiction when the topic is animals and our planet.,2 Valued,2,2,2
+500,Jazmin,I like to read about adventures which is like I sometimes like fiction but I prefer non-fiction because I like learning about real people.,2 Valued,2,3,3
+500,Chris,I like mostly fiction but I'm into space travel so I guess if it's a book about astronomy then I'm into that.,2 Valued,3,3,3
+500,Luis,"Give me action stuff anyday. Wait, nonfiction books are about real people. I read minecraft blogs.",2 Valued,2,2,2
+500,Luis,I like reading about things I can use in my daily life so I guess that's why I prefer non-fiction.,2 Valued,2,2,3
+500,Chris,I like feeling like I am on an adventure when I am reading.,2 Valued,1,1,1
+500,Oliver,"Hmm, I guess I prefer fiction, but I'm into historical fiction too, which is kind of like non-fiction, except not everything is exactly true.",2 Valued,2,3,1
+500,Oliver,I usually like fiction stories because I love mysteries but I guess mysteries could be real events too.,2 Valued,2,3,1
+500,Sharleen,I like stories about people that are like me.,2 Valued,1,2,2
+500,Sharleen,I like fiction because I love reading about magic stories. ,2 Valued,1,2,2
+100,Class,Good thank you. We're ready to talk about what we like to read outside of school now. ,,,,
+100,Class,We're good. We are excited to tell you what we like to read,,,,
+1101,Class,The answer is 4 of course,,,,
+1101,Class,Would you believe 22.,,,,
+1101,Class,The answer is 4 of course,,,,
+1101,Class,I don't know how to add yet
+1101,Class,Math is hard

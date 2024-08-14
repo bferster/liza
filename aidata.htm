@@ -421,7 +421,7 @@
 	function SaveResponseFile(f)																// EXTRACT AND SAVE STUDENT RESPONSES
 	{
 		let i,v=[];
-		let fields=["intent","student","response","valued","language","knowledge","thinking","action","understanding","responseType"];			// Field names
+		let fields=["intent","student","response","valued","language","knowledge","thinking","action","understanding"];	// Field names
 		for (i=0;i<f.length;++i) 																	// For each responses
 			if (f[i].response &&  f[i].intent) v.push(f[i]);										// If there, add it
 		let str=Papa.unparse(v,{ header:true, skipEmptyLines:true, columns:fields });				// Make CSV using lib
