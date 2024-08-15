@@ -3,8 +3,8 @@ student,Sharleen,"sharleen,charlene,shar,charlie","sex=female,b=1,a=2,k=3,t=4,u=
 student,Jazmin,"jazmin,jazz,jasmine,jasmina","sex=female,b=1,a=2,k=3,t=4,u=3,color=#076290,seat=8,mod!=body3,"
 student,Luis,"luis,louise,lewis,louis,louie,lou,lew","sex=male,b=1,a=2,k=3,t=4,u=3,color=#e26d33,seat=7,mod!=body3,"
 student,Farrah,"farrah,farah,ferel,feral,farrell,sara,sarah,tara,pharaoh,fair","sex=female,b=1,a=2,k=3,t=4,u=3,color=#9b4286,seat=6,mod!=body3,"
-student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=1,mod!=body3,"
-student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=2,mod!=body3,"
+student,Chris,"chris,crisp,christ","sex=male,b=1,a=2,k=3,t=4,u=3,color=#b1233c,seat=2,mod!=body3,"
+student,Oliver,"oliver,liver","sex=male,b=1,a=2,k=3,t=4,u=3,color=#734325,seat=1,mod!=body3,"
 student,Class,"everybody,everyone,anybody,anyone,team,u-haul,uhaul,you all,guys,kids,y'all,class,group,children,friends","sex=choral,b=1,a=2,k=3,t=4,u=3,color=#cccccc,seat=0,"
 ddesk,desk3
 string,multi,"Start,Explain,Question,Discover,Reflect	",
@@ -72,10 +72,10 @@ movie,Grace demo,https://www.youtube.com/embed/7Gc4ZCH6OZc?si=dcQNSQ9CsYvlw2P9
 varlabels,data,"Accurate,Language,Careful,Reflect"
 session,data,"trt=324,endpoll=poll4,endurl=https://agileteacherlab.org/practice-library,"
 aimodel,wit,POQILB6-X-KVNPU3PR665-X-V3PPL3CXU-X-CU6E4
-trigger,time,"who=Oliver,when=.5,do=say:Teacher, why did you want to talk with me?+act:interrupt"
+trigger,time,"who=Chris,when=.5,do=say:Hi teacher, I see you have written the 2 questions on the board. Can you reed them to me?+act:interrupt"
 trigger,time,"who=Luis,when=1.5,do=act:twistRight"
 trigger,time,"who=Farrah,when=2,do=act:twistLeft"
-trigger,time,"who=Oliver,when=1185,"do=prompt:Please stop talking to the students!"
+trigger,time,"who=Chris,when=1185,"do=prompt:Please stop talking to the students!"
 lessonplan,Discover Student Thinking About the Portrait,"Engage the Student,<i>Students state purpose:</i> &quot;We will answer the question on the board so you learn more about our thinking.&quot;,<i>Breathe:</i> &quot;Let’s breathe in - hold the breath anthen breathe out.&quot;,<i>Listen:</i> Students share their thinking during the Domino Discover routine.,+Understand Student Thinking,<b>Step 1a.  Clarify:</b> &quot;When do you think this photograph was taken?&quot;,<b>Step 1b.  Clarify:</b> &quot;What makes you say that?&quot; or &quot;Tell us more about the details you see.&quot;,<b>Step 2.  Reflect:</b> &quot;You are noticing details in the picture.&quot or &quot;You are using your knowledge or experiences to guide your thinking.&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending. - Stop asking questions.,<i>Reflect:</i> Complete our survey.,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacherlab.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."
 																											
 
