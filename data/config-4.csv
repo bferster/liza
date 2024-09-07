@@ -20,7 +20,9 @@ seat,7,"x=-100,y=-100,z=0,r=0,"
 seat,8,"x=0,y=-100,z=0,r=0,"
 seat,9,"x=250,y=-100,z=0,r=30,"
 
-resource,Variance in Student Responses,assets/variances.pdf
+resource,Student Variance - Discover Student Thinking,assets/variance4.pdf
+resource,On Students' Desks,assets/desks4.pdf
+resource,Overview - Discover Student Thinking,assets/thinking4.pdf
 
 action,sleep,"sleep,snooze"
 action,headCenter,"eyes front,head center"
@@ -56,14 +58,12 @@ keyrule,ANDYOU,"lets|let's,hear,from"
 keyrule,1101,"2,\+|plus|and,2"
 
 picture,Welcome,assets/demoWelcome.png
-picture,When,assets/loc1when.png
-picture,Draw,assets/demoDraw.png
-picture,Remarks1,assets/loc1Remarks1.png
-picture,Remarks2,assets/loc1Remarks2.png
-picture,Deep1,assets/loc1Deep1.png
-picture,Deep2,assets/loc1Deep2.png
-picture,TruthPic,assets/DrawTruth.png
-picture,Blank,assets/blankBB.png
+picture,Guiding Questiion,assets/loc1when.png
+picture,Student Responses 1,assets/loc1Remarks1.png
+picture,Student Responses 2,assets/loc1Remarks2.png
+picture,Clarifying Questiuons,assets/loc1Deep1.png
+picture,Reflecting Back,assets/loc1Deep2.png
+picture,Noticing Details,assets/DrawTruth.png
 
 movie,Sojourner's Activities,https://www.youtube.com/embed/eNofqcdRYgE?si=f_SfyTDtZXtBv4yG
 movie,The Truth is Powerful,https://player.vimeo.com/video/953664260?h=b04632be2f&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479
@@ -118,5 +118,6 @@ trigger,time,"who=Luis,when=322,do=act:interrupt"
 trigger,time,"who=Jazmin,when=322,do=act:interrupt"
 trigger,time,"who=Sharleen,when=322,do=act:interrupt"
 
-lessonplan,Discover Student Thinking About the Portrait,"Engage the Student,<i>Students state purpose:</i> &quot;We will answer the question on the board so you learn more about our thinking.&quot;,<i>Breathe:</i> &quot;Let’s breathe in - hold the breath anthen breathe out.&quot;,<i>Listen:</i> Students share their thinking during the Domino Discover routine.,+Understand Student Thinking,<b>Step 1a.  Clarify:</b> &quot;When do you think this photograph was taken?&quot;,<b>Step 1b.  Clarify:</b> &quot;What makes you say that?&quot; or &quot;Tell us more about the details you see.&quot;,<b>Step 2.  Reflect:</b> &quot;You are noticing details in the picture.&quot or &quot;You are using your knowledge or experiences to guide your thinking.&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending. - Stop asking questions.,<i>Reflect:</i> Complete our survey.,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacherlab.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."
+lessonplan,Discover Student Thinking About the Portrait,"Engage the Student,<i>Students state purpose:</i> &quot;We will answer the question on the board so you learn more about our thinking.&quot;,<i>Breathe:</i> &quot;Let’s breathe in - hold the breath - then breathe out.&quot;,<i>Listen:</i> Students share their thinking during the Domino Discover routine.+Understand Student Thinking,<b>Step 1a.  Clarify:</b> &quot;When do you think this photograph was taken?&quot;,<b>Step 1b.  Clarify:</b> &quot;What makes you say that?&quot; or &quot;Tell us more about the details you see.&quot;,<b>Step 2.  Reflect:</b> &quot;You are noticing details in the picture.&quot or &quot;You are using your knowledge or experiences to guide your thinking.&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending.,<i>Reflect:</i> Complete our survey.,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacherlab.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."
+																											
 																											

@@ -56,12 +56,8 @@ keyrule,ANDYOU,"lets|let's,hear,from"
 keyrule,1101,"2,\+|plus|and,2"
 
 picture,Welcome,assets/demoWelcome.png
-picture,When,assets/loc1when.png
-picture,Draw,assets/demoDraw.png
-picture,Remarks1,assets/loc1Remarks1.png
-picture,Remarks2,assets/loc1Remarks2.png
-picture,Deep1,assets/loc1Deep1.png
-picture,Deep2,assets/loc1Deep2.png
+picture,Questions,assets/loc2Question.png
+
 picture,TruthPic,assets/DrawTruth.png
 picture,Blank,assets/blankBB.png
 
@@ -72,11 +68,13 @@ movie,Grace demo,https://www.youtube.com/embed/7Gc4ZCH6OZc?si=dcQNSQ9CsYvlw2P9
 varlabels,data,"Accurate,Language,Careful,Reflect"
 session,data,"trt=324,endpoll=poll4,endurl=https://agileteacherlab.org/practice-library,"
 aimodel,wit,POQILB6-X-KVNPU3PR665-X-V3PPL3CXU-X-CU6E4
-trigger,time,"who=Chris,when=.5,do=say:Hi teacher, I see you have written the 2 questions on the board. Can you reed them to me?+act:interrupt"
-trigger,time,"who=Luis,when=1.5,do=act:twistRight"
-trigger,time,"who=Farrah,when=2,do=act:twistLeft"
+trigger,time,"who=Chris,when=.5,do=say:Hi teacher, I see you have written the two questions on the board?+act:interrupt"
+trigger,time,"who=Luis,when=5,do=act:twistRight"
+trigger,time,"who=Farrah,when=1,do=act:twistLeft"
+trigger,time,"who=Chris,when=.5,do=say:Can you read them to me?"
+
 trigger,time,"who=Chris,when=1185,"do=prompt:Please stop talking to the students!"
-lessonplan,Discover Student Thinking About the Portrait,"Engage the Student,<i>Students state purpose:</i> &quot;We will answer the question on the board so you learn more about our thinking.&quot;,<i>Breathe:</i> &quot;Let’s breathe in - hold the breath anthen breathe out.&quot;,<i>Listen:</i> Students share their thinking during the Domino Discover routine.,+Understand Student Thinking,<b>Step 1a.  Clarify:</b> &quot;When do you think this photograph was taken?&quot;,<b>Step 1b.  Clarify:</b> &quot;What makes you say that?&quot; or &quot;Tell us more about the details you see.&quot;,<b>Step 2.  Reflect:</b> &quot;You are noticing details in the picture.&quot or &quot;You are using your knowledge or experiences to guide your thinking.&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending. - Stop asking questions.,<i>Reflect:</i> Complete our survey.,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacherlab.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."
+lessonplan,Discover Student Thinking About the Portrait,"Engage the Student,<i>Students state purpose:</i> &quot;We will answer the question on the board so you learn more about our thinking.&quot;,<i>Breathe:</i> &quot;Let’s breathe in - hold the breath - then breathe out.&quot;,<i>Listen:</i> Students share their thinking during the Domino Discover routine.+Understand Student Thinking,<b>Step 1a.  Clarify:</b> &quot;When do you think this photograph was taken?&quot;,<b>Step 1b.  Clarify:</b> &quot;What makes you say that?&quot; or &quot;Tell us more about the details you see.&quot;,<b>Step 2.  Reflect:</b> &quot;You are noticing details in the picture.&quot or &quot;You are using your knowledge or experiences to guide your thinking.&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending.,<i>Reflect:</i> Complete our survey.,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacherlab.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."
 																											
 
 

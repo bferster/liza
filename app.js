@@ -335,6 +335,9 @@ class App  {
 		if (e.done)	return;																			// Already handled
 		e.done=1;																					// Flag it done
 		let student=e.who;																			// Get speaker
+		
+	trace(student)	
+		
 		if (!student || (student == "current"))	student=this.curStudent;							// Use current student
 		else if (student == "random")  	student=this.students[Math.floor(Math.random()*this.students.length)].id;	// Get random student
 		this.curStudent=student;																	// Set as current student	
@@ -773,7 +776,7 @@ class App  {
 		<div id='resourcesDiv' style='height:50vh;width:calc(100% - 32px);background-color:#fff;padding:16px;border-radius:6px;overflow-y:auto;margin-top:10px'>`;
 		for (i=0;i<sets.length;++i) {																// For each set
 			col=cols[i%4];																			// Get color
-			if (i == sets.length-1)	col="#333", str+="<br><br><br>";								// Tips are black and lowered
+			if (i == sets.length-1)	col="#333", str+="<br><br>";									// Tips are black and lowered
 			v=sets[i].split(",");																	// Get members
 			str+=`<div style="font-size:24px;color:${col}"><b>${v[0]}</b></div><ul>`;				// Add header
 			for (j=1;j<v.length;++j) str+=`<li>${v[j]}</li>`;										// Add members
@@ -781,12 +784,12 @@ class App  {
 			}
 			
 		str+=`</div><div style="width:100%;font-size:10px;color:#666;text-align:center;margin: 8px 0 0 0">`;
-		$("body").append(str.replace(/\t|\n|\r/g,""));													// Add to body
-		$("#trclose").on("click", ()=>{ this.ShowLessonPlan(); });										// ON CLOSE
+		$("body").append(str.replace(/\t|\n|\r/g,""));												// Add to body
+		$("#trclose").on("click", ()=>{ this.ShowLessonPlan(); });									// ON CLOSE
 	
-		var h=window.innerHeight-$("#lz-resources").height()-86;										// Calc top
-		$("#lz-resources").css("top",h+"px");															// Set top
-		$("#lz-resources").show("slide",{ direction:"down" });											// Slide up
+		var h=window.innerHeight-$("#lz-resources").height()-86;									// Calc top
+		$("#lz-resources").css("top",h+"px");														// Set top
+		$("#lz-resources").show("slide",{ direction:"down" });										// Slide up
 		$("#lz-resources").on("mousedown touchdown touchmove mousewheel", (e)=> { e.stopPropagation() } );	// Don't move orbiter
 	}
 
