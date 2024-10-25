@@ -46,19 +46,22 @@ action,pair,"pair,pare,pier,pear"
 action,read,"read,reed,red,re-read,reread"
 action,breathe,breathe
 
-keyrule,600,high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy
+keyrule,600,high|hi|hello|welcome|greetings
 keyrule,600,"nice|good|great,to,see|meet"
 keyrule,600,"how,are,you"
 keyrule,600,"good,morning|afternoon|evening|day"
 
-keyrule,ANDYOU,"how|what,about,you"
+keyrule,ANDYOU,"how,about,you"
 keyrule,ANDYOU,"lets|let's,hear,from"
 keyrule,1101,"2,\+|plus|and,2"
 
-picture,Welcome,assets/demoWelcome.png
-picture,Questions,assets/loc2Question.png
-
-picture,TruthPic,assets/DrawTruth.png
+picture,Question,assets/loc2ql.png
+picture,Have/Need,assets/loc2qr.png
+picture,Must Haves,assets/loc2musthave.png
+picture,Annotated Response,assets/loc2annotate.png
+picture,Task,assets/loc2task.png
+picture,Literacy,assets/loc2literacy.png
+picture,Sentence,assets/loc2qsentence.png
 picture,Blank,assets/blankBB.png
 
 movie,Sojourner's Activities,https://www.youtube.com/embed/eNofqcdRYgE?si=f_SfyTDtZXtBv4yG
@@ -72,7 +75,7 @@ trigger,time,"who=Chris,when=.5,do=say:Hi teacher, I see you have written the tw
 trigger,time,"who=Luis,when=5,do=act:twistRight"
 trigger,time,"who=Farrah,when=1,do=act:twistLeft"
 trigger,time,"who=Chris,when=.5,do=say:Can you read them to me?"
-
+trigger,time,"who=Chris,when=20,do=slide:0Must Haves+slide:1Annotated Response"
 trigger,time,"who=Chris,when=1185,"do=prompt:Please stop talking to the students!"
 lessonplan,Discover Student Thinking About the Portrait,"Engage the Student,<i>Students state purpose:</i> &quot;We will answer the question on the board so you learn more about our thinking.&quot;,<i>Breathe:</i> &quot;Let’s breathe in - hold the breath - then breathe out.&quot;,<i>Listen:</i> Students share their thinking during the Domino Discover routine.+Understand Student Thinking,<b>Step 1a.  Clarify:</b> &quot;When do you think this photograph was taken?&quot;,<b>Step 1b.  Clarify:</b> &quot;What makes you say that?&quot; or &quot;Tell us more about the details you see.&quot;,<b>Step 2.  Reflect:</b> &quot;You are noticing details in the picture.&quot or &quot;You are using your knowledge or experiences to guide your thinking.&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending.,<i>Reflect:</i> Complete our survey.,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacherlab.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."
 																											
