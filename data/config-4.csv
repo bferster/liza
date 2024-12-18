@@ -58,7 +58,7 @@ keyrule,ANDYOU,"lets|let's,hear,from"
 keyrule,1101,"2,\+|plus|and,2"
 
 picture,Welcome,assets/demoWelcome.png
-picture,Guiding Questiion,assets/loc1when.png
+picture,Guiding Question,assets/loc2ql.png
 picture,Student Responses 1,assets/loc1Remarks1.png
 picture,Student Responses 2,assets/loc1Remarks2.png
 picture,Clarifying Questiuons,assets/loc1Deep1.png
@@ -84,9 +84,9 @@ trigger,time,"who=Luis,when=23,do=act:breathe"
 trigger,time,"who=Jazmin,when=23,do=act:breathe"
 trigger,time,"who=Oliver,when=23,do=act:breathe"
 trigger,time,"who=Sharleen,when=23,do=act:breathe"
-trigger,time,"who=Jazmin,when=34,do=say:Teacher, Click on the pencil icon on the toolbar and circle details in the image that may tell you when the photograph was taken.+var:1,2,3,4,5+act:interrupt+slide:0TruthPic+camera:0,150,500,0,0,0,0,0+var:1,2,3,4,5+act:interrupt"
-trigger,time,"who=Luis,when=55,do=say:Thanks teacher, we can see your ideas about when this photograph was taken, now we'd like to share our ideas.+var:1,2,3,4,5+close:blackboard",
-trigger,time,"who=Farrah,when=64,do=say:We'd like to show you our Domino Discover routine - today we will each share our name and when we think the photograph was taken.+var:1,2,3,4,5"
+trigger,time,"who=Jazmin,when=34,do=say:Teacher, Click on the pencil icon on the toolbar and circle details in the image that may tell you when the photograph was taken.+var:1,2,3,4,5+act:interrupt+slide:0Noticing Details+camera:0,150,500,0,0,0,0,0+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Luis,when=55,do=say:Thanks teacher, we can see your ideas about when this photograph was taken, now we'd like to share our ideas.+slide:0Welcome+var:1,2,3,4,5+close:blackboard",
+trigger,time,"who=Farrah,when=64,do=say:We'd like to show you our Domino Discover routine - today we will each share our name and when we think the photograph was taken.+var:1,2,3,4,5+slide:0Welcome",
 trigger,time,"who=Oliver,when=74,do=say:I'm Oliver, It looks like it was taken a long time ago.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Chris,when=79,do=say:I'm Chris, You can see she's dressed the way people were during slavery time.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Farrah,when=85,do=say:I'm Farrah, Maybe in the olden days?+var:1,2,3,4,5+act:interrupt"
