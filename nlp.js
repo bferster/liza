@@ -117,8 +117,15 @@ class NLP {
 	CleanIntent(remark)																				// CLEAN UP INTENT
 	{
 		let i,re;
-		if (!remark)  return("");																		// No remark
-		let studentNames=["Oliver","Sharleen","Luis","Jazmin","Chris","Farrah","kids","class","children","student"];	// Student names
+		if (!remark)  return("");																		// No remark	                                              
+		let studentNames=["Oliver","liver",																// Student names
+						"Sharleen","charlene","shar","charlie",
+						"Luis","louise","lewis","louis","louie","lou","lew",
+						"Jazmin","jazz","jasmine","jasmina","jackson",
+						"Chris","crisp","christ",
+						"Farrah","farah","ferel","feral","farrell","sara","sarah","tara","pharaoh","fair",
+						"kids","class","children","student"
+						];	
 		for (i=0;i<studentNames.length;++i) {															// For each name
 			re=new RegExp(studentNames[i],"ig");														// Make name regex
 			remark=remark.replace(re,"");																// Replace names with blank

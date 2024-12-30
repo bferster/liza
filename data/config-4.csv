@@ -48,20 +48,23 @@ action,pair,"pair,pare,pier,pear"
 action,read,"read,reed,red,re-read,reread"
 action,breathe,breathe
 
+keyrule,220,"tell,me,again"
+keyrule,220,"repeat"
+keyrule,220,"what,answer"
 keyrule,600,high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy
 keyrule,600,"nice|good|great,to,see|meet"
 keyrule,600,"how,are,you"
 keyrule,600,"good,morning|afternoon|evening|day"
-
 keyrule,ANDYOU,"how|what,about,you"
 keyrule,ANDYOU,"lets|let's,hear,from"
 keyrule,1101,"2,\+|plus|and,2"
 
 picture,Welcome,assets/demoWelcome.png
+picture,Sojourner Truth,assets/loc1truth.png
 picture,Guiding Question,assets/loc2ql.png
 picture,Student Responses 1,assets/loc1Remarks1.png
 picture,Student Responses 2,assets/loc1Remarks2.png
-picture,Clarifying Questiuons,assets/loc1Deep1.png
+picture,Clarifying Questions,assets/loc1Deep1.png
 picture,Reflecting Back,assets/loc1Deep2.png
 picture,Noticing Details,assets/DrawTruth.png
 
@@ -85,18 +88,18 @@ trigger,time,"who=Jazmin,when=23,do=act:breathe"
 trigger,time,"who=Oliver,when=23,do=act:breathe"
 trigger,time,"who=Sharleen,when=23,do=act:breathe"
 trigger,time,"who=Jazmin,when=34,do=say:Teacher, Click on the pencil icon on the toolbar and circle details in the image that may tell you when the photograph was taken.+var:1,2,3,4,5+act:interrupt+slide:0Noticing Details+camera:0,150,500,0,0,0,0,0+var:1,2,3,4,5+act:interrupt"
-trigger,time,"who=Luis,when=55,do=say:Thanks teacher, we can see your ideas about when this photograph was taken, now we'd like to share our ideas.+slide:0Welcome+var:1,2,3,4,5+close:blackboard",
-trigger,time,"who=Farrah,when=64,do=say:We'd like to show you our Domino Discover routine - today we will each share our name and when we think the photograph was taken.+var:1,2,3,4,5+slide:0Welcome",
+trigger,time,"who=Luis,when=55,do=say:Thanks teacher, we can see your ideas about when this photograph was taken, now we'd like to share our ideas.+var:1,2,3,4,5+close:blackboard",
+trigger,time,"who=Farrah,when=64,do=say:We'd like to show you our Domino Discover routine - today we will each share our name and when we think the photograph was taken.+var:1,2,3,4,5",
 trigger,time,"who=Oliver,when=74,do=say:I'm Oliver, It looks like it was taken a long time ago.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Chris,when=79,do=say:I'm Chris, You can see she's dressed the way people were during slavery time.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Farrah,when=85,do=say:I'm Farrah, Maybe in the olden days?+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Luis,when=90,do=say:I'm Luis, The title underneath says Sojourner Truth. She was alive hundreds of years ago.+var:1,2,3,4,5"
-trigger,time,"who=Farrah,when=108,do=say:Look on the blackboard. You can see the answers that we just shared.+var:1,2,3,4,5+act:interrupt+slide:0Remarks1+slide:1Remarks2"
-trigger,time,"who=Chris,when=116,do=say:Ask us about our answers by pressing the space bar and asking us the clarifying question, What makes you say that? or ask us to tell you about the details we see.+var:1,2,3,4,5+act:interrupt+slide:Deep+slide:0Deep1"
-trigger,time,"who=Oliver,when=125,do=say:You can reflect back what you heard us say in our responses with a statement that starts with ""You noticed"", or ""You are bringing""+var:1,2,3,4,5+act:interrupt+slide:0Question1+slide:1Deep2"
-trigger,time,"who=Sharleen,when=132,do=say:Reflecting back our responses confirms that you understood our response+var:1,2,3,4,5+act:interrupt+slide:0Question1+slide:1Question2"
+trigger,time,"who=Farrah,when=108,do=say:Look on the blackboard. You can see the answers that we just shared.+var:1,2,3,4,5+act:interrupt+slide:0Student Responses 1+slide:1Student Responses 2"
+trigger,time,"who=Chris,when=116,do=say:Ask us about our answers by pressing the space bar and asking us the clarifying question, What makes you say that? or ask us to tell you about the details we see.+var:1,2,3,4,5+act:interrupt+slide:0Clarifying Questions+slide:1Reflecting Back"
+trigger,time,"who=Oliver,when=125,do=say:You can reflect back what you heard us say in our responses with a statement that starts with ""You noticed"", or ""You are bringing""+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Sharleen,when=132,do=say:Reflecting back our responses confirms that you understood our response+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Farrah,when=233,do=prompt:5 seconds to finish your clarifying questions and reflections!""+var:1,2,3,4,5"
-trigger,time,"who=Chris,when=238,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see a timeline of our lesson and our interactions+var:1,2,3,4,5+act:interrupt"
+trigger,time,"who=Chris,when=238,do=say:It's time for us to go to our next class, but before we go, click on the graph in the toolbar to see a timeline of our lesson and our interactions+var:1,2,3,4,5+act:interrupt+slide:0Student Responses 1+slide:1Student Responses 2"
 trigger,time,"who=Luis,when=247,do=say:Look for the green line to see the type of feedback you used to interact with us.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Oliver,when=252,do=say:The green line shows your clarify question, What makes you say that and statements that Reflect back to us what we shared with you+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Jazmin,when=261,do=say:Click on a colored dot see the differences in our responses.+var:1,2,3,4,5+act:interrupt"
