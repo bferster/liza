@@ -20,9 +20,8 @@ seat,7,"x=-100,y=-100,z=0,r=0,"
 seat,8,"x=0,y=-100,z=0,r=0,"
 seat,9,"x=250,y=-100,z=0,r=30,"
 
+resource,Overview - Discover Student Thinking,assets/overview4.pdf
 resource,Student Variance - Discover Student Thinking,assets/variance4.pdf
-resource,On Students' Desks,assets/desks4.pdf
-resource,Overview - Discover Student Thinking,assets/thinking4.pdf
 
 action,sleep,"sleep,snooze"
 action,headCenter,"eyes front,head center"
@@ -51,17 +50,18 @@ action,breathe,breathe
 keyrule,220,"tell,me,again"
 keyrule,220,"repeat"
 keyrule,220,"what,answer"
-keyrule,600,high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy
-keyrule,600,"nice|good|great,to,see|meet"
-keyrule,600,"how,are,you"
-keyrule,600,"good,morning|afternoon|evening|day"
+keyrule,320,"you|your|you're,bring|bringing|brain|brought"
+!keyrule,600,high|hi|hello|howdy|hey|hay|welcome|greetings|howdy-do|audi|howdy
+!keyrule,600,"nice|good|great,to,see|meet"
+!keyrule,600,"how,are,you"
+!keyrule,600,"good,morning|afternoon|evening|day"
 keyrule,ANDYOU,"how|what,about,you"
 keyrule,ANDYOU,"lets|let's,hear,from"
 keyrule,1101,"2,\+|plus|and,2"
 
 picture,Welcome,assets/demoWelcome.png
 picture,Sojourner Truth,assets/loc1truth.png
-picture,Guiding Question,assets/loc2ql.png
+picture,Guiding Question,assets/loc1question.png
 picture,Student Responses 1,assets/loc1Remarks1.png
 picture,Student Responses 2,assets/loc1Remarks2.png
 picture,Clarifying Questions,assets/loc1Deep1.png
@@ -70,14 +70,13 @@ picture,Noticing Details,assets/DrawTruth.png
 
 movie,Sojourner's Activities,https://www.youtube.com/embed/eNofqcdRYgE?si=f_SfyTDtZXtBv4yG
 movie,The Truth is Powerful,https://player.vimeo.com/video/953664260?h=b04632be2f&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479
-movie,Grace demo,https://www.youtube.com/embed/7Gc4ZCH6OZc?si=dcQNSQ9CsYvlw2P9 
 
 varlabels,data,"Accurate,Language,Careful,Reflect"
 session,data,"trt=324,endpoll=poll4,endurl=https://agileteacherlab.org/practice-library,"
 aimodel,wit,4XRYT-X-245DCKOI64-X-7DEFUBZ3P-X-G6KOGZCI
 trigger,time,"who=Luis,when=.5,do=say:Welcome teacher, we're glad that you're here today.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Jazmin,when=6,do=say:In the next six minutes, we are going to give you a tour of our classroom+var:1,2,3,4,5+act:interrupt"
-trigger,time,"who=Chris,when=11,do=say:and we will answer the question on the board. When was this photograph taken?+var:1,2,3,4,5"
+trigger,time,"who=Chris,when=11,do=say:and we will answer the question on the board. When was this photograph taken?+var:1,2,3,4,5+slide:1Guiding Question"
 trigger,time,"who=Farrah,when=13,do=Our responses will help you learn more about our thinking+var:1,2,3,4,5"
 trigger,time,"who=Luis,when=15,do=say:Before we get started let's take a couple deep breaths together.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Farrah,when=19,do=say:Breathe in through your nose, hold your breath, now breathe out. Go ahead and take another breath. Breathing helps us relax and learn from our practice.+var:1,2,3,4,5+act:interrupt"
@@ -94,6 +93,8 @@ trigger,time,"who=Oliver,when=74,do=say:I'm Oliver, It looks like it was taken a
 trigger,time,"who=Chris,when=79,do=say:I'm Chris, You can see she's dressed the way people were during slavery time.+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Farrah,when=85,do=say:I'm Farrah, Maybe in the olden days?+var:1,2,3,4,5+act:interrupt"
 trigger,time,"who=Luis,when=90,do=say:I'm Luis, The title underneath says Sojourner Truth. She was alive hundreds of years ago.+var:1,2,3,4,5"
+trigger,time,"who=Jazmin,when=98,do=say:I'm Jazmin, it was a long time ago.+var:1,2,3,4,5"
+trigger,time,"who=Sharleen,when=103,do=say:I'm Sharleen. I agree with Jazmin.+var:1,2,3,4,5"
 trigger,time,"who=Farrah,when=108,do=say:Look on the blackboard. You can see the answers that we just shared.+var:1,2,3,4,5+act:interrupt+slide:0Student Responses 1+slide:1Student Responses 2"
 trigger,time,"who=Chris,when=116,do=say:Ask us about our answers by pressing the space bar and asking us the clarifying question, What makes you say that? or ask us to tell you about the details we see.+var:1,2,3,4,5+act:interrupt+slide:0Clarifying Questions+slide:1Reflecting Back"
 trigger,time,"who=Oliver,when=125,do=say:You can reflect back what you heard us say in our responses with a statement that starts with ""You noticed"", or ""You are bringing""+var:1,2,3,4,5+act:interrupt"
@@ -121,6 +122,20 @@ trigger,time,"who=Luis,when=322,do=act:interrupt"
 trigger,time,"who=Jazmin,when=322,do=act:interrupt"
 trigger,time,"who=Sharleen,when=322,do=act:interrupt"
 
-lessonplan,Discover Student Thinking About the Portrait,"Engage the Student,<i>Students state purpose:</i> &quot;We will answer the question on the board so you learn more about our thinking.&quot;,<i>Breathe:</i> &quot;Let’s breathe in - hold the breath - then breathe out.&quot;,<i>Listen:</i> Students share their thinking during the Domino Discover routine.+Understand Student Thinking,<b>Step 1a.  Clarify:</b> &quot;When do you think this photograph was taken?&quot;,<b>Step 1b.  Clarify:</b> &quot;What makes you say that?&quot; or &quot;Tell us more about the details you see.&quot;,<b>Step 2.  Reflect:</b> &quot;You are noticing details in the picture.&quot or &quot;You are using your knowledge or experiences to guide your thinking.&quot;+End Simulation,<i>Stop:</i> An alert will tell you simulation is ending.,<i>Reflect:</i> Complete our survey.,<i>Print:</i> Certificate (if you want one)+Technology Tips,Allow agileteacherlab.org to access your microphone.,Press spacebar to speak. You will see your words transcribed in the toolbar.,Type your words in the toolbar if you have trouble with your microphone."
+lessonplan,Discover Student Thinking About the Portrait,"Introduction,We will answer the question on the board so you learn more about our thinking.</i>
++Teaching Challenge,
+Clarify Student Thinking (press space bar to speak):<br><br><b>
+&quot;What makes you say that?&quot; or<br>
+&quot;Tell us more about the details you see.&quot;<br><br></b>,
+Reflect Back your Understanding:<br><br><b>
+&quot;You are noticing details in the picture.&quot; or <br>
+&quot;You are using your knowledge or experiences to guide your thinking.&quot;</b>
++End Simulation,
+<b>Stop:</b> An alert will tell you simulation is ending,
+<b>Reflect:</b> Complete our survey.,
+<b>Print:</b> Certificate (if desired)
++Technology Tips,
+Allow Agile Teacher Lab to access your microphone.,
+Type into the toolbar if you have trouble with your microphone."
 																											
 																											

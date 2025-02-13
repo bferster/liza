@@ -40,6 +40,7 @@ intent,student,response,valued,language,knowledge,thinking,action,understanding,
 310,Jazmin,"Yes, you noticed my thinking.",0 Not Present,0 Not present,0 Not present,1 Not present,talk,,
 310,Luis,"Yes, you noticed my thinking.",0 Not Present,0 Not present,0 Not present,2 Not present,talk,,
 310,Oliver,"There could be a couple of options for when the picture is taken, but since this is schooltime, I think it's from history.",1 Vocabulary,2 Accurate but incomplete,-1 General guess,1 Make connection,talk,,
+320,Class,"Yes, thanks"
 1001,Class,Could you say that in a different way.,,,,,,,
 1001,Class,I am not sure what you were talking about,,,,,,,
 1001,Class,What did you want me to understand,,,,,,,
